@@ -1,0 +1,89 @@
+SeganX coding style :
+
+Preprocessor defined in UPPER_CASE. Multiple words are separated with an underscore.
+	If implementation is a single line parentheses should be used
+		ASSING_VALUE(x,v)	( x = v )
+	Instead of 
+		ASSING_VALUE(x,v)	x = v
+
+Enum names are PascalCase. 
+	The enum constants use all UPPER_CASE. Multiple words are separated with an underscore.
+	
+Struct declared in PascalCase
+	Members are camelCase
+	No function allowed to implement in struct except constructor to initialize members
+
+Class definded in PascalCase or start with namespace in lowercase and end with PascalCase. For example : Logger and sysLogger are ok
+	Member variables are m_camelCase
+	Member functions in public scope are PascalCase
+	Member functions in private scope are _PascalCase
+	Use public members as much as possible
+	
+	Avoid implementing functions GetXxx() as much as possible. For example, instead of:
+		MemberData GetMemberData(void);
+	use:
+		class->m_variable 
+	to access data in a member.
+	
+	Function overloading should be avoided in most cases. For example, instead of:
+		Anim*	GetAnim( const int index ) const;
+		Anim*	GetAnim( const char* name ) const;
+	use:
+		Anim*	GetAnimByIndex( const int index ) const;
+		Anim*	GetAnimByName( const char* name ) const;
+
+		
+GENERAL NOTES: 
+
+Use braces in new line for declarations ( enum, struct, class, function, ... )
+	class
+	{
+	}
+
+Pad parenthesized expressions with spaces
+	if ( x ) {
+	}
+Instead of 
+	if (x) {
+	}
+And
+	x = ( y * 0.5f );
+Instead of
+	x = (y * 0.5f);
+
+Use precision specification for floating point values unless there is an explicit need for a double.
+	float f = 0.5f;
+Instead of
+	float f = 0.5;
+And
+	float f = 1.0f;
+Instead of
+	float f = 1.f;
+
+Function names start with a lower case:
+	void function( void );
+
+In multi-word function names each word starts with a lower case and separated with underscore :
+	void this_function_does_something( void );
+
+Global variable names are g_camelCase
+	extern float g_globalVariable;
+
+static variable names are s_camelCase
+	static float s_staticVariable;
+
+Local variable names are camelCase
+	float stackVariable;
+
+Typedef names use PascalCase
+	typedef int FileHandle;
+
+Use ‘const’ as much as possible
+	const wchar* get_engine_directory( const int index, const wchar* pakageName );
+
+
+
+REFERENCES:
+	http://geosoft.no/development/cppstyle.html
+	http://www.geeks3d.com/20081111/id-software-c-coding-conventions/
+	http://www.possibility.com/Cpp/CppCodingStandard.html

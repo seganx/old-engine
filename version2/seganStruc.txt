@@ -1,0 +1,216 @@
+//////////////////////////////////
+../lib
+
+sx_mem_alloc()
+sx_mem_realoc()
+sx_mem_free()
+sx_mem_size()
+sx_abs()
+sx_pow()
+sx_sqrt()
+sx_sin()
+sx_cos()
+sx_tan()
+sx_cot()
+sx_asin()
+sx_acos()
+sx_atan()
+sx_acot()
+sx_max()
+sx_min()
+sx_floor()
+sx_ceil()
+sx_raund()
+sx_random_f(max)
+sx_random_f_l(min, max)
+sx_random_i(max)
+sx_random_i_l(min, max)
+
+MemMan
+MemManPool
+Array
+Map
+Queue
+Stack
+Stream
+String
+
+
+//////////////////////////////////
+../math
+
+int2
+int3
+int4
+float2
+float3
+float4
+matrix
+quat
+rotation
+transform
+plane
+rect2D
+rect3D
+aaBox
+obBox
+sphere
+ray
+
+
+//////////////////////////////////
+../system
+sx_os_initialize()
+sx_os_finalize()
+...
+Logger
+Network
+Window
+Application
+File
+FileManager
+Task
+TaskManager
+
+
+//////////////////////////////////
+../d3d
+
+d3dDevice --| Initialize()
+			| Finalize()
+			| CreateDevice()
+			| DestroyDevice()
+			| CreateGeometry()
+			| CreateTexture()
+			| CreateShader()
+			| SetGeometry()
+			| SetTexture()
+			| SetShader()
+			| GetInfo()
+
+d3dVertexBuffer
+d3dIndexBuffer
+d3dSurface
+d3dTexture
+d3dShader
+
+
+//////////////////////////////////
+../input
+
+inInput ----| Initialize()
+			| Finalize()
+			| Attach()
+			| Update()
+			| GetKey()
+inInputDevice
+inInputDevice_keyboard
+inInputDevice_mouse
+inInputDevice_joystick
+
+
+//////////////////////////////////
+../physics
+
+phDevice --| Initialize()
+			| Finalize()
+phTypes
+phRigid
+phMaterial
+
+
+//////////////////////////////////
+../script
+
+scDevice -| Initialize()
+			| Finalize()
+scLexer
+scParser
+scCompiler
+scCommand
+scContext
+scLuncher
+
+
+//////////////////////////////////
+../sound
+
+sndDevice --| Initialize()
+			| Finalize()
+sndMusicStream
+sndSoundBuffer
+sndPlayer
+
+
+//////////////////////////////////
+../ai
+
+aiDevice ---| Initialize()
+			| Finalize()
+aiTask
+aiTask_goto
+aiTask_cover
+aiTask_scape
+aiState
+aiState_move
+aiState_pickup
+aiMind
+
+
+//////////////////////////////////
+../ui
+
+uiDevice ---| Initialize()
+			| Finalize()
+uiElement
+uiControl
+uiPanel
+uiButton
+uiCheckBox
+uiScrollBar
+uiProgressBar
+uiListBox
+uiLabel
+uiEditBox
+
+
+////////////////////////////////
+../Engine
+
+extern Engine* g_engine;
+Engine -----| Initialize()
+			| Finalize()
+			| Run()
+		m_scene;
+		m_renderer;
+		m_gui;
+		m_physics;
+		m_sound;
+		m_system
+
+StringTokenizer
+StringList
+StringObjectList
+WeightBlender
+Geometry
+TextureManager
+GeometryManager
+ShaderManager
+SoundManager
+Renderer
+Scene
+Node
+NodeMember
+Mesh
+Animator
+Particle
+Terrain
+Sound
+Path
+
+HUD::Draw(...)
+{	
+	g_engine->m_renderer->SetShader( m_shader );
+	g_engine->m_renderer->SetTexture( m_texture );
+	g_engine->m_renderer->DrawRect( x1, y1, x2, y2 );
+}
