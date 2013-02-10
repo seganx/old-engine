@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Editor">
+      <UniqueIdentifier>{c418eee1-dd9b-40c5-9a3c-43c67e20ab63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EditorForms">
+      <UniqueIdentifier>{c804e1e7-c691-4508-8344-d65b04122141}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EditorUI">
+      <UniqueIdentifier>{0bfbf91e-7f40-43d0-9897-4749bc91cde4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpaceObject">
+      <UniqueIdentifier>{89b0a4ba-2c1b-46c1-ad13-d1a14d7b50c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpaceScene">
+      <UniqueIdentifier>{251cb61d-ccee-4d12-81fc-6ee6118e6062}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpaceHUD">
+      <UniqueIdentifier>{56839ca5-702b-4210-bc0a-92a59eac677b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SpaceGame">
+      <UniqueIdentifier>{13e02e6c-33c6-427a-b5b9-fc17424ffd6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Imports">
+      <UniqueIdentifier>{7323a52a-8886-43d6-9331-9ed488b45868}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorCamera.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorSettings.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorTypes.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorUndo.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="MainEditor.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWindow.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_Ask.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_EditAnimator.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_EditMesh.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_EditNode.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_EditParticle.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_EditPath.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_EditSound.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_EditTerrain.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_Explorer.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_Hint.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_ImportModel.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_ImportSound.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_SetName.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_Settings.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_Toolbar.h">
+      <Filter>EditorForms</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseForm.h">
+      <Filter>EditorUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorBox.h">
+      <Filter>EditorUI</Filter>
+    </ClInclude>
+    <ClInclude Include="EditMaterial.h">
+      <Filter>EditorUI</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorUI.h">
+      <Filter>EditorUI</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeExplorer.h">
+      <Filter>EditorUI</Filter>
+    </ClInclude>
+    <ClInclude Include="PopupMenu.h">
+      <Filter>EditorUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxItemUI.h">
+      <Filter>EditorUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxListBox.h">
+      <Filter>EditorUI</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorObject.h">
+      <Filter>SpaceObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_ObjectToolbar.h">
+      <Filter>SpaceObject</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorScene.h">
+      <Filter>SpaceScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Form_SceneToolbar.h">
+      <Filter>SpaceScene</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorHUD.h">
+      <Filter>SpaceHUD</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorGame.h">
+      <Filter>SpaceGame</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportFont.h">
+      <Filter>Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportModel.h">
+      <Filter>Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportMS3D.h">
+      <Filter>Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportOBJ.h">
+      <Filter>Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportTexture.h">
+      <Filter>Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportX.h">
+      <Filter>Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="MS3DFile.h">
+      <Filter>Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportEngine.h" />
+    <ClInclude Include="sxEditor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="sxEditor.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="sxEditor.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="EditorCamera.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorSettings.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorUndo.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="MainEditor.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWindow.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_Ask.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_EditAnimator.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_EditMesh.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_EditNode.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_EditParticle.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_EditPath.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_EditSound.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_EditTerrain.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_Explorer.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_Hint.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_ImportModel.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_ImportSound.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_SetName.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_Settings.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_Toolbar.cpp">
+      <Filter>EditorForms</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseForm.cpp">
+      <Filter>EditorUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorBox.cpp">
+      <Filter>EditorUI</Filter>
+    </ClCompile>
+    <ClCompile Include="EditMaterial.cpp">
+      <Filter>EditorUI</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorUI.cpp">
+      <Filter>EditorUI</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeExplorer.cpp">
+      <Filter>EditorUI</Filter>
+    </ClCompile>
+    <ClCompile Include="PopupMenu.cpp">
+      <Filter>EditorUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxItemUI.cpp">
+      <Filter>EditorUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxListBox.cpp">
+      <Filter>EditorUI</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorObject.cpp">
+      <Filter>SpaceObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_ObjectToolbar.cpp">
+      <Filter>SpaceObject</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorScene.cpp">
+      <Filter>SpaceScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Form_SceneToolbar.cpp">
+      <Filter>SpaceScene</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorHUD.cpp">
+      <Filter>SpaceHUD</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorGame.cpp">
+      <Filter>SpaceGame</Filter>
+    </ClCompile>
+    <ClCompile Include="ImportFont.cpp">
+      <Filter>Imports</Filter>
+    </ClCompile>
+    <ClCompile Include="ImportMS3D.cpp">
+      <Filter>Imports</Filter>
+    </ClCompile>
+    <ClCompile Include="ImportOBJ.cpp">
+      <Filter>Imports</Filter>
+    </ClCompile>
+    <ClCompile Include="ImportTexture.cpp">
+      <Filter>Imports</Filter>
+    </ClCompile>
+    <ClCompile Include="ImportX.cpp">
+      <Filter>Imports</Filter>
+    </ClCompile>
+    <ClCompile Include="MS3DFile.cpp">
+      <Filter>Imports</Filter>
+    </ClCompile>
+    <ClCompile Include="sxEditor.cpp" />
+  </ItemGroup>
+</Project>

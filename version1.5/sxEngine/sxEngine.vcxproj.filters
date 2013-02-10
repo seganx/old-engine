@@ -1,0 +1,550 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Render">
+      <UniqueIdentifier>{a907850b-3e8e-4bdf-a75a-3395dbe0b517}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\API">
+      <UniqueIdentifier>{0f16ef4d-f1c5-449d-b45e-b3e1f4e48a29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{75c21674-11c6-443d-9396-d4c9410d5221}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{177fdec5-f672-440b-a3dd-dd671bf20b04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{831d186b-4516-4ac4-b7ab-c228de163ed4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Render">
+      <UniqueIdentifier>{d11ab98e-0a7c-43e9-ba18-f91fb4121394}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Scene">
+      <UniqueIdentifier>{9f8e7955-e0ea-4ea2-86e3-bf22541effc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Node">
+      <UniqueIdentifier>{4116a4b0-5bed-427b-b336-dbf73af2c9b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{afeb5890-16e3-452f-9f5a-10f761edd720}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{3030cf45-3b30-4951-8820-1d83e158bff3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script">
+      <UniqueIdentifier>{660e3ac2-74f1-4c0c-92a5-a702203ec1c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{52e28cb8-ac1d-4897-83a2-2a09b9e6f7ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{a01dc693-9a6f-48a0-b06c-a37c1279dd8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI">
+      <UniqueIdentifier>{1415a69a-a1ed-4897-8802-d5d5ae7df39f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{9a0d4007-fc9d-4dd4-8a8c-1fbe3a45216e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="sxRender\sxAnimation.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxAnimationController.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxAnimationJoint.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxGeometry.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxMaterial.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxShader.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxShaderPool.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxTexture.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxDevice3D.cpp">
+      <Filter>Render\API</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxGeometry3D.cpp">
+      <Filter>Render\API</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxGeometry3DTool.cpp">
+      <Filter>Render\API</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxResource3D.cpp">
+      <Filter>Render\API</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxShader3D.cpp">
+      <Filter>Render\API</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxSurface3D.cpp">
+      <Filter>Render\API</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxTask3D.cpp">
+      <Filter>Render\API</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxTexture3D.cpp">
+      <Filter>Render\API</Filter>
+    </ClCompile>
+    <ClCompile Include="sxRender\sxUI3D.cpp">
+      <Filter>Render\API</Filter>
+    </ClCompile>
+    <ClCompile Include="sxSystem\sxFile.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="sxSystem\sxFileMan.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="sxSystem\sxLog.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="sxSystem\sxSys.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="sxSystem\sxTaskMan.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="sxSystem\sxWindow.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="sxSystem\sxZip.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxCore.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxSettings.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxCamera.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxCameraBlender.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxMaterialMan.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxPipeline_deferred.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxPipeline_forward.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxReflector_ground.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxRenderer.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxShaderStore.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxShadow_direction.cpp">
+      <Filter>Core\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxScene.cpp">
+      <Filter>Core\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxSceneManager_SBVH.cpp">
+      <Filter>Core\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxAnimator.cpp">
+      <Filter>Core\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxMesh.cpp">
+      <Filter>Core\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxNode.cpp">
+      <Filter>Core\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxNodeMember.cpp">
+      <Filter>Core\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxParticle.cpp">
+      <Filter>Core\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxPathNode.cpp">
+      <Filter>Core\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxSound.cpp">
+      <Filter>Core\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCore\sxTerrain.cpp">
+      <Filter>Core\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxButton.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxCheckBox.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxControl.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxEditBox.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxElement.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxFont.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxLabel.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxPanel.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxPanelEx.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxProgressBar.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxTrackBar.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxGUI\sxTypesGUI.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="sxPhysics\sxPhysics.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="sxPhysics\sxRigid.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="sxInput\sxInputClass.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="sxInput\sxJoystic_model_a.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="sxInput\sxKeyboard.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="sxInput\sxMouse.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="sxInput\sxMouse_editor.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="sxInput\sxTypesInput.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="sxSound\sxSoundData.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="sxSound\sxSoundDevice.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="sxSound\sxSoundPlayer.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCommon\sxMath.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCommon\sxTool.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="sxCommon\sxWeightBlender.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="sxEngine.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="sxRender\sxAnimation.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxAnimationController.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxAnimationJoint.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxGeometry.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxMaterial.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxRender.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxRender_def.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxShader.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxShaderPool.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxTexture.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxTypes3D.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxDevice3D.h">
+      <Filter>Render\API</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxGeometry3D.h">
+      <Filter>Render\API</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxGeometry3DTool.h">
+      <Filter>Render\API</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxResource3D.h">
+      <Filter>Render\API</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxShader3D.h">
+      <Filter>Render\API</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxSurface3D.h">
+      <Filter>Render\API</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxTask3D.h">
+      <Filter>Render\API</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxTexture3D.h">
+      <Filter>Render\API</Filter>
+    </ClInclude>
+    <ClInclude Include="sxRender\sxUI3D.h">
+      <Filter>Render\API</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSystem\sxFile.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSystem\sxFileMan.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSystem\sxLog.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSystem\sxSys.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSystem\sxSystem.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSystem\sxSystem_def.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSystem\sxTaskMan.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSystem\sxWin6.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSystem\sxWindow.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSystem\sxZip.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxCore.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxCore_def.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxSettings.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxTypes.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxCamera.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxCameraBlender.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxMaterialMan.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxPipeline.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxPipeline_deferred.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxPipeline_forward.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxReflector_ground.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxRenderer.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxShaderStore.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxShadow_direction.h">
+      <Filter>Core\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxScene.h">
+      <Filter>Core\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxSceneManager.h">
+      <Filter>Core\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxSceneManager_SBVH.h">
+      <Filter>Core\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxAnimator.h">
+      <Filter>Core\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxMesh.h">
+      <Filter>Core\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxNode.h">
+      <Filter>Core\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxNodeMember.h">
+      <Filter>Core\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxParticle.h">
+      <Filter>Core\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxPathNode.h">
+      <Filter>Core\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxSound.h">
+      <Filter>Core\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCore\sxTerrain.h">
+      <Filter>Core\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxButton.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxCheckBox.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxControl.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxEditBox.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxElement.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxFont.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxGUI.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxGUI_def.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxLabel.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxPanel.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxPanelEx.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxProgressBar.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxTrackBar.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxGUI\sxTypesGUI.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="sxPhysics\sxPhysics.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="sxPhysics\sxPhysics_def.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="sxPhysics\sxRigid.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="sxPhysics\sxTypesPhysics.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="sxInput\sxInput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="sxInput\sxInput_def.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="sxInput\sxInputClass.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="sxInput\sxJoystic_model_a.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="sxInput\sxKeyboard.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="sxInput\sxMouse.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="sxInput\sxMouse_editor.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="sxInput\sxTypesInput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSound\sxSound.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSound\sxSoundData.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSound\sxSoundDevice.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSound\sxSoundPlayer.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="sxSound\sxTypesSound.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCommon\sxCommon.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCommon\sxCommon_def.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCommon\sxMath.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCommon\sxTool.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="sxCommon\sxWeightBlender.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="sxEngine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="sxEngine.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
