@@ -1,0 +1,286 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{45061582-8909-4C0A-9029-5D13D4D9E461}</ProjectGuid>
+    <RootNamespace>sxEngine</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files (x86)\Microsoft DirectX 9.0 SDK (April 2005)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files %28x86%29\Microsoft DirectX 9.0 SDK %28April 2005%29\Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SXENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>
+      </OptimizeReferences>
+      <EnableCOMDATFolding>
+      </EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="sxRender\sxAnimation.cpp" />
+    <ClCompile Include="sxRender\sxAnimationController.cpp" />
+    <ClCompile Include="sxRender\sxAnimationJoint.cpp" />
+    <ClCompile Include="sxRender\sxGeometry.cpp" />
+    <ClCompile Include="sxRender\sxMaterial.cpp" />
+    <ClCompile Include="sxRender\sxShader.cpp" />
+    <ClCompile Include="sxRender\sxShaderPool.cpp" />
+    <ClCompile Include="sxRender\sxTexture.cpp" />
+    <ClCompile Include="sxRender\sxDevice3D.cpp" />
+    <ClCompile Include="sxRender\sxGeometry3D.cpp" />
+    <ClCompile Include="sxRender\sxGeometry3DTool.cpp" />
+    <ClCompile Include="sxRender\sxResource3D.cpp" />
+    <ClCompile Include="sxRender\sxShader3D.cpp" />
+    <ClCompile Include="sxRender\sxSurface3D.cpp" />
+    <ClCompile Include="sxRender\sxTask3D.cpp" />
+    <ClCompile Include="sxRender\sxTexture3D.cpp" />
+    <ClCompile Include="sxRender\sxUI3D.cpp" />
+    <ClCompile Include="sxSystem\sxFile.cpp" />
+    <ClCompile Include="sxSystem\sxFileMan.cpp" />
+    <ClCompile Include="sxSystem\sxLog.cpp" />
+    <ClCompile Include="sxSystem\sxSys.cpp" />
+    <ClCompile Include="sxSystem\sxTaskMan.cpp" />
+    <ClCompile Include="sxSystem\sxWindow.cpp" />
+    <ClCompile Include="sxSystem\sxZip.cpp" />
+    <ClCompile Include="sxCore\sxCore.cpp" />
+    <ClCompile Include="sxCore\sxSettings.cpp" />
+    <ClCompile Include="sxCore\sxCamera.cpp" />
+    <ClCompile Include="sxCore\sxCameraBlender.cpp" />
+    <ClCompile Include="sxCore\sxMaterialMan.cpp" />
+    <ClCompile Include="sxCore\sxPipeline_deferred.cpp" />
+    <ClCompile Include="sxCore\sxPipeline_forward.cpp" />
+    <ClCompile Include="sxCore\sxReflector_ground.cpp" />
+    <ClCompile Include="sxCore\sxRenderer.cpp" />
+    <ClCompile Include="sxCore\sxShaderStore.cpp" />
+    <ClCompile Include="sxCore\sxShadow_direction.cpp" />
+    <ClCompile Include="sxCore\sxScene.cpp" />
+    <ClCompile Include="sxCore\sxSceneManager_SBVH.cpp" />
+    <ClCompile Include="sxCore\sxAnimator.cpp" />
+    <ClCompile Include="sxCore\sxMesh.cpp" />
+    <ClCompile Include="sxCore\sxNode.cpp" />
+    <ClCompile Include="sxCore\sxNodeMember.cpp" />
+    <ClCompile Include="sxCore\sxParticle.cpp" />
+    <ClCompile Include="sxCore\sxPathNode.cpp" />
+    <ClCompile Include="sxCore\sxSound.cpp" />
+    <ClCompile Include="sxCore\sxTerrain.cpp" />
+    <ClCompile Include="sxGUI\sxButton.cpp" />
+    <ClCompile Include="sxGUI\sxCheckBox.cpp" />
+    <ClCompile Include="sxGUI\sxControl.cpp" />
+    <ClCompile Include="sxGUI\sxEditBox.cpp" />
+    <ClCompile Include="sxGUI\sxElement.cpp" />
+    <ClCompile Include="sxGUI\sxFont.cpp" />
+    <ClCompile Include="sxGUI\sxLabel.cpp" />
+    <ClCompile Include="sxGUI\sxPanel.cpp" />
+    <ClCompile Include="sxGUI\sxPanelEx.cpp" />
+    <ClCompile Include="sxGUI\sxProgressBar.cpp" />
+    <ClCompile Include="sxGUI\sxTrackBar.cpp" />
+    <ClCompile Include="sxGUI\sxTypesGUI.cpp" />
+    <ClCompile Include="sxPhysics\sxPhysics.cpp" />
+    <ClCompile Include="sxPhysics\sxRigid.cpp" />
+    <ClCompile Include="sxInput\sxInputClass.cpp" />
+    <ClCompile Include="sxInput\sxJoystic_model_a.cpp" />
+    <ClCompile Include="sxInput\sxKeyboard.cpp" />
+    <ClCompile Include="sxInput\sxMouse.cpp" />
+    <ClCompile Include="sxInput\sxMouse_editor.cpp" />
+    <ClCompile Include="sxInput\sxTypesInput.cpp" />
+    <ClCompile Include="sxSound\sxSoundData.cpp" />
+    <ClCompile Include="sxSound\sxSoundDevice.cpp" />
+    <ClCompile Include="sxSound\sxSoundPlayer.cpp" />
+    <ClCompile Include="sxCommon\sxMath.cpp" />
+    <ClCompile Include="sxCommon\sxTool.cpp" />
+    <ClCompile Include="sxCommon\sxWeightBlender.cpp" />
+    <ClCompile Include="sxEngine.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="sxRender\sxAnimation.h" />
+    <ClInclude Include="sxRender\sxAnimationController.h" />
+    <ClInclude Include="sxRender\sxAnimationJoint.h" />
+    <ClInclude Include="sxRender\sxGeometry.h" />
+    <ClInclude Include="sxRender\sxMaterial.h" />
+    <ClInclude Include="sxRender\sxRender.h" />
+    <ClInclude Include="sxRender\sxRender_def.h" />
+    <ClInclude Include="sxRender\sxShader.h" />
+    <ClInclude Include="sxRender\sxShaderPool.h" />
+    <ClInclude Include="sxRender\sxTexture.h" />
+    <ClInclude Include="sxRender\sxTypes3D.h" />
+    <ClInclude Include="sxRender\sxDevice3D.h" />
+    <ClInclude Include="sxRender\sxGeometry3D.h" />
+    <ClInclude Include="sxRender\sxGeometry3DTool.h" />
+    <ClInclude Include="sxRender\sxResource3D.h" />
+    <ClInclude Include="sxRender\sxShader3D.h" />
+    <ClInclude Include="sxRender\sxSurface3D.h" />
+    <ClInclude Include="sxRender\sxTask3D.h" />
+    <ClInclude Include="sxRender\sxTexture3D.h" />
+    <ClInclude Include="sxRender\sxUI3D.h" />
+    <ClInclude Include="sxSystem\sxFile.h" />
+    <ClInclude Include="sxSystem\sxFileMan.h" />
+    <ClInclude Include="sxSystem\sxLog.h" />
+    <ClInclude Include="sxSystem\sxSys.h" />
+    <ClInclude Include="sxSystem\sxSystem.h" />
+    <ClInclude Include="sxSystem\sxSystem_def.h" />
+    <ClInclude Include="sxSystem\sxTaskMan.h" />
+    <ClInclude Include="sxSystem\sxWin6.h" />
+    <ClInclude Include="sxSystem\sxWindow.h" />
+    <ClInclude Include="sxSystem\sxZip.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="sxCore\sxCore.h" />
+    <ClInclude Include="sxCore\sxCore_def.h" />
+    <ClInclude Include="sxCore\sxSettings.h" />
+    <ClInclude Include="sxCore\sxTypes.h" />
+    <ClInclude Include="sxCore\sxCamera.h" />
+    <ClInclude Include="sxCore\sxCameraBlender.h" />
+    <ClInclude Include="sxCore\sxMaterialMan.h" />
+    <ClInclude Include="sxCore\sxPipeline.h" />
+    <ClInclude Include="sxCore\sxPipeline_deferred.h" />
+    <ClInclude Include="sxCore\sxPipeline_forward.h" />
+    <ClInclude Include="sxCore\sxReflector_ground.h" />
+    <ClInclude Include="sxCore\sxRenderer.h" />
+    <ClInclude Include="sxCore\sxShaderStore.h" />
+    <ClInclude Include="sxCore\sxShadow_direction.h" />
+    <ClInclude Include="sxCore\sxScene.h" />
+    <ClInclude Include="sxCore\sxSceneManager.h" />
+    <ClInclude Include="sxCore\sxSceneManager_SBVH.h" />
+    <ClInclude Include="sxCore\sxAnimator.h" />
+    <ClInclude Include="sxCore\sxMesh.h" />
+    <ClInclude Include="sxCore\sxNode.h" />
+    <ClInclude Include="sxCore\sxNodeMember.h" />
+    <ClInclude Include="sxCore\sxParticle.h" />
+    <ClInclude Include="sxCore\sxPathNode.h" />
+    <ClInclude Include="sxCore\sxSound.h" />
+    <ClInclude Include="sxCore\sxTerrain.h" />
+    <ClInclude Include="sxGUI\sxButton.h" />
+    <ClInclude Include="sxGUI\sxCheckBox.h" />
+    <ClInclude Include="sxGUI\sxControl.h" />
+    <ClInclude Include="sxGUI\sxEditBox.h" />
+    <ClInclude Include="sxGUI\sxElement.h" />
+    <ClInclude Include="sxGUI\sxFont.h" />
+    <ClInclude Include="sxGUI\sxGUI.h" />
+    <ClInclude Include="sxGUI\sxGUI_def.h" />
+    <ClInclude Include="sxGUI\sxLabel.h" />
+    <ClInclude Include="sxGUI\sxPanel.h" />
+    <ClInclude Include="sxGUI\sxPanelEx.h" />
+    <ClInclude Include="sxGUI\sxProgressBar.h" />
+    <ClInclude Include="sxGUI\sxTrackBar.h" />
+    <ClInclude Include="sxGUI\sxTypesGUI.h" />
+    <ClInclude Include="sxPhysics\sxPhysics.h" />
+    <ClInclude Include="sxPhysics\sxPhysics_def.h" />
+    <ClInclude Include="sxPhysics\sxRigid.h" />
+    <ClInclude Include="sxPhysics\sxTypesPhysics.h" />
+    <ClInclude Include="sxInput\sxInput.h" />
+    <ClInclude Include="sxInput\sxInput_def.h" />
+    <ClInclude Include="sxInput\sxInputClass.h" />
+    <ClInclude Include="sxInput\sxJoystic_model_a.h" />
+    <ClInclude Include="sxInput\sxKeyboard.h" />
+    <ClInclude Include="sxInput\sxMouse.h" />
+    <ClInclude Include="sxInput\sxMouse_editor.h" />
+    <ClInclude Include="sxInput\sxTypesInput.h" />
+    <ClInclude Include="sxSound\sxSound.h" />
+    <ClInclude Include="sxSound\sxSoundData.h" />
+    <ClInclude Include="sxSound\sxSoundDevice.h" />
+    <ClInclude Include="sxSound\sxSoundPlayer.h" />
+    <ClInclude Include="sxSound\sxTypesSound.h" />
+    <ClInclude Include="sxCommon\sxCommon.h" />
+    <ClInclude Include="sxCommon\sxCommon_def.h" />
+    <ClInclude Include="sxCommon\sxMath.h" />
+    <ClInclude Include="sxCommon\sxTool.h" />
+    <ClInclude Include="sxCommon\sxWeightBlender.h" />
+    <ClInclude Include="sxEngine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="sxEngine.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\sxLib\win32dll\sxlib.vcxproj">
+      <Project>{e1c1fbb3-5741-4900-a5bd-e47ba3c27ccf}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

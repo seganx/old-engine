@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E27293E0-5E58-49E1-A2C5-27EC1D5232F6}</ProjectGuid>
+    <RootNamespace>sxEditor</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files %28x86%29\Microsoft DirectX 9.0 SDK %28April 2005%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files (x86)\Microsoft DirectX 9.0 SDK (April 2005)\Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
+    <Link>
+      <OutputFile>$(ProjectDir)$(Configuration)\$(ProjectName).exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>COPY "..\sxEngine\$(Configuration)\sxEngine.dll"  "$(Configuration)\sxEngine.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(ProjectDir)$(Configuration)\$(ProjectName).exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>
+      </OptimizeReferences>
+      <EnableCOMDATFolding>
+      </EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>COPY "..\sxEngine\$(Configuration)\sxEngine.dll"  "$(Configuration)\sxEngine.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="EditorCamera.h" />
+    <ClInclude Include="EditorSettings.h" />
+    <ClInclude Include="EditorTypes.h" />
+    <ClInclude Include="EditorUndo.h" />
+    <ClInclude Include="MainEditor.h" />
+    <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="Form_Ask.h" />
+    <ClInclude Include="Form_EditAnimator.h" />
+    <ClInclude Include="Form_EditMesh.h" />
+    <ClInclude Include="Form_EditNode.h" />
+    <ClInclude Include="Form_EditParticle.h" />
+    <ClInclude Include="Form_EditPath.h" />
+    <ClInclude Include="Form_EditSound.h" />
+    <ClInclude Include="Form_EditTerrain.h" />
+    <ClInclude Include="Form_Explorer.h" />
+    <ClInclude Include="Form_Hint.h" />
+    <ClInclude Include="Form_ImportModel.h" />
+    <ClInclude Include="Form_ImportSound.h" />
+    <ClInclude Include="Form_SetName.h" />
+    <ClInclude Include="Form_Settings.h" />
+    <ClInclude Include="Form_Toolbar.h" />
+    <ClInclude Include="BaseForm.h" />
+    <ClInclude Include="ColorBox.h" />
+    <ClInclude Include="EditMaterial.h" />
+    <ClInclude Include="EditorUI.h" />
+    <ClInclude Include="NodeExplorer.h" />
+    <ClInclude Include="PopupMenu.h" />
+    <ClInclude Include="sxItemUI.h" />
+    <ClInclude Include="sxListBox.h" />
+    <ClInclude Include="EditorObject.h" />
+    <ClInclude Include="Form_ObjectToolbar.h" />
+    <ClInclude Include="EditorScene.h" />
+    <ClInclude Include="Form_SceneToolbar.h" />
+    <ClInclude Include="EditorHUD.h" />
+    <ClInclude Include="EditorGame.h" />
+    <ClInclude Include="ImportFont.h" />
+    <ClInclude Include="ImportModel.h" />
+    <ClInclude Include="ImportMS3D.h" />
+    <ClInclude Include="ImportOBJ.h" />
+    <ClInclude Include="ImportTexture.h" />
+    <ClInclude Include="ImportX.h" />
+    <ClInclude Include="MS3DFile.h" />
+    <ClInclude Include="ImportEngine.h" />
+    <ClInclude Include="sxEditor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="sxEditor.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="sxEditor.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="EditorCamera.cpp" />
+    <ClCompile Include="EditorSettings.cpp" />
+    <ClCompile Include="EditorUndo.cpp" />
+    <ClCompile Include="MainEditor.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="Form_Ask.cpp" />
+    <ClCompile Include="Form_EditAnimator.cpp" />
+    <ClCompile Include="Form_EditMesh.cpp" />
+    <ClCompile Include="Form_EditNode.cpp" />
+    <ClCompile Include="Form_EditParticle.cpp" />
+    <ClCompile Include="Form_EditPath.cpp" />
+    <ClCompile Include="Form_EditSound.cpp" />
+    <ClCompile Include="Form_EditTerrain.cpp" />
+    <ClCompile Include="Form_Explorer.cpp" />
+    <ClCompile Include="Form_Hint.cpp" />
+    <ClCompile Include="Form_ImportModel.cpp" />
+    <ClCompile Include="Form_ImportSound.cpp" />
+    <ClCompile Include="Form_SetName.cpp" />
+    <ClCompile Include="Form_Settings.cpp" />
+    <ClCompile Include="Form_Toolbar.cpp" />
+    <ClCompile Include="BaseForm.cpp" />
+    <ClCompile Include="ColorBox.cpp" />
+    <ClCompile Include="EditMaterial.cpp" />
+    <ClCompile Include="EditorUI.cpp" />
+    <ClCompile Include="NodeExplorer.cpp" />
+    <ClCompile Include="PopupMenu.cpp" />
+    <ClCompile Include="sxItemUI.cpp" />
+    <ClCompile Include="sxListBox.cpp" />
+    <ClCompile Include="EditorObject.cpp" />
+    <ClCompile Include="Form_ObjectToolbar.cpp" />
+    <ClCompile Include="EditorScene.cpp" />
+    <ClCompile Include="Form_SceneToolbar.cpp" />
+    <ClCompile Include="EditorHUD.cpp" />
+    <ClCompile Include="EditorGame.cpp" />
+    <ClCompile Include="ImportFont.cpp" />
+    <ClCompile Include="ImportMS3D.cpp" />
+    <ClCompile Include="ImportOBJ.cpp" />
+    <ClCompile Include="ImportTexture.cpp" />
+    <ClCompile Include="ImportX.cpp" />
+    <ClCompile Include="MS3DFile.cpp" />
+    <ClCompile Include="sxEditor.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\sxEngine\sxEngine.vcxproj">
+      <Project>{45061582-8909-4c0a-9029-5d13d4d9e461}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\sxLib\win32dll\sxlib.vcxproj">
+      <Project>{e1c1fbb3-5741-4900-a5bd-e47ba3c27ccf}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
