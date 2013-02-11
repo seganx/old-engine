@@ -335,6 +335,7 @@ void ImportMS3DFile( const WCHAR* FileName, const UINT flag, OUT sx::core::PNode
 
 				str1024 txFile = FileName;
 				txFile.ExtractFilePath();
+				txFile.MakePathStyle();
 				txFile << str;
 
 				ImportTexture(txFile);
@@ -479,6 +480,7 @@ void ImportMS3DFile( const WCHAR* FileName, const UINT flag, OUT sx::core::PNode
 					
 					str1024 txFile = FileName;
 					txFile.ExtractFilePath();
+					txFile.MakePathStyle();
 					txFile << str;
 					txFile.ExtractFileName();
 					txFile.ExcludeFileExtension();

@@ -518,8 +518,8 @@ SEGAN_INLINE void mem_realloc_dbg( void*& p, const uint newsizeinbyte, const wch
 			mb = null;
 
 			//	report memory allocations to file
-			str64 memreportfile = L"sx_mem_report_"; memreportfile << s_mem_corruptions;
-			mem_report_debug_to_file( memreportfile, mb->tag );
+			str64 memreportfile = L"sx_mem_report_"; memreportfile << s_mem_corruptions; memreportfile << L".txt";
+			mem_report_debug_to_file( memreportfile, -1 );
 
 			//	report call stack
 			lib_assert( L"memory block has been corrupted !", mb->file, mb->line );
@@ -594,8 +594,8 @@ SEGAN_INLINE void mem_free_dbg( const void* p )
 			mem_debug_push( mb );
 
 			//	report memory allocations to file
-			str64 memreportfile = L"sx_mem_report_"; memreportfile << s_mem_corruptions;
-			mem_report_debug_to_file( memreportfile, mb->tag );
+			str64 memreportfile = L"sx_mem_report_"; memreportfile << s_mem_corruptions; memreportfile << L".txt";
+			mem_report_debug_to_file( memreportfile, -1 );
 
 			//	report call stack
 			lib_assert( L"memory block has been corrupted !", mb->file, mb->line );
@@ -641,7 +641,7 @@ SEGAN_INLINE void mem_report_debug( CB_Memory callback, const uint tag /*= 0 */ 
 	}
 }
 
-#if 0
+#if defined(_DEBUG)
 void mem_report_debug_to_window( const uint tag /*= 0 */ )
 {
 	if ( !s_mem_root ) return;
@@ -956,7 +956,9 @@ void sx_lib_finalize( void )
 #if SEGAN_MEMLEAK
 	else
 	{
-	//mem_report_debug_to_window( 0 );
+#if defined(_DEBUG)
+	mem_report_debug_to_window( 0 );
+#endif
 	mem_report_debug_to_file( L"sx_memleak_report.txt", 0 );
 	mem_clear_debug();
 	}
@@ -964,7 +966,9 @@ void sx_lib_finalize( void )
 
 	callstack_clear();
 #elif SEGAN_MEMLEAK
-	//mem_report_debug_to_window( 0 );
+#if defined(_DEBUG)
+	mem_report_debug_to_window( 0 );
+#endif
 	mem_report_debug_to_file( L"sx_memleak_report.txt", 0 );
 	mem_clear_debug();
 #endif

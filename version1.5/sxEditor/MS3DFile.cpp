@@ -11,9 +11,9 @@ class CMS3DFileI
 public:
 	Array<ms3d_vertex_t>		arrVertices;
 	Array<ms3d_triangle_t>		arrTriangles;
-	Array<ms3d_group_t>		arrGroups;
+	Array<ms3d_group_t>			arrGroups;
 	Array<ms3d_material_t>		arrMaterials;
-	Array<ms3d_joint_t>		arrJoints;
+	Array<ms3d_joint_t>			arrJoints;
 
 	float	fAnimationFPS;
 	float	fCurrentTime;
@@ -34,6 +34,7 @@ CMS3DFile::CMS3DFile()
 
 CMS3DFile::~CMS3DFile()
 {
+	Clear();
 	sx_delete( _i );
 }
 

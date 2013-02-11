@@ -32,21 +32,19 @@ public:
 	}
 
 	void Log(const WCHAR* logmessage){
-
-		_message = logmessage;
-		_message << L"\r\n";
+		if ( !logmessage ) return;
 
 		if (SEGAN_SET_HAS(_mode, LM_CONSOLE))
-			wprintf(_message.Text());	
+			wprintf(logmessage);	
 
 		if (SEGAN_SET_HAS(_mode, LM_WINDOW) && _window)
-			PostMessage(_window, WM_SX_LOGGER, (WPARAM)_message.Text(), 0);
+			PostMessage(_window, WM_SX_LOGGER, (WPARAM)logmessage, 0);
 
 		if (SEGAN_SET_HAS(_mode, LM_FILE))
-			_filestream->Write(_message.Text(), _message.Length()*sizeof(WCHAR));
+			_filestream->Write(logmessage, (int)wcslen(logmessage)*sizeof(WCHAR));
 
 		if (_callback)
-			_callback(_message.Text());
+			_callback(logmessage);
 
 	}
 
@@ -110,12 +108,11 @@ public:
 public:
 	UINT				_mode;
 	HWND				_window;
-	String		_message;
-	String		_filename;
-	PStream	_filestream;
+	String				_filename;
+	PStream				_filestream;
 
 	CriticalSection	_cs;
-	CallBack_Logger				_callback;
+	CallBack_Logger		_callback;
 
 	WCHAR*				m_buffer;
 };
