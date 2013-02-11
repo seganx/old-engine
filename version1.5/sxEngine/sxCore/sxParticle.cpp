@@ -53,7 +53,7 @@ namespace sx { namespace core {
 
 	Particle::~Particle()
 	{
-		sx_callstack_push(Particle::~Particle());
+		sx_callstack();
 
 		Clear();
 	}

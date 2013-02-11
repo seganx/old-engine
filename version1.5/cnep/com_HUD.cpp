@@ -13,20 +13,20 @@ com_HUD::com_HUD( void ): Component()
 	, m_healthBar(0)
 	//, m_healthBar_Time(0)
 {
-	sx_callstack_push(com_HUD::com_HUD());
+	sx_callstack();
 
 	m_name = L"HUD";
 }
 
 com_HUD::~com_HUD( void )
 {
-	sx_callstack_push(com_HUD::~com_HUD());
+	sx_callstack();
 	Finalize();
 }
 
 void com_HUD::Initialize( void )
 {
-	sx_callstack_push(com_HUD::Initialize());
+	sx_callstack();
 
 	m_healthBar = sx_new( sx::gui::ProgressBar );
 	m_healthBar->SetSize( float2(256, 32) );
@@ -48,14 +48,15 @@ void com_HUD::Initialize( void )
 
 void com_HUD::Finalize( void )
 {
-	sx_callstack_push(com_HUD::Finalize());
+	sx_callstack();
+
 	g_game->m_gui->Remove( m_healthBar );	
 	sx_delete_and_null( m_healthBar );
 }
 
 void com_HUD::Update( float elpsTime )
 {
-	sx_callstack_push(com_HUD::Update());
+	sx_callstack();
 
 	if ( m_owner && m_owner->m_health.icur > 0 )
 	{
@@ -98,7 +99,7 @@ void com_HUD::Update( float elpsTime )
 
 void com_HUD::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_HUD::MsgProc(msg=%d), msg);
+	sx_callstack();
 
 // 	switch ( msg )
 // 	{
@@ -108,7 +109,7 @@ void com_HUD::MsgProc( UINT msg, void* data )
 
 Component* com_HUD::Clone( void )
 {
-	sx_callstack_push(com_HUD::Clone());
+	sx_callstack();
 	return sx_new( com_HUD );
 }
 

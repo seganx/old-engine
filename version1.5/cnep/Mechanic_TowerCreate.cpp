@@ -22,7 +22,7 @@ namespace GM
 		,	m_towerIndex(0)
 		,	m_Tower(0)
 	{
-		sx_callstack_push(Mechanic_TowerCreate::Mechanic_TowerCreate());
+		sx_callstack();
 
 		for (int i=0; i<5; i++)
 			m_btnCreate[i] = 0;
@@ -32,12 +32,12 @@ namespace GM
 
 	Mechanic_TowerCreate::~Mechanic_TowerCreate( void )
 	{
-		sx_callstack_push(Mechanic_TowerCreate::~Mechanic_TowerCreate());
+		sx_callstack();
 	}
 
 	void Mechanic_TowerCreate::Initialize( void )
 	{
-		sx_callstack_push(Mechanic_TowerCreate::Initialize());
+		sx_callstack();
 
 		Finalize();
 
@@ -87,7 +87,7 @@ namespace GM
 
 	void Mechanic_TowerCreate::Finalize( void )
 	{
-		sx_callstack_push(Mechanic_TowerCreate::Finalize());
+		sx_callstack();
 
 		g_game->m_gui->Remove( m_pnlCreate0 );
 
@@ -105,7 +105,7 @@ namespace GM
 
 	void Mechanic_TowerCreate::ProcessInput( bool& inputHandled, float elpsTime )
 	{
-		sx_callstack_push(Mechanic_TowerCreate::ProcessInput());
+		sx_callstack();
 
 		if ( NotInGame() )
 		{
@@ -301,7 +301,7 @@ namespace GM
 
 	void Mechanic_TowerCreate::Update( float elpsTime )
 	{
-		sx_callstack_push(Mechanic_TowerCreate::Update());
+		sx_callstack();
 
 		if ( !g_game->m_game_currentLevel || g_game->m_game_paused )
 		{
@@ -335,7 +335,7 @@ namespace GM
 
 	void Mechanic_TowerCreate::MsgProc( UINT recieverID, UINT msg, void* data )
 	{
-		sx_callstack_push(Mechanic_TowerCreate::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
+		sx_callstack_param(Mechanic_TowerCreate::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
 		switch ( msg )
 		{
@@ -488,7 +488,7 @@ namespace GM
 
 	void Mechanic_TowerCreate::CatchTower( int index )
 	{
-		sx_callstack_push(Mechanic_TowerCreate::CatchTower(index=%d), index);
+		sx_callstack_param(Mechanic_TowerCreate::CatchTower(index=%d), index);
 
 		if ( !m_btnCreate[index] ) return;
 		Entity* towerType = (Entity*)m_btnCreate[index]->GetUserData();
@@ -524,7 +524,7 @@ namespace GM
 	{
 		if ( g_game->m_mouseMode != MS_CreateTower && !force ) return;
 
-		sx_callstack_push(Mechanic_TowerCreate::ReleaseCaughtTower());
+		sx_callstack();
 
 		g_game->m_mouseMode = MS_Null;
 		Entity::SetSelected(NULL);
@@ -536,7 +536,7 @@ namespace GM
 
 	void Mechanic_TowerCreate::CreateTower( float3 pos )
 	{
-		sx_callstack_push(Mechanic_TowerCreate::CreateTower());
+		sx_callstack();
 		sx_assert(m_Tower);
 
 		//  now try to locate best place depend on mouse position
@@ -599,7 +599,7 @@ namespace GM
 
 	bool Mechanic_TowerCreate::CanBuyTower( int index )
 	{
-		sx_callstack_push(Mechanic_TowerCreate::CanBuyTower());
+		sx_callstack();
 
 		if ( !m_btnCreate[index] ) return false;
 
@@ -611,7 +611,7 @@ namespace GM
 
 	FORCEINLINE void Mechanic_TowerCreate::ShowPanel( void )
 	{
-		sx_callstack_push(Mechanic_TowerCreate::ShowPanel());
+		sx_callstack();
 
 		//Entity::SetSelected( NULL );
 
@@ -626,7 +626,7 @@ namespace GM
 
 	FORCEINLINE void Mechanic_TowerCreate::HidePanel( void )
 	{
-		sx_callstack_push(Mechanic_TowerCreate::HidePanel());
+		sx_callstack();
 
 		m_pnlCreate0->State_SetIndex(0);
 		m_pnlCreate1->State_SetIndex(0);

@@ -31,7 +31,7 @@ Entity::Entity( void )
 , test_onDamageXP(0)
 , test_onDeadXP(0)
 {
-	sx_callstack_push(Entity::Entity());
+	sx_callstack();
 
 	m_ID = g_game->GetNewID();
 	SetDirection(m_face);
@@ -42,7 +42,7 @@ Entity::Entity( void )
 
 Entity::~Entity( void )
 {
-	sx_callstack_push(Entity::~Entity(%s), m_typeName.Text());
+	sx_callstack_param(Entity::~Entity(%s), m_typeName.Text());
 
 	if ( m_initialized ) Finalize();
 
@@ -68,7 +68,7 @@ Entity::~Entity( void )
 void Entity::Attach( Component* com )
 {
 	if ( !com ) return;
-	sx_callstack_push(Entity[%s]::Attach(com=%s), m_typeName.Text(), com->m_name.Text());
+	sx_callstack_param(Entity[%s]::Attach(com=%s), m_typeName.Text(), com->m_name.Text());
 
 	if ( com->m_owner && com->m_owner != this )
 		com->m_owner->m_components.Remove( com );
@@ -86,7 +86,7 @@ void Entity::Detach( Component* com )
 {
 	if ( !com ) return;
 
-	sx_callstack_push(Entity[%s]::Detach(com=%s), m_typeName.Text(), com->m_name.Text());
+	sx_callstack_param(Entity[%s]::Detach(com=%s), m_typeName.Text(), com->m_name.Text());
 
 	if ( m_components.Remove( com ) )
 	{
@@ -100,7 +100,7 @@ void Entity::Initialize( void )
 {
 	if ( m_initialized ) return;
 
-	sx_callstack_push(Entity[%s]::Initialize(), m_typeName.Text());
+	sx_callstack_param(Entity[%s]::Initialize(), m_typeName.Text());
 
 	for ( int i=0; i<NUM_LEVELS; i++ )
 		m_attackLevel[i].projectile = ProjectileManager::GetTypeByName( m_attackLevel[i].bullet );
@@ -132,7 +132,7 @@ void Entity::Initialize( void )
 
 void Entity::Finalize( void )
 {
-	sx_callstack_push(Entity[%s]::Finalize(), m_typeName.Text());
+	sx_callstack_param(Entity[%s]::Finalize(), m_typeName.Text());
 
 	if ( s_Selected == this )
 		s_Selected = NULL;
@@ -153,14 +153,14 @@ void Entity::Finalize( void )
 
 const float3& Entity::GetPosition() const
 {
-	sx_callstack_push(Entity[%s]::GetPosition(), m_typeName.Text());
+	sx_callstack();
 
 	return m_pos;
 }
 
 inline void Entity::SetPosition( const float3& pos )
 {
-	sx_callstack_push(Entity[%s]::SetPosition(), m_typeName.Text());
+	sx_callstack();
 
 	m_pos = pos;
 	if (m_node)
@@ -172,14 +172,14 @@ inline void Entity::SetPosition( const float3& pos )
 
 inline const float3& Entity::GetDirection( void ) const
 {
-	sx_callstack_push(Entity[%s}::GetDirection(), m_typeName.Text());
+	sx_callstack();
 
 	return m_face;
 }
 
 inline void Entity::SetDirection( const float3& dir )
 {
-	sx_callstack_push(Entity[%s]::SetDirection(), m_typeName.Text());
+	sx_callstack();
 
 	m_face = dir;
 	if (m_node)
@@ -188,13 +188,13 @@ inline void Entity::SetDirection( const float3& dir )
 
 Brain* Entity::GetBrain( void )
 {
-	sx_callstack_push(Entity[%s]::GetBrain(), m_typeName.Text());
+	sx_callstack();
 	return &m_brain;
 }
 
 Sphere Entity::GetBoundingSphere( void )
 {
-	sx_callstack_push(Entity[%s]::GetBoundingSphere(), m_typeName.Text());
+	sx_callstack();
 
 	Sphere res( GetPosition(), 0 );
 	if ( m_mesh )
@@ -204,7 +204,7 @@ Sphere Entity::GetBoundingSphere( void )
 
 float Entity::GetDistance_edge( Entity* target )
 {
-	sx_callstack_push(Entity[%s]::GetDistance_edge(), m_typeName.Text());
+	sx_callstack();
 
 	if ( !target ) return FLT_MAX;
 
@@ -222,7 +222,7 @@ float Entity::GetDistance_edge( Entity* target )
 
 void Entity::SetLevel( int level )
 {
-	sx_callstack_push(Entity[%s]::SetLevel(level=%d), m_typeName.Text(), level);
+	sx_callstack_param(Entity[%s]::SetLevel(level=%d), m_typeName.Text(), level);
 
 	//  verify that the level is exist in tower
 	if ( m_maxLevel > 6 )
@@ -288,7 +288,7 @@ void Entity::SetState( UINT state )
 {
 	if ( m_state == state ) return;
 
-	sx_callstack_push(Entity::SetState(state=%d), m_typeName.Text(), state);
+	sx_callstack_param(Entity::SetState(state=%d), m_typeName.Text(), state);
 
 	m_state = state;
 
@@ -431,7 +431,7 @@ void Entity::SetState( UINT state )
 
 void Entity::Update( float elpsTime )
 {
-	sx_callstack_push(Entity[%s]::Update(), m_typeName.Text());
+	sx_callstack();
 
 	sx_assert(m_node);
 
@@ -574,7 +574,7 @@ void Entity::Update( float elpsTime )
 
 void Entity::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(Entity[%s]::MsgProc(msg=%d), m_typeName.Text(), msg);
+	sx_callstack_param(Entity[%s]::MsgProc(msg=%d), m_typeName.Text(), msg);
 
 	if ( !m_initialized ) return;
 
@@ -664,7 +664,7 @@ void Entity::MsgProc( UINT msg, void* data )
 
 Entity* Entity::Clone( void )
 {
-	sx_callstack_push(Entity[%s]::Clone(), m_typeName.Text());
+	sx_callstack_param(Entity[%s]::Clone(), m_typeName.Text());
 
 	//  verify that this entity is not initialized
 	sx_assert( m_initialized==false );

@@ -1005,7 +1005,7 @@ namespace sx { namespace core {
 
 	void Terrain::Manager::Load( Stream& strm )
 	{
-		sx_callstack_push(Terrain::Manager::Load());
+		sx_callstack();
 
 		ClearrAll();
 

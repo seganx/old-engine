@@ -17,19 +17,19 @@ Task_goto_node::Task_goto_node( void )
 , m_group(0)
 , m_matIndex(-1)
 {
-	sx_callstack_push(Task_goto_node::Task_goto_node());
+	sx_callstack();
 
 	m_Type = GTT_GOTO_NODE;
 }
 
 Task_goto_node::~Task_goto_node( void )
 {
-	sx_callstack_push(Task_goto_node::~Task_goto_node());
+	sx_callstack();
 }
 
 void Task_goto_node::Initialize( void )
 {
-	sx_callstack_push(Task_goto_node::Initialize());
+	sx_callstack();
 
 	Task::Initialize();
 
@@ -46,7 +46,7 @@ void Task_goto_node::Initialize( void )
 
 void Task_goto_node::Finalize( void )
 {
-	sx_callstack_push(Task_goto_node::Finalize());
+	sx_callstack();
 
 	m_Path.Clear();
 	m_startNode = 0;
@@ -63,7 +63,7 @@ void Task_goto_node::Update( float elpstime, DWORD& status )
 {
 	if ( m_Status == TS_FAILED || m_owner->m_health.icur<1 || !m_startNode || !m_endNode ) return;
 	
-	sx_callstack_push(Task_goto_node::Update());
+	sx_callstack();
 
 	float3 disPos = m_endNode->GetPosition_world();
 	if ( !m_owner->m_move.moveSpeed || disPos.Distance_sqr( m_owner->GetPosition() ) < 1.0f )
@@ -163,7 +163,7 @@ void Task_goto_node::Update( float elpstime, DWORD& status )
 
 FORCEINLINE void Task_goto_node::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(Task_goto_node::MsgProc(msg=%d), msg);
+	sx_callstack_param(Task_goto_node::MsgProc(msg=%d), msg);
 
 	switch (msg)
 	{

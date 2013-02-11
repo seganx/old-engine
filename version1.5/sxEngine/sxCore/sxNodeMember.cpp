@@ -17,7 +17,7 @@ namespace sx { namespace core {
 
 	NodeMember::~NodeMember( void )
 	{
-		sx_callstack_push(NodeMember::~NodeMember());
+		sx_callstack();
 		SetOwner(NULL);
 	}
 

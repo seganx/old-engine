@@ -135,7 +135,7 @@ namespace sx { namespace core {
 
 	PathNode::~PathNode()
 	{
-		sx_callstack_push(PathNode::~PathNode());
+		sx_callstack();
 
 		//  remove connections
 		while ( m_Neighbor.Count() )

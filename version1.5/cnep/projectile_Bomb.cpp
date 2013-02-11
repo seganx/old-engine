@@ -8,17 +8,17 @@
 
 Projectile_BOMB::Projectile_BOMB( void ):	Projectile()
 {
-	sx_callstack_push(Projectile_BOMB::Projectile_BOMB());
+	sx_callstack();
 }
 
 Projectile_BOMB::~Projectile_BOMB( void )
 {
-	sx_callstack_push(Projectile_BOMB::~Projectile_BOMB());
+	sx_callstack();
 }
 
 void Projectile_BOMB::AddToScene( void )
 {
-	sx_callstack_push(Projectile_BOMB::AddToScene());
+	sx_callstack();
 
 	if ( m_target )
 		m_targetPos = m_target->GetPosition();
@@ -48,7 +48,7 @@ void Projectile_BOMB::AddToScene( void )
 
 void Projectile_BOMB::Update( float elpsTime )
 {
-	sx_callstack_push(Projectile_BOMB::Update());
+	sx_callstack();
 	sx_assert(m_node);
 
 	if ( !m_node ) return;
@@ -155,7 +155,7 @@ void Projectile_BOMB::Update( float elpsTime )
 
 Projectile* Projectile_BOMB::Clone( void )
 {
-	sx_callstack_push(Projectile_BOMB::Clone());
+	sx_callstack();
 
 	Projectile_BOMB* bomb	= sx_new( Projectile_BOMB );
 	bomb->m_attack			= m_attack;

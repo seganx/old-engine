@@ -298,7 +298,7 @@ namespace sx { namespace core {
 
 	UINT Pipeline_Forward::MsgProc( UINT msgType, void* data )
 	{
-		sx_callstack_push(Pipeline_Forward::MsgProc());
+		sx_callstack_param(Pipeline_Forward::MsgProc());
 
 		switch (msgType)
 		{

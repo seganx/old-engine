@@ -346,7 +346,7 @@ namespace sx { namespace sys
 
 	void TaskManager::Update( float elpsTime )
 	{
-		sx_callstack_push(TaskManager::Update());
+		sx_callstack();
 
 		for (int i=0; i<4; i++)
 		{

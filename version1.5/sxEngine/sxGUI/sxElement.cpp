@@ -158,7 +158,7 @@ namespace sx { namespace gui {
 
 	void Element::SetTextureSrc( const WCHAR* src )
 	{
-		sx_callstack_push(Element::SetTexture(src=%s), src);
+		sx_callstack();
 
 		if (src && m_TX && (wcscmp(m_TX->GetSource(), src) == 0)) 
 			return;

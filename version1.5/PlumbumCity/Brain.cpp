@@ -30,7 +30,7 @@ void Brain::Initialize( void )
 
 void Brain::Finalize( void )
 {
-	sx_callstack_push(Brain::Finalize());
+	sx_callstack();
 
 	SetCurrentTask( NULL );
 	SetParallelTask( NULL );
@@ -84,7 +84,7 @@ void Brain::Update( float elpsTime )
 
 void Brain::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(Brain::MsgProc(msg=%d), msg);
+	sx_callstack_param(Brain::MsgProc(msg=%d), msg);
 
 	if ( m_taskParallel )	m_taskParallel->MsgProc( msg, data );
 	if ( m_taskCurrent )	m_taskCurrent->MsgProc( msg, data );
@@ -198,7 +198,7 @@ void Brain::SetCurrentMission( UINT index )
 
 void Brain::SetCurrentTask( Task* curTask )
 {
-	sx_callstack_push(SetCurrentTask());
+	sx_callstack();
 
 	if ( m_taskCurrent )
 		m_taskCurrent->Finalize();
@@ -216,7 +216,7 @@ void Brain::SetCurrentTask( Task* curTask )
 
 void Brain::SetParallelTask( Task* parTask )
 {
-	sx_callstack_push(Brain::SetParallelTask());
+	sx_callstack();
 
 	if ( m_taskParallel )
 		m_taskParallel->Finalize();

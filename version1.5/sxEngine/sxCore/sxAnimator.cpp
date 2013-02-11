@@ -23,7 +23,7 @@ namespace sx { namespace core {
 
 	Animator::~Animator( void )
 	{
-		sx_callstack_push(Animator::~Animator());
+		sx_callstack();
 		ClearAnimations();
 	}
 

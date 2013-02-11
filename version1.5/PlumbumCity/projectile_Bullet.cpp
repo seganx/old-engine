@@ -4,17 +4,17 @@
 
 projectile_Bullet::projectile_Bullet( void ): Projectile(), m_initPos(0,0,0)
 {
-	sx_callstack_push(projectile_Bullet::projectile_Bullet());
+	sx_callstack();
 }
 
 projectile_Bullet::~projectile_Bullet( void )
 {
-	sx_callstack_push(projectile_Bullet::~projectile_Bullet());
+	sx_callstack();
 }
 
 void projectile_Bullet::AddToScene( void )
 {
-	sx_callstack_push(projectile_Bullet::AddToScene());
+	sx_callstack();
 
 	m_initPos = m_pos;
 
@@ -23,7 +23,7 @@ void projectile_Bullet::AddToScene( void )
 
 void projectile_Bullet::Update( float elpsTime )
 {
-	sx_callstack_push(projectile_Bullet::Update());
+	sx_callstack();
 
 	float speed = m_speed * elpsTime * 0.001f;
 
@@ -105,7 +105,7 @@ void projectile_Bullet::Update( float elpsTime )
 
 Projectile* projectile_Bullet::Clone( void )
 {
-	sx_callstack_push(projectile_Bullet::Clone());
+	sx_callstack();
 
 	projectile_Bullet* bullet	= sx_new( projectile_Bullet );
 	bullet->m_attack			= m_attack;
@@ -117,7 +117,7 @@ Projectile* projectile_Bullet::Clone( void )
 
 void projectile_Bullet::DamageToTarget( Entity* target )
 {
-	sx_callstack_push(projectile_Bullet::DamageToTarget());
+	sx_callstack();
 
 	if ( target && target->m_health.icur > 0 && ( target->m_move.type == GMT_BOTH || m_attack.targetType == GMT_BOTH || m_attack.targetType == target->m_move.type ) )
 	{

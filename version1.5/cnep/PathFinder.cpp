@@ -22,7 +22,7 @@ int cmpPathNode( const PNode& n1, const PNode& n2 )
 
 sx::core::PPathNode PathFinder::GetPathNode_nearest( const float3& pos, const float threshold )
 {
-	sx_callstack_push(PathFinder::GetPathNode_nearest());
+	sx_callstack();
 
 	static ArrayPNode_inline nodes(512); nodes.Clear();
 	Scene::GetNodesByArea(pos, threshold, nodes, NMT_PATHNODE);
@@ -60,7 +60,7 @@ sx::core::PPathNode PathFinder::GetPathNode_nearest( const float3& pos, const fl
 
 sx::core::PPathNode PathFinder::GetPathNode_random( const float3 pos, const float threshold )
 {
-	sx_callstack_push(PathFinder::GetPathNode_random());
+	sx_callstack();
 
 	static ArrayPNode_inline nodes(512); nodes.Clear();
 	Scene::GetNodesByArea(pos, threshold, nodes, NMT_PATHNODE);
@@ -84,7 +84,7 @@ sx::core::PPathNode PathFinder::GetPathNode_random( const float3 pos, const floa
 
 bool PathFinder::FindPath_byPos( const float3 fromPos, const float fromThreshold, const float3 toPos, const float toThreshold, sx::core::ArrayPPathNode& path, UINT group /*= 0*/ )
 {
-	sx_callstack_push(PathFinder::FindPath_byPos());
+	sx_callstack();
 
 	//  find start node
 	ArrayPNode_inline startNodes(512);
@@ -131,7 +131,7 @@ bool PathFinder::FindPath_byNode( sx::core::PNode start, sx::core::PNode goal, s
 {
 	if ( !start || !goal ) return false;
 
-	sx_callstack_push(PathFinder::FindPath_byNode());
+	sx_callstack();
 
 	bool res = FindPath_byPos(
 		start->GetPosition_world(), start->GetSphere_local().r, 

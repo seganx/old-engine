@@ -163,7 +163,7 @@ namespace sx { namespace core {
 
 	void Renderer::SetSize( HWND Display, UINT Width, UINT Height, SX_D3D_ DWORD Flag )
 	{
-		sx_callstack_push(Renderer::SetSize(Width=%d, Height=%d), Width, Height);
+		sx_callstack_param(Renderer::SetSize(Width=%d, Height=%d), Width, Height);
 
 		static bool Creating = false;
 		static DWORD d3dFlag = 0;
@@ -217,7 +217,7 @@ namespace sx { namespace core {
 
 	void Renderer::SetRenderTarget( d3d::PTexture target )
 	{
-		sx_callstack_push(Renderer::SetRenderTarget());
+		sx_callstack();
 
 		s_sceneRT = target;
 
@@ -240,7 +240,7 @@ namespace sx { namespace core {
 
 	void Renderer::Begin( void )
 	{
-		sx_callstack_push(Renderer::Begin());
+		sx_callstack();
 
 		//  init device to default
 		d3d::Device3D::InitStates();
@@ -251,7 +251,7 @@ namespace sx { namespace core {
 
 	void Renderer::End( void )
 	{
-		sx_callstack_push(Renderer::End());
+		sx_callstack();
 
 		d3d::Device3D::Scene_End();
 		d3d::Device3D::Scene_Present();
@@ -414,7 +414,7 @@ namespace sx { namespace core {
 
 	void Renderer::RenderScene( DWORD flag )
 	{
-		sx_callstack_push(Renderer::RenderScene());
+		sx_callstack();
 
 		// update shader pool
 		sx::d3d::ShaderPool::SetLight( &s_sunLight );
@@ -492,7 +492,7 @@ namespace sx { namespace core {
 
 	UINT Renderer::MsgProc( MT_ UINT msgType, void* data )
 	{
-		sx_callstack_push(Renderer::MsgProc());
+		sx_callstack();
 
 		switch (msgType)
 		{
@@ -571,7 +571,7 @@ namespace sx { namespace core {
 
 	void Renderer::Load( Stream& stream )
 	{
-		sx_callstack_push(Renderer::Load());
+		sx_callstack();
 
 		UINT id = 0;
 		SEGAN_STREAM_READ(stream, id);

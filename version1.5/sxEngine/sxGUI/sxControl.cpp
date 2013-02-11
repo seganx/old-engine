@@ -293,7 +293,7 @@ namespace sx { namespace gui {
 
 	FORCEINLINE sx::gui::PElement Control::GetElement( int index )
 	{
-		sx_callstack_push(Control::GetElement(index=%d), index);
+		sx_callstack();
 
 		if (index<0 || index>=m_Elements.Count())
 			return NULL;

@@ -148,7 +148,7 @@ namespace sx { namespace core {
 
 	Sound::~Sound( void )
 	{
-		sx_callstack_push(Sound::~Sound());
+		sx_callstack();
 
 		ReleaseSoundPlayer( this );
 
@@ -258,7 +258,7 @@ namespace sx { namespace core {
 
 	UINT Sound::MsgProc( UINT msgType, void* data )
 	{
-		sx_callstack_push(Sound::MsgProc(msgType=%d), msgType);
+		sx_callstack_param(Sound::MsgProc(msgType=%d), msgType);
 
 		switch ( msgType )
 		{

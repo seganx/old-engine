@@ -121,7 +121,7 @@ UINT MainMsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void MainLoop(float elpsTime)
 {
-	sx_callstack_push(MainLoop());
+	sx_callstack();
 
 	if ( elpsTime > 1000 ) return;
 
@@ -159,6 +159,8 @@ void MainLoop(float elpsTime)
 
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
+	sx_callstack();
+
 	//  make single application
 	String mutexName = L"SeganX Game :: "; mutexName << GAME_TITLE;
 	HANDLE mutex = CreateMutex(NULL, TRUE, *mutexName);

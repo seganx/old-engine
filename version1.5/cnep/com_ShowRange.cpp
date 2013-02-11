@@ -12,19 +12,19 @@ static sx::core::PNode	s_cylinderNode	= NULL;
 
 com_ShowRange::com_ShowRange( void ): Component()
 {
-	sx_callstack_push(com_ShowRange::com_ShowRange());
+	sx_callstack();
 
 	m_name = L"Show Range";
 }
 
 com_ShowRange::~com_ShowRange( void )
 {
-	sx_callstack_push(com_ShowRange::~com_ShowRange());
+	sx_callstack();
 }
 
 void com_ShowRange::Initialize( void )
 {
-	sx_callstack_push(com_ShowRange::Initialize());
+	sx_callstack();
 
 	if ( s_initialCount == 0 )
 	{
@@ -50,7 +50,7 @@ void com_ShowRange::Initialize( void )
 
 void com_ShowRange::Finalize( void )
 {
-	sx_callstack_push(com_ShowRange::Finalize());
+	sx_callstack();
 
 	if ( s_initialCount )
 	{
@@ -71,7 +71,7 @@ void com_ShowRange::Finalize( void )
 
 void com_ShowRange::Update( float elpsTime )
 {
-	sx_callstack_push(com_ShowRange::Update());
+	sx_callstack();
 
 	Entity* pEntity = Entity::GetSelected();
 
@@ -100,7 +100,7 @@ void com_ShowRange::Update( float elpsTime )
 
 void com_ShowRange::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_ShowRange::MsgProc(msg=%d), msg);
+	sx_callstack_param(com_ShowRange::MsgProc(msg=%d), msg);
 
 	switch ( msg )
 	{
@@ -114,13 +114,13 @@ void com_ShowRange::MsgProc( UINT msg, void* data )
 
 Component* com_ShowRange::Clone( void )
 {
-	sx_callstack_push(com_ShowRange::Clone());
+	sx_callstack();
 
 	return sx_new( com_ShowRange );
 }
 
 void com_ShowRange::SetColor( D3DColor color )
 {
-	sx_callstack_push(com_ShowRange::SetColor());
+	sx_callstack();
 	s_color = color;
 }

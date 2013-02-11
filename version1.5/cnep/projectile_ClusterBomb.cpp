@@ -13,17 +13,17 @@ projectile_ClusterBomb::projectile_ClusterBomb( void )
 ,	m_time(0)
 ,	m_turnDir(0,0,0)
 {
-	sx_callstack_push(projectile_ClusterBomb::projectile_ClusterBomb());
+	sx_callstack();
 }
 
 projectile_ClusterBomb::~projectile_ClusterBomb( void )
 {
-	sx_callstack_push(projectile_ClusterBomb::~projectile_ClusterBomb());
+	sx_callstack();
 }
 
 void projectile_ClusterBomb::Update( float elpsTime )
 {
-	sx_callstack_push(projectile_ClusterBomb::Update());
+	sx_callstack();
 	sx_assert(m_node);
 
 	if ( !m_node ) return;
@@ -102,7 +102,10 @@ void projectile_ClusterBomb::Update( float elpsTime )
 					static sx::core::ArrayPNode_inline nodes(512); nodes.Clear();
 					sx::core::Scene::GetNodesByArea( proj->m_targetPos, m_attack.minRange, nodes, NMT_PATHNODE );
 					if ( nodes.Count() )
-						proj->m_targetPos = nodes[ sx::cmn::Random( nodes.Count()-1 ) ]->GetPosition_world();
+					{
+						int index = sx_clamp_i( sx::cmn::Random( nodes.Count()-1 ), 0, nodes.Count()-1 );
+						proj->m_targetPos = nodes[ index ]->GetPosition_world();
+					}
 
 					nodes.Clear();
 					sx::core::Scene::GetNodesByArea( proj->m_targetPos, 10.0, nodes, NMT_PATHNODE );
@@ -160,7 +163,7 @@ void projectile_ClusterBomb::Update( float elpsTime )
 
 Projectile* projectile_ClusterBomb::Clone( void )
 {
-	sx_callstack_push(projectile_ClusterBomb::Clone());
+	sx_callstack();
 
 	projectile_ClusterBomb* bomb	= sx_new( projectile_ClusterBomb );
 	bomb->m_attack					= m_attack;

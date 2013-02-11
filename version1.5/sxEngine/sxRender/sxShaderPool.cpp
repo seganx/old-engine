@@ -10,7 +10,7 @@ public:
 	// in necessary times this function will call to recreate shader pool
 	static void CreateShaderPool(void)
 	{
-		sx_callstack_push(ShaderPool_internal::CreateShaderPool());
+		sx_callstack();
 
 		sx_delete_and_null(pShaderPool);
 
@@ -41,7 +41,7 @@ public:
 	// delete shader pool
 	static void DeleteShaderPool(void)
 	{
-		sx_callstack_push(ShaderPool_internal::DeleteShaderPool());
+		sx_callstack();
 		sx_delete_and_null(pShaderPool);
 	}
 
@@ -54,7 +54,7 @@ public:
 	// update shared variables
 	static void Update(float elpsTime)
 	{
-		sx_callstack_push(ShaderPool_internal::Update());
+		sx_callstack();
 
 		if (!pShaderPool) return;
 
@@ -102,7 +102,7 @@ namespace sx { namespace d3d {
 
 	void ShaderPool::Initialize( void )
 	{
-		sx_callstack_push(ShaderPool::Initialize());
+		sx_callstack();
 
 		ShaderPool_internal::DeleteShaderPool();
 		ShaderPool_internal::CreateShaderPool();

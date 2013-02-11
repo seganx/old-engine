@@ -137,7 +137,7 @@ void CreateRT(void)
 
 void Editor::Initialize( void )
 {
-	sx_callstack_push(Editor::Initialize());
+	sx_callstack();
 	
 	//  verify that current editor is clear 
 	Finalize();
@@ -203,7 +203,7 @@ void Editor::Initialize( void )
 
 void Editor::Finalize( void )
 {
-	sx_callstack_push(Editor::Finalize());
+	sx_callstack();
 
 	if ( g_panelObject )
 	{

@@ -4,31 +4,31 @@
 
 com_GoldenTower::com_GoldenTower( void ): Component(), m_time(0)
 {
-	sx_callstack_push(com_GoldenTower::com_GoldenTower());
+	sx_callstack();
 	m_name = L"Golden Tower";
 }
 
 com_GoldenTower::~com_GoldenTower( void )
 {
-	sx_callstack_push(com_GoldenTower::~com_GoldenTower());
+	sx_callstack();
 	
 }
 
 void com_GoldenTower::Initialize( void )
 {
-	sx_callstack_push(com_GoldenTower::Initialize());
+	sx_callstack();
 }
 
 void com_GoldenTower::Finalize( void )
 {
-	sx_callstack_push(com_GoldenTower::Finalize());
+	sx_callstack();
 }
 
 void com_GoldenTower::Update( float elpsTime )
 {
 	if ( !m_owner || m_time <= 0 || m_owner->m_health.icur < 1 || !m_owner->m_node ) return;
 
-	sx_callstack_push(com_GoldenTower::Update());
+	sx_callstack();
 
 	m_owner->m_curAttack.physicalDamage		*= m_owner->m_curAttack.goldenValue;
 	m_owner->m_curAttack.electricalDamage	*= m_owner->m_curAttack.goldenValue;
@@ -43,7 +43,7 @@ void com_GoldenTower::Update( float elpsTime )
 
 void com_GoldenTower::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_GoldenTower::MsgProc(msg=%d), msg);
+	sx_callstack_param(com_GoldenTower::MsgProc(msg=%d), msg);
 
 	switch ( msg )
 	{
@@ -69,7 +69,7 @@ void com_GoldenTower::MsgProc( UINT msg, void* data )
 
 Component* com_GoldenTower::Clone( void )
 {
-	sx_callstack_push(com_GoldenTower::Clone());
+	sx_callstack();
 
 	com_GoldenTower* me = sx_new( com_GoldenTower );
 	return me;

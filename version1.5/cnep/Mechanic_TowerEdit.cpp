@@ -33,7 +33,7 @@ namespace GM
 		,	m_lblFireRate(0)
 		,	m_mode(0)
 	{
-		sx_callstack_push(Mechanic_TowerEdit::Mechanic_TowerEdit());
+		sx_callstack();
 
 		ZeroMemory( m_pnlUpdate,	sizeof(m_pnlUpdate)	);
 		ZeroMemory( m_pnlLamp,		sizeof(m_pnlLamp)	);
@@ -42,13 +42,13 @@ namespace GM
 
 	Mechanic_TowerEdit::~Mechanic_TowerEdit( void )
 	{
-		sx_callstack_push(Mechanic_TowerEdit::~Mechanic_TowerEdit());
+		sx_callstack();
 
 	}
 
 	void Mechanic_TowerEdit::Initialize( void )
 	{
-		sx_callstack_push(Mechanic_TowerEdit::Initialize());
+		sx_callstack();
 
 		// create first background
 		m_back = sx_new( sx::gui::PanelEx );
@@ -228,7 +228,7 @@ namespace GM
 
 	void Mechanic_TowerEdit::Finalize( void )
 	{
-		sx_callstack_push(Mechanic_TowerEdit::Finalize());
+		sx_callstack();
 
 		g_game->m_gui->Remove( m_back );
 
@@ -240,7 +240,7 @@ namespace GM
 		if ( NotInGame() || g_game->m_mouseMode == MS_CreateTower )
 			return;
 
-		sx_callstack_push(Mechanic_TowerEdit::ProcessInput());
+		sx_callstack();
 
 		if ( inputHandled )
 		{
@@ -316,7 +316,7 @@ namespace GM
 
 	void Mechanic_TowerEdit::Update( float elpsTime )
 	{
-		sx_callstack_push(Mechanic_TowerEdit::Update());
+		sx_callstack();
 
 		if ( !g_game->m_game_currentLevel || g_game->m_game_paused )
 		{
@@ -472,7 +472,7 @@ namespace GM
 
 	void Mechanic_TowerEdit::OnButtonClick( sx::gui::PControl Sender )
 	{
-		sx_callstack_push(Mechanic_TowerEdit::OnButtonClick());
+		sx_callstack();
 
 		Entity* selectedTower = Entity::GetSelected();
 		if ( !selectedTower || !selectedTower->m_initialized || !selectedTower->m_health.icur || selectedTower->m_partyCurrent != PARTY_TOWER )
@@ -547,7 +547,7 @@ namespace GM
 
 	void Mechanic_TowerEdit::MsgProc( UINT recieverID, UINT msg, void* data )
 	{
-		sx_callstack_push(Mechanic_TowerEdit::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
+		sx_callstack_param(Mechanic_TowerEdit::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
 		switch ( msg )
 		{

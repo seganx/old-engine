@@ -23,7 +23,7 @@
 
 Player::Player( void ):	m_gold(500), m_people(100)
 {
-	sx_callstack_push(Player::Player());
+	sx_callstack();
 
 	m_name = L"Player1";
 	m_camera_RTS.m_Activate = true;
@@ -32,7 +32,7 @@ Player::Player( void ):	m_gold(500), m_people(100)
 
 Player::~Player( void )
 {
-	sx_callstack_push(Player::~Player());
+	sx_callstack();
 
 	for (int i=0; i<m_Mechanics.Count(); i++)
 	{
@@ -43,7 +43,7 @@ Player::~Player( void )
 
 void Player::Initialize( void )
 {
-	sx_callstack_push(Player::Initialize());
+	sx_callstack();
 
 	for (int i=0; i<m_Mechanics.Count(); i++)
 	{
@@ -53,7 +53,7 @@ void Player::Initialize( void )
 
 void Player::Finalize( void )
 {
-	sx_callstack_push(Player::Finalize());
+	sx_callstack();
 
 	for (int i=0; i<m_Mechanics.Count(); i++)
 	{
@@ -63,7 +63,7 @@ void Player::Finalize( void )
 
 void Player::ProcessInput( bool& inputHandled, float elpsTime )
 {
-	sx_callstack_push(Player::ProcessInput());
+	sx_callstack();
 
 	if ( !g_game->m_game_paused )
 	{
@@ -124,7 +124,7 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 
 void Player::Update( float elpsTime )
 {
-	sx_callstack_push(Player::Update());
+	sx_callstack();
 
 	if ( !g_game->m_game_currentLevel || g_game->m_game_paused )
 	{
@@ -163,7 +163,7 @@ void Player::Update( float elpsTime )
 
 void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 {
-	sx_callstack_push(Player::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
+	sx_callstack_param(Player::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
 	//  check message
 	switch (msg)
@@ -432,7 +432,7 @@ void Player::SyncPlayerAndGame( bool playerToGame )
 
 void Player::ClearMechanincs( void )
 {
-	sx_callstack_push(Player::ClearMechanincs());
+	sx_callstack();
 	
 
 	for (int i=0; i<m_Mechanics.Count(); i++)

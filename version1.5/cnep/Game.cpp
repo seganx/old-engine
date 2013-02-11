@@ -205,7 +205,7 @@ UINT Game::GetNewID( void )
 
 const WCHAR* Game::GetLevelPath( void )
 {
-	sx_callstack_push(Game::GetLevelPath());
+	sx_callstack();
 
 	static str1024 mainPath;
 	mainPath = sx::sys::FileManager::Project_GetDir();
@@ -256,7 +256,7 @@ void Game::Finalize( void )
 
 void Game::LoadLevel( void )
 {
-	sx_callstack_push(Game::LoadLevel());
+	sx_callstack();
 
 	// be sure the level is empty
 	ClearLevel();
@@ -366,7 +366,7 @@ void Game::LoadLevel( void )
 
 void Game::ClearLevel( void )
 {
-	sx_callstack_push(Game::ClearLevel());
+	sx_callstack();
 
 	m_gui->m_gameSpeed->SetValue( 1.0f );
 	ProjectileManager::ClearProjectiles();
@@ -388,7 +388,7 @@ void Game::Reset( void )
 
 void Game::Update( float elpsTime )
 {
-	sx_callstack_push(Game::Update());
+	sx_callstack();
 
 	if ( m_app_Closing ) return;
 
@@ -469,7 +469,7 @@ void Game::Update( float elpsTime )
 
 void Game::Render( DWORD flag )
 {
-	sx_callstack_push(Game::Render());
+	sx_callstack();
 
 	if ( m_app_Closing || m_game_currentLevel != m_game_nextLevel ) return;
 	if ( !sx::core::Renderer::CanRender() ) return;
@@ -575,7 +575,7 @@ void Game::Render( DWORD flag )
 
 void Game::PostMessage( UINT RecieverID, UINT msg, void* data )
 {
-	sx_callstack_push(Game::PostMessage(RecieverID=%d, msg=%d), RecieverID, msg);
+	sx_callstack_param(Game::PostMessage(RecieverID=%d, msg=%d), RecieverID, msg);
 
 	switch ( msg )
 	{
@@ -724,7 +724,7 @@ void Achievement::Finalize( void )
 //////////////////////////////////////////////////////////////////////////
 void Upgrades::LoadDefaults( void )
 {
-	sx_callstack_push(Upgrades::LoadDefaults());
+	sx_callstack();
 
 	//  load some level configuration
 	String str = sx::sys::FileManager::Project_GetDir();

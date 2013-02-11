@@ -91,7 +91,7 @@ namespace sx { namespace core {
 
 	void Settings::SetSunLightPosition( float theta, float phi )
 	{
-		sx_callstack_push(Settings::SetSunLightPosition());
+		sx_callstack();
 
 		sunlightPosition.Set(theta, phi);
 

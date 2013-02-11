@@ -13,7 +13,7 @@ arrayPComponent		s_componentTypes;
 
 void ComponentManager::ClearTypes( void )
 {
-	sx_callstack_push(ComponentManager::ClearTypes());
+	sx_callstack();
 
 	for ( int i=0; i<s_componentTypes.Count(); i++ )
 	{
@@ -26,7 +26,7 @@ void ComponentManager::ClearTypes( void )
 
 void ComponentManager::LoadTypes( void )
 {
-	sx_callstack_push(ComponentManager::LoadTypes());
+	sx_callstack();
 
 
 	String str = sx::sys::FileManager::Project_GetDir();
@@ -103,7 +103,7 @@ void ComponentManager::LoadTypes( void )
 
 Component* ComponentManager::CreateComponentByTypeName( const WCHAR* name )
 {
-	sx_callstack_push(ComponentManager::CreateComponentByTypeName(name=%s), name);
+	sx_callstack_param(ComponentManager::CreateComponentByTypeName(name=%s), name);
 
 	for (int i=0; i<s_componentTypes.Count(); i++)
 	{
@@ -120,7 +120,7 @@ Component* ComponentManager::CreateComponentByTypeName( const WCHAR* name )
 
 void ComponentManager::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(ComponentManager::MsgProc(msg=%d), msg);
+	sx_callstack_param(ComponentManager::MsgProc(msg=%d), msg);
 
 	switch ( msg )
 	{

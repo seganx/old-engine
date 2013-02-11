@@ -7,12 +7,12 @@ Component::Component( void )
 	, m_tag(0)
 	, m_deleteMe(false)
 {
-	sx_callstack_push(Component::Component());
+	sx_callstack();
 }
 
 Component::~Component( void )
 {
-	sx_callstack_push(Component::~Component());
+	sx_callstack();
 
 	if ( m_owner )
 	{
@@ -23,7 +23,7 @@ Component::~Component( void )
 
 void Component::SetOwner( Entity* owner )
 {
-	sx_callstack_push(Component::SetOwner());
+	sx_callstack();
 
 	if ( m_owner == owner ) return;
 

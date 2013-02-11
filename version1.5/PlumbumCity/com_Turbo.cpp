@@ -9,7 +9,7 @@ com_Turbo::com_Turbo( void ): Component()
 	,	m_turboCount(1)
 	,	m_time(-1)
 {
-	sx_callstack_push(com_Turbo::com_Turbo());
+	sx_callstack();
 
 	m_name = L"Turbo";
 	m_tag = MAKEFOURCC('C','M','T','B');
@@ -17,12 +17,12 @@ com_Turbo::com_Turbo( void ): Component()
 
 com_Turbo::~com_Turbo( void )
 {
-	sx_callstack_push(com_Turbo::~com_Turbo());	
+	sx_callstack();	
 }
 
 void com_Turbo::Initialize( void )
 {
-	sx_callstack_push(com_Turbo::Initialize());
+	sx_callstack();
 	if ( m_owner->m_node )
 		m_owner->m_node->GetChildByName( m_nodeName, m_node );
 	m_time = -1.0f;
@@ -30,12 +30,12 @@ void com_Turbo::Initialize( void )
 
 void com_Turbo::Finalize( void )
 {
-	sx_callstack_push(com_Turbo::Finalize());
+	sx_callstack();
 }
 
 void com_Turbo::Update( float elpsTime )
 {
-	sx_callstack_push(com_Turbo::Update());
+	sx_callstack();
 
 	if ( !m_owner || m_owner->m_health.icur < 1 || !m_owner->m_node ) return;
 
@@ -65,7 +65,7 @@ void com_Turbo::Update( float elpsTime )
 
 void com_Turbo::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_Turbo::MsgProc(msg=%d), msg);
+	sx_callstack_param(com_Turbo::MsgProc(msg=%d), msg);
 
 	if ( !m_owner || m_owner->m_health.icur < 1 || !m_owner->m_node ) return;
 
@@ -104,7 +104,7 @@ void com_Turbo::MsgProc( UINT msg, void* data )
 
 Component* com_Turbo::Clone( void )
 {
-	sx_callstack_push(com_Turbo::Clone());
+	sx_callstack();
 
 	com_Turbo* me		= sx_new( com_Turbo );
 	me->m_name			= m_name;

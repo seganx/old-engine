@@ -14,19 +14,19 @@ com_weapon_Cannon::com_weapon_Cannon( void ) : Component()
 	, m_DirOffset(0,0,1)
 	, m_Fire(false)
 {
-	sx_callstack_push(com_weapon_Cannon::com_weapon_Cannon());
+	sx_callstack();
 
 	m_name = L"Cannon";
 }
 
 com_weapon_Cannon::~com_weapon_Cannon( void )
 {
-	sx_callstack_push(com_weapon_Cannon::~com_weapon_Cannon());
+	sx_callstack();
 }
 
 void com_weapon_Cannon::Initialize( void )
 {
-	sx_callstack_push(com_weapon_Cannon::Initialize());
+	sx_callstack();
 
 	m_owner->m_weaponType = GWT_MORTAR;
 
@@ -56,7 +56,7 @@ void com_weapon_Cannon::Initialize( void )
 
 void com_weapon_Cannon::Finalize( void )
 {
-	sx_callstack_push(com_weapon_Cannon::Finalize());
+	sx_callstack();
 
 	m_nodeWeapon	= NULL;
 	m_nodePipe		= NULL;
@@ -65,7 +65,7 @@ void com_weapon_Cannon::Finalize( void )
 void com_weapon_Cannon::Update( float elpsTime )
 {
 	if ( !m_owner || !m_nodeWeapon || !m_nodePipe || m_owner->m_health.icur<1) return;
-	sx_callstack_push(com_weapon_Cannon::Update());
+	sx_callstack();
 
 	m_shootTime += elpsTime;
 
@@ -169,7 +169,7 @@ void com_weapon_Cannon::Update( float elpsTime )
 
 void com_weapon_Cannon::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_weapon_Cannon::MsgProc(msg=%d), msg);
+	sx_callstack_param(com_weapon_Cannon::MsgProc(msg=%d), msg);
 
 	switch (msg)
 	{
@@ -216,7 +216,7 @@ void com_weapon_Cannon::MsgProc( UINT msg, void* data )
 
 Component* com_weapon_Cannon::Clone( void )
 {
-	sx_callstack_push(com_weapon_Cannon::Clone());
+	sx_callstack();
 
 	com_weapon_Cannon * me	=	sx_new( com_weapon_Cannon );
 	me->m_tag					=	m_tag;
@@ -225,7 +225,7 @@ Component* com_weapon_Cannon::Clone( void )
 
 void com_weapon_Cannon::BlendDirection( float elpsTime )
 {
-	sx_callstack_push(com_weapon_Cannon::BlendDirection());
+	sx_callstack();
 
 	if ( m_Dir.Dot( m_DirOffset ) < 0 )
 	{
@@ -258,7 +258,7 @@ void com_weapon_Cannon::ShootTheBomp( int special )
 {
 	if ( !m_target ) return;
 
-	sx_callstack_push(com_weapon_Cannon::ShootTheBomp(special=%d), special);
+	sx_callstack_param(com_weapon_Cannon::ShootTheBomp(special=%d), special);
 
 	const prpAttack* attack		= &( m_owner->m_curAttack );
 	const prpAttack* ability	= &( m_owner->m_curAbility );

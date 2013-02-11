@@ -42,21 +42,21 @@ namespace GM
 		, m_node(0)
 		, m_pos(0,0,0)
 	{
-		sx_callstack_push(Mechanic_PA_Trap::Mechanic_PA_Trap());
+		sx_callstack();
 
 		m_attack.actionCount = 1;
 	}
 
 	Mechanic_PA_Trap::~Mechanic_PA_Trap( void )
 	{
-		sx_callstack_push(Mechanic_PA_Trap::~Mechanic_PA_Trap());
+		sx_callstack();
 
 		powerAttack_count--;
 	}
 
 	void Mechanic_PA_Trap::Initialize( void )
 	{
-		sx_callstack_push(Mechanic_PA_Trap::Initialize());
+		sx_callstack();
 
 		m_panelEx = sx_new( sx::gui::PanelEx );
 		m_panelEx->SetSize( float2(64,64) );
@@ -80,7 +80,7 @@ namespace GM
 
 	void Mechanic_PA_Trap::Finalize( void )
 	{
-		sx_callstack_push(Mechanic_PA_Trap::Finalize());
+		sx_callstack();
 
 		// gui will deleted by their parents
 		sx_delete_and_null( m_panelEx );
@@ -96,7 +96,7 @@ namespace GM
 		if ( NotInGame() || g_game->m_mouseMode == MS_CreateTower )
 			return;
 
-		sx_callstack_push(Mechanic_PA_Trap::ProcessInput());
+		sx_callstack();
 
 		if ( m_Time < m_coolTime )
 		{
@@ -151,7 +151,7 @@ namespace GM
 	{
 		if ( NotInGame() )	return;
 
-		sx_callstack_push(Mechanic_PA_Trap::Update());
+		sx_callstack();
 
 		if ( m_Time < m_coolTime )
 		{
@@ -265,7 +265,7 @@ namespace GM
 
 	void Mechanic_PA_Trap::MsgProc( UINT recieverID, UINT msg, void* data )
 	{
-		sx_callstack_push(Mechanic_PA_Trap::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
+		sx_callstack_param(Mechanic_PA_Trap::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
 		switch (msg)
 		{
@@ -390,7 +390,7 @@ namespace GM
 	{
 		if ( !m_node ) return;
 
-		sx_callstack_push(Mechanic_PA_Trap::OnGUIClick());
+		sx_callstack();
 
 		if ( m_Time >= m_coolTime && g_game->m_player->m_gold >= m_Cost )
 		{
@@ -408,7 +408,7 @@ namespace GM
 
 	void Mechanic_PA_Trap::CreateTrap( void )
 	{
-		sx_callstack_push(Mechanic_PA_Trap::CreateTrap());
+		sx_callstack();
 
 		static sx::core::ArrayPNode_inline nodes(256); nodes.Clear();
 		sx::core::Scene::GetNodesByArea( m_pos, 2.0f, nodes, NMT_PATHNODE );
@@ -495,7 +495,7 @@ namespace GM
 
 	void Mechanic_PA_Trap::ClearTraps( void )
 	{
-		sx_callstack_push(Mechanic_PA_Trap::ClearTraps());
+		sx_callstack();
 
 		for ( int i=0; i<m_traps.Count(); i++ )
 		{

@@ -18,7 +18,7 @@ namespace sx { namespace core {
 
 		static FORCEINLINE void Free(Sector*& sector)
 		{
-			sx_callstack_push(Sector::Free(%.8x),(uint)sector);
+			sx_callstack();
 
 			sx_delete(sector);
 			sector = NULL;
@@ -104,7 +104,7 @@ namespace sx { namespace core {
 
 	FORCEINLINE void FindNearestSectorTo(const PSector root, const Sphere& sphere, IN_OUT PSector& result)
 	{
-		sx_callstack_push(FindNearestSectorTo());
+		sx_callstack();
 
 		if ( !root ) return;
 
@@ -141,7 +141,7 @@ namespace sx { namespace core {
 
 	FORCEINLINE void InsertNode(PSector& root, PSector sector, PNode pNode)
 	{
-		sx_callstack_push(InsertNode());
+		sx_callstack();
 
 		if (sector->m_node)
 		{
@@ -203,7 +203,7 @@ namespace sx { namespace core {
 
 	FORCEINLINE void DeleteSector(PSector& sector)
 	{
-		sx_callstack_push(DeleteSector(%.8x), (uint)sector);
+		sx_callstack();
 
 		if (!sector) return;
 		DeleteSector(sector->m_left);
@@ -213,7 +213,7 @@ namespace sx { namespace core {
 
 	FORCEINLINE void _GetAllNodes(const PSector sector, ArrayPNode_abs& nodeList)
 	{
-		sx_callstack_push(_GetAllNodes());
+		sx_callstack();
 
 		if (!sector) return;
 
@@ -378,7 +378,7 @@ namespace sx { namespace core {
 
 	void SceneManager_SBVH::Clear( void )
 	{
-		sx_callstack_push(SceneManager_SBVH::Clear());
+		sx_callstack();
 
 		DeleteSector(m_root);
 		m_count = 0;
@@ -391,7 +391,7 @@ namespace sx { namespace core {
 
 	void SceneManager_SBVH::Add( const PNode pNode )
 	{
-		sx_callstack_push(SceneManager_SBVH::Add());
+		sx_callstack();
 
 		sx_assert(pNode);
 		sx_assert(!pNode->m_Sector);
@@ -417,7 +417,7 @@ namespace sx { namespace core {
 
 	void SceneManager_SBVH::Remove( const PNode pNode )
 	{
-		sx_callstack_push(SceneManager_SBVH::Remove());
+		sx_callstack();
 
 		sx_assert(pNode);
 
@@ -466,7 +466,7 @@ namespace sx { namespace core {
 
 	void SceneManager_SBVH::GetAllNodes( IN_OUT ArrayPNode_abs& nodeList )
 	{
-		sx_callstack_push(SceneManager_SBVH::GetAllNodes());
+		sx_callstack();
 
 		if (m_count)
 			_GetAllNodes( m_root, nodeList );

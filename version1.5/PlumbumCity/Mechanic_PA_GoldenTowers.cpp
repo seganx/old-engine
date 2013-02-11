@@ -24,19 +24,19 @@ namespace GM
 		, m_goldenTime(5)
 		, m_index( powerAttack_count++ )
 	{
-		sx_callstack_push(Mechanic_PA_GoldenTowers::Mechanic_PA_GoldenTowers());
+		sx_callstack();
 
 	}
 
 	Mechanic_PA_GoldenTowers::~Mechanic_PA_GoldenTowers( void )
 	{
-		sx_callstack_push(Mechanic_PA_GoldenTowers::~Mechanic_PA_GoldenTowers());
+		sx_callstack();
 		powerAttack_count--;
 	}
 
 	void Mechanic_PA_GoldenTowers::Initialize( void )
 	{
-		sx_callstack_push(Mechanic_PA_GoldenTowers::Initialize());
+		sx_callstack();
 
 		m_panelEx = sx_new( sx::gui::PanelEx );
 		m_panelEx->SetSize( float2(64,64) );
@@ -60,7 +60,7 @@ namespace GM
 
 	void Mechanic_PA_GoldenTowers::Finalize( void )
 	{
-		sx_callstack_push(Mechanic_PA_GoldenTowers::Finalize());
+		sx_callstack();
 
 		// gui will deleted by their parents
 		m_panelEx->SetParent( NULL );
@@ -72,7 +72,7 @@ namespace GM
 		if ( NotInGame() || g_game->m_mouseMode == MS_CreateTower )
 			return;
 
-		sx_callstack_push(Mechanic_PA_GoldenTowers::ProcessInput());
+		sx_callstack();
 
 		if ( m_Time < m_coolTime )
 		{
@@ -100,7 +100,7 @@ namespace GM
 		if ( !g_game->m_game_currentLevel || g_game->m_game_paused )
 			return;
 
-		sx_callstack_push(Mechanic_PA_GoldenTowers::Update());
+		sx_callstack();
 
 		if ( m_Time < m_coolTime )
 		{
@@ -134,7 +134,7 @@ namespace GM
 
 	void Mechanic_PA_GoldenTowers::MsgProc( UINT recieverID, UINT msg, void* data )
 	{
-		sx_callstack_push(Mechanic_PA_GoldenTowers::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
+		sx_callstack_param(Mechanic_PA_GoldenTowers::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
 		switch (msg)
 		{
@@ -224,7 +224,7 @@ namespace GM
 
 	void Mechanic_PA_GoldenTowers::OnGUIClick( sx::gui::PControl Sender )
 	{
-		sx_callstack_push(Mechanic_PA_GoldenTowers::OnGUIClick());
+		sx_callstack();
 
 		if ( m_Time >= m_coolTime && g_game->m_player->m_gold >= m_Cost )
 		{

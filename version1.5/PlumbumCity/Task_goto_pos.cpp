@@ -8,32 +8,32 @@ Task_goto_pos::Task_goto_pos( void )
 , m_stunTime(0)
 , m_posGoal(0,0,0)
 {
-	sx_callstack_push(Task_goto_pos::Task_goto_pos());
+	sx_callstack();
 
 	m_Type = GTT_GOTO_POSITION;
 }
 
 Task_goto_pos::~Task_goto_pos( void )
 {
-	sx_callstack_push(Task_goto_pos::~Task_goto_pos());
+	sx_callstack();
 }
 
 void Task_goto_pos::Initialize( void )
 {
-	sx_callstack_push(Task_goto_pos::Initialize());
+	sx_callstack();
 	Task::Initialize();
 }
 
 void Task_goto_pos::Finalize( void )
 {
-	sx_callstack_push(Task_goto_pos::Finalize());
+	sx_callstack();
 }
 
 void Task_goto_pos::Update( float elpstime, DWORD& status )
 {
 	if ( m_Status == TS_FAILED || m_owner->m_health.icur<1 ) return;
 	
-	sx_callstack_push(Task_goto_pos::Update());
+	sx_callstack();
 
 	if ( !m_owner->m_move.moveSpeed || m_posGoal.Distance_sqr( m_owner->GetPosition() ) < 1.0f )
 	{
@@ -77,7 +77,7 @@ void Task_goto_pos::Update( float elpstime, DWORD& status )
 
 FORCEINLINE void Task_goto_pos::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(Task_goto_pos::MsgProc(msg=%d), msg);
+	sx_callstack_param(Task_goto_pos::MsgProc(msg=%d), msg);
 
 	switch (msg)
 	{

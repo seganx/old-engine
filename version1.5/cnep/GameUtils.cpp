@@ -59,7 +59,7 @@ namespace GU
 	{
 		if ( g_game->m_game_paused || !m_Activate ) return;
 		
-		sx_callstack_push(Camera_RTS::ProseccInput());
+		sx_callstack();
 
 #if 0
 		if ( SEGAN_KEYUP(0, SX_INPUT_KEY_F) )
@@ -116,7 +116,7 @@ namespace GU
 	{
 		if ( !m_Activate ) return;
 
-		sx_callstack_push(Camera_RTS::Update());
+		sx_callstack();
 
 		float theta;
 		if ( m_freeMode )
@@ -312,7 +312,7 @@ namespace GU
 
 	void Camera_Mobile::Update( float elpsTime )
 	{
-		sx_callstack_push(Camera_Mobile::Update());
+		sx_callstack();
 
 		if ( !m_nodeCamera ) m_Activate = false;
 		if ( !m_Activate )

@@ -11,7 +11,7 @@ com_weapon_Luncher::com_weapon_Luncher( void ) : Component()
 	, m_shootTime(0)
 	, m_Fire(false)
 {
-	sx_callstack_push(com_weapon_Luncher::com_weapon_Luncher());
+	sx_callstack();
 
 	ZeroMemory( m_nodePipe, sizeof(m_nodePipe) );
 	m_name = L"Launcher";
@@ -19,12 +19,12 @@ com_weapon_Luncher::com_weapon_Luncher( void ) : Component()
 
 com_weapon_Luncher::~com_weapon_Luncher( void )
 {
-	sx_callstack_push(com_weapon_Luncher::~com_weapon_Luncher());
+	sx_callstack();
 }
 
 void com_weapon_Luncher::Initialize( void )
 {
-	sx_callstack_push(com_weapon_Luncher::Initialize());
+	sx_callstack();
 
 	m_owner->m_weaponType = GWT_LAUNCHER;
 
@@ -56,7 +56,7 @@ void com_weapon_Luncher::Initialize( void )
 
 void com_weapon_Luncher::Finalize( void )
 {
-	sx_callstack_push(com_weapon_Luncher::Finalize());
+	sx_callstack();
 
 	m_nodeWeapon	= NULL;
 	ZeroMemory( m_nodePipe, sizeof(m_nodePipe) );
@@ -65,7 +65,7 @@ void com_weapon_Luncher::Finalize( void )
 void com_weapon_Luncher::Update( float elpsTime )
 {
 	if ( !m_owner || !m_nodeWeapon || !m_nodePipe[0] || m_owner->m_health.icur<1) return;
-	sx_callstack_push(com_weapon_Luncher::Update());
+	sx_callstack();
 
 	m_shootTime += elpsTime;
 
@@ -121,7 +121,7 @@ void com_weapon_Luncher::Update( float elpsTime )
 
 void com_weapon_Luncher::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_weapon_Luncher::MsgProc(msg=%d), msg);
+	sx_callstack_param(com_weapon_Luncher::MsgProc(msg=%d), msg);
 
 	switch (msg)
 	{
@@ -154,7 +154,7 @@ void com_weapon_Luncher::MsgProc( UINT msg, void* data )
 
 Component* com_weapon_Luncher::Clone( void )
 {
-	sx_callstack_push(com_weapon_Luncher::Clone());
+	sx_callstack();
 
 	com_weapon_Luncher * me	=	sx_new( com_weapon_Luncher );
 	me->m_tag				=	m_tag;
@@ -166,7 +166,7 @@ void com_weapon_Luncher::ShootTheMissile()
 {
 	if ( !m_target ) return;
 
-	sx_callstack_push(com_weapon_Luncher::ShootTheMissile());
+	sx_callstack();
 
 	Projectile* proj	= m_owner->m_curAttack.projectile->Clone();
 

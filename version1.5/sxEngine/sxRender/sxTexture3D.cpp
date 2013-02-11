@@ -120,7 +120,7 @@ namespace sx { namespace d3d
 
 	bool Texture3D::CreateTexture( D3DResourceType type, UINT width, D3DFormat format /*= D3DFMT_DXT5*/, bool limitSize /*= true*/ )
 	{
-		sx_callstack_push(Texture3D::CreateTexture());
+		sx_callstack();
 
 		Cleanup();
 
@@ -385,7 +385,7 @@ namespace sx { namespace d3d
 
 	void Texture3D::Cleanup( void )
 	{
-		sx_callstack_push(Texture3D::Cleanup());
+		sx_callstack();
 
 		if ( !m_TX ) return;
 

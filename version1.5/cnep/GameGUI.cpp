@@ -113,7 +113,7 @@ GoldAndPeople::~GoldAndPeople( void )
 void GoldAndPeople::ProcessInput( bool& inputHandled, float elpsTime )
 {
 	if ( !g_game->m_game_currentLevel || g_game->m_game_paused || g_game->m_app_Loading ) return;
-	sx_callstack_push(GoldAndPeople::ProcessInput());
+	sx_callstack();
 
 	if ( !inputHandled && SEGAN_KEYUP( 0, SX_INPUT_KEY_I ) )
 	{
@@ -552,7 +552,7 @@ void GameGUI::Finalize( void )
 
 void GameGUI::ProcessInput( bool& inputHandled, float elpsTime )
 {
-	sx_callstack_push(GameGUI::ProcessInput());
+	sx_callstack();
 
 	m_info->ProcessInput( inputHandled, elpsTime );
 	m_confirmExit->ProcessInput( inputHandled, elpsTime );
@@ -634,7 +634,7 @@ void GameGUI::Update( float elpsTime )
 
 void GameGUI::Draw( DWORD flag )
 {
-	sx_callstack_push(GameGUI::Draw());
+	sx_callstack();
 
 	for (int i=0; i<m_gui.Count(); i++)
 	{
@@ -661,7 +661,7 @@ void GameGUI::Draw( DWORD flag )
 
 void GameGUI::MsgProc( UINT recieverID, UINT msg, void* data )
 {
-	sx_callstack_push(GameGUI::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
+	sx_callstack_param(GameGUI::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
 	if ( !m_main ) return;
 

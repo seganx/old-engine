@@ -30,7 +30,7 @@ static sxArrEntity				s_EntityTypes;		//!  use to hold types of entities
 
 void EntityManager::ClearTypes( void )
 {
-	sx_callstack_push(EntityManager::ClearTypes());
+	sx_callstack();
 
 
  	for (int i=0; i<s_EntityTypes.Count(); i++)
@@ -49,7 +49,7 @@ void EntityManager::ClearTypes( void )
 
 void EntityManager::LoadTypes( Callback_Draw_Loading drawLoading )
 {
-	sx_callstack_push(EntityManager::LoadTypes());
+	sx_callstack();
 
 	String str = sx::sys::FileManager::Project_GetDir();
 	str << L"entities.txt";
@@ -332,7 +332,7 @@ void EntityManager::LoadTypes( Callback_Draw_Loading drawLoading )
 
 const Entity* EntityManager::GetTypeByIndex( int index )
 {
-	sx_callstack_push(EntityManager::GetTypeByIndex(index=%d), index);
+	sx_callstack_param(EntityManager::GetTypeByIndex(index=%d), index);
 
 	if ( index < 0 || index >= s_EntityTypes.Count() ) return NULL;
 	return s_EntityTypes[index];
@@ -340,7 +340,7 @@ const Entity* EntityManager::GetTypeByIndex( int index )
 
 const Entity* EntityManager::GetTypeByName( const WCHAR* name )
 {
-	sx_callstack_push(EntityManager::GetTypeByName(name=%s), name);
+	sx_callstack_param(EntityManager::GetTypeByName(name=%s), name);
 
 	for (int i=0; i<s_EntityTypes.Count(); i++)
 	{
@@ -355,7 +355,7 @@ const Entity* EntityManager::GetTypeByName( const WCHAR* name )
 
 Entity* EntityManager::CreateEntityByTypeName( const WCHAR* name )
 {
-	sx_callstack_push(EntityManager::CreateEntityByTypeName(name=%s), name);
+	sx_callstack_param(EntityManager::CreateEntityByTypeName(name=%s), name);
 
 	for (int i=0; i<s_EntityTypes.Count(); i++)
 	{
@@ -371,7 +371,7 @@ Entity* EntityManager::CreateEntityByTypeName( const WCHAR* name )
 
 void EntityManager::AddEntity( Entity* pe )
 {
-	sx_callstack_push(EntityManager::AddEntity());
+	sx_callstack();
 
 	if ( s_EntityMap.Insert(pe->m_ID, pe) )
 	{
@@ -382,7 +382,7 @@ void EntityManager::AddEntity( Entity* pe )
 
 void EntityManager::RemoveEntity( UINT id )
 {
-	sx_callstack_push(EntityManager::RemoveEntity(id=%d), id);
+	sx_callstack();
 
 	Entity* pe = NULL;
 	if ( s_EntityMap.Find(id, pe) )
@@ -395,7 +395,7 @@ void EntityManager::RemoveEntity( UINT id )
 
 void EntityManager::ClearEntities( void )
 {
-	sx_callstack_push(EntityManager::ClearEntities());
+	sx_callstack();
 
 
 	while ( s_EntityArr.Count() )
@@ -409,14 +409,14 @@ void EntityManager::ClearEntities( void )
 
 UINT EntityManager::GetEntityCount( void )
 {
-	sx_callstack_push(EntityManager::GetEntityCount());
+	sx_callstack();
 
 	return s_EntityArr.Count();
 }
 
 Entity* EntityManager::GetEntityByIndex( const int index )
 {
-	sx_callstack_push(EntityManager::GetEntityByIndex(index=%d : count=%d), index, s_EntityArr.Count());
+	sx_callstack_param(EntityManager::GetEntityByIndex(index=%d : count=%d), index, s_EntityArr.Count());
 	sx_assert(index>=0 && index<s_EntityArr.Count());
 	return s_EntityArr[index];
 }
@@ -431,7 +431,7 @@ Entity* EntityManager::GetEntityByID( const UINT id )
 
 void EntityManager::Update( float elpsTime )
 {
-	sx_callstack_push(EntityManager::Update());
+	sx_callstack();
 
 	int n = s_EntityArr.Count();
 	for (int i=0; i<n; i++)
@@ -514,7 +514,7 @@ void EntityManager::Update( float elpsTime )
 
 void EntityManager::MsgProc( UINT RecieverID, UINT msg, void* data )
 {
-	sx_callstack_push(EntityManager::MsgProc(RecieverID=%d, msg=%d), RecieverID, msg);
+	sx_callstack_param(EntityManager::MsgProc(RecieverID=%d, msg=%d), RecieverID, msg);
 
 	switch ( msg )
 	{

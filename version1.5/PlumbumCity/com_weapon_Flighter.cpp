@@ -16,7 +16,7 @@ com_weapon_Flighter::com_weapon_Flighter( void )
 	, m_time(0)
 	, m_Fire(false)
 {
-	sx_callstack_push(com_weapon_Flighter::com_weapon_Flighter());
+	sx_callstack();
 
 	ZeroMemory( m_nodePipe, sizeof(m_nodePipe) );
 	m_name = L"Flighter";
@@ -24,12 +24,12 @@ com_weapon_Flighter::com_weapon_Flighter( void )
 
 com_weapon_Flighter::~com_weapon_Flighter( void )
 {
-	sx_callstack_push(com_weapon_Flighter::~com_weapon_Flighter());
+	sx_callstack();
 }
 
 void com_weapon_Flighter::Initialize( void )
 {
-	sx_callstack_push(com_weapon_Flighter::Initialize());
+	sx_callstack();
 
 	m_owner->m_weaponType = GWT_FLIGHTER;
 
@@ -67,7 +67,7 @@ void com_weapon_Flighter::Initialize( void )
 
 void com_weapon_Flighter::Finalize( void )
 {
-	sx_callstack_push(com_weapon_Flighter::Finalize());
+	sx_callstack();
 
 	m_nodeWeapon = NULL;
 	ZeroMemory( m_nodePipe, sizeof(m_nodePipe) );
@@ -76,7 +76,7 @@ void com_weapon_Flighter::Finalize( void )
 void com_weapon_Flighter::Update( float elpsTime )
 {
 	if ( !m_owner || !m_nodeWeapon || !m_nodePipe[0] || m_owner->m_health.icur<1 ) return;
-	sx_callstack_push(com_weapon_Flighter::Update());
+	sx_callstack();
 
 	m_shootTime += elpsTime;
 
@@ -204,7 +204,7 @@ void com_weapon_Flighter::Update( float elpsTime )
 
 void com_weapon_Flighter::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_weapon_Flighter::MsgProc(msg=%d), msg);
+	sx_callstack_param(com_weapon_Flighter::MsgProc(msg=%d), msg);
 
 	switch (msg)
 	{
@@ -251,7 +251,7 @@ void com_weapon_Flighter::MsgProc( UINT msg, void* data )
 
 Component* com_weapon_Flighter::Clone( void )
 {
-	sx_callstack_push(com_weapon_Flighter::Clone());
+	sx_callstack();
 
 	com_weapon_Flighter * me	=	sx_new( com_weapon_Flighter );
 	me->m_tag					=	m_tag;
@@ -260,7 +260,7 @@ Component* com_weapon_Flighter::Clone( void )
 
 void com_weapon_Flighter::BlendDirection( float elpsTime )
 {
-	sx_callstack_push(com_weapon_Flighter::BlendDirection());
+	sx_callstack();
 
 	if ( m_Dir.Dot( m_DirOffset ) < 0 )
 	{
@@ -291,7 +291,7 @@ void com_weapon_Flighter::BlendDirection( float elpsTime )
 
 void com_weapon_Flighter::ShootTheBullet( const prpAttack* pAttack, Sphere& targetSphere )
 {
-	sx_callstack_push(com_weapon_Flighter::ShootTheBullet());
+	sx_callstack();
 
 	//  rotate and show the pipe
 	msg_Mesh msgMesh( 0, SX_MESH_INVISIBLE );

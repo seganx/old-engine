@@ -11,7 +11,7 @@ com_Supporter::com_Supporter( void ): Component()
 	,	m_regen(0)
 	,	m_towers(512)
 {
-	sx_callstack_push(com_Supporter::com_Supporter());
+	sx_callstack();
 
 	m_name = L"Supporter";
 	m_tag = MAKEFOURCC('C','M','S','P');
@@ -19,12 +19,12 @@ com_Supporter::com_Supporter( void ): Component()
 
 com_Supporter::~com_Supporter( void )
 {
-	sx_callstack_push(com_Supporter::~com_Supporter());	
+	sx_callstack();	
 }
 
 void com_Supporter::Initialize( void )
 {
-	sx_callstack_push(com_Supporter::Initialize());
+	sx_callstack();
 
 	sx::core::ArrayPNode_inline	nodes(512);
 	sx::core::Scene::GetNodesByArea( m_owner->GetPosition(), m_owner->m_curAttack.maxRange, nodes, NMT_ALL, PARTY_TOWER );
@@ -63,12 +63,12 @@ void com_Supporter::Initialize( void )
 
 void com_Supporter::Finalize( void )
 {
-	sx_callstack_push(com_Supporter::Finalize());
+	sx_callstack();
 }
 
 void com_Supporter::Update( float elpsTime )
 {
-	sx_callstack_push(com_Supporter::Update());
+	sx_callstack();
 
 	if ( !m_owner || m_owner->m_health.icur < 1 || !m_owner->m_node ) return;
 
@@ -106,7 +106,7 @@ void com_Supporter::Update( float elpsTime )
 
 void com_Supporter::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_Supporter::MsgProc(msg=%d), msg);
+	sx_callstack_param(com_Supporter::MsgProc(msg=%d), msg);
 
 	if ( !m_owner || m_owner->m_health.icur < 1 || !m_owner->m_node ) return;
 
@@ -155,7 +155,7 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 
 Component* com_Supporter::Clone( void )
 {
-	sx_callstack_push(com_Supporter::Clone());
+	sx_callstack();
 
 	com_Supporter* me = sx_new( com_Supporter );
 

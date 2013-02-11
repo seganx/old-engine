@@ -18,7 +18,8 @@
 class SEGAN_LIB_API _CallStack
 {
 public:
-	_CallStack( const wchar* file, const sint line, const wchar* function, ... );
+	_CallStack( const wchar* file, const sint line, const wchar* function );
+	_CallStack( const sint line, const wchar* file, const wchar* function, ... );
 	~_CallStack( void );
 };
 
@@ -29,8 +30,12 @@ SEGAN_LIB_API void callstack_report( CallStack_Callback callback );
 SEGAN_LIB_API void callstack_clear( void );
 SEGAN_LIB_API void detect_crash(void);
 
-//! create new log for function call
-#define sx_callstack_push(function,...)				_CallStack _callstack( _CRT_WIDE(__FILE__), __LINE__, _CRT_WIDE(#function), __VA_ARGS__ )
+
+//! create a new call stack for function with out parameters
+#define sx_callstack()								_CallStack _callstack( _CRT_WIDE(__FILE__), __LINE__, _CRT_WIDE(__FUNCTION__) )
+
+//! create new call stack for function with name and parameters
+#define sx_callstack_param(function,...)			_CallStack _callstack( __LINE__, _CRT_WIDE(__FILE__), _CRT_WIDE(#function), __VA_ARGS__ )
 
 //! report call stack to a file
 #define sx_callstack_report_to_file(name, tag)		callstack_report_to_file( name, tag )
@@ -46,7 +51,7 @@ SEGAN_LIB_API void detect_crash(void);
 
 #else
 
-#define sx_callstack_push(function,...)
+#define sx_callstack_param(function,...)
 #define sx_callstack_report_to_file(name, tag)
 #define sx_callstack_report(callback)
 #define sx_callstack_clear()

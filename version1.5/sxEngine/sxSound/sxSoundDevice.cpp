@@ -178,7 +178,7 @@ namespace sx { namespace snd {
 
 	void Device::Pause( bool pause )
 	{
-		sx_callstack_push(Device::Pause());
+		sx_callstack();
 
 		if ( !s_deviceInfo.inited && pause == s_Pause ) return;
 		s_Pause = pause;

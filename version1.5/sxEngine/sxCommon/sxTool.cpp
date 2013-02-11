@@ -696,7 +696,7 @@ namespace sx { namespace cmn
 
 	SEGAN_API void String_Load( String& _string, const WCHAR* FileName )
 	{
-		sx_callstack_push(String_Load(String&, FileName=%s), FileName);
+		sx_callstack_param(String_Load(String&, FileName=%s), FileName);
 
 		if (!FileName)
 			return;

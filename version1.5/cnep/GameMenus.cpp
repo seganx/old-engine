@@ -61,7 +61,7 @@ void Menu::Update( float elpsTime )
 
 void Menu::Draw( DWORD flag )
 {
-	sx_callstack_push(Menu::Draw());
+	sx_callstack();
 
 	m_back->Draw( flag );
 }
@@ -215,7 +215,7 @@ void MenuMain::Initialize( void )
 void MenuMain::ProcessInput( bool& inputHandled, float elpsTime )
 {
 	if ( inputHandled ) return;
-	sx_callstack_push(MenuMain::ProcessInput());
+	sx_callstack();
 
 	if ( g_game->m_game_currentLevel == 0 && m_slantBack->State_GetIndex() )
 	{
@@ -646,7 +646,7 @@ void MenuMap::Finalize( void )
 void MenuMap::ProcessInput( bool& inputHandled, float elpsTime )
 {
 	if ( !m_back->State_GetIndex() ) return;
-	sx_callstack_push(MenuMap::ProcessInput());
+	sx_callstack();
 
 	if ( !inputHandled && SEGAN_KEYUP( 0, SX_INPUT_KEY_ESCAPE ) )
 	{
@@ -739,7 +739,7 @@ void MenuMap::Update( float elpsTime )
 
 void MenuMap::Draw( DWORD flag )
 {
-	sx_callstack_push(MenuMap::Draw());
+	sx_callstack();
 	Menu::Draw(flag);
 }
 
@@ -1130,7 +1130,7 @@ void MenuProfile::ProcessInput( bool& inputHandled, float elpsTime )
 {
 	if ( !m_back->State_GetIndex() ) return;
 	if ( inputHandled ) return;
-	sx_callstack_push(MenuProfile::ProcessInput());
+	sx_callstack();
 
 	Menu::ProcessInput( inputHandled, elpsTime );
 	if ( !m_back->State_GetIndex() ) return;
@@ -1432,7 +1432,7 @@ void MenuAchievements::Initialize( void )
 void MenuAchievements::ProcessInput( bool& inputHandled, float elpsTime )
 {
 	if ( inputHandled ) return;
-	sx_callstack_push(MenuAchievements::ProcessInput());
+	sx_callstack();
 
 	Menu::ProcessInput( inputHandled, elpsTime );
 	if ( !m_back->State_GetIndex() ) return;
@@ -1608,7 +1608,7 @@ void MenuSettings::ProcessInput( bool& inputHandled, float elpsTime )
 {
 	if ( !m_back->State_GetIndex() ) return;
 	if ( inputHandled ) return;
-	sx_callstack_push(MenuSettings::ProcessInput());
+	sx_callstack();
 
 	if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_ESCAPE ) )
 	{
@@ -1858,7 +1858,7 @@ void MenuConfirmExit::OnClick( sx::gui::PControl sender )
 
 void MenuConfirmExit::ProcessInput( bool& inputHandled, float elpsTime )
 {
-	sx_callstack_push(MenuConfirmExit::ProcessInput());
+	sx_callstack();
 
 	Menu::ProcessInput( inputHandled, elpsTime );
 	if ( !m_back->State_GetIndex() ) return;
@@ -2013,7 +2013,7 @@ void MenuPause::Initialize( void )
 void MenuPause::ProcessInput( bool& inputHandled, float elpsTime )
 {
 	if ( inputHandled ) return;
-	sx_callstack_push(MenuPause::ProcessInput());
+	sx_callstack();
 
 	if ( g_game->m_mouseMode == MS_Null && g_game->m_game_currentLevel && SEGAN_KEYDOWN(0, SX_INPUT_KEY_ESCAPE) )
 	{
@@ -2055,7 +2055,7 @@ void MenuPause::Update( float elpsTime )
 
 void MenuPause::MsgProc( UINT recieverID, UINT msg, void* data )
 {
-	sx_callstack_push(MenuPause::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
+	sx_callstack_param(MenuPause::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
 	Menu::MsgProc( recieverID, msg, data );
 
@@ -2271,7 +2271,7 @@ void MenuVictory::Finalize( void )
 
 void MenuVictory::ProcessInput( bool& inputHandled, float elpsTime )
 {
-	sx_callstack_push(MenuVictory::ProcessInput());
+	sx_callstack();
 
 	if ( !m_back->State_GetIndex() ) return;
 	Menu::ProcessInput( inputHandled, elpsTime );
@@ -2633,7 +2633,7 @@ void MenuGameOver::Initialize( void )
 
 void MenuGameOver::ProcessInput( bool& inputHandled, float elpsTime )
 {
-	sx_callstack_push(MenuGameOver::ProcessInput());
+	sx_callstack();
 
 	if ( !m_back->State_GetIndex() ) return;
 
@@ -2803,7 +2803,7 @@ void MenuInfo::Finalize( void )
 
 void MenuInfo::ProcessInput( bool& inputHandled, float elpsTime )
 {
-	sx_callstack_push(MenuInfo::ProcessInput());
+	sx_callstack();
 
 	if (g_game->m_gui->m_pause->IsVisible() || g_game->m_gui->m_settings->IsVisible() || 
 		g_game->m_gui->m_victory->IsVisible() || g_game->m_gui->m_gameOver->IsVisible() ) return;
@@ -2825,7 +2825,7 @@ void MenuInfo::ProcessInput( bool& inputHandled, float elpsTime )
 
 void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 {
-	sx_callstack_push(MenuInfo::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
+	sx_callstack_param(MenuInfo::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
 	switch ( msg )
 	{
@@ -2922,7 +2922,7 @@ void MenuInfo::Update( float elpsTime )
 
 void MenuInfo::Draw( DWORD flag )
 {
-	sx_callstack_push(MenuInfo::Draw());
+	sx_callstack();
 
 	m_back->Draw( flag );
 }
@@ -3100,7 +3100,7 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 
 void MenuInfo::ClearTutorial( void )
 {
-	sx_callstack_push(MenuInfo::ClearTutorial());
+	sx_callstack();
 
 	for ( int i=0; i<m_tutorial.Count(); i++ )
 	{
@@ -3236,7 +3236,7 @@ void MenuUpgrade::Finalize( void )
 
 void MenuUpgrade::ProcessInput( bool& inputHandled, float elpsTime )
 {
-	sx_callstack_push(MenuUpgrade::ProcessInput());
+	sx_callstack();
 
 	if ( !m_back->State_GetIndex() ) return;
 	m_back->ProcessInput( inputHandled );

@@ -306,7 +306,7 @@ namespace sx { namespace d3d
 
 	FORCEINLINE void UI3D::ReadyToDebug( const D3DColor color )
 	{
-		sx_callstack_push(UI3D::ReadyToDebug());
+		sx_callstack();
 
 		UI3D_internal::ReadyToDebug( color>0 ? color : 0xffffffff );
 	}
@@ -321,7 +321,7 @@ namespace sx { namespace d3d
 
 	void UI3D::DrawQuad( void )
 	{
-		sx_callstack_push(UI3D::DrawQuad());
+		sx_callstack();
 
 		static PDirect3DVertexBuffer vbQuad0 = NULL;
 		static PDirect3DVertexBuffer vbQuad1 = NULL;

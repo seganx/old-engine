@@ -40,7 +40,7 @@ void GamePlay::Finalize( void )
 
 void GamePlay::ProcessInput( bool& inputHandled, float elpsTime )
 {
-	sx_callstack_push(GamePlay::ProcessInput());
+	sx_callstack();
 
 	for (int i=0; i<m_Mechanics.Count(); i++)
 	{
@@ -50,7 +50,7 @@ void GamePlay::ProcessInput( bool& inputHandled, float elpsTime )
 
 void GamePlay::Update( float elpsTime )
 {
-	sx_callstack_push(GamePlay::Update());
+	sx_callstack();
 
 	for (int i=0; i<m_Mechanics.Count(); i++)
 	{
@@ -60,7 +60,7 @@ void GamePlay::Update( float elpsTime )
 
 void GamePlay::MsgProc( UINT recieverID, UINT msg, void* data )
 {
-	sx_callstack_push(GamePlay::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
+	sx_callstack_param(GamePlay::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
 	for (int i=0; i<m_Mechanics.Count(); i++)
 	{

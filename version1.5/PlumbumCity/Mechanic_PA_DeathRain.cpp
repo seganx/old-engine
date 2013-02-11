@@ -43,20 +43,20 @@ namespace GM
 		, m_Index( powerAttack_count++ )
 		, m_hotNode(0)
 	{
-		sx_callstack_push(Mechanic_PA_DeathRain::Mechanic_PA_DeathRain());
+		sx_callstack();
 
 	}
 
 	Mechanic_PA_DeathRain::~Mechanic_PA_DeathRain( void )
 	{
-		sx_callstack_push(Mechanic_PA_DeathRain::~Mechanic_PA_DeathRain());
+		sx_callstack();
 
 		powerAttack_count--;
 	}
 
 	void Mechanic_PA_DeathRain::Initialize( void )
 	{
-		sx_callstack_push(Mechanic_PA_DeathRain::Initialize());
+		sx_callstack();
 
 		m_panelEx = sx_new( sx::gui::PanelEx );
 		m_panelEx->SetSize( float2(64,64) );
@@ -80,7 +80,7 @@ namespace GM
 
 	void Mechanic_PA_DeathRain::Finalize( void )
 	{
-		sx_callstack_push(Mechanic_PA_DeathRain::Finalize());
+		sx_callstack();
 
 		// gui will deleted by their parents
 		sx_delete_and_null( m_panelEx );
@@ -98,7 +98,7 @@ namespace GM
 	{
 		if ( NotInGame() || g_game->m_mouseMode == MS_CreateTower )
 			return;
-		sx_callstack_push(Mechanic_PA_DeathRain::ProcessInput());
+		sx_callstack();
 
 		if ( m_Time < m_coolTime )
 		{
@@ -158,7 +158,7 @@ namespace GM
 	{
 		if ( NotInGame() )	return;
 
-		sx_callstack_push(Mechanic_PA_DeathRain::Update());
+		sx_callstack();
 
 		if ( m_Time < m_coolTime )
 		{
@@ -260,7 +260,7 @@ namespace GM
 
 	void Mechanic_PA_DeathRain::MsgProc( UINT recieverID, UINT msg, void* data )
 	{
-		sx_callstack_push(Mechanic_PA_DeathRain::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
+		sx_callstack_param(Mechanic_PA_DeathRain::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
 		switch (msg)
 		{
@@ -411,7 +411,7 @@ namespace GM
 	{
 		if ( !m_hotNode || !m_Attack.bullet[0] || !m_Attack.minRange ) return;
 
-		sx_callstack_push(Mechanic_PA_DeathRain::OnGUIClick());
+		sx_callstack();
 
 		if ( m_Time >= m_coolTime && g_game->m_player->m_gold >= m_Cost )
 		{
@@ -428,7 +428,7 @@ namespace GM
 
 	void Mechanic_PA_DeathRain::CreateBombZone( const float3& pos )
 	{
-		sx_callstack_push(Mechanic_PA_DeathRain::CreateBombZone());
+		sx_callstack();
 
 		if ( SEGAN_KEYDOWN(0, SX_INPUT_KEY_MOUSE_LEFT) )
 		{

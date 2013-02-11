@@ -115,7 +115,7 @@ namespace sx { namespace core {
 
 	void Node::Clear( void )
 	{
-		sx_callstack_push(Node::Clear());
+		sx_callstack();
 
 		//  members will detach themselves on destruction. so we just delete them straight forward
 		for ( int i=0; i<m_Member.Count(); i++ )
@@ -256,7 +256,7 @@ namespace sx { namespace core {
 
 	void Node::GetChildren( ArrayPNode_abs& nodeList, bool traverseChildes )
 	{
-		sx_callstack_push(Node::GetChildren());
+		sx_callstack();
 
 		for (int i=0; i<m_Child.Count(); i++)
 		{
@@ -431,7 +431,7 @@ namespace sx { namespace core {
 
 	FORCEINLINE void Node::SetTransformQ( const float3& vPosition, const floatQ& qQuaternion )
 	{
-		sx_callstack_push(Node::SetTransformQ());
+		sx_callstack();
 
 		m_Pos = vPosition;
 		m_Quat = qQuaternion;
@@ -460,7 +460,7 @@ namespace sx { namespace core {
 	
 	void Node::UpdateBoundingVolumes( void )
 	{
-		sx_callstack_push(Node::UpdateBoundingVolumes());
+		sx_callstack();
 
 		//  this trick says me that this node is going to delete
 		if ( m_UserTag == USERTAG_DELETE ) return;
@@ -653,7 +653,7 @@ namespace sx { namespace core {
 
 	UINT Node::MsgProc( UINT msgType, void* data )
 	{
-		sx_callstack_push(Node::MsgProc(msgType=%d), msgType);
+		sx_callstack_param(Node::MsgProc(msgType=%d), msgType);
 
 		switch (msgType)
 		{
@@ -780,7 +780,7 @@ namespace sx { namespace core {
 
 	void Node::Load( Stream& stream )
 	{
-		sx_callstack_push(Node::Load());
+		sx_callstack();
 
 		Clear();
 

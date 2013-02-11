@@ -19,19 +19,19 @@ com_weapon_GroundLava::com_weapon_GroundLava( void ): Component()
 	, m_headShot(false)
 	, m_fire(0)
 {
-	sx_callstack_push(com_weapon_GroundLava::com_weapon_GroundLava());
+	sx_callstack();
 
 	m_name = L"Groundlava";
 }
 
 com_weapon_GroundLava::~com_weapon_GroundLava( void )
 {
-	sx_callstack_push(com_weapon_GroundLava::~com_weapon_GroundLava());
+	sx_callstack();
 }
 
 void com_weapon_GroundLava::Initialize( void )
 {
-	sx_callstack_push(com_weapon_GroundLava::Initialize());
+	sx_callstack();
 
 	m_owner->m_weaponType = GWT_GROUNDLAVA;
 
@@ -62,7 +62,7 @@ void com_weapon_GroundLava::Initialize( void )
 
 void com_weapon_GroundLava::Finalize( void )
 {
-	sx_callstack_push(com_weapon_GroundLava::Finalize());
+	sx_callstack();
 
 	m_nodeWeapon = NULL;
 	m_nodePipe = NULL;
@@ -71,7 +71,7 @@ void com_weapon_GroundLava::Finalize( void )
 void com_weapon_GroundLava::Update( float elpsTime )
 {
 	if ( !m_owner || !m_nodeWeapon || !m_nodePipe || m_owner->m_health.icur<1 ) return;
-	sx_callstack_push(com_weapon_GroundLava::Update());
+	sx_callstack();
 
 	m_shootTime += elpsTime;
 
@@ -184,7 +184,7 @@ void com_weapon_GroundLava::Update( float elpsTime )
 
 void com_weapon_GroundLava::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_weapon_GroundLava::MsgProc(msg=%d), msg);
+	sx_callstack_param(com_weapon_GroundLava::MsgProc(msg=%d), msg);
 
 	switch (msg)
 	{
@@ -223,7 +223,7 @@ void com_weapon_GroundLava::MsgProc( UINT msg, void* data )
 
 Component* com_weapon_GroundLava::Clone( void )
 {
-	sx_callstack_push(com_weapon_GroundLava::Clone());
+	sx_callstack();
 
 	com_weapon_GroundLava * me	=	sx_new( com_weapon_GroundLava );
 	me->m_tag					=	m_tag;
@@ -233,7 +233,7 @@ Component* com_weapon_GroundLava::Clone( void )
 
 void com_weapon_GroundLava::BlendDirection( float elpsTime )
 {
-	sx_callstack_push(com_weapon_GroundLava::BlendDirection());
+	sx_callstack();
 
 	if ( m_dir.Dot( m_dirOffset ) < 0 )
 	{
@@ -264,7 +264,7 @@ void com_weapon_GroundLava::BlendDirection( float elpsTime )
 
 void com_weapon_GroundLava::ShootTheBullet( const prpAttack* pAttack, Sphere& targetSphere )
 {
-	sx_callstack_push(com_weapon_GroundLava::ShootTheBullet());
+	sx_callstack();
 
 	//  shoot the bullet
 	Projectile* proj			= pAttack->projectile->Clone();
@@ -290,7 +290,7 @@ void com_weapon_GroundLava::ShootTheBullet( const prpAttack* pAttack, Sphere& ta
 
 void com_weapon_GroundLava::SearchForHeadshot( float elpsTime )
 {
-	sx_callstack_push(com_weapon_GroundLava::SearchForHeadshot());
+	sx_callstack();
 
 	m_searchTime += elpsTime * 0.001f;
 	if ( m_searchTime < m_owner->m_curAbility.coolTime ) return;
@@ -333,7 +333,7 @@ void com_weapon_GroundLava::SearchForHeadshot( float elpsTime )
 
 void com_weapon_GroundLava::UpdateHeadshot( float elpsTime )
 {
-	sx_callstack_push(com_weapon_GroundLava::UpdateHeadshot());
+	sx_callstack();
 
 	// verify that this entity can head shot
 	if ( !m_target || !m_owner->m_curAbility.projectile )

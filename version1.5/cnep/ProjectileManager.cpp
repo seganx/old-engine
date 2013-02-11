@@ -14,7 +14,7 @@ static Map<UINT, Projectile*>  s_ProjectileTypes;		//  types of projectiles
 
 void ProjectileManager::ClearTypes( void )
 {
-	sx_callstack_push(ProjectileManager::ClearTypes());
+	sx_callstack();
 
 
 	for (Map<UINT, Projectile*>::Iterator it = s_ProjectileTypes.First(); !it.IsLast(); it++)
@@ -27,7 +27,7 @@ void ProjectileManager::ClearTypes( void )
 
 void ProjectileManager::LoadTypes( void )
 {
-	sx_callstack_push(ProjectileManager::LoadTypes());
+	sx_callstack();
 
 
 	String str = sx::sys::FileManager::Project_GetDir();
@@ -99,7 +99,7 @@ void ProjectileManager::LoadTypes( void )
 
 Projectile* ProjectileManager::GetTypeByName( const WCHAR* name )
 {
-	sx_callstack_push(ProjectileManager::GetTypeByName(name=%s), name);
+	sx_callstack_param(ProjectileManager::GetTypeByName(name=%s), name);
 
 	if ( !name || !name[0] ) return NULL;
 
@@ -155,7 +155,7 @@ Projectile* ProjectileManager::CreateProjectileByType( ProjectileType weaponType
 
 Projectile* ProjectileManager::CreateProjectileByTypeName( const WCHAR* name )
 {
-	sx_callstack_push(ProjectileManager::CreateProjectileByTypeName(name=%s), name);
+	sx_callstack_param(ProjectileManager::CreateProjectileByTypeName(name=%s), name);
 	sx_assert(name);
 
 	if ( !name ) return NULL;
@@ -175,7 +175,7 @@ Projectile* ProjectileManager::CreateProjectileByTypeName( const WCHAR* name )
 
 void ProjectileManager::DeleteProjectile( Projectile* &me )
 {
-	sx_callstack_push(ProjectileManager::DeleteProjectile());
+	sx_callstack();
 
 	//me->Projectile::~Projectile();
 	//s_Pool.Free(me);
@@ -185,7 +185,7 @@ void ProjectileManager::DeleteProjectile( Projectile* &me )
 
 void ProjectileManager::AddProjectile( Projectile* p )
 {
-	sx_callstack_push(ProjectileManager::AddProjectile());
+	sx_callstack();
 
 	if ( p->m_node )
 	{
@@ -198,7 +198,7 @@ void ProjectileManager::AddProjectile( Projectile* p )
 
 void ProjectileManager::ClearProjectiles( void )
 {
-	sx_callstack_push(ProjectileManager::ClearProjectiles());
+	sx_callstack();
 
 
 	for (int i=0; i<s_Projectiles.Count(); i++)
@@ -212,7 +212,7 @@ void ProjectileManager::ClearProjectiles( void )
 
 void ProjectileManager::Update( float elpstime )
 {
-	sx_callstack_push(ProjectileManager::Update());
+	sx_callstack();
 
 	for ( int i=0; i<s_Projectiles.Count(); i++ )
 	{
@@ -239,7 +239,7 @@ int ProjectileManager::GetProjectileCount( void )
 
 void ProjectileManager::MsgProc( UINT recieverID, UINT msg, void* data )
 {
-	sx_callstack_push(ProjectileManager::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
+	sx_callstack_param(ProjectileManager::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
 	switch ( msg )
 	{

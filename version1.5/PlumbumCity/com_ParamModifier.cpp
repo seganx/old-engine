@@ -20,7 +20,7 @@ com_ParamModifier::com_ParamModifier( void ): Component()
 	,	m_mainMoveType(GMT_NULL)
 	,	m_emitter(true)
 {
-	sx_callstack_push(com_ParamModifier::com_ParamModifier());
+	sx_callstack();
 
 	m_name = L"ParamModifier";
 	m_tag = MAKEFOURCC('C','M','P','M');
@@ -28,12 +28,12 @@ com_ParamModifier::com_ParamModifier( void ): Component()
 
 com_ParamModifier::~com_ParamModifier( void )
 {
-	sx_callstack_push(com_ParamModifier::~com_ParamModifier());	
+	sx_callstack();	
 }
 
 void com_ParamModifier::Initialize( void )
 {
-	sx_callstack_push(com_ParamModifier::Initialize(m_emitter=%d), byte(m_emitter));
+	sx_callstack_param(com_ParamModifier::Initialize(m_emitter=%d), byte(m_emitter));
 
 	if ( m_emitter )
 	{
@@ -55,12 +55,12 @@ void com_ParamModifier::Initialize( void )
 
 void com_ParamModifier::Finalize( void )
 {
-	sx_callstack_push(com_ParamModifier::Finalize());
+	sx_callstack();
 }
 
 void com_ParamModifier::Update( float elpsTime )
 {
-	sx_callstack_push(com_ParamModifier::Update());
+	sx_callstack();
 
 	using namespace sx::core;
 	if ( !m_owner || m_owner->m_health.icur < 1 || !m_owner->m_node ) return;
@@ -274,7 +274,7 @@ void com_ParamModifier::Update( float elpsTime )
 
 void com_ParamModifier::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_ParamModifier::MsgProc(msg=%d), msg);
+	sx_callstack_param(com_ParamModifier::MsgProc(msg=%d), msg);
 
 	switch ( msg )
 	{
@@ -314,7 +314,7 @@ void com_ParamModifier::MsgProc( UINT msg, void* data )
 
 Component* com_ParamModifier::Clone( void )
 {
-	sx_callstack_push(com_ParamModifier::Clone());
+	sx_callstack();
 
 	com_ParamModifier* me	= sx_new( com_ParamModifier );
 	me->m_name				= m_name;

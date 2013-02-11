@@ -21,7 +21,7 @@ namespace sx { namespace d3d {
 
 	bool Shader3D::CompileShader( const WCHAR* code, SQ_ ShaderQuality quality, const WCHAR* userLog /*= NULL*/ )
 	{
-		sx_callstack_push(Shader3D::CompileShader(%s, quality, %s), code, userLog);
+		sx_callstack_param(Shader3D::CompileShader(%s, quality, %s), code, userLog);
 
 		if ( !Device3D::GetDevice() || !code ) return false;
 
@@ -128,7 +128,7 @@ namespace sx { namespace d3d {
 
 	FORCEINLINE void Shader3D::SetValue( D3DShaderHandle hParam, const void* pData, UINT numBytes )
 	{
-		sx_callstack_push(Shader3D::SetValue());
+		sx_callstack();
 
 		if (!m_Effect || !hParam) return;
 
@@ -180,7 +180,7 @@ namespace sx { namespace d3d {
 
 	FORCEINLINE void Shader3D::SetToDevice( void )
 	{
-		sx_callstack_push(Shader3D::SetToDevice());
+		sx_callstack();
 
 		d3d::Device3D::SetEffect( m_Effect );
 	}

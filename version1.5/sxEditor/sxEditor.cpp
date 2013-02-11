@@ -192,7 +192,7 @@ void MainLoop(float elpsTime)
 //////////////////////////////////////////////////////////////////////////
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
-	sx_callstack_push(wWinMain());
+	sx_callstack();
 
 	//  load the settings of the editor from file and store them to the editor settings class
 	//  TODO

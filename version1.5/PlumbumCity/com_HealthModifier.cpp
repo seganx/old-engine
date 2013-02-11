@@ -8,7 +8,7 @@ com_HealthModifier::com_HealthModifier( void ): Component()
 	,	m_coolTime(0)
 	,	m_time(0)
 {
-	sx_callstack_push(com_HealthModifier::com_HealthModifier());
+	sx_callstack();
 
 	m_name = L"HealthModifier";
 	m_tag = MAKEFOURCC('C','M','H','M');
@@ -16,24 +16,24 @@ com_HealthModifier::com_HealthModifier( void ): Component()
 
 com_HealthModifier::~com_HealthModifier( void )
 {
-	sx_callstack_push(com_HealthModifier::~com_HealthModifier());	
+	sx_callstack();	
 }
 
 void com_HealthModifier::Initialize( void )
 {
-	sx_callstack_push(com_HealthModifier::Initialize());
+	sx_callstack();
 }
 
 void com_HealthModifier::Finalize( void )
 {
-	sx_callstack_push(com_HealthModifier::Finalize());
+	sx_callstack();
 }
 
 void com_HealthModifier::Update( float elpsTime )
 {
 	if ( !m_owner || m_owner->m_health.icur < 1 ) return;
 
-	sx_callstack_push(com_HealthModifier::Update());
+	sx_callstack();
 
 	if ( m_count < 1 || m_coolTime < EPSILON || !m_value )
 	{
@@ -62,12 +62,12 @@ void com_HealthModifier::Update( float elpsTime )
 
 void com_HealthModifier::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_HealthModifier::MsgProc(msg=%d), msg);
+	sx_callstack_param(com_HealthModifier::MsgProc(msg=%d), msg);
 }
 
 Component* com_HealthModifier::Clone( void )
 {
-	sx_callstack_push(com_HealthModifier::Clone());
+	sx_callstack();
 
 	com_HealthModifier* me = sx_new( com_HealthModifier );
 	

@@ -4,6 +4,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#if defined(_DEBUG)
+#if defined(_MSC_VER)
+#if ( _MSC_VER >= 1400 )
+#define DEBUG_OUTPUT_WINDOW
+#endif
+#endif
+#endif
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -40,7 +47,7 @@ SEGAN_INLINE sint lib_assert( const wchar* expression, const wchar* file, const 
 {
 
 #if ( SEGAN_CALLSTACK == 1 )
-	_CallStack _callstack( file, line, L"assertion '%s'", expression );
+	_CallStack _callstack( line, file, L"assertion '%s'", expression );
 #endif
 
 #if defined(_DEBUG)
@@ -61,15 +68,12 @@ SEGAN_INLINE sint lib_assert( const wchar* expression, const wchar* file, const 
 //////////////////////////////////////////////////////////////////////////
 /* call stack system should be safe. o memory allocation or using 
 any other service so we need a pool and fill it consecutively. */
-#define CALLSTACK_MAX	128
+#define CALLSTACK_MAX	64
 
 struct CallStackData
 {
-#if SEGAN_CALLSTACK_PARAMS
-	wchar	function[512];
-#else
+	wchar	name[1024];
 	wchar*	function;
-#endif
 	wchar*	file;
 	sint	line;
 };
@@ -81,14 +85,11 @@ SEGAN_INLINE void callstack_clean( CallStackData *csd )
 {
 	csd->file = null;
 	csd->line = 0;
-#if SEGAN_CALLSTACK_PARAMS
-	csd->function[0] = 0;
-#else
+	csd->name[0] = 0;
 	csd->function = null;
-#endif
 }
 
-SEGAN_INLINE _CallStack::_CallStack( const wchar* file, const sint line, const wchar* function, ... )
+SEGAN_INLINE _CallStack::_CallStack( const wchar* file, const sint line, const wchar* function )
 {
 	if ( callstack_index < CALLSTACK_MAX )
 	{
@@ -97,6 +98,7 @@ SEGAN_INLINE _CallStack::_CallStack( const wchar* file, const sint line, const w
 		CallStackData* csd = &callstack_pool[callstack_index++];
 
 		csd->file = (wchar*)file;
+#if 0
 		if ( csd->file )
 		{
 			wchar *s = csd->file;
@@ -111,25 +113,64 @@ SEGAN_INLINE _CallStack::_CallStack( const wchar* file, const sint line, const w
 			}
 			csd->file = s;
 		}
+#endif
 
 		csd->line = line;
+		csd->name[0] = 0;
 		if ( function )
 		{
-#if SEGAN_CALLSTACK_PARAMS
-			va_list argList;
-			va_start( argList, function );
-			sint len = _vscwprintf( function, argList);
-			if ( len < 511 )
-				vswprintf_s( csd->function, 511, function, argList );
-			else
-				String::Copy( csd->function, 511, function );
-			va_end( argList );
-#else
 			csd->function = (wchar*)function;
-#endif
 		}
 		else
 			csd->function = null;
+
+		lib_leave_cs();
+	}
+}
+
+SEGAN_INLINE _CallStack::_CallStack( const sint line, const wchar* file, const wchar* function, ... )
+{
+	if ( callstack_index < CALLSTACK_MAX )
+	{
+		lib_enter_cs();
+
+		CallStackData* csd = &callstack_pool[callstack_index++];
+
+		csd->file = (wchar*)file;
+#if 0
+		if ( csd->file )
+		{
+			wchar *s = csd->file;
+			wchar *c1 = s;
+			wchar *c2 = s;
+			while ( c1 || c2 )
+			{
+				c1 = wcsstr( s, L"\\" );
+				c2 = wcsstr( s, L"/" );
+				if ( c1 ) s = ++c1;
+				if ( c2 ) s = ++c2;
+			}
+			csd->file = s;
+		}
+#endif
+
+		csd->line = line;
+		csd->function = null;
+		if ( function )
+		{
+			va_list argList;
+			va_start( argList, function );
+			sint len = _vscwprintf( function, argList);
+			if ( len < 1023 )
+				vswprintf_s( csd->name, 1023, function, argList );
+			else
+				String::Copy( csd->name, 1023, function );
+			va_end( argList );
+		}
+		else
+		{
+			csd->name[0] = null;
+		}
 
 		lib_leave_cs();
 	}
@@ -151,7 +192,7 @@ void callstack_report( CallStack_Callback callback )
 	{
 		CallStackData* csd = &callstack_pool[i];
 		if ( csd->line && csd->file )
-			(*callback)( csd->file, csd->line, csd->function );
+			(*callback)( csd->file, csd->line, csd->function ? csd->function : csd->name );
 	}
 }
 
@@ -221,6 +262,8 @@ void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ 
 
 				if ( csd->function )
 					tmp << csd->function << '\n';
+				else if ( csd->name[0] )
+					tmp << csd->name << '\n';
 				else
 					tmp << L"no name !\n";
 
@@ -641,7 +684,7 @@ SEGAN_INLINE void mem_report_debug( CB_Memory callback, const uint tag /*= 0 */ 
 	}
 }
 
-#if defined(_DEBUG)
+#if defined(DEBUG_OUTPUT_WINDOW)
 void mem_report_debug_to_window( const uint tag /*= 0 */ )
 {
 	if ( !s_mem_root ) return;
@@ -956,7 +999,7 @@ void sx_lib_finalize( void )
 #if SEGAN_MEMLEAK
 	else
 	{
-#if defined(_DEBUG)
+#if defined(DEBUG_OUTPUT_WINDOW)
 	mem_report_debug_to_window( 0 );
 #endif
 	mem_report_debug_to_file( L"sx_memleak_report.txt", 0 );
@@ -966,7 +1009,7 @@ void sx_lib_finalize( void )
 
 	callstack_clear();
 #elif SEGAN_MEMLEAK
-#if defined(_DEBUG)
+#if defined(DEBUG_OUTPUT_WINDOW)
 	mem_report_debug_to_window( 0 );
 #endif
 	mem_report_debug_to_file( L"sx_memleak_report.txt", 0 );

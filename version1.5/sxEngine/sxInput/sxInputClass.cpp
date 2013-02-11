@@ -102,7 +102,7 @@ namespace sx { namespace io {
 
 	void Input::SendSignal( int playerID, InputSignalType idSignal, void* data )
 	{
-		sx_callstack_push(Input::SendSignal());
+		sx_callstack();
 
 		switch (idSignal)
 		{
@@ -121,7 +121,7 @@ namespace sx { namespace io {
 
 	void Input::Update( float elpsTime )
 	{
-		sx_callstack_push(Input::Update());
+		sx_callstack();
 
 		if (GetForegroundWindow() != g_input_win_hwnd)
 			return;

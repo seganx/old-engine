@@ -10,20 +10,20 @@
 //////////////////////////////////////////////////////////////////////////
 Task_attack_weapon::Task_attack_weapon( void ): Task(), m_Target(NULL), m_targetIndex(0), m_searchTime(0), m_fireTime(0)
 {
-	sx_callstack_push(Task_attack_weapon::Task_attack_weapon());
+	sx_callstack();
 
 	m_Type = GTT_ATTACK_WEAPON;
 }
 
 Task_attack_weapon::~Task_attack_weapon( void )
 {
-	sx_callstack_push(Task_attack_weapon::~Task_attack_weapon());
+	sx_callstack();
 
 }
 
 void Task_attack_weapon::Initialize( void )
 {
-	sx_callstack_push(Task_attack_weapon::Initialize());
+	sx_callstack();
 
 	Task::Initialize();
 
@@ -36,7 +36,7 @@ void Task_attack_weapon::Initialize( void )
 
 void Task_attack_weapon::Finalize( void )
 {
-	sx_callstack_push(Task_attack_weapon::Finalize());
+	sx_callstack();
 
 	m_searchTime = 0;
 	m_fireTime = 0;
@@ -51,7 +51,7 @@ void Task_attack_weapon::Update( float elpstime, DWORD& status )
 {
 	if ( m_Status == TS_FAILED || m_owner->m_health.icur < 1 ) return;
 
-	sx_callstack_push(Task_attack_weapon::Update());
+	sx_callstack();
 
 
 	m_searchTime += elpstime;
@@ -168,7 +168,7 @@ void Task_attack_weapon::Update( float elpstime, DWORD& status )
 
 FORCEINLINE void Task_attack_weapon::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(Task_attack_weapon::MsgProc(msg=%d), msg);
+	sx_callstack_param(Task_attack_weapon::MsgProc(msg=%d), msg);
 
 	switch (msg)
 	{
@@ -213,7 +213,7 @@ FORCEINLINE void Task_attack_weapon::MsgProc( UINT msg, void* data )
 
 void Task_attack_weapon::SearchForEnemy( void )
 {
-	sx_callstack_push(Task_attack_weapon::SearchForEnemy());
+	sx_callstack();
 
 	prpAttack* pAttack = &( m_owner->m_curAttack );
 

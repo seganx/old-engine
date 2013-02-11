@@ -41,7 +41,7 @@ namespace sx { namespace core {
 
 	void Scene::Cleanup( void )
 	{
-		sx_callstack_push(Scene::Cleanup());
+		sx_callstack();
 
 		if ( !Scene_internal::s_SceneMan ) return;
 
@@ -70,14 +70,14 @@ namespace sx { namespace core {
 
 	sx::core::PNode Scene::CreateNode( void )
 	{
-		sx_callstack_push(Scene::CreateNode());
+		sx_callstack();
 
 		return sx_new( Node );
 	}
 
 	void Scene::DeleteNode( PNode& pNode )
 	{
-		sx_callstack_push(Scene::DeleteNode());
+		sx_callstack();
 
 		if (Scene_internal::s_SceneMan && pNode)
 			RemoveNode(pNode);
@@ -87,7 +87,7 @@ namespace sx { namespace core {
 
 	void Scene::AddNode( const PNode pNode )
 	{
-		sx_callstack_push(Scene::AddNode());
+		sx_callstack();
 
 		sx_assert(Scene_internal::s_SceneMan);
 		if ( !pNode || pNode->m_Sector ) return;
@@ -138,7 +138,7 @@ namespace sx { namespace core {
 
 	void Scene::UpdateNode( const PNode pNode )
 	{
-		sx_callstack_push(Scene::UpdateNode());
+		sx_callstack();
 
 		sx_assert(Scene_internal::s_SceneMan);
 		Scene_internal::s_SceneMan->UpdateNode(pNode);
@@ -172,7 +172,7 @@ namespace sx { namespace core {
 
 	void Scene::LoadNodes( Stream& stream, Callback_LoadScene callback /*= 0*/ )
 	{
-		sx_callstack_push(Scene::LoadNodes());
+		sx_callstack();
 
 		sx_assert(Scene_internal::s_SceneMan);
 

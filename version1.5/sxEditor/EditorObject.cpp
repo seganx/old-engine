@@ -86,7 +86,7 @@ static Internal_Form_Object frm_Internal;
 
 void EditorObject::Initialize( void )
 {
-	sx_callstack_push(EditorObject::Initialize());
+	sx_callstack();
 
 	//  create objects
 	frm_Toolbar			= sx_new( Form_ObjectToolbar );

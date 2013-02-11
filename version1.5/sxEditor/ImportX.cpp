@@ -405,6 +405,8 @@ bool ImportXToLibrary( const WCHAR* fileName, sx::core::PNode& node )
 		node->Load(file);
 		file.Close();
 	}
+
+	sx_delete( mesh );
  	return true;
 }
 

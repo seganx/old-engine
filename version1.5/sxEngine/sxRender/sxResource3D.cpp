@@ -770,7 +770,7 @@ namespace sx { namespace d3d
 
 	bool Resource3D::CreateEffect( const char* srcCode, OUT PD3DXEffect& outEffect, const WCHAR* UserLog /*= NULL*/ )
 	{
-		sx_callstack_push(Resource3D::CreateEffect(code=%s), srcCode);
+		sx_callstack_param(Resource3D::CreateEffect(code=%s), srcCode);
 
 		if (!Resource3D_internal::s_EffectPool)
 			D3DXCreateEffectPool(&Resource3D_internal::s_EffectPool);
@@ -1037,7 +1037,7 @@ namespace sx { namespace d3d
 
 	void Resource3D::ReleaseTexture( PDirect3DBaseTexture& TX )
 	{
-		sx_callstack_push(Resource3D::ReleaseTexture(PDirect3DBaseTexture));
+		sx_callstack();
 
 		if ( !Device3D::IsCreated() || !TX ) return;
 
@@ -1065,7 +1065,7 @@ namespace sx { namespace d3d
 
 	void Resource3D::ReleaseEffect( PD3DXEffect& EF )
 	{
-		sx_callstack_push(Resource3D::ReleaseEffect());
+		sx_callstack();
 
 		if (!EF) return;
 
@@ -1076,7 +1076,7 @@ namespace sx { namespace d3d
 
 	void Resource3D::OnDeviceLost( void )
 	{
-		sx_callstack_push(Resource3D::OnDeviceLost());
+		sx_callstack();
 		if ( _ondeviceLost ) return;
 		_ondeviceLost = true;
 
@@ -1093,7 +1093,7 @@ namespace sx { namespace d3d
 
 	void Resource3D::OnDeviceReset( void )
 	{
-		sx_callstack_push(Resource3D::OnDeviceReset());
+		sx_callstack();
 		if ( !_ondeviceLost ) return;
 		_ondeviceLost = false;
 

@@ -16,7 +16,7 @@ com_weapon_MachineGun::com_weapon_MachineGun( void ): Component()
 	, m_DirOffset(0,0,1)
 	, m_fire(0)
 {
-	sx_callstack_push(com_weapon_MachineGun::com_weapon_MachineGun());
+	sx_callstack();
 
 	ZeroMemory( m_nodePipe, sizeof(m_nodePipe) );
 	m_name = L"Machinegun";
@@ -26,12 +26,12 @@ com_weapon_MachineGun::com_weapon_MachineGun( void ): Component()
 
 com_weapon_MachineGun::~com_weapon_MachineGun( void )
 {
-	sx_callstack_push(com_weapon_MachineGun::~com_weapon_MachineGun());
+	sx_callstack();
 }
 
 void com_weapon_MachineGun::Initialize( void )
 {
-	sx_callstack_push(com_weapon_MachineGun::Initialize());
+	sx_callstack();
 
 	m_owner->m_weaponType = GWT_MACHINEGUN;
 
@@ -69,7 +69,7 @@ void com_weapon_MachineGun::Initialize( void )
 
 void com_weapon_MachineGun::Finalize( void )
 {
-	sx_callstack_push(com_weapon_MachineGun::Finalize());
+	sx_callstack();
 
 	m_nodeWeapon = NULL;
 	ZeroMemory( m_nodePipe, sizeof(m_nodePipe) );
@@ -78,7 +78,7 @@ void com_weapon_MachineGun::Finalize( void )
 void com_weapon_MachineGun::Update( float elpsTime )
 {
 	if ( !m_owner || !m_nodeWeapon || !m_nodePipe[0] || m_owner->m_health.icur<1 ) return;
-	sx_callstack_push(com_weapon_MachineGun::Update());
+	sx_callstack();
 
 	m_shootTime += elpsTime;
 
@@ -192,7 +192,7 @@ void com_weapon_MachineGun::Update( float elpsTime )
 
 void com_weapon_MachineGun::MsgProc( UINT msg, void* data )
 {
-	sx_callstack_push(com_weapon_MachineGun::MsgProc(msg=%d), msg);
+	sx_callstack_param(com_weapon_MachineGun::MsgProc(msg=%d), msg);
 
 	switch (msg)
 	{
@@ -239,7 +239,7 @@ void com_weapon_MachineGun::MsgProc( UINT msg, void* data )
 
 Component* com_weapon_MachineGun::Clone( void )
 {
-	sx_callstack_push(com_weapon_MachineGun::Clone());
+	sx_callstack();
 
 	com_weapon_MachineGun * me	=	sx_new( com_weapon_MachineGun );
 	me->m_tag					=	m_tag;
@@ -249,7 +249,7 @@ Component* com_weapon_MachineGun::Clone( void )
 
 void com_weapon_MachineGun::BlendDirection( float elpsTime )
 {
-	sx_callstack_push(com_weapon_MachineGun::BlendDirection());
+	sx_callstack();
 
 	if ( m_Dir.Dot( m_DirOffset ) < 0 )
 	{
@@ -280,7 +280,7 @@ void com_weapon_MachineGun::BlendDirection( float elpsTime )
 
 void com_weapon_MachineGun::ShootTheBullet( const prpAttack* pAttack, Sphere& targetSphere, bool special )
 {
-	sx_callstack_push(com_weapon_MachineGun::ShootTheBullet(special=%d), byte(special));
+	sx_callstack_param(com_weapon_MachineGun::ShootTheBullet(special=%d), byte(special));
 
 	//  shoot the bullet
 	Projectile* proj			= pAttack->projectile->Clone();

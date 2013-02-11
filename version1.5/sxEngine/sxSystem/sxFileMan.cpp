@@ -235,7 +235,7 @@ namespace sx { namespace sys
 
 	bool FileManager::File_Open( const WCHAR* FileName, const WCHAR* PackageName, PStream& OutStream )
 	{
-		sx_callstack_push(FileManager::File_Open(FileName=%s, PackageName=%s), FileName, PackageName);
+		sx_callstack_param(FileManager::File_Open(FileName=%s, PackageName=%s), FileName, PackageName);
 
 		OutStream = NULL;
 		if (!FileName) return false;

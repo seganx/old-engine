@@ -305,7 +305,7 @@ public:
 
 	void SetSource( const WCHAR* srcAddress )
 	{
-		sx_callstack_push(DerivedTexture::SetSource(srcAddress=%s), srcAddress);
+		sx_callstack();
 
 		UINT id = sx::cmn::GetCRC32(srcAddress);
 		if (id == m_ID) return;
@@ -338,7 +338,7 @@ public:
 
 	void Activate( int LOD /*= 0*/ )
 	{
-		sx_callstack_push(DerivedTexture::Activate(LOD=%d), LOD);
+		sx_callstack();
 
 		if ( !s_loadInThread )
 		{
@@ -407,7 +407,7 @@ public:
 
 	void Cleanup( void )
 	{
-		sx_callstack_push(DerivedTexture::Cleanup());
+		sx_callstack();
 
 		m_APITX.Cleanup();
 
@@ -458,7 +458,7 @@ public:
 
 	void Load( Stream& stream, bool limitSize /*= true*/ )
 	{
-		sx_callstack_push(DerivedTexture::Load(stream, limitSize));
+		sx_callstack();
 
 		//  at first read the version and title
 		int fileVer = 0; char ch[1024];
@@ -956,7 +956,7 @@ namespace sx { namespace d3d
 
 	bool Texture::Manager::Get( OUT PTexture& pTxur, const WCHAR* src )
 	{
-		sx_callstack_push(Texture::Manager::Get(src=%s), src);
+		sx_callstack();
 
 		if (!src) 
 		{
@@ -985,7 +985,7 @@ namespace sx { namespace d3d
 
 	bool Texture::Manager::Create( OUT PTexture& pTxur, const WCHAR* src )
 	{
-		sx_callstack_push(Texture::Manager::Create(src=%s), src);
+		sx_callstack();
 
 		pTxur = sx_new( DerivedTexture );
 		if (pTxur)

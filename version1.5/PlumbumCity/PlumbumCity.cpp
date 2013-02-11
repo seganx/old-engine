@@ -121,7 +121,7 @@ UINT MainMsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 void MainLoop(float elpsTime)
 {
-	sx_callstack_push(MainLoop());
+	sx_callstack();
 
 	if ( elpsTime > 1000 ) return;
 

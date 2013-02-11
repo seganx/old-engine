@@ -117,7 +117,7 @@ namespace sx { namespace core {
 
 	Mesh::~Mesh()
 	{
-		sx_callstack_push(Mesh::~Mesh());
+		sx_callstack();
 
 		Clear();
 

@@ -509,7 +509,7 @@ namespace sx { namespace d3d
 
 	void Device3D::InitStates( void )
 	{
-		sx_callstack_push(Device3D::InitStates());
+		sx_callstack();
 
 		for (int i=0; i<8; i++)
 		{
@@ -585,7 +585,7 @@ namespace sx { namespace d3d
 
 	bool Device3D::CheckHealth( rnrCallback_OnDeviceLost OnDeviceLost, rnrCallback_OnDeviceReset OnDeviceReset )
 	{
-		sx_callstack_push(Device3D::CheckHealth());
+		sx_callstack();
 
 		static int ResetFailed = 0;
 		if (!Direct3D_internal::m_pDevice) return false;
@@ -630,7 +630,7 @@ namespace sx { namespace d3d
 
 	HRESULT Device3D::Reset( UINT Width, UINT Height, SX_D3D_ DWORD Flag )
 	{
-		sx_callstack_push(Device3D::Reset(Width=%d, Height=%d));
+		sx_callstack_param(Device3D::Reset(Width=%d, Height=%d));
 
 		//  cleanup last resources
 		Resource3D::OnDeviceLost();
@@ -795,7 +795,7 @@ e_reset:
 
 	void sx::d3d::Device3D::Scene_End( void )
 	{
-		sx_callstack_push(Device3D::Scene_End());
+		sx_callstack();
 
 		if (!Direct3D_internal::rs_rendering) return;
 
@@ -805,7 +805,7 @@ e_reset:
 
 	void Device3D::Scene_Present( PRECT pDestRect )
 	{
-		sx_callstack_push(Device3D::Scene_Present());
+		sx_callstack();
 
 		static int   s_iFrame	= 0;
 		static float s_iTime	= 0;
@@ -877,7 +877,7 @@ e_reset:
 
 	void Device3D::SetRenderTarget( UINT index, PDirect3DSurface surf )
 	{
-		sx_callstack_push(Device3D::SetRenderTarget(index=%d), index);
+		sx_callstack();
 
 		if (surf)
 			Direct3D_internal::m_pDevice->SetRenderTarget(index, surf);
@@ -895,7 +895,7 @@ e_reset:
 
 	void Device3D::SetEffect( PD3DXEffect effect )
 	{
-		sx_callstack_push(Device3D::SetEffect());
+		sx_callstack();
 
 		static PD3DXEffect lastEffect = NULL;
 		if (lastEffect != effect)
@@ -1148,7 +1148,7 @@ e_reset:
 
 	void Device3D::RS_Alpha( DWORD mode )
 	{
-		sx_callstack_push(Device3D::RS_Alpha());
+		sx_callstack();
 
 		DWORD option;
 
@@ -1326,7 +1326,7 @@ e_reset:
 
 	void Device3D::SetFogDesc( IN FogDesc& inDesc )
 	{
-		sx_callstack_push(Device3D::SetFogDesc());
+		sx_callstack();
 
 		Direct3D_internal::m_fog_Desc = inDesc;
 

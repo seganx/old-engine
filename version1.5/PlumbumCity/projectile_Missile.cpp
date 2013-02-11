@@ -12,17 +12,17 @@ projectile_Missile::projectile_Missile( void )
 ,	m_time(0)
 ,	m_turnDir(0,0,0)
 {
-	sx_callstack_push(projectile_Missile::projectile_Missile());
+	sx_callstack();
 }
 
 projectile_Missile::~projectile_Missile( void )
 {
-	sx_callstack_push(projectile_Missile::~projectile_Missile());
+	sx_callstack();
 }
 
 void projectile_Missile::Update( float elpsTime )
 {
-	sx_callstack_push(projectile_Missile::Update());
+	sx_callstack();
 	sx_assert(m_node);
 
 	if ( !m_node ) return;
@@ -170,7 +170,7 @@ void projectile_Missile::Update( float elpsTime )
 
 Projectile* projectile_Missile::Clone( void )
 {
-	sx_callstack_push(projectile_Missile::Clone());
+	sx_callstack();
 
 	projectile_Missile* missile	= sx_new( projectile_Missile );
 	missile->m_attack			= m_attack;

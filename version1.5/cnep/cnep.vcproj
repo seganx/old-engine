@@ -91,7 +91,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="COPY &quot;..\sxEngine\$(ConfigurationName)\sxEngine.dll&quot;  &quot;$(ConfigurationName)\sxEngine.dll&quot;"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
