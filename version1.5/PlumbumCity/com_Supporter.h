@@ -1,9 +1,9 @@
 /********************************************************************
 	created:	2012/07/26
 	filename: 	com_Supporter.h
-	Author:		Sajad Beigjani
-	eMail:		sajad.b@gmail.com
-	Site:		www.SeganX.com
+	Author:		Nader Golbaz
+	eMail:		ngolbaz@gmail.com
+	Site:		www.?.com
 	Desc:		This file contain a simple component to make ...
 *********************************************************************/
 #ifndef GUARD_com_Supporter_HEADER_FILE
@@ -44,7 +44,7 @@ public:
 	float				m_energy;
 	float				m_regen;
 
-	sx::core::ArrayPNode_inline	m_towers;
+	sx::core::ArrayPNode_inline	m_towers;	//	review - Sajad : this can be array of entity instead of array of node
 
 };
 
