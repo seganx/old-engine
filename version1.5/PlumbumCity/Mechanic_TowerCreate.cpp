@@ -24,7 +24,7 @@ namespace GM
 	{
 		sx_callstack_push(Mechanic_TowerCreate::Mechanic_TowerCreate());
 
-		for (int i=0; i<5; i++)
+		for (int i=0; i<NUM_TOWERS; i++)
 			m_btnCreate[i] = 0;
 
 		m_ShowRange.m_tag = MAKEFOURCC('M','C','T','C');
@@ -95,7 +95,7 @@ namespace GM
 
 		m_ShowRange.Finalize();
 
-		for (int i=0; i<5; i++)
+		for (int i=0; i<NUM_TOWERS; i++)
 			m_btnCreate[i] = NULL;
 
 		m_towerIndex = 0;
@@ -230,7 +230,7 @@ namespace GM
 		else if ( g_game->m_mouseMode == MS_ShowCreateTower )
 		{
 			//  check GUI 
-			for ( int i=0; i<5; i++ )
+			for ( int i=0; i<NUM_TOWERS; i++ )
 			{
 				if ( !m_btnCreate[i] || !m_btnCreate[i]->GetUserData() ) continue;
 
@@ -314,7 +314,7 @@ namespace GM
 
 		if ( m_pnlCreate0->State_GetIndex() )
 		{
-			for ( int i=0; i<5; i++ )
+			for ( int i=0; i<NUM_TOWERS; i++ )
 			{
 				if ( m_btnCreate[i] )
 				{
@@ -341,7 +341,7 @@ namespace GM
 		{
 		case GMT_LEVEL_LOAD:		/////////////////////////////////////////////////    LOAD LEVEL
 			{
-				Entity* towerTypes[5] = {0,0,0,0,0};
+				Entity* towerTypes[NUM_TOWERS] = {0,0,0,0,0,0};
 
 				//  load some level configuration
 				String str = Game::GetLevelPath();
@@ -368,7 +368,7 @@ namespace GM
 								m_tower_distance = 7.0f;
 								script.GetFloat( i, L"tower_distance", m_tower_distance );
 
-								for ( int t=0; t<5; t++ )
+								for ( int t=0; t<NUM_TOWERS; t++ )
 								{
 									str.Format(L"tower%d", t+1);
 									if ( script.GetString( i, str, tmpStr ) )
@@ -389,7 +389,7 @@ namespace GM
 				//  create tower icons
 				m_pnlCreate1->SetParent( NULL );
 				m_pnlArrow->SetParent(NULL);
-				for ( int i=0; i<5; i++ )
+				for ( int i=0; i<NUM_TOWERS; i++ )
 				{
 					m_btnCreate[i] = sx_new( sx::gui::PanelEx );
 					m_btnCreate[i]->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
@@ -404,10 +404,11 @@ namespace GM
 					switch ( i )
 					{
 					case 0: m_btnCreate[i]->State_GetByIndex(0).Rotation.Set( 0.0f, 0.0f, 0.0f ); break;
-					case 1: m_btnCreate[i]->State_GetByIndex(0).Rotation.Set( 0.0f, 0.0f, sx::math::DegToRad( 72.0f) ); break;
-					case 2: m_btnCreate[i]->State_GetByIndex(0).Rotation.Set( 0.0f, 0.0f, sx::math::DegToRad( 144.0f) ); break;
-					case 3: m_btnCreate[i]->State_GetByIndex(0).Rotation.Set( 0.0f, 0.0f, sx::math::DegToRad(-144.0f) ); break;
-					case 4: m_btnCreate[i]->State_GetByIndex(0).Rotation.Set( 0.0f, 0.0f, sx::math::DegToRad(-72.0f) ); break;
+					case 1: m_btnCreate[i]->State_GetByIndex(0).Rotation.Set( 0.0f, 0.0f, sx::math::DegToRad( 60.0f) ); break;
+					case 2: m_btnCreate[i]->State_GetByIndex(0).Rotation.Set( 0.0f, 0.0f, sx::math::DegToRad( 120.0f) ); break;
+					case 3: m_btnCreate[i]->State_GetByIndex(0).Rotation.Set( 0.0f, 0.0f, sx::math::DegToRad( 180.0f) ); break;
+					case 4: m_btnCreate[i]->State_GetByIndex(0).Rotation.Set( 0.0f, 0.0f, sx::math::DegToRad(-120.0f) ); break;
+					case 5: m_btnCreate[i]->State_GetByIndex(0).Rotation.Set( 0.0f, 0.0f, sx::math::DegToRad(-60.0f) ); break;
 					}
 
 					m_btnCreate[i]->State_Add();
@@ -617,7 +618,7 @@ namespace GM
 
 		m_pnlCreate0->State_SetIndex(1);
 		m_pnlCreate1->State_SetIndex(1);
-		for ( int i=0; i<5; i++ )
+		for ( int i=0; i<NUM_TOWERS; i++ )
 		{
 			if ( m_btnCreate[i] )
 				m_btnCreate[i]->State_SetIndex( 1 );
@@ -630,7 +631,7 @@ namespace GM
 
 		m_pnlCreate0->State_SetIndex(0);
 		m_pnlCreate1->State_SetIndex(0);
-		for ( int i=0; i<5; i++ )
+		for ( int i=0; i<NUM_TOWERS; i++ )
 		{
 			if ( m_btnCreate[i] )
 				m_btnCreate[i]->State_SetIndex( 0 );

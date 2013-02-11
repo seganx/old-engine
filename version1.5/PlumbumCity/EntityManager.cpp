@@ -13,6 +13,7 @@
 #include "com_GoldenTower.h"
 #include "com_HealthModifier.h"
 #include "com_ParamModifier.h"
+#include "com_Supporter.h"
 #include "ComponentManager.h"
 
 typedef Map<UINT, Entity*>		sxMapEntity;
@@ -252,6 +253,8 @@ void EntityManager::LoadTypes( Callback_Draw_Loading drawLoading )
 				pe->Attach( sx_new( com_weapon_GroundLava ) );
 			else if ( tmpStr == L"luncher" )
 				pe->Attach( sx_new( com_weapon_Luncher ) );
+			else if ( tmpStr == L"supporter" )
+				pe->Attach( sx_new( com_Supporter ) );
 		}
 
 		for ( int c = 0; c < 15; c++ )

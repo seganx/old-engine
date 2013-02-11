@@ -543,6 +543,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\com_Supporter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\com_Supporter.h"
+				>
+			</File>
+			<File
 				RelativePath=".\com_Turbo.cpp"
 				>
 			</File>

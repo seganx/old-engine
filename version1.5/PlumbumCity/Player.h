@@ -44,9 +44,10 @@ public:
 
 public:
 
-	String				m_name;				//	name of player
+	String						m_name;				//	name of player
 	int							m_gold;				//  gold
 	int							m_people;			//	current people
+	int							m_energy;			//  
 
 	PlayerProfile				m_profile;
 };

@@ -13,6 +13,8 @@
 #include "Mechanic.h"
 #include "com_ShowRange.h"
 
+#define NUM_TOWERS 6
+
 class Entity;
 
 namespace GM
@@ -64,7 +66,7 @@ namespace GM
 		sx::gui::PPanelEx	m_pnlCreate0;		//  background panel of tower creator
 		sx::gui::PPanelEx	m_pnlCreate1;		//  background panel of tower creator
 		sx::gui::PPanelEx	m_pnlArrow;			//	arrow to selected tower
-		sx::gui::PPanelEx	m_btnCreate[5];		//  buttons to create towers
+		sx::gui::PPanelEx	m_btnCreate[NUM_TOWERS];		//  buttons to create towers
 		
 		float				m_tower_distance;	//	minimum distance of towers
 		int					m_towerIndex;		//  index of tower type
