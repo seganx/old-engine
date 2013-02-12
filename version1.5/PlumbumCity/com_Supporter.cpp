@@ -9,6 +9,7 @@ com_Supporter::com_Supporter( void ): Component()
 	,	m_time(0)
 	,	m_energy(0)
 	,	m_repair(0)
+	,	m_started(false)
 	,	m_towers(512)
 {
 	sx_callstack();
@@ -55,9 +56,10 @@ void com_Supporter::Initialize( void )
 		}
 	}
 
-	m_time = 0.0f;
-	m_energy = 0.0f;
-	m_repair = 0.0f;
+	m_time		= 0.0f;
+	m_energy	= 0.0f;
+	m_repair	= 0.0f;
+	m_started	= false;
 	m_owner->m_experience = 0.0f;	
 }
 
@@ -70,7 +72,10 @@ void com_Supporter::Update( float elpsTime )
 {
 	sx_callstack();
 
-	if ( !m_owner || m_owner->m_health.icur < 1 || !m_owner->m_node ) return;
+	if ( !m_started || !m_owner || m_owner->m_health.icur < 1 || !m_owner->m_node )
+	{
+		return;
+	}
 
 	const float delta = elpsTime * 0.001f;
 
@@ -95,7 +100,8 @@ void com_Supporter::Update( float elpsTime )
 			{
 				const int addHealth = static_cast<int>(m_repair);
 				m_repair -= addHealth;
-				m_towers[i]->m_health.icur += m_towers[i]->m_health.icur + addHealth > m_towers[i]->m_health.imax ? 0 : addHealth;
+				m_towers[i]->m_health.icur +=
+					m_towers[i]->m_health.icur + addHealth > m_towers[i]->m_health.imax ? 0 : addHealth;
 			}
 		}
 	}
@@ -109,6 +115,11 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 
 	switch ( msg )
 	{
+	case GMT_WAVE_STARTED:
+		{
+			m_started = true;
+		}
+		break;
 	case GMT_I_INITIALIZED:
 		if ( data )
 		{

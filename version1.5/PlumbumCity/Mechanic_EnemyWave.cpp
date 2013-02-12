@@ -363,6 +363,11 @@ namespace GM
 
 		if ( m_waveIndex < m_wavesSrc.Count() )
 		{
+			if (m_waveIndex == 0)
+			{
+				EntityManager::MsgProc(0, GMT_WAVE_STARTED, NULL);
+			}
+
 			EnemyWave* pWave = m_wavesSrc[ m_waveIndex ];
 
 			//  show tips of start wave

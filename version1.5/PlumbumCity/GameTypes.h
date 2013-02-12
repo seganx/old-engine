@@ -99,6 +99,7 @@ enum GameMessageType
 	GMT_GAME_RESETING,		//  say to all objects that game is going to reset
 	GMT_GAME_RESET,			//  say to all objects that game is reseting to reset themselves
 	GMT_GAME_PAUSED,		//  say to all objects that game is paused
+	GMT_WAVE_STARTED,		//	mechanic says that first wave has been started
 	GMT_WAVE_FINISHED,		//	mechanic says that all waves have been finished
 	GMT_I_INITIALIZED,		//  the entity is initialized. data will be pointer to entity
 	GMT_I_FINALIZED,		//  the entity is finalized. data will be pointer to entity
