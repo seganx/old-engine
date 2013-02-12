@@ -42,7 +42,7 @@ public:
 	sx::core::PNode		m_node;
 	float				m_time;
 	float				m_energy;
-	float				m_regen;
+	float				m_repair;
 
 	Array<Entity*>		m_towers;
 

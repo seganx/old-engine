@@ -8,7 +8,7 @@ com_Supporter::com_Supporter( void ): Component()
 	,	m_node(0)
 	,	m_time(0)
 	,	m_energy(0)
-	,	m_regen(0)
+	,	m_repair(0)
 	,	m_towers(512)
 {
 	sx_callstack();
@@ -57,7 +57,7 @@ void com_Supporter::Initialize( void )
 
 	m_time = 0.0f;
 	m_energy = 0.0f;
-	m_regen = 0.0f;
+	m_repair = 0.0f;
 	m_owner->m_experience = 0.0f;	
 }
 
@@ -77,7 +77,7 @@ void com_Supporter::Update( float elpsTime )
 	m_owner->m_experience += m_owner->test_onDamageXP * delta;
 	
 	m_energy += m_owner->m_curAttack.stunValue * delta;
-	m_regen += m_owner->m_curAttack.physicalDamage * delta;
+	m_repair += m_owner->m_curAttack.physicalDamage * delta;
 
 	m_time += elpsTime;
 
@@ -93,8 +93,8 @@ void com_Supporter::Update( float elpsTime )
 		{
 			if ( m_towers[i] && m_towers[i]->m_health.icur > 0 )
 			{
-				const int addHealth = static_cast<int>(m_regen);
-				m_regen -= addHealth;
+				const int addHealth = static_cast<int>(m_repair);
+				m_repair -= addHealth;
 				m_towers[i]->m_health.icur += m_towers[i]->m_health.icur + addHealth > m_towers[i]->m_health.imax ? 0 : addHealth;
 			}
 		}
