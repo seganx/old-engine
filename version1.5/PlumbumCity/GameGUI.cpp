@@ -516,9 +516,10 @@ void GameGUI::Initialize( void )
 
 	// TEST
 	m_energy = sx_new( sx::gui::Label );
+	m_energy->SetParent( m_goldPeople->m_back );
 	m_energy->SetSize( float2( 100, 50 ) );
 	m_energy->GetElement(0)->Color() = D3DColor(0,0,0,0.02f);
-	m_energy->Position().Set( 50.0f, 20.0f, 0 );
+	m_energy->Position().Set( 65.0f, -45.0f, 0 );
 	//
 }
 

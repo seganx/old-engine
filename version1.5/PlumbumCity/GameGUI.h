@@ -77,7 +77,7 @@ public:
 
 	GoldAndPeople*				m_goldPeople;		//	to show gold and people
 	GameHint*					m_hint;				//  simple class to handle hints in the game
-	Array<GameTips*>	m_tips;				//  array of game tips
+	Array<GameTips*>			m_tips;				//  array of game tips
 	sx::gui::ArrayPControl		m_gui;				//	array of gui to display
 	MenuStatus*					m_status;
 	MenuMain*					m_main;
