@@ -40,7 +40,8 @@ enum MouseState
 	MS_CreateHotzone,
 	MS_CreateTrap,
 	MS_MobileCamera,
-	MS_FreeCamera
+	MS_FreeCamera,
+	MS_ManualTower
 };
 
 enum EntityState

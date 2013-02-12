@@ -419,6 +419,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Mechanic_MT_Machinegun.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Mechanic_MT_Machinegun.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Mechanic_Music.cpp"
 				>
 			</File>
