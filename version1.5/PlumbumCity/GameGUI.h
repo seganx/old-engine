@@ -93,6 +93,10 @@ public:
 	MenuCinematic*				m_cinematic;
 	MenuInfo*					m_info;
 	MenuUpgrade*				m_upgradePanel;
+
+	// TEST
+	sx::gui::Label*				m_energy;
+	//
 };
 
 #endif	//	GUARD_GameGUI_HEADER_FILE

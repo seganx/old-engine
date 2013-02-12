@@ -21,7 +21,7 @@
 #include "Mechanic_PA_GoldenTowers.h"
 
 
-Player::Player( void ):	m_gold(500), m_people(100)
+Player::Player( void ):	m_gold(500), m_people(100), m_energy(100)
 {
 	sx_callstack();
 

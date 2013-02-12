@@ -423,6 +423,7 @@ GameGUI::GameGUI( void ): Form()
 , m_victory(0)
 , m_gameOver(0)
 , m_cinematic(0)
+, m_energy(0)
 {
 
 }
@@ -512,6 +513,14 @@ void GameGUI::Initialize( void )
 	m_cinematic->Initialize();
 	m_info->Initialize();
 	m_upgradePanel->Initialize();
+
+	// TEST
+	m_energy = sx_new( sx::gui::Label );
+	m_energy->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+	m_energy->SetSize( float2( 240, 150 ) );
+	m_energy->GetElement(0)->Color() = D3DColor(0,0,0,0.02f);
+	m_energy->Position().Set( 10.0f, 5.0f, 0 );
+	//
 }
 
 void GameGUI::Finalize( void )
@@ -530,6 +539,9 @@ void GameGUI::Finalize( void )
 	m_status->Finalize();
 	m_upgradePanel->Finalize();
 
+	// TEST
+	sx_delete_and_null( m_energy );
+	//
 
 	sx_delete_and_null( m_upgradePanel );
 	sx_delete_and_null( m_info );
@@ -629,6 +641,12 @@ void GameGUI::Update( float elpsTime )
 			m_goldPeople->m_back->State_SetIndex(1);
 		}
 	}
+
+	// TEST
+	str128 strHint;
+	strHint.Format( L"%d", g_game->m_player->m_energy );
+	m_energy->SetText(strHint);
+	//
 }
 
 
@@ -657,6 +675,10 @@ void GameGUI::Draw( DWORD flag )
 	m_status->Draw( flag );
 	m_confirmExit->Draw( flag );
 	m_cinematic->Draw( flag );
+
+	// TEST
+	m_energy->Draw( flag );
+	//
 }
 
 void GameGUI::MsgProc( UINT recieverID, UINT msg, void* data )
