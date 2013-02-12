@@ -112,11 +112,11 @@ namespace GM
 		//  update hint of buttons
 		str1024 strHint;		
 		if ( m_Hint.Text() )
-			strHint.Format( m_Hint.Text(), m_Cost, g_game->m_player->m_gold );
+			strHint.Format( m_Hint.Text(), m_Cost, g_game->m_player->m_energy );
 		m_panelEx->SetHint( strHint );
 		m_progBar->SetHint( strHint );
 
-		if ( g_game->m_player->m_gold >= m_Cost )
+		if ( g_game->m_player->m_energy >= m_Cost )
 		{
 			m_panelEx->State_GetCurrent().Color.y = 1.0f;
 			m_panelEx->State_GetCurrent().Color.z = 1.0f;
@@ -226,10 +226,10 @@ namespace GM
 	{
 		sx_callstack();
 
-		if ( m_Time >= m_coolTime && g_game->m_player->m_gold >= m_Cost )
+		if ( m_Time >= m_coolTime && g_game->m_player->m_energy >= m_Cost )
 		{
 			m_Time = 0;
-			g_game->m_player->m_gold -= m_Cost;
+			g_game->m_player->m_energy -= m_Cost;
 
 			int n = EntityManager::GetEntityCount();
 			for (int i=0; i<n; i++)
