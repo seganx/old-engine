@@ -200,6 +200,8 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 						{
 							script.GetInteger( i, L"gold", m_gold );
 
+							script.GetInteger( i, L"energy", m_energy );
+
 							switch ( g_game->m_difficultyLevel )
 							{
 							case 0:	
@@ -254,6 +256,8 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 						if ( tmpStr == L"NORMAL" )
 						{
 							script.GetInteger( i, L"gold", m_gold );
+
+							script.GetInteger( i, L"energy", m_energy );
 
 							switch ( g_game->m_difficultyLevel )
 							{

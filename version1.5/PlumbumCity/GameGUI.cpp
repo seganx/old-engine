@@ -516,10 +516,9 @@ void GameGUI::Initialize( void )
 
 	// TEST
 	m_energy = sx_new( sx::gui::Label );
-	m_energy->AddProperty( SX_GUI_PROPERTY_VISIBLE );
-	m_energy->SetSize( float2( 240, 150 ) );
+	m_energy->SetSize( float2( 100, 50 ) );
 	m_energy->GetElement(0)->Color() = D3DColor(0,0,0,0.02f);
-	m_energy->Position().Set( 10.0f, 5.0f, 0 );
+	m_energy->Position().Set( 50.0f, 20.0f, 0 );
 	//
 }
 

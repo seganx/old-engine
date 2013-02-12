@@ -44,7 +44,7 @@ public:
 	float				m_energy;
 	float				m_regen;
 
-	sx::core::ArrayPNode_inline	m_towers;	//	review - Sajad : this can be array of entity instead of array of node
+	Array<Entity*>		m_towers;
 
 };
 

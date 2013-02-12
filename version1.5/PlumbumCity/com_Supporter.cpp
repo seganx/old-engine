@@ -51,7 +51,7 @@ void com_Supporter::Initialize( void )
 		
 		if (notSupporter)
 		{
-			m_towers.PushBack(node);
+			m_towers.PushBack(entity);
 		}
 	}
 
@@ -91,14 +91,11 @@ void com_Supporter::Update( float elpsTime )
 
 		for ( int i=0; i<m_towers.Count(); i++ )
 		{
-			sx::core::PNode node = m_towers[i];
-			Entity* entity = (Entity*)node->GetUserData();
-
-			if ( entity && entity->m_health.icur > 0 )
+			if ( m_towers[i] && m_towers[i]->m_health.icur > 0 )
 			{
 				const int addHealth = static_cast<int>(m_regen);
 				m_regen -= addHealth;
-				entity->m_health.icur += entity->m_health.icur + addHealth > entity->m_health.imax ? 0 : addHealth;
+				m_towers[i]->m_health.icur += m_towers[i]->m_health.icur + addHealth > m_towers[i]->m_health.imax ? 0 : addHealth;
 			}
 		}
 	}
@@ -134,7 +131,7 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 					const float distance = m_owner->GetDistance_edge( entity );
 					if ( distance <= m_owner->m_curAttack.maxRange )
 					{
-						m_towers.PushBack(entity->m_node);
+						m_towers.PushBack(entity);
 					}				
 				}
 			}
@@ -146,7 +143,7 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 			Entity* entity = static_cast<Entity*>(data);
 			if ( entity->m_partyCurrent == PARTY_TOWER )
 			{
-				m_towers.Remove(entity->m_node);
+				m_towers.Remove(entity);
 			}
 		}
 		break;
