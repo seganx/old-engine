@@ -161,7 +161,7 @@ struct msg_IntersectRay
 	OUT		result		results[32];	//! intersected results
 
 
-	msg_IntersectRay(IN DWORD _type, IN Ray& _ray, IN DepthLevel dlevel, const WCHAR* pname)
+	msg_IntersectRay(IN DWORD _type, IN const Ray& _ray, IN DepthLevel dlevel, const WCHAR* pname)
 		: name(pname)
 		, type(_type)
 		, ray(_ray.pos, _ray.dir)

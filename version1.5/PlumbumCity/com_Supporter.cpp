@@ -35,7 +35,7 @@ void com_Supporter::Initialize( void )
 	for ( int i=0; i<nodes.Count(); i++ )
 	{
 		sx::core::PNode node = nodes[i];
-		Entity* entity = (Entity*)node->GetUserData();
+		Entity* entity = static_cast<Entity*>(node->GetUserData());
 
 		if ( !entity || entity->m_health.icur < 1 ) continue;
 
