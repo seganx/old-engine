@@ -157,9 +157,9 @@ namespace GM
 
 		//	Blend Direction
 		{
-			float dx = m_rotOffset.x - m_rot.x;
-			float dy = m_rotOffset.y - m_rot.y;
-			float dz = m_rotOffset.z - m_rot.z;
+			const float dx = m_rotOffset.x - m_rot.x;
+			const float dy = m_rotOffset.y - m_rot.y;
+			const float dz = m_rotOffset.z - m_rot.z;
 
 			float blendTime = elpsTime * 0.005f;
 			m_rot.y += dy * blendTime;
@@ -367,12 +367,6 @@ namespace GM
 		camera.Eye = m_nodeCamera->GetPosition_world();
 
 		float3 dir(0, 0, 0.1f);
-		if ( m_fire )
-		{
-			dir.x += sx_random_f_limit(-0.0005f, 0.0005f);
-			dir.y += sx_random_f_limit(-0.0005f, 0.0005f);
-			dir.z += sx_random_f_limit(-0.002f, 0.002f);
-		}
 		dir.Transform_Norm( dir, m_nodeCamera->GetMatrix_world() );
 		camera.Eye += dir;
 		camera.At = camera.Eye + dir * 10;
@@ -465,6 +459,7 @@ namespace GM
 		ProjectileManager::AddProjectile(proj);
 
 		--m_fire;
+		m_rotOffset.x -= 0.025f;
 	}
 
 } // namespace GM
