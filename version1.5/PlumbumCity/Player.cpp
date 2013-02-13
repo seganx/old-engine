@@ -86,7 +86,7 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 	}
 
 	//  TEST
-#if 0
+#if 1
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_R) )
 	{
 		inputHandled = true;
@@ -151,6 +151,12 @@ void Player::Update( float elpsTime )
 		return;
 	}
 	
+
+	for (int i=0; i<m_Mechanics.Count(); i++)
+	{
+		m_Mechanics[i]->Update( elpsTime * Config::GetData()->game_speed );
+	}
+
 	if ( g_game->m_mouseMode == MS_ManualTower )
 	{
 		m_camera_Pause.m_Activate = false;
@@ -163,11 +169,6 @@ void Player::Update( float elpsTime )
 		m_camera_MBL.Update(elpsTime);
 		m_camera_RTS.Update(elpsTime);
 		m_camera_Pause = g_game->m_player->m_camera_RTS;
-	}
-
-	for (int i=0; i<m_Mechanics.Count(); i++)
-	{
-		m_Mechanics[i]->Update( elpsTime * Config::GetData()->game_speed );
 	}
 }
 

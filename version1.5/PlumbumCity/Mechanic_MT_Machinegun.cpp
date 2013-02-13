@@ -89,7 +89,7 @@ namespace GM
 				{
 					if ( m_selected )
 					{
-						EnterToManula();
+						EnterToManual();
 					}
 					else
 					{
@@ -128,7 +128,7 @@ namespace GM
 
 			if ( SEGAN_KEYUP(0, SX_INPUT_KEY_ESCAPE) || SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_RIGHT) )
 			{
-				g_game->m_mouseMode = MS_Null;
+				LeaveManual();
 			}
 		}
 	}
@@ -278,6 +278,10 @@ namespace GM
 				m_node->GetChildByName(L"pipe1", m_nodePipe[1]);
 				m_node->GetChildByName(L"pipe2", m_nodePipe[2]);
 				m_node->GetChildByName(L"pipe3", m_nodePipe[3]);
+
+				//  stop particle spray
+				msg_Particle msgPrtcl(0, SX_PARTICLE_SPRAY, 0, true );
+				m_node->MsgProc( MT_PARTICLE, &msgPrtcl );
 			}
 
 			//  invisible meshes of fire and stop particles
@@ -290,10 +294,6 @@ namespace GM
 					{
 						msg_Mesh msgMesh( SX_MESH_INVISIBLE );
 						m_nodePipe[i]->MsgProc( MT_MESH, &msgMesh );
-
-						//  stop particle spray
-						msg_Particle msgPrtcl(0, SX_PARTICLE_SPRAY, 0, true );
-						m_nodePipe[i]->MsgProc( MT_PARTICLE, &msgPrtcl );
 					}
 				}
 			}
@@ -304,7 +304,7 @@ namespace GM
 		}
 	}
 
-	void Mechanic_MT_Machinegun::EnterToManula( void )
+	void Mechanic_MT_Machinegun::EnterToManual( void )
 	{
 		//  find weapon node
 		if ( m_node )

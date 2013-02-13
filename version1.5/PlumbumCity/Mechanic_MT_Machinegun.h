@@ -42,7 +42,7 @@ namespace GM
 	public:
 
 		//! enter to manual tower mode
-		void EnterToManula(void);
+		void EnterToManual(void);
 
 		//! leave manual tower mode
 		void LeaveManual(void);
