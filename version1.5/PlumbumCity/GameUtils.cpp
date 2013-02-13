@@ -4,8 +4,6 @@
 #include "Game.h"
 
 
-#define CAMERA_FAR	6000.0f
-
 namespace GU
 {
 

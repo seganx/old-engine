@@ -98,7 +98,7 @@ namespace GM
 
 	void Mechanic_EnemyWaves::ProcessInput( bool& inputHandled, float elpsTime )
 	{
-		if ( NotInGame() )	return;
+		if ( NotInGame() /*|| g_game->m_mouseMode == MS_ManualTower*/ ) return;
 
 		if ( SEGAN_KEYDOWN(0, SX_INPUT_KEY_SPACE ) )
 		{

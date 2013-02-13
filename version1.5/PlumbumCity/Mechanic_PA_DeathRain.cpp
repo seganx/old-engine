@@ -96,7 +96,7 @@ namespace GM
 
 	void Mechanic_PA_DeathRain::ProcessInput( bool& inputHandled, float elpsTime )
 	{
-		if ( NotInGame() || g_game->m_mouseMode == MS_CreateTower )
+		if ( NotInGame() || g_game->m_mouseMode == MS_CreateTower || g_game->m_mouseMode == MS_ManualTower )
 			return;
 		sx_callstack();
 

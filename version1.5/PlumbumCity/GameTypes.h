@@ -13,6 +13,9 @@
 
 #define _TEST_	1		//	test for games
 
+#define CAMERA_FAR	6000.0f
+
+
 #define MISSION_
 #define MISSION_GOTO_NODE		0x00000001		//  goto specified node. data 0 & 1 most be pointer to scene nodes
 #define MISSION_GOTO_POSITION	0x00000002		//  goto specified position. use no path nodes and go directly

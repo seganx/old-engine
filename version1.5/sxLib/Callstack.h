@@ -51,6 +51,7 @@ SEGAN_LIB_API void detect_crash(void);
 
 #else
 
+#define sx_callstack()
 #define sx_callstack_param(function,...)
 #define sx_callstack_report_to_file(name, tag)
 #define sx_callstack_report(callback)

@@ -454,6 +454,7 @@ void Game::Update( float elpsTime )
 	//////////////////////////////////////////////////////////////////////////
 	//  update additional objects
 	m_panel_Cursor->Position().Set( SEGAN_MOUSE_ABSX(0) - SEGAN_VP_WIDTH/2, SEGAN_VP_HEIGHT/2 - SEGAN_MOUSE_ABSY(0), 0.0f );
+
 	m_panel_Cursor->Update( elpsTime );
 
 	if ( m_app_Loading )

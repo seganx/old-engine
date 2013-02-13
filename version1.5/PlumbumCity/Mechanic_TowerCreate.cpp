@@ -107,7 +107,7 @@ namespace GM
 	{
 		sx_callstack();
 
-		if ( NotInGame() )
+		if ( NotInGame() || g_game->m_mouseMode == MS_ManualTower )
 		{
 			ReleaseCaughtTower();
 			return;

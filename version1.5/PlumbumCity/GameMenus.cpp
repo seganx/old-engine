@@ -2929,9 +2929,12 @@ void MenuInfo::Draw( DWORD flag )
 
 void MenuInfo::Show( void )
 {
-	Menu::Show();
-	g_game->m_game_paused = true;
-	m_time = 0;
+	if ( g_game->m_mouseMode == MS_Null )
+	{
+		Menu::Show();
+		g_game->m_game_paused = true;
+		m_time = 0;
+	}
 }
 
 void MenuInfo::Hide( void )

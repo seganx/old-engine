@@ -19,6 +19,7 @@
 #include "Mechanic_PA_Trap.h"
 #include "Mechanic_PA_DeathRain.h"
 #include "Mechanic_PA_GoldenTowers.h"
+#include "Mechanic_MT_Machinegun.h"
 
 
 Player::Player( void ):	m_gold(500), m_people(100), m_energy(100)
@@ -65,7 +66,7 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 {
 	sx_callstack();
 
-	if ( !g_game->m_game_paused )
+	if ( !g_game->m_game_paused && g_game->m_mouseMode != MS_ManualTower )
 	{
 		m_camera_Pause.m_Activate = false;
 		m_camera_MBL.ProseccInput( inputHandled, elpsTime );
@@ -150,10 +151,19 @@ void Player::Update( float elpsTime )
 		return;
 	}
 	
-	m_camera_MBL.Attach( Entity::GetSelected() );
-	m_camera_MBL.Update(elpsTime);
-	m_camera_RTS.Update(elpsTime);
-	m_camera_Pause = g_game->m_player->m_camera_RTS;
+	if ( g_game->m_mouseMode == MS_ManualTower )
+	{
+		m_camera_Pause.m_Activate = false;
+		m_camera_RTS.m_Activate = false;
+		m_camera_MBL.m_Activate = false;
+	}
+	else
+	{
+		m_camera_MBL.Attach( Entity::GetSelected() );
+		m_camera_MBL.Update(elpsTime);
+		m_camera_RTS.Update(elpsTime);
+		m_camera_Pause = g_game->m_player->m_camera_RTS;
+	}
 
 	for (int i=0; i<m_Mechanics.Count(); i++)
 	{
@@ -314,6 +324,14 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 						else if ( tmpStr == L"Predator" )
 							m_Mechanics.PushBack( sx_new( GM::Mechanic_PA_Predator ) );
 					}
+					else if ( tmpStr == L"ManualTower" )
+					{
+						if ( !script.GetString(i, L"Name", tmpStr) )
+							continue;
+
+						if ( tmpStr == L"Machinegun" )
+							m_Mechanics.Insert( 0, sx_new( GM::Mechanic_MT_Machinegun ) );
+					}
 				}
 			}
 
@@ -327,6 +345,10 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 
 	case GMT_LEVEL_CLEAR:		/////////////////////////////////////////////////    CLEAR LEVEL
 		{						//////////////////////////////////////////////////////////////////////////
+			//  send message to mechanics
+			for (int i=0; i<m_Mechanics.Count(); i++)
+				m_Mechanics[i]->MsgProc( recieverID, msg, data );
+
 			//  clear mechanics
 			ClearMechanincs();
 		}
