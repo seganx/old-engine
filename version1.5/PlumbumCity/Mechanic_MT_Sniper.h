@@ -12,6 +12,7 @@
 
 #include "ImportEngine.h"
 #include "Mechanic.h"
+#include "GameTypes.h"
 
 class Entity;
 struct prpAttack;
@@ -44,31 +45,35 @@ namespace GM
 	public:
 
 		//! enter to manual tower mode
-		void EnterToManual( const Entity* tower );
+		void EnterToManual(void);
 
 		//! leave manual tower mode
 		void LeaveManual(void);
 
+		//! update the camera
+		void UpdateCamera( float elpsTime );
+
 		//! shoot a bullet and change index of pipe
-		void ShootTheBullet( const prpAttack* pAttack, const float3& dir );
+		void ShootTheBullet(void);
 
 	public:
-
-		Entity*				m_tower;			//	selected tower
+		prpAttack			m_attack;			//	attack property of tower
+		sx::core::PNode		m_node;				//	the node in the scene
+		sx::core::PNode		m_nodeCamera;		//	camera node
 		sx::core::PNode		m_nodeWeapon;		//  weapon node
 		sx::core::PNode		m_nodePipe;			//  pipe of weapon to shoot
 
 		int					m_shootCount;		//  number of shooting
 		float				m_shootTime;		//  time of shooting
-		float3				m_dir;				//  direction of weapon
-		float3				m_dirOffset;		//  offset of direction
+		float3				m_rot;				//  direction of weapon
+		float3				m_rotOffset;		//  offset of direction
+		float3				m_rotMax;			//	maximum rotation value
 
 		int					m_fire;				//  fire order for weapon
-
 		int					m_magazineCap;		//	capacity of each magazine
 		int					m_bullets;			//	number of bullets in weapon
 		float				m_reloadTime;		//	time of reload for weapon
-
+		bool				m_selected;			//	true of this tower has been selected
 	};
 
 

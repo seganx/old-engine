@@ -20,6 +20,7 @@
 #include "Mechanic_PA_DeathRain.h"
 #include "Mechanic_PA_GoldenTowers.h"
 #include "Mechanic_MT_Machinegun.h"
+#include "Mechanic_MT_Sniper.h"
 
 
 Player::Player( void ):	m_gold(500), m_people(100), m_energy(100)
@@ -332,6 +333,8 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 
 						if ( tmpStr == L"Machinegun" )
 							m_Mechanics.Insert( 0, sx_new( GM::Mechanic_MT_Machinegun ) );
+						else if ( tmpStr == L"Sniper" )
+							m_Mechanics.Insert( 0, sx_new( GM::Mechanic_MT_Sniper ) );
 					}
 				}
 			}
