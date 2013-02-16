@@ -67,6 +67,11 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 {
 	sx_callstack();
 
+	for (int i=0; i<m_Mechanics.Count(); i++)
+	{
+		m_Mechanics[i]->ProcessInput( inputHandled, elpsTime );
+	}
+
 	if ( !g_game->m_game_paused && g_game->m_mouseMode != MS_ManualTower )
 	{
 		m_camera_Pause.m_Activate = false;
@@ -79,11 +84,6 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 		{
 			m_camera_MBL.m_Activate = !m_camera_MBL.m_Activate;
 		}
-	}
-
-	for (int i=0; i<m_Mechanics.Count(); i++)
-	{
-		m_Mechanics[i]->ProcessInput( inputHandled, elpsTime );
 	}
 
 	//  TEST

@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxEngine", "..\sxEngine\sxEngine.vcxproj", "{45061582-8909-4C0A-9029-5D13D4D9E461}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxlib", "..\sxLib\win32dll\sxlib.vcxproj", "{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PlumbumCity", "PlumbumCity.vcxproj", "{3E4767B8-16E2-4758-B42A-1FBBCBB63214}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{45061582-8909-4C0A-9029-5D13D4D9E461}.Debug|Win32.ActiveCfg = Debug|Win32
+		{45061582-8909-4C0A-9029-5D13D4D9E461}.Debug|Win32.Build.0 = Debug|Win32
+		{45061582-8909-4C0A-9029-5D13D4D9E461}.Release|Win32.ActiveCfg = Release|Win32
+		{45061582-8909-4C0A-9029-5D13D4D9E461}.Release|Win32.Build.0 = Release|Win32
+		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}.Debug|Win32.Build.0 = Debug|Win32
+		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}.Release|Win32.ActiveCfg = Release|Win32
+		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}.Release|Win32.Build.0 = Release|Win32
+		{3E4767B8-16E2-4758-B42A-1FBBCBB63214}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3E4767B8-16E2-4758-B42A-1FBBCBB63214}.Debug|Win32.Build.0 = Debug|Win32
+		{3E4767B8-16E2-4758-B42A-1FBBCBB63214}.Release|Win32.ActiveCfg = Release|Win32
+		{3E4767B8-16E2-4758-B42A-1FBBCBB63214}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

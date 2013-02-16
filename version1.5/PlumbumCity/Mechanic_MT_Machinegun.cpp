@@ -349,7 +349,9 @@ namespace GM
 	void Mechanic_MT_Machinegun::LeaveManual( void )
 	{
 		if ( g_game->m_mouseMode == MS_ManualTower )
+		{
 			g_game->m_mouseMode = MS_Null;
+		}
 
 		m_nodeCamera = null;
 		m_nodeWeapon = NULL;

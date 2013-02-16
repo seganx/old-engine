@@ -1050,7 +1050,7 @@ void MenuProfile::Initialize( void )
 	//	load profiles
 	String fileName = sx::sys::GetDocumentsFolder();
 	fileName.MakePathStyle();
-	fileName << L"RoadsOfBattle";
+	fileName << L"PlumbumCity";
 	fileName << L"/profiles.dat";
 
 	sx::sys::FileStream	file;
@@ -1318,7 +1318,7 @@ void MenuProfile::SaveProfile( void )
 	//	save profiles
 	String fileName = sx::sys::GetDocumentsFolder();
 	fileName.MakePathStyle();
-	fileName << L"RoadsOfBattle";
+	fileName << L"PlumbumCity";
 	sx::sys::MakeFolder( fileName );
 	fileName << L"/profiles.dat";
 

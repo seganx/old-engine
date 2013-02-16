@@ -2,49 +2,49 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Render">
-      <UniqueIdentifier>{a907850b-3e8e-4bdf-a75a-3395dbe0b517}</UniqueIdentifier>
+      <UniqueIdentifier>{d8e0476f-a364-4aaf-b52c-eb1a3794fe99}</UniqueIdentifier>
     </Filter>
     <Filter Include="Render\API">
-      <UniqueIdentifier>{0f16ef4d-f1c5-449d-b45e-b3e1f4e48a29}</UniqueIdentifier>
+      <UniqueIdentifier>{654ecb0d-3201-4f77-8bd5-9313aa8a0e7b}</UniqueIdentifier>
     </Filter>
     <Filter Include="System">
-      <UniqueIdentifier>{75c21674-11c6-443d-9396-d4c9410d5221}</UniqueIdentifier>
+      <UniqueIdentifier>{0623baa2-9dbb-4367-ba7b-2f91a080c05f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{177fdec5-f672-440b-a3dd-dd671bf20b04}</UniqueIdentifier>
+      <UniqueIdentifier>{ca434328-dddc-4b12-a554-80f189ad4a1f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core">
-      <UniqueIdentifier>{831d186b-4516-4ac4-b7ab-c228de163ed4}</UniqueIdentifier>
+      <UniqueIdentifier>{d512fc50-ab45-432f-84e2-ee15741d69ea}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Render">
-      <UniqueIdentifier>{d11ab98e-0a7c-43e9-ba18-f91fb4121394}</UniqueIdentifier>
+      <UniqueIdentifier>{e06d102d-4501-4beb-8c63-870a97c15b5e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Scene">
-      <UniqueIdentifier>{9f8e7955-e0ea-4ea2-86e3-bf22541effc8}</UniqueIdentifier>
+      <UniqueIdentifier>{5bf2a055-6494-40d1-92b8-16a2fed5cf09}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Node">
-      <UniqueIdentifier>{4116a4b0-5bed-427b-b336-dbf73af2c9b7}</UniqueIdentifier>
+      <UniqueIdentifier>{57fec192-6306-4396-a06c-4b2d073b02ed}</UniqueIdentifier>
     </Filter>
     <Filter Include="GUI">
-      <UniqueIdentifier>{afeb5890-16e3-452f-9f5a-10f761edd720}</UniqueIdentifier>
+      <UniqueIdentifier>{c2edcfa4-4010-4923-aa15-78fb99738bcf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Physics">
-      <UniqueIdentifier>{3030cf45-3b30-4951-8820-1d83e158bff3}</UniqueIdentifier>
+      <UniqueIdentifier>{57e31c6a-4af5-4293-9cb0-1a6800736229}</UniqueIdentifier>
     </Filter>
     <Filter Include="Script">
-      <UniqueIdentifier>{660e3ac2-74f1-4c0c-92a5-a702203ec1c7}</UniqueIdentifier>
+      <UniqueIdentifier>{eb9c0631-1ba8-412e-bc86-06fa8bfe4e12}</UniqueIdentifier>
     </Filter>
     <Filter Include="Input">
-      <UniqueIdentifier>{52e28cb8-ac1d-4897-83a2-2a09b9e6f7ef}</UniqueIdentifier>
+      <UniqueIdentifier>{0871443b-6183-4b9e-83ed-7e401ee320ed}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sound">
-      <UniqueIdentifier>{a01dc693-9a6f-48a0-b06c-a37c1279dd8f}</UniqueIdentifier>
+      <UniqueIdentifier>{635f3484-0060-4c3b-8074-5ff34c859e90}</UniqueIdentifier>
     </Filter>
     <Filter Include="AI">
-      <UniqueIdentifier>{1415a69a-a1ed-4897-8802-d5d5ae7df39f}</UniqueIdentifier>
+      <UniqueIdentifier>{652b66ef-90ec-4e9e-b141-530ab23ed5e8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Common">
-      <UniqueIdentifier>{9a0d4007-fc9d-4dd4-8a8c-1fbe3a45216e}</UniqueIdentifier>
+      <UniqueIdentifier>{97ca7fce-c5e9-4b29-a96a-f864fa950b96}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
