@@ -79,24 +79,24 @@ typedef byte				*pbyte;
 	#endif
 #endif
 
-#if !defined( SEGAN_ENG_API )
-	#if defined( SEGAN_ENG_API )
-		#define SEGAN_ENG_API		__declspec(dllimport)
+#if !defined( SEGAN_API )
+	#if defined( SEGAN_API )
+		#define SEGAN_API		__declspec(dllimport)
 	#else
-		#define SEGAN_ENG_API		__declspec(dllexport)
+		#define SEGAN_API		__declspec(dllexport)
 	#endif
 #endif
 
 
-#define SEGAN_LIB_INLINE	__forceinline
+#define SEGAN_LIB_INLINE		__forceinline
 
-#define SEGAN_INLINE		inline
+#define SEGAN_INLINE			inline
 
-#define SEGAN_MEMLEAK		1		// use first version of memory leak detector
+#define SEGAN_MEMLEAK			1		// use first version of memory leak detector
 
-#define SEGAN_CALLSTACK		1		// enable call stack system to log stack of function
+#define SEGAN_CALLSTACK			1		// enable call stack system to log stack of function
 
-#define SEGAN_LIB_ASSERT	1		// check and log some special events on containers
+#define SEGAN_LIB_ASSERT		1		// check and log some special events on containers
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -108,7 +108,7 @@ typedef byte				*pbyte;
 #define SEGAN_RELEASE_AND_NULL(Obj)			{ if (Obj) { Obj->Release(); Obj = null; } }
 
 // some useful macros for cardinal handling
-#define SEGAN_SET_HAS(set, subset)			( set & subset )
+#define SEGAN_SET_HAS(set, subset)			( ( set & subset ) != 0 )
 #define SEGAN_SET_ADD(set, subset)			( set |= subset )
 #define SEGAN_SET_REM(set, subset)			( set &= ~subset )
 
@@ -118,6 +118,9 @@ typedef byte				*pbyte;
 #define SEGAN_2TH_BYTEOF(var)				((byte*)(&var))[1]
 #define SEGAN_3TH_BYTEOF(var)				((byte*)(&var))[2]
 #define SEGAN_4TH_BYTEOF(var)				((byte*)(&var))[3]
+
+#define SEGAN_CLAMP(var, Min, Max)			{ if (var<Min) var=Min; if (var>Max) var=Max; }
+#define	SEGAN_BETWEEN(var, Min, Max)		(Min<=var && var<=Max)
 
 //! avoid class from copy constructor and assign operator
 #define SEGAN_STERILE_CLASS(classname)		private: classname(classname& obj); void operator= (classname& obj);

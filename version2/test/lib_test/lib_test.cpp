@@ -22,13 +22,13 @@ void callstack_callback( const wchar* file, const sint line, const wchar* functi
 
 int Hi( int a )
 {
-	sx_callstack_push(Hi(%d), a );
+	sx_callstack_param(Hi(%d), a );
 	return a << 1;
 }
 
 int power( int n, int m )
 {
-	sx_callstack_push(power(%d, %d), n, m);
+	sx_callstack_param(power(%d, %d), n, m);
 	return Hi(n);
 }
 
@@ -56,10 +56,16 @@ int main(int argc, char* argv[])
 {
 	SetThreadAffinityMask( GetCurrentThread(), 1 );
 
-	static wchar tmp[800000];
-	tmp[0] = 0;
+	//Logger_Log( L" this is a simple test" );
 
-	Logger_Log( L" this is a simple test" );
+
+#if 1
+	String str = "hello";
+	bool e = str == L"hello1";
+
+	const wchar* tst = sx_str_make_pathstyle( L"D:\\SeganX\\version.2\\sxLib.txt" );
+	str = tst;
+#endif
 
 #if 0
 	Array<int> array_i;

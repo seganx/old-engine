@@ -312,4 +312,10 @@ typedef MemoryStream *PMemoryStream, StreamMemory, *PStreamMemory;
 //! use only for distinct types ( int, float, enum, vector, ... )
 #define sx_stream_read(variable)		stream.Read( &variable, sizeof(variable) )
 
+//! use only for distinct types ( int, float, enum, vector, ... )
+#define SEGAN_STREAM_WRITE(stream, variable)	stream.Write(&variable, sizeof(variable))
+
+//! use only for distinct types ( int, float, enum, vector, ... )
+#define SEGAN_STREAM_READ(stream, variable)		stream.Read(&variable, sizeof(variable))
+
 #endif	//	GUARD_Stream_HEADER_FILE

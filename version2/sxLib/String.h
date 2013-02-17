@@ -12,7 +12,6 @@
 #include "Memory.h"
 #include <wchar.h>
 #include <stdarg.h>
-#include <string.h>
 
 
 #if	defined(_WIN32)
@@ -23,6 +22,179 @@
 	//#define	PATH_PART
 #endif
 
+
+SEGAN_LIB_INLINE uint sx_str_len( const wchar* str )
+{
+	uint len = 0;
+	if ( str )
+	{
+		while ( *str++ ) ++len;
+	}
+	return len;
+}
+
+SEGAN_LIB_INLINE uint sx_str_len( const char* str )
+{
+	uint len = 0;
+	if ( str )
+	{
+		while ( *str++ ) ++len;
+	}
+	return len;
+}
+
+SEGAN_LIB_INLINE sint sx_str_cmp( const wchar* str1, const wchar* str2 )
+{
+	sint res = 0 ;
+	if ( str1 && str2 && (void*)str1 != (void*)str2 )
+	{
+		while( !(res = (sint)(*str1 - *str2)) && *str1 )
+			++str1, ++str2;
+		if ( res < 0 )		res = -1;
+		else if ( res > 0 )	res = 1;
+	}
+	else if ( str1 )
+		res = 1;
+	else if ( str2 )
+		res = -1;	
+	return res;
+}
+
+SEGAN_LIB_INLINE sint sx_str_cmp( const char* str1, const char* str2 )
+{
+	sint res = 0 ;
+	if ( str1 && str2 && (void*)str1 != (void*)str2 )
+	{
+		while( !(res = (sint)(*str1 - *str2)) && *str1 )
+			++str1, ++str2;
+		if ( res < 0 )		res = -1;
+		else if ( res > 0 )	res = 1;
+	}
+	else if ( str1 )
+		res = 1;
+	else if ( str2 )
+		res = -1;	
+	return res;
+}
+
+SEGAN_LIB_INLINE sint sx_str_cmp( const wchar* str1, const char* str2 )
+{
+	sint res = 0 ;
+	if ( str1 && str2 && (void*)str1 != (void*)str2 )
+	{
+		while( !(res = (sint)(*str1 - *str2)) && *str1 )
+			++str1, ++str2;
+		if ( res < 0 )		res = -1;
+		else if ( res > 0 )	res = 1;
+	}
+	else if ( str1 )
+		res = 1;
+	else if ( str2 )
+		res = -1;	
+	return res;
+}
+
+SEGAN_LIB_INLINE void sx_str_copy( wchar* dest, const sint dest_size_in_word, const wchar* src )
+{
+	sx_assert(dest);
+	if ( src )
+	{
+		for ( int i=0; i<dest_size_in_word; i++ )
+		{
+			dest[i] = src[i];
+			if ( dest[i] == 0 ) break;
+		}
+		dest[dest_size_in_word-1] = 0;
+	}
+}
+
+SEGAN_LIB_INLINE void sx_str_copy( wchar* dest, const sint dest_size_in_word, const char* src )
+{
+	sx_assert(dest);
+	if ( src )
+	{
+		for ( int i=0; i<dest_size_in_word; i++ )
+		{
+			dest[i] = src[i];
+			if ( dest[i] == 0 ) break;
+		}
+		dest[dest_size_in_word-1] = 0;
+	}
+}
+
+SEGAN_LIB_INLINE wchar sx_str_upper( wchar c )
+{
+	if ( 'a' <= c && c <= 'z' )
+		c += 'A' - 'a';
+	return c;
+}
+
+SEGAN_LIB_INLINE wchar sx_str_lower( wchar c )
+{
+	if ( 'A' <= c && c <= 'Z' )
+		c += 'a' - 'A';
+	return c;
+}
+
+SEGAN_LIB_INLINE sint sx_str_to_int( const wchar* str )
+{
+	if ( !str ) return 0;
+	return _wtoi( str );
+}
+
+SEGAN_LIB_INLINE float sx_str_to_float( const wchar* str )
+{
+	if ( !str ) return 0.0f;
+	return (float)_wtof( str );
+}
+
+/*! return true if entry string is type of file path and end with '/' or '\'*/
+SEGAN_LIB_INLINE const bool sx_str_is_pathstyle( const wchar* filepath )
+{
+	if ( !filepath ) return false;
+	sint len = sx_str_len( filepath );
+	if ( len )
+	{
+		wchar ch = filepath[--len];
+		return ( ch == '/' || ch == '\\' );
+	}
+	return false;
+}
+
+/*! return true if entry string is as complete filename*/
+SEGAN_LIB_INLINE const bool sx_str_is_fullfilepath( const wchar* filepath )
+{
+	if ( !filepath ) return false;
+	return ( filepath[1] == ':' || ( filepath[0] == '\\' && filepath[1] == '\\') || ( filepath[0] == '/' && filepath[1] == '/') );
+}
+
+/*! convert integer number to string.
+NOTE: this function uses string memory pool and the returned string will be deleted in the next call*/
+SEGAN_LIB_API const wchar* sx_int_to_str( const sint number );
+
+/*! convert float number to string with specified precision.
+NOTE: this function uses string memory pool and the returned string will be deleted in the next call*/
+SEGAN_LIB_API const wchar* sx_float_to_str( float number, sint precision = 3 );
+
+/*! extract file path from full filename.
+NOTE: this function uses string memory pool and the returned string will be deleted in the next call*/
+SEGAN_LIB_API const wchar* sx_str_extract_filepath( const wchar* filename );
+
+/*! extract file name ( may contain file extension ) from full filename.
+NOTE: this function uses string memory pool and the returned string will be deleted in the next call*/
+SEGAN_LIB_API const wchar* sx_str_extract_filename( const wchar* filename );
+
+/*! extract file extension from filename.
+NOTE: this function uses string memory pool and the returned string will be deleted in the next call*/
+SEGAN_LIB_API const wchar* sx_str_extract_extension( const wchar* filename );
+
+/*! exclude file extension from full filename.
+NOTE: this function uses string memory pool and the returned string will be deleted in the next call*/
+SEGAN_LIB_API const wchar* sx_str_exclude_extension( const wchar* filename );
+
+/*! return path file as string and guarantee the file path end with '/' or '\'
+NOTE: this function uses string memory pool and the returned string will be deleted in the next call*/
+SEGAN_LIB_API const wchar* sx_str_make_pathstyle( const wchar* filepath );
 
 /*! 
 string class stores strings of wide characters
@@ -39,44 +211,44 @@ public:
 	{
 	}
 
-	String( const char InChar )
+	String( const char ch )
 		: m_text(0)
 		, m_len(0)
 		, m_size(0)
 		, m_sampler(32)
 		, m_tmp(0)
 	{
-		Append( InChar );
+		Append( ch );
 	}
 
-	String( const char* InStr )
+	String( const char* str )
 		: m_text(0)
 		, m_len(0)
 		, m_size(0)
 		, m_sampler(32)
 		, m_tmp(0)
 	{
-		Append( InStr );
+		Append( str );
 	}
 
-	String( const wchar* InStr )
+	String( const wchar* str )
 		: m_text(0)
 		, m_len(0)
 		, m_size(0)
 		, m_sampler(32)
 		, m_tmp(0)
 	{
-		Append( InStr );
+		Append( str );
 	}
 
-	String( const String& InStr )
+	String( const String& str )
 		: m_text(0)
 		, m_len(0)
 		, m_size(0)
-		, m_sampler(InStr.m_sampler)
+		, m_sampler(str.m_sampler)
 		, m_tmp(0)
 	{
-		Append( InStr.m_text );
+		Append( str );
 	}
 
 	~String( void )
@@ -84,29 +256,35 @@ public:
 		mem_free( m_text );
 	}
 
-	SEGAN_LIB_INLINE void Clear( void )
+	SEGAN_LIB_INLINE void Clear( bool freemem = false )
 	{
-		mem_free( m_text );
-		m_text = 0;
-		m_size = 0;
+		if ( freemem )
+		{
+			mem_free( m_text );
+			m_size = 0;
+		}
+		else if ( m_text )
+		{
+			m_text[0] = 0;
+		}
 		m_len = 0;
 	}
 
 	SEGAN_LIB_INLINE void SetText( const wchar* str )
 	{
-		if ( str == m_text ) return;
-		if ( str )
+		if ( str != m_text )
 		{
-			m_len  = (uint)wcslen(str);
-			_Realloc( m_len + 1 );
-			memcpy( m_text, str, m_len * sizeof(wchar) );
-			m_text[m_len] = 0;
-			return;
-		}
-		else
-		{
-			Clear();
-			return;
+			if ( str )
+			{
+				m_len  = sx_str_len( str );
+				_Realloc( m_len + 1 );
+				memcpy( m_text, str, m_len * sizeof(wchar) );
+				m_text[m_len] = 0;
+			}
+			else
+			{
+				Clear();
+			}
 		}
 	}
 
@@ -114,16 +292,14 @@ public:
 	{
 		if ( str )
 		{
-			m_len  = (uint)strlen(str);
+			m_len  = sx_str_len( str );
 			_Realloc( m_len + 1 );
 			for ( sint i=0; i < m_len; m_text[i] = str[i], i++ );
 			m_text[m_len] = 0;
-			return;
 		}
 		else
 		{
 			Clear();
-			return;
 		}
 	}
 
@@ -152,14 +328,26 @@ public:
 		return m_text;
 	}
 
+	SEGAN_LIB_INLINE void Append( const String& str )
+	{
+		//	trusted . safe and optimized function
+		sint slen = str.m_len;
+		if ( slen )
+		{
+			_Realloc( m_len + slen + 1 );
+			for ( sint i=0; i<=slen; m_text[i+m_len] = str.m_text[i], i++ );
+			m_len += slen;
+		}
+	}
+
 	SEGAN_LIB_INLINE void Append( const wchar* str )
 	{
 		//	trusted . safe and optimized function
 		if ( !str ) return;
-		sint slen = (sint)wcslen(str);
+		sint slen = sx_str_len( str );
 		if ( !slen ) return;
 		_Realloc( m_len + slen + 1 );
-		for ( sint i=0; i<=slen; m_text[i+m_len]=str[i], i++ );
+		for ( sint i=0; i<=slen; m_text[i+m_len] = str[i], i++ );
 		m_len += slen;
 	}
 
@@ -167,10 +355,10 @@ public:
 	{
 		//	trusted . safe and optimized function
 		if ( !str ) return;
-		sint slen = (sint)strlen(str);
+		sint slen = sx_str_len( str );
 		if ( !slen ) return;
 		_Realloc( m_len + slen + 1 );
-		for ( sint i=0; i<=slen; m_text[i+m_len]=str[i], i++ );
+		for ( sint i=0; i<=slen; m_text[i+m_len] = str[i], i++ );
 		m_len += slen;
 	}
 
@@ -189,7 +377,7 @@ public:
 		if ( !str ) return;
 		if ( _where < 0 ) _where = 0;
 		else if ( _where > m_len ) _where = m_len;
-		sint slen = (sint)wcslen(str);
+		sint slen = sx_str_len(str);
 		_Realloc( m_len + slen + 1 );
 		for ( sint i=m_len; i>=_where; m_text[i+slen] = m_text[i], i-- );
 		for ( sint i=0; i<slen; m_text[i+_where] = str[i], i++ );
@@ -202,7 +390,7 @@ public:
 		if ( !str ) return;
 		if ( _where < 0 ) _where = 0;
 		else if ( _where > m_len ) _where = m_len;
-		sint slen = (sint)strlen(str);
+		sint slen = sx_str_len( str );
 		_Realloc( m_len + slen + 1 );
 		for ( sint i=m_len; i>=_where; m_text[i+slen] = m_text[i], i-- );
 		for ( sint i=0; i<slen; m_text[i+_where]=str[i], i++ );
@@ -272,6 +460,21 @@ public:
 			if (p) return ( (sint)(p - m_text) );
 		}
 		return -1;
+	}
+
+	SEGAN_LIB_INLINE void Replace(const wchar* what, const wchar* with)
+	{
+		if ( !m_text || !what || !with ) return;
+
+		int lenwhat = (int)sx_str_len(what);
+		int lenwith = (int)sx_str_len(with);
+		int index = 0;
+		while ( ( index = Find(what, index) ) > -1 )
+		{
+			Delete(index, lenwhat);
+			Insert(with, index);
+			index += lenwith;
+		}
 	}
 
 	SEGAN_LIB_INLINE void Revers( sint from, sint to )
@@ -375,7 +578,7 @@ public:
 
 	SEGAN_LIB_INLINE wchar& operator[] ( const sint index )
 	{
-		if ( !m_text || index < 0 || index > m_len ) return m_tmp;
+		sx_assert( !m_text || index < 0 || index > m_len );
 		return m_text[index];
 	}
 
@@ -476,7 +679,7 @@ public:
 	SEGAN_LIB_INLINE bool IsFullPath( void )
 	{
 		if ( !m_text ) return false;
-		return ( Find(L":") || Find(L"\\\\") || Find(L"//") );
+		return ( m_text[1] == ':' || ( m_text[0] == '\\' && m_text[1] == '\\') || ( m_text[0] == '/' && m_text[1] == '/') );
 	}
 
 	SEGAN_LIB_INLINE void MakePathStyle( void )
@@ -516,9 +719,9 @@ public:
 	}
 
 	//  operator declarations for << //////////////////////////////////////////////////////////////////////////
-	SEGAN_LIB_INLINE String& operator<< ( const String& Str )
+	SEGAN_LIB_INLINE String& operator<< ( const String& str )
 	{
-		Append( Str.m_text );
+		Append( str );
 		return *this;
 	}
 
@@ -546,107 +749,44 @@ public:
 		return *this;
 	}
 
+	SEGAN_LIB_INLINE String& operator<< ( const int number )
+	{
+		wchar tmp[64];
+		_itow_s( (int)number, tmp, 64, 10 );
+		Append( tmp );
+		return *this;
+	}
+
 	//  operator declarations for == //////////////////////////////////////////////////////////////////////////
 	SEGAN_LIB_INLINE bool operator== ( const String& Str ) const
 	{
-		if ( !m_text || !Str.m_text )
-			return ( m_text == Str.m_text );
-		return ( wcscmp( m_text, Str.m_text ) == 0 );
+		return ( sx_str_cmp( m_text, Str.m_text ) == 0 );
 	}
 
 	SEGAN_LIB_INLINE bool operator== ( const wchar* str ) const
 	{
-		if ( !m_text || !str )
-			return ( m_text == str );
-		return ( wcscmp( m_text, str ) == 0 );
+		return ( sx_str_cmp( m_text, str ) == 0 );
 	}
 
 	SEGAN_LIB_INLINE bool operator== ( const char* str ) const
 	{
-		if ( !m_text || !str )
-			return ( (void*)m_text == (void*)str );
-		String tmp = str;
-		return ( wcscmp( m_text, tmp.m_text ) == 0 );
+		return ( sx_str_cmp( m_text, str ) == 0 );
 	}
 
 	//  operator declarations for != //////////////////////////////////////////////////////////////////////////
 	SEGAN_LIB_INLINE bool operator!= ( const String& Str ) const
 	{
-		if ( !m_text || !Str.m_text )
-			return ( m_text != Str.m_text );
-		return ( wcscmp( m_text, Str.m_text ) != 0 );
+		return ( sx_str_cmp( m_text, Str.m_text ) != 0 );
 	}
 
 	SEGAN_LIB_INLINE bool operator!= ( const wchar* str ) const
 	{
-		if ( !m_text || !str )
-			return ( m_text != str );
-		return ( wcscmp( m_text, str ) != 0 );
+		return ( sx_str_cmp( m_text, str ) != 0 );
 	}
 
-	SEGAN_LIB_INLINE bool operator!= (const char* str) const {
-		if (!m_text || !str)
-			return ( (void*)m_text != (void*)str );
-		String tmp = str;
-		return ( wcscmp( m_text, tmp.m_text ) != 0 );
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	//	STATICS FUNCTIONS
-	//////////////////////////////////////////////////////////////////////////
-
-	SEGAN_LIB_INLINE static void Copy( wchar* dest, const sint dest_size_in_word, const wchar* src )
+	SEGAN_LIB_INLINE bool operator!= (const char* str) const
 	{
-		if ( src )
-		{
-			for ( int i=0; i<dest_size_in_word; i++ )
-			{
-				dest[i] = src[i];
-				if ( dest[i] == 0 ) break;
-			}
-			dest[dest_size_in_word-1] = 0;
-		}
-	}
-
-	SEGAN_LIB_INLINE static sint StrToInt( const wchar* str )
-	{
-		if ( !str ) return 0;
-		return _wtoi( str );
-	}
-
-	SEGAN_LIB_INLINE static float StrToFloat( const wchar* str )
-	{
-		if ( !str ) return 0.0f;
-		return (float)_wtof( str );
-	}
-
-	SEGAN_LIB_INLINE static wchar UpperChar( wchar c )
-	{
-		if ( 'a' <= c && c <= 'z' )
-			c += 'A' - 'a';
-		return c;
-	}
-
-	SEGAN_LIB_INLINE static wchar LowerChar( wchar c )
-	{
-		if ( 'A' <= c && c <= 'Z' )
-			c += 'a' - 'A';
-		return c;
-	}
-
-	SEGAN_LIB_INLINE static bool IsPathStyle( const wchar* Path )
-	{
-		if ( !Path ) return false;
-		sint len = (sint)wcslen(Path) - 1;
-		if ( len < 1 ) return false;
-		return ( Path[len] == '/' || Path[len] == '\\' );
-	}
-
-	SEGAN_LIB_INLINE static bool IsFullPath( const wchar* Path )
-	{
-		if ( !Path ) return false;
-		String path = Path;
-		return path.Find( L":" ) || path.Find( L"\\\\" ) || path.Find( L"//" );
+		return ( sx_str_cmp( m_text, str ) != 0 );
 	}
 
 private:
@@ -686,28 +826,34 @@ public:
 		m_text[0] = 0;
 	}
 
-	String_fix( const char InChar ): m_len(0)
+	String_fix( const char ch ): m_len(0)
 	{
 		m_text[0] = 0;
-		Append( InChar );
+		Append( ch );
 	}
 
-	String_fix( const char* InStr ): m_len(0)
+	String_fix( const char* str ): m_len(0)
 	{
 		m_text[0] = 0;
-		Append( InStr );
+		Append( str );
 	}
 
-	String_fix( const wchar* InStr ): m_len(0)
+	String_fix( const wchar* str ): m_len(0)
 	{
 		m_text[0] = 0;
-		Append( InStr );
+		Append( str );
 	}
 
-	String_fix( const String_fix& InStr ): m_len(0)
+	String_fix( const String_fix& str ): m_len(0)
 	{
 		m_text[0] = 0;
-		Append( InStr.m_text );
+		Append( str );
+	}
+
+	String_fix( const String& str ): m_len(0)
+	{
+		m_text[0] = 0;
+		Append( str );
 	}
 
 	~String_fix( void )
@@ -722,19 +868,19 @@ public:
 
 	SEGAN_LIB_INLINE void SetText( const wchar* str )
 	{
-		if ( str == m_text ) return;
-		if ( str )
+		if ( str == m_text )
 		{
-			m_len  = (uint)wcslen( str );
-			if ( m_len > count - 1 ) m_len = count - 1;
-			for ( sint i = 0; i < m_len; m_text[i] = str[i], i++ );
-			m_text[m_len] = 0;
-			return;
-		}
-		else
-		{
-			Clear();
-			return;
+			if ( str )
+			{
+				m_len  = sx_str_len( str );
+				if ( m_len > count - 1 ) m_len = count - 1;
+				memcpy( m_text, str, m_len * sizeof(wchar) );
+				m_text[m_len] = 0;
+			}
+			else
+			{
+				Clear();
+			}
 		}
 	}
 
@@ -746,12 +892,10 @@ public:
 			if ( m_len + 1 > count ) m_len = count - 1;
 			for ( sint i = 0; i < m_len; m_text[i] = str[i], i++ );
 			m_text[m_len] = 0;
-			return;
 		}
 		else
 		{
 			Clear();
-			return;
 		}
 	}
 
@@ -769,7 +913,7 @@ public:
 		va_list argList;
 		va_start( argList, format );
 		if ( _vscwprintf(format, argList) < count - 1 )
-			m_len = vswprintf_s( m_text, count - 2, format, argList );
+			m_len = vswprintf_s( m_text, count - 1, format, argList );
 		else
 			Clear();
 		va_end(argList);
@@ -782,22 +926,28 @@ public:
 
 	SEGAN_LIB_INLINE void Append( const wchar* str )
 	{
-		//	trusted . safe and optimized function
-		if ( !str ) return;
-		sint slen = (sint)wcslen(str);
-		if ( !slen ) return;
-		if ( m_len + slen > count ) return;
-		for ( sint i=0; i<=slen; m_text[i+m_len]=str[i], i++ );
-		m_len += slen;
+		if ( str )
+		{
+			for ( int i=0; m_len<count; i++, m_len++ )
+			{
+				m_text[m_len] = str[i];
+				if ( m_text[m_len] == 0 ) break;
+			}
+			m_text[count-1] = 0;
+		}
 	}
 
 	SEGAN_LIB_INLINE void Append( const char* str )
 	{
-		if ( !str ) return;
-		sint slen = (sint)strlen(str);
-		if ( !slen ) return;
-		for ( sint i = 0; i < slen && i < count - 1; m_text[i+m_len] = str[i], m_len++, i++ );
-		m_text[m_len]=0;
+		if ( str )
+		{
+			for ( int i=0; m_len<count; i++, m_len++ )
+			{
+				m_text[m_len] = str[i];
+				if ( m_text[m_len] == 0 ) break;
+			}
+			m_text[count-1] = 0;
+		}
 	}
 
 	SEGAN_LIB_INLINE void Append( const wchar c )
@@ -815,7 +965,7 @@ public:
 		if ( !str ) return;
 		if ( _where < 0 ) _where = 0;
 		else if ( _where > m_len ) _where = m_len;
-		sint slen = (sint)wcslen(str);
+		sint slen = (sint)sx_str_len(str);
 		if ( m_len + slen > count ) return;
 		for ( sint i = m_len; i >= _where; m_text[i+slen] = m_text[i], i-- );
 		for ( sint i = 0; i < slen; m_text[i+_where] = str[i], i++ );
@@ -897,6 +1047,21 @@ public:
 			if (p) return ( (sint)(p - m_text) );
 		}
 		return -1;
+	}
+
+	SEGAN_LIB_INLINE void Replace(const wchar* what, const wchar* with)
+	{
+		if ( !m_text || !what || !with ) return;
+
+		int lenwhat = (int)sx_str_len(what);
+		int lenwith = (int)sx_str_len(with);
+		int index = 0;
+		while ( ( index = Find(what, index) ) > -1 )
+		{
+			Delete(index, lenwhat);
+			Insert(with, index);
+			index += lenwith;
+		}
 	}
 
 	SEGAN_LIB_INLINE void Revers( sint from, sint to )
@@ -1000,7 +1165,7 @@ public:
 
 	SEGAN_LIB_INLINE wchar& operator[] ( const sint index )
 	{
-		if ( !m_text[0] || index < 0 || index > m_len ) return m_text[m_len-1];
+		sx_assert( !m_text || index < 0 || index > m_len );
 		return m_text[index];
 	}
 
@@ -1171,100 +1336,59 @@ public:
 		return *this;
 	}
 
+	SEGAN_LIB_INLINE String_fix& operator<< (sint number)
+	{
+		wchar tmp[64];
+		_itow_s( number, tmp, 64, 10 );
+		Append( tmp );
+		return *this;
+	}
+
+	SEGAN_LIB_INLINE String_fix& operator<< (uint number)
+	{
+		wchar tmp[64];
+		_itow_s( (int)number, tmp, 64, 10 );
+		Append( tmp );
+		return *this;
+	}
+
 	//  operator declarations for == //////////////////////////////////////////////////////////////////////////
 	SEGAN_LIB_INLINE bool operator== ( const String_fix& Str ) const
 	{
-		if ( !m_text[0] || !Str.m_text )
-			return ( m_text == Str.m_text );
-		return ( wcscmp( m_text, Str.m_text ) == 0 );
+		return ( sx_str_cmp( m_text, Str.m_text ) == 0 );
 	}
 
 	SEGAN_LIB_INLINE bool operator== ( const wchar* str ) const
 	{
-		if ( !m_text[0] || !str )
-			return ( m_text == str );
-		return ( wcscmp( m_text, str ) == 0 );
+		return ( sx_str_cmp( m_text, str ) == 0 );
 	}
 
 	SEGAN_LIB_INLINE bool operator== ( const char* str ) const
 	{
-		if ( !m_text[0] || !str )
-			return ( (void*)m_text == (void*)str );
-		String_fix tmp = str;
-		return ( wcscmp( m_text, tmp.m_text ) == 0 );
+		return ( sx_str_cmp( m_text, str ) == 0 );
 	}
 
 	//  operator declarations for != //////////////////////////////////////////////////////////////////////////
 	SEGAN_LIB_INLINE bool operator!= ( const String_fix& Str ) const
 	{
-		if ( !m_text[0] || !Str.m_text )
-			return ( m_text != Str.m_text );
-		return ( wcscmp( m_text, Str.m_text ) != 0 );
+		return ( sx_str_cmp( m_text, Str.m_text ) != 0 );
 	}
 
 	SEGAN_LIB_INLINE bool operator!= ( const wchar* str ) const
 	{
-		if ( !m_text[0] || !str )
-			return ( m_text != str );
-		return ( wcscmp( m_text, str ) != 0 );
+		return ( sx_str_cmp( m_text, str ) != 0 );
 	}
 
-	SEGAN_LIB_INLINE bool operator!= (const char* str) const {
-		if (!m_text[0] || !str)
-			return ( (void*)m_text != (void*)str );
-		String_fix tmp = str;
-		return ( wcscmp( m_text, tmp.m_text ) != 0 );
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	//	STATICS FUNCTIONS
-	//////////////////////////////////////////////////////////////////////////
-
-	SEGAN_LIB_INLINE static sint StrToInt( const wchar* str )
+	SEGAN_LIB_INLINE bool operator!= (const char* str) const
 	{
-		if ( !str ) return 0;
-		return _wtoi(str);
-	}
-
-	SEGAN_LIB_INLINE static float StrToFloat( const wchar* str )
-	{
-		if ( !str ) return 0.0f;
-		return (float)_wtof(str);
-	}
-
-	SEGAN_LIB_INLINE static wchar UpperChar( wchar c )
-	{
-		if ( 'a' <= c && c <= 'z' )
-			c += 'A' - 'a';
-		return c;
-	}
-
-	SEGAN_LIB_INLINE static wchar LowerChar( wchar c )
-	{
-		if ( 'A' <= c && c <= 'Z' )
-			c += 'a' - 'A';
-		return c;
-	}
-
-	SEGAN_LIB_INLINE static bool IsPathStyle( const wchar* Path )
-	{
-		if ( !Path ) return false;
-		sint len = (sint)wcslen(Path) - 1;
-		if ( len < 1 ) return false;
-		return ( Path[len]=='/' || Path[len]=='\\' );
-	}
-
-	SEGAN_LIB_INLINE static bool IsFullPath( const wchar* Path )
-	{
-		if ( !Path ) return false;
-		String_fix path = Path;
-		return path.Find( L":" ) || path.Find( L"\\\\" ) || path.Find( L"//" );
+		return ( sx_str_cmp( m_text, str ) != 0 );
 	}
 
 private:
 	wchar			m_text[count];	//	main text
 	sint			m_len;			//  length of String_fix
 };
+
 
 
 typedef String_fix<16>		str16;

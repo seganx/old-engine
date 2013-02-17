@@ -4,6 +4,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#if defined(_DEBUG)
+#if defined(_MSC_VER)
+#if ( _MSC_VER >= 1400 )
+#define DEBUG_OUTPUT_WINDOW
+#endif
+#endif
+#endif
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -35,13 +42,12 @@ extern void sx_lib_finalize( void );
 
 #if ( defined(_DEBUG) || SEGAN_CALLSTACK )
 
-void callstack_report_to_file( const wchar* fileName, const wchar* title = L" " );
 
 SEGAN_INLINE sint lib_assert( const wchar* expression, const wchar* file, const sint line )
 {
 
 #if ( SEGAN_CALLSTACK == 1 )
-	callstack_push( file, line, L"assertion '%s'", expression );
+	_CallStack _callstack( line, file, L"assertion '%s'", expression );
 #endif
 
 #if defined(_DEBUG)
@@ -62,15 +68,12 @@ SEGAN_INLINE sint lib_assert( const wchar* expression, const wchar* file, const 
 //////////////////////////////////////////////////////////////////////////
 /* call stack system should be safe. o memory allocation or using 
 any other service so we need a pool and fill it consecutively. */
-#define CALLSTACK_MAX	128
+#define CALLSTACK_MAX	64
 
 struct CallStackData
 {
-#if SEGAN_CALLSTACK_PARAMS
-	wchar	function[512];
-#else
+	wchar	name[1024];
 	wchar*	function;
-#endif
 	wchar*	file;
 	sint	line;
 };
@@ -78,64 +81,118 @@ CallStackData	callstack_pool[CALLSTACK_MAX];
 uint			callstack_index = 0;
 bool			callstack_end	= false;
 
-
-SEGAN_INLINE void callstack_push( const wchar* file, const sint line, const wchar* function, ... )
+SEGAN_INLINE void callstack_clean( CallStackData *csd )
 {
-	lib_enter_cs();
+	csd->file = null;
+	csd->line = 0;
+	csd->name[0] = 0;
+	csd->function = null;
+}
 
-	CallStackData* csd = &callstack_pool[callstack_index];
-
-	csd->file = (wchar*)file;
-	if ( csd->file )
+SEGAN_INLINE _CallStack::_CallStack( const wchar* file, const sint line, const wchar* function )
+{
+	if ( callstack_index < CALLSTACK_MAX )
 	{
-		wchar *s = csd->file;
-		wchar *c1 = s;
-		wchar *c2 = s;
-		while ( c1 || c2 )
+		lib_enter_cs();
+
+		CallStackData* csd = &callstack_pool[callstack_index++];
+
+		csd->file = (wchar*)file;
+#if 0
+		if ( csd->file )
 		{
-			c1 = wcsstr( s, L"\\" );
-			c2 = wcsstr( s, L"/" );
-			if ( c1 ) s = ++c1;
-			if ( c2 ) s = ++c2;
+			wchar *s = csd->file;
+			wchar *c1 = s;
+			wchar *c2 = s;
+			while ( c1 || c2 )
+			{
+				c1 = wcsstr( s, L"\\" );
+				c2 = wcsstr( s, L"/" );
+				if ( c1 ) s = ++c1;
+				if ( c2 ) s = ++c2;
+			}
+			csd->file = s;
 		}
-		csd->file = s;
-	}
-
-	csd->line = line;
-	if ( function )
-	{
-#if SEGAN_CALLSTACK_PARAMS
-		va_list argList;
-		va_start( argList, function );
-		sint len = _vscwprintf( function, argList);
-		if ( len < 511 )
-			vswprintf_s( csd->function, 511, function, argList );
-		else
-			String::Copy( csd->function, 511, function );
-		va_end( argList );
-#else
-		csd->function = (wchar*)function;
 #endif
+
+		csd->line = line;
+		csd->name[0] = 0;
+		if ( function )
+		{
+			csd->function = (wchar*)function;
+		}
+		else
+			csd->function = null;
+
+		lib_leave_cs();
 	}
-	else
+}
+
+SEGAN_INLINE _CallStack::_CallStack( const sint line, const wchar* file, const wchar* function, ... )
+{
+	if ( callstack_index < CALLSTACK_MAX )
+	{
+		lib_enter_cs();
+
+		CallStackData* csd = &callstack_pool[callstack_index++];
+
+		csd->file = (wchar*)file;
+#if 0
+		if ( csd->file )
+		{
+			wchar *s = csd->file;
+			wchar *c1 = s;
+			wchar *c2 = s;
+			while ( c1 || c2 )
+			{
+				c1 = wcsstr( s, L"\\" );
+				c2 = wcsstr( s, L"/" );
+				if ( c1 ) s = ++c1;
+				if ( c2 ) s = ++c2;
+			}
+			csd->file = s;
+		}
+#endif
+
+		csd->line = line;
 		csd->function = null;
+		if ( function )
+		{
+			va_list argList;
+			va_start( argList, function );
+			sint len = _vscwprintf( function, argList);
+			if ( len < 1023 )
+				vswprintf_s( csd->name, 1023, function, argList );
+			else
+				sx_str_copy( csd->name, 1023, function );
+			va_end( argList );
+		}
+		else
+		{
+			csd->name[0] = null;
+		}
 
-	if ( ++callstack_index >= CALLSTACK_MAX ) callstack_index = 0;
+		lib_leave_cs();
+	}
+}
 
-	lib_leave_cs();
+SEGAN_INLINE _CallStack::~_CallStack( void )
+{
+	if ( callstack_index > 0 )
+	{
+		callstack_clean( &callstack_pool[--callstack_index] );
+	}
 }
 
 void callstack_report( CallStack_Callback callback )
 {
 	if ( !callback ) return;
 
-	int index = callstack_index;
 	for ( int i=0; i<CALLSTACK_MAX; i++ )
 	{
-		if ( index >= CALLSTACK_MAX ) index = 0;
-		CallStackData* csd = &callstack_pool[index++];
+		CallStackData* csd = &callstack_pool[i];
 		if ( csd->line && csd->file )
-			(*callback)( csd->file, csd->line, csd->function );
+			(*callback)( csd->file, csd->line, csd->function ? csd->function : csd->name );
 	}
 }
 
@@ -143,14 +200,7 @@ void callstack_clear( void )
 {
 	for ( int i=0; i<CALLSTACK_MAX; i++ )
 	{
-		CallStackData* csd = &callstack_pool[i];
-		csd->file = null;
-		csd->line = 0;
-#if SEGAN_CALLSTACK_PARAMS
-		csd->function[0] = 0;
-#else
-		csd->function = null;
-#endif
+		callstack_clean( &callstack_pool[i] );
 	}
 }
 
@@ -159,7 +209,7 @@ void detect_crash( void )
 	callstack_end = true;
 }
 
-void callstack_report_to_file( const wchar* fileName, const wchar* title /*= L" "*/ )
+void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ )
 {
 	lib_enter_cs();
 
@@ -174,7 +224,7 @@ void callstack_report_to_file( const wchar* fileName, const wchar* title /*= L" 
 		wchar strTime[64];
 		wcsftime( strTime, 64, L"%H_%M_%S", &timeInfo );
 		static int logCount = 0;
-		swprintf_s( strName, 128, L"%s_%s_%d.txt", fileName, strTime, ++logCount );
+		swprintf_s( strName, 128, L"%s_%s_%d.txt", name, strTime, ++logCount );
 	}
 	
 	//	report called functions in the file
@@ -182,13 +232,43 @@ void callstack_report_to_file( const wchar* fileName, const wchar* title /*= L" 
 	if( _wfopen_s( &f, strName, L"w, ccs=UNICODE" ) == 0 )
 	{
 		fwprintf( f, L"seganx call stack report : %s\n\n", title );
-		int index = callstack_index;
+
+		//	compute maximum length of every line
+		sint maxlength = 0;
 		for ( int i=0; i<CALLSTACK_MAX; i++ )
 		{
-			if ( index >= CALLSTACK_MAX ) index = 0;
-			CallStackData* csd = &callstack_pool[index++];
+			CallStackData* csd = &callstack_pool[i];
 			if ( csd->line && csd->file )
-				fwprintf( f, L"%s - %d - %s\n", csd->file, csd->line, csd->function );
+			{
+				str1024 tmp;
+				tmp << csd->file << '(' << csd->line << L") : ";
+				if ( maxlength < tmp.Length() )
+					maxlength = tmp.Length();
+			}
+		}
+
+		//	write lines to the file
+		for ( int i=0; i<CALLSTACK_MAX; i++ )
+		{
+			CallStackData* csd = &callstack_pool[i];
+			if ( csd->line && csd->file )
+			{
+				str1024 tmp;
+				tmp << csd->file << '(' << csd->line << L") : ";
+
+				sint len = tmp.Length();
+				for ( sint spaces = maxlength + 5; spaces > len; spaces-- )
+					tmp << ' ';
+
+				if ( csd->function )
+					tmp << csd->function << '\n';
+				else if ( csd->name[0] )
+					tmp << csd->name << '\n';
+				else
+					tmp << L"no name !\n";
+
+				fputws( tmp.Text(), f );
+			}
 		}
 		fclose( f );
 	}
@@ -225,7 +305,7 @@ SEGAN_INLINE void mem_realloc( void*& p, const uint newsizeinbyte )
 {
 	if ( !newsizeinbyte )
 	{
-		sx_mem_free( p );
+		mem_free( p );
 		p = null;
 		return;
 	}
@@ -282,9 +362,9 @@ SEGAN_INLINE void mem_copy( void* dest, const void* src, const uint size )
 }
 
 
-SEGAN_INLINE void mem_set( void* dest, const sint value, const uint size )
+SEGAN_INLINE void mem_set( void* dest, const sint val, const uint size )
 {
-	memset( dest, value, size );
+	memset( dest, val, size );
 }
 
 
@@ -295,13 +375,14 @@ SEGAN_INLINE void mem_set( void* dest, const sint value, const uint size )
 
 struct MemBlock
 {
-	void*		mem;
+	char		sign[16];
 	wchar*		file;
 	uint		line;
 	uint		size;
 	uint		tag;
 	bool		corrupted;
 	MemBlock*	next;
+	MemBlock*	prev;
 };
 static MemBlock*		s_mem_root			= null;
 static bool				s_mem_enable_leak	= false;
@@ -311,57 +392,84 @@ static char*			s_mem_protection	= "!protected area!";
 static uint				s_mem_protect_size	= 16;
 static sint				s_mem_corruptions	= 0;
 
-// use an static memory pool to hold data
-static MemMan_Pool		s_mem_pool( 1024 * 1024 );
 
-
-SEGAN_INLINE void* mem_code_protection( void* p, const uint realsizeinbyte )
+struct MemCodeReport
 {
-	if ( !p ) return null;
-
-	//	sign beginning of memory block
-	u32* first = (u32*)p;
-	memcpy( first, s_mem_protection, s_mem_protect_size );
-
-	//	sign end of memory block
-	u32* last = (u32*)( pbyte(p) + realsizeinbyte + s_mem_protect_size );
-	memcpy( last, s_mem_protection, s_mem_protect_size );
-
-	//	prepare pointer
-	return ( pbyte(p) + s_mem_protect_size );
-}
-
-struct MemDecodedReport
-{
-	void*	p;			//	decoded memory address
-	bool	corrupted;	//	memory has been corrupted
+	void*		p;		//	user coded memory
+	MemBlock*	mb;		//	memory block for log
 };
-SEGAN_INLINE MemDecodedReport mem_decode_protection( const void* p, const uint realsizeinbyte )
-{
-	MemDecodedReport res;
-	if ( !p )
-	{
-		res.p = null;
-		res.corrupted = false;
-		return res;
-	}
 
-	res.p = ( pbyte(p) - s_mem_protect_size );
+SEGAN_INLINE void mem_check_protection( MemBlock* mb )
+{
+	pbyte p = pbyte(mb) + sizeof(MemBlock);
 
 	//	check beginning of memory block
-	u32* first = (u32*)( res.p );
-	if ( memcmp( first, s_mem_protection, s_mem_protect_size ) )
+	if ( memcmp( p, s_mem_protection, s_mem_protect_size ) )
 	{
-		res.corrupted = true;
+		mb->corrupted = true;
 	}
 	else
 	{
 		//	check end of memory block
-		u32* last = (u32*)( pbyte(p) + realsizeinbyte );
-		if ( memcmp( last, s_mem_protection, s_mem_protect_size ) )
-			res.corrupted = true;
+		p += s_mem_protect_size + mb->size;
+		if ( memcmp( p , s_mem_protection, s_mem_protect_size ) )
+			mb->corrupted = true;
 		else
-			res.corrupted = false;
+			mb->corrupted = false;
+	}
+}
+
+SEGAN_INLINE MemCodeReport mem_code_protection( void* p, const uint realsizeinbyte )
+{
+	MemCodeReport res;
+	if ( !p )
+	{
+		res.p = null;
+		res.mb = null;
+		return res;
+	}
+
+	// extract mem block
+	res.mb = (MemBlock*)p;
+	res.mb->corrupted = false;
+
+	//	set protection sign for mem block
+	memcpy( res.mb->sign, s_mem_protection, s_mem_protect_size );
+
+	// prepare the result
+	p = pbyte(p) + sizeof(MemBlock);
+	res.p = pbyte(p) + s_mem_protect_size;
+
+	//	sign beginning of memory block
+	memcpy( p, s_mem_protection, s_mem_protect_size );
+
+	//	sign end of memory block
+	memcpy( pbyte(res.p) + realsizeinbyte, s_mem_protection, s_mem_protect_size );
+
+	return res;
+}
+
+
+SEGAN_INLINE MemCodeReport mem_decode_protection( const void* p )
+{
+	MemCodeReport res;
+	if ( !p )
+	{
+		res.p = null;
+		res.mb = null;
+	}
+	else
+	{
+		res.mb	= (MemBlock*)( pbyte(p) - s_mem_protect_size - sizeof(MemBlock) );
+		res.p	= res.mb;
+
+		// check protection sign for mem block
+		if ( memcmp( res.mb->sign, s_mem_protection, s_mem_protect_size ) )
+		{
+			res.p = null;
+			res.mb = null;
+		}
+		else mem_check_protection( res.mb );
 	}
 
 	return res;
@@ -372,40 +480,36 @@ SEGAN_INLINE void mem_debug_push( MemBlock* mb )
 	if ( !s_mem_root )
 	{
 		mb->next = null;
+		mb->prev = null;
 		s_mem_root = mb;
 	}
 	else
 	{
+		s_mem_root->prev = mb;
 		mb->next = s_mem_root;
+		mb->prev = null;
 		s_mem_root = mb;
 	}
 }
 
-SEGAN_INLINE MemBlock* mem_debug_pop( const void* mem )
+SEGAN_INLINE void mem_debug_pop( MemBlock* mb )
 {
-	if ( !s_mem_root || !mem ) return null;
-
-	if ( s_mem_root->mem == mem )
+	if ( s_mem_root )
 	{
-		MemBlock* res = s_mem_root;
-		s_mem_root = res->next;
-		return res;
-	}
-
-	MemBlock* prev = s_mem_root;	
-	MemBlock* curr = s_mem_root->next;
-	while ( curr )
-	{
-		if ( curr->mem == mem )
+		// unlink from the list
+		if ( mb == s_mem_root )
 		{
-			prev->next = curr->next;
-			return curr;
+			s_mem_root = s_mem_root->next;
+			if ( s_mem_root )
+				s_mem_root->prev = null;
 		}
-		prev = curr;
-		curr = curr->next;
+		else
+		{
+			mb->prev->next = mb->next;
+			if ( mb->next )
+				mb->next->prev = mb->prev;
+		}
 	}
-
-	return null;
 }
 
 SEGAN_INLINE void mem_enable_debug( const bool enable, const uint tag /*= 0 */ )
@@ -428,25 +532,31 @@ SEGAN_INLINE void* mem_alloc_dbg( const uint sizeinbyte, const wchar* file, cons
 
 	if ( s_mem_enable_leak )
 	{
-		res = mem_alloc( sizeinbyte + 2 * s_mem_protect_size );
-
-		//	sign memory to check memory corruption
-		res = mem_code_protection( res, sizeinbyte );
-
-		/*store memory info. we must allocate a separate memory block info.
-		because it kept safe even if the user memory has been corrupted  */
 		lib_enter_cs();
-		MemBlock* mb = (MemBlock*)s_mem_pool.Alloc( sizeof(MemBlock) );
-		if ( mb )
+
+		//	first block for holding data, second block for protection, memory and close with other protection
+		res = mem_alloc( sizeof(MemBlock) + s_mem_protect_size + sizeinbyte + s_mem_protect_size );
+
+		if ( res )
 		{
-			mb->mem = res;
-			mb->file = (wchar*)file;
-			mb->line = line;
-			mb->size = sizeinbyte;
-			mb->tag = s_mem_tag;
-			mb->corrupted = false;
-			mem_debug_push( mb );
+			//	sign memory to check memory corruption
+			MemCodeReport memreport = mem_code_protection( res, sizeinbyte );
+
+			//	store mem block to link list
+			if ( memreport.mb )
+			{
+				memreport.mb->file	= (wchar*)file;
+				memreport.mb->line	= line;
+				memreport.mb->size	= sizeinbyte;
+				memreport.mb->tag	= s_mem_tag;
+		
+				mem_debug_push( memreport.mb );
+			}
+
+			//	set user memory as result
+			res = memreport.p;
 		}
+
 		lib_leave_cs();
 	}
 	else
@@ -466,77 +576,75 @@ SEGAN_INLINE void mem_realloc_dbg( void*& p, const uint newsizeinbyte, const wch
 	}
 
 	lib_enter_cs();
-	MemBlock* mb = mem_debug_pop( p );
-	if ( mb )
+
+	MemCodeReport memreport = mem_decode_protection( p );
+
+	if ( memreport.mb )
 	{
-		//	decode memory to check corruption
-		MemDecodedReport memblock = mem_decode_protection( p, mb->size );
-
 		//	if memory has been corrupted we should hold the corrupted memory info
-		if ( memblock.corrupted )
+		if ( memreport.mb->corrupted )
 		{
-			mb->corrupted = true;
-			mb->mem = null;
-			mem_debug_push( mb );
-			mb = null;
-
 			//	report memory allocations to file
-			str64 memreportfile = L"sx_mem_report_"; memreportfile << s_mem_corruptions;
-			mem_report_debug_to_file( memreportfile, mb->tag );
+			str64 memreportfile = L"sx_mem_report_"; memreportfile << s_mem_corruptions; memreportfile << L".txt";
+			mem_report_debug_to_file( memreportfile, -1 );
 
 			//	report call stack
-			lib_assert( L"memory block has been corrupted !", mb->file, mb->line );
-
-			//	store new memory info
-			mb = (MemBlock*)s_mem_pool.Alloc( sizeof(MemBlock) );
-			if ( mb )
-				mb->corrupted = false;
+			lib_assert( L"memory block has been corrupted !", memreport.mb->file, memreport.mb->line );
+		}
+		else
+		{
+			//	pop mem block from the list
+			mem_debug_pop( memreport.mb );
 		}
 
 		//	realloc the memory block
-		mem_realloc( memblock.p, newsizeinbyte + 2 * s_mem_protect_size );
+		mem_realloc( memreport.p, sizeof(MemBlock) + s_mem_protect_size + newsizeinbyte + s_mem_protect_size );
 
 		//	sign memory to check protection
-		p = mem_code_protection( memblock.p, newsizeinbyte );
+		memreport = mem_code_protection( memreport.p, newsizeinbyte );
 
-		if ( mb )
+		if ( memreport.mb )
 		{
-			mb->mem = p;
-			mb->file = (wchar*)file;
-			mb->line = line;
-			mb->size = newsizeinbyte;
-			mb->tag = s_mem_tag;
-			mem_debug_push( mb );
+			memreport.mb->file = (wchar*)file;
+			memreport.mb->line = line;
+			memreport.mb->size = newsizeinbyte;
+			memreport.mb->tag = s_mem_tag;
+
+			mem_debug_push( memreport.mb );
 		}
+
+		//	set as result
+		p = memreport.p;
 	}
 	else
 	{
 		if ( s_mem_enable_leak )
 		{
 			//	realloc the memory block
-			mem_realloc( p, newsizeinbyte + 2 * s_mem_protect_size );
+			mem_realloc( p, sizeof(MemBlock) + s_mem_protect_size + newsizeinbyte + s_mem_protect_size );
 
-			//	sign memory to check memory corruption
-			p = mem_code_protection( p, newsizeinbyte );
+			//	sign memory to check protection
+			memreport = mem_code_protection( p, newsizeinbyte );
 
-			//	store memory info
-			mb = (MemBlock*)s_mem_pool.Alloc( sizeof(MemBlock) );
-			if ( mb )
+			if ( memreport.mb )
 			{
-				mb->mem = p;
-				mb->file = (wchar*)file;
-				mb->line = line;
-				mb->size = newsizeinbyte;
-				mb->tag = s_mem_tag;
-				mb->corrupted = false;
-				mem_debug_push( mb );
+				memreport.mb->file = (wchar*)file;
+				memreport.mb->line = line;
+				memreport.mb->size = newsizeinbyte;
+				memreport.mb->tag = s_mem_tag;
+
+				mem_debug_push( memreport.mb );
 			}
+
+			//	set as result
+			p = memreport.p;
 		}
 		else
 		{
 			mem_realloc( p, newsizeinbyte );
 		}
 	}
+
 	lib_leave_cs();
 }
 
@@ -546,30 +654,28 @@ SEGAN_INLINE void mem_free_dbg( const void* p )
 
 	lib_enter_cs();
 
-	MemBlock* mb = mem_debug_pop( p );
-	if ( mb )
-	{
-		MemDecodedReport mem = mem_decode_protection( p, mb->size );
-		if ( mem.corrupted )
-		{
-			mb->corrupted = true;
-			mb->mem = null;
-			mem_debug_push( mb );
+	MemCodeReport memreport = mem_decode_protection( p );
 
+	if ( memreport.mb )
+	{
+		//	if memory has been corrupted we should hold the corrupted memory info
+		if ( memreport.mb->corrupted )
+		{
 			//	report memory allocations to file
-			str64 memreportfile = L"sx_mem_report_"; memreportfile << s_mem_corruptions;
-			mem_report_debug_to_file( memreportfile, mb->tag );
+			str64 memreportfile = L"sx_mem_report_"; memreportfile << s_mem_corruptions; memreportfile << L".txt";
+			mem_report_debug_to_file( memreportfile, -1 );
 
 			//	report call stack
-			lib_assert( L"memory block has been corrupted !", mb->file, mb->line );
+			lib_assert( L"memory block has been corrupted !", memreport.mb->file, memreport.mb->line );
 		}
 		else
-			s_mem_pool.Free( mb );
-
-		mem_free( mem.p );
+		{
+			//	pop mem block from the list
+			mem_debug_pop( memreport.mb );
+			mem_free( memreport.p );
+		}
 	}
-	else
-		mem_free( p );
+	else mem_free( p );
 
 	lib_leave_cs();
 }
@@ -585,8 +691,7 @@ SEGAN_INLINE void mem_report_debug( CB_Memory callback, const uint tag /*= 0 */ 
 		{
 			if ( leaf->tag == tag )
 			{
-				if ( leaf->mem )
-					leaf->corrupted = mem_decode_protection( leaf->mem, leaf->size ).corrupted;
+				mem_check_protection( leaf );
 				(*callback)( leaf->file, leaf->line, leaf->size, leaf->tag, leaf->corrupted );
 			}
 			leaf = leaf->next;
@@ -596,15 +701,14 @@ SEGAN_INLINE void mem_report_debug( CB_Memory callback, const uint tag /*= 0 */ 
 	{
 		while ( leaf )
 		{
-			if ( leaf->mem )
-				leaf->corrupted = mem_decode_protection( leaf->mem, leaf->size ).corrupted;
+			mem_check_protection( leaf );
 			(*callback)( leaf->file, leaf->line, leaf->size, leaf->tag, leaf->corrupted );
 			leaf = leaf->next;
 		}
 	}
 }
 
-#if 0
+#if defined(DEBUG_OUTPUT_WINDOW)
 void mem_report_debug_to_window( const uint tag /*= 0 */ )
 {
 	if ( !s_mem_root ) return;
@@ -618,8 +722,7 @@ void mem_report_debug_to_window( const uint tag /*= 0 */ )
 		{
 			if ( leaf->tag == tag )
 			{
-				if ( leaf->mem )
-					leaf->corrupted = mem_decode_protection( leaf->mem, leaf->size ).corrupted;
+				mem_check_protection( leaf );
 
 				str1024 tmp;
 				if ( leaf->corrupted )
@@ -637,8 +740,7 @@ void mem_report_debug_to_window( const uint tag /*= 0 */ )
 	{
 		while ( leaf )
 		{
-			if ( leaf->mem )
-				leaf->corrupted = mem_decode_protection( leaf->mem, leaf->size ).corrupted;
+			mem_check_protection( leaf );
 
 			str1024 tmp;
 			if ( leaf->corrupted )
@@ -657,41 +759,58 @@ void mem_report_debug_to_window( const uint tag /*= 0 */ )
 
 SEGAN_INLINE void mem_report_debug_to_file( const wchar* fileName, const uint tag /*= 0 */ )
 {
-	//if ( !s_mem_root ) return;
+	if ( !s_mem_root ) return;
 
 	//	report called functions in the file
 	FILE* f = null;
 	if( _wfopen_s( &f, fileName, L"w, ccs=UNICODE" ) == 0 )
 	{
-		fwprintf( f, L"seganx memory debug report : \n\n" );		
+		fputws( L"seganx memory debug report : \n\n", f );
 		MemBlock* leaf = s_mem_root;
 		if ( tag )
 		{
-			while ( leaf )
+			if ( tag == -1 )
 			{
-				if ( leaf->tag == tag )
+				while ( leaf )
 				{
-					if ( leaf->mem )
-						leaf->corrupted = mem_decode_protection( leaf->mem, leaf->size ).corrupted;
+					mem_check_protection( leaf );
 
-					str1024 tmp;
 					if ( leaf->corrupted )
-						tmp << leaf->file << L"(" << leaf->line << L"): error : memory corrupted : size = " << leaf->size << L" tag = " << leaf->tag;
-					else
-						tmp << leaf->file << L"(" << leaf->line << L"): warning : memory leak : size = " << leaf->size << L" tag = " << leaf->tag;
-					tmp << L"\n";
+					{
+						str1024 tmp;
+						tmp << leaf->file << L"(" << leaf->line << L"): error : memory corrupted : size = " << leaf->size << L" tag = " << leaf->tag << L"\n";
+						fputws( tmp.Text(), f );
+					}
 
-					fwprintf( f, tmp.Text() );
+					leaf = leaf->next;
 				}
-				leaf = leaf->next;
+			}
+			else
+			{
+				while ( leaf )
+				{
+					if ( leaf->tag == tag )
+					{
+						mem_check_protection( leaf );
+
+						str1024 tmp;
+						if ( leaf->corrupted )
+							tmp << leaf->file << L"(" << leaf->line << L"): error : memory corrupted : size = " << leaf->size << L" tag = " << leaf->tag;
+						else
+							tmp << leaf->file << L"(" << leaf->line << L"): warning : memory leak : size = " << leaf->size << L" tag = " << leaf->tag;
+						tmp << L"\n";
+
+						fputws( tmp.Text(), f );
+					}
+					leaf = leaf->next;
+				}
 			}
 		}
 		else
 		{
 			while ( leaf )
 			{
-				if ( leaf->mem )
-					leaf->corrupted = mem_decode_protection( leaf->mem, leaf->size ).corrupted;
+				mem_check_protection( leaf );
 
 				str1024 tmp;
 				if ( leaf->corrupted )
@@ -700,7 +819,7 @@ SEGAN_INLINE void mem_report_debug_to_file( const wchar* fileName, const uint ta
 					tmp << leaf->file << L"(" << leaf->line << L"): warning : memory leak : size = " << leaf->size << L" tag = " << leaf->tag;
 				tmp << L"\n";
 
-				fwprintf( f, tmp.Text() );
+				fputws( tmp.Text(), f );
 
 				leaf = leaf->next;
 			}
@@ -715,7 +834,9 @@ SEGAN_INLINE void mem_clear_debug( void )
 	while ( leaf )
 	{
 		s_mem_root = leaf->next;
-		s_mem_pool.Free( leaf );
+		
+		mem_free( leaf );
+
 		leaf = s_mem_root;
 	}
 }
@@ -805,41 +926,152 @@ SEGAN_INLINE sint sx_random_i( const sint range )
 
 //////////////////////////////////////////////////////////////////////////
 //	string functions
-
-SEGAN_INLINE const wchar* IntToStr( const int number )
+//	for multi threaded support we can use a simple string pool
+wchar* str_pop( void )
 {
+	typedef wchar StrItem[1024];
+	static StrItem str_pool[256];
+	static sint index = 0;
 	lib_enter_cs();
-	static wchar tmp[64];
-	_itow_s(number, tmp, 64, 10);
+	if ( index > 63 ) index = 0;
+	wchar* res = str_pool[index];
 	lib_leave_cs();
+	return res;
+
+}
+SEGAN_INLINE const wchar* sx_int_to_str( const int number )
+{
+	wchar* tmp = str_pop();
+	_itow_s( number, tmp, 64, 10 );
 	return tmp;
 }
 
-SEGAN_LIB_API const wchar* FloatToStr( float number, int precision )
+SEGAN_INLINE const wchar* sx_float_to_str( float number, int precision )
 {
-	lib_enter_cs();
-	static str128 res;
-	if ( abs(number)<0.000001f )
-		number = 0;
-	char tmp[64];
-	int decimal, sign;
-	_fcvt_s(tmp, 64, number, precision, &decimal, &sign);
-	res = tmp;
-	if(precision>0)
+	sx_assert( precision > 0 && precision < 7 );
+	wchar* res = str_pop();
+	if ( sx_abs_f( number ) < 0.000001f )
 	{
-		if (decimal>0) res.Insert('.', decimal);
-		else
-		{
-			for (int i=decimal; i<=0; res.Insert('0'), i++);
-			res.Insert('.', 1);
-		}
+		sx_str_copy( res, precision + 3, L"0.000000" );
 	}
-	else if(decimal<0) res.Insert('0');
-	if (sign && str128::StrToFloat(res)>0) res.Insert('-');
-	lib_leave_cs();
+	else
+	{
+		char tmp[64];
+		int decimal, sign;
+		_fcvt_s( tmp, 64, number, precision, &decimal, &sign );
+		if ( tmp[0] )
+		{
+			int k = 0;
+			if ( sign ) res[k++] = '-';
+			if ( decimal > 0 )
+			{
+				int d = 0;
+				for ( ; d < decimal; )
+					res[k++] = tmp[d++];
+				res[k++] = '.';
+				for ( ; tmp[d]; )
+					res[k++] = tmp[d++];
+			}
+			else
+			{
+				res[k++] = '0';
+				res[k++] = '.';
+				for (; decimal<0; decimal++ )
+					res[k++] = '0';
+				for (; tmp[decimal]; decimal++ )
+					res[k++] = tmp[decimal];
+			}
+			res[k++] = 0;
+		}
+		else sx_str_copy( res, precision + 3, L"0.000000" );
+	}
 	return res;
 }
 
+SEGAN_INLINE const wchar* sx_str_extract_filepath( const wchar* filename )
+{
+	if ( !filename ) return null;
+	wchar* res = str_pop();
+	int len=0;
+	for ( int i=0; filename[i]; ++i )
+	{
+		if ( filename[i] == '\\' || filename[i] == '/' )
+			len = i + 1;
+	}
+	for ( int i=0; i<len; i++ )
+		res[i] = filename[i];
+	res[len] = 0;
+	return res;
+}
+
+SEGAN_INLINE const wchar* sx_str_extract_filename( const wchar* filename )
+{
+	if ( !filename ) return null;
+	wchar* res = str_pop();
+	int len=0;
+	for ( int i=0; filename[i]; ++i )
+	{
+		if ( filename[i] == '\\' || filename[i] == '/' )
+			len = i + 1;
+	}
+	for ( int i=0; filename[len]; ++i, ++len )
+		res[i] = filename[len];
+	res[len] = 0;
+	return res;
+}
+
+SEGAN_INLINE const wchar* sx_str_extract_extension( const wchar* filename )
+{
+	if ( !filename ) return null;
+	wchar* res = str_pop();
+	int len=0;
+	for ( int i=0; filename[i]; ++i )
+	{
+		if ( filename[i] == '.' )
+			len = i + 1;
+	}
+	for ( int i=0; filename[len]; ++i, ++len )
+		res[i] = filename[len];
+	res[len] = 0;
+	return res;
+}
+
+SEGAN_INLINE const wchar* sx_str_exclude_extension( const wchar* filename )
+{
+	if ( !filename ) return null;
+	wchar* res = str_pop();
+	int len=0;
+	for ( int i=0; filename[i]; ++i )
+	{
+		if ( filename[i] == '.' )
+			len = i;
+	}
+	for ( int i=0; i<len; ++i )
+		res[i] = filename[i];
+	res[len] = 0;
+	return res;
+}
+
+SEGAN_INLINE const wchar* sx_str_make_pathstyle( const wchar* filepath )
+{
+	if ( !filepath ) return null;
+	sint len = sx_str_len( filepath );
+	if ( len )
+	{
+		wchar ch = filepath[--len];
+		if ( ch != '/' && ch != '\\' )
+		{
+			++len;
+			wchar* res = str_pop();
+			for ( int i=0; i<len; ++i )
+				res[i] = filepath[i];
+			res[len++] = PATH_PART;
+			res[len] = 0;
+			return res;
+		}
+	}
+	return filepath;
+}
 
 
 
@@ -885,17 +1117,37 @@ void sx_lib_initialize( void )
 void sx_lib_finalize( void )
 {
 
+#if SEGAN_CALLSTACK
+	if ( !callstack_end )	//	verify that application crashed
+	{
+		callstack_report_to_file( L"sx_crash_report", L"application closed unexpectedly !" );
+
 #if SEGAN_MEMLEAK
-	//mem_report_debug_to_window( 0 );
+		mem_report_debug_to_file( L"sx_mem_corruption_report.txt", -1 );
+		mem_clear_debug();
+#endif
+
+	}
+#if SEGAN_MEMLEAK
+	else
+	{
+#if defined(DEBUG_OUTPUT_WINDOW)
+	mem_report_debug_to_window( 0 );
+#endif
+	mem_report_debug_to_file( L"sx_memleak_report.txt", 0 );
+	mem_clear_debug();
+	}
+#endif
+
+	callstack_clear();
+#elif SEGAN_MEMLEAK
+#if defined(DEBUG_OUTPUT_WINDOW)
+	mem_report_debug_to_window( 0 );
+#endif
 	mem_report_debug_to_file( L"sx_memleak_report.txt", 0 );
 	mem_clear_debug();
 #endif
 
-#if SEGAN_CALLSTACK
-	if ( !callstack_end )	//	verify that application crashed
-		callstack_report_to_file( L"sx_crash_report", L"application closed unexpectedly !" );
-	callstack_clear();
-#endif
 
 	lib_finit_cs();
 }

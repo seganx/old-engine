@@ -191,6 +191,7 @@ private:
 		_Clear( leaf->left );
 		_Clear( leaf->right );
 		mem_free( leaf );
+		leaf = null;
 	}
 
 	SEGAN_LIB_INLINE bool _Insert( const T_key& key, const T_data& item, Leaf*& root )

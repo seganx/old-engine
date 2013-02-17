@@ -41,9 +41,7 @@ public:
 
 	SEGAN_LIB_INLINE void Clear( void )
 	{
-		mem_free( m_item );
-		m_item = null;
-		m_size = 0;
+		_Realloc( 0 );
 		m_count = 0;
 	}
 

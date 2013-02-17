@@ -26,16 +26,18 @@ SEGAN_LIB_API void		mem_realloc( void*& p, const uint newsizeinbyte );
 SEGAN_LIB_API uint		mem_size( const void* p );
 SEGAN_LIB_API void		mem_free( const void* p );
 SEGAN_LIB_API void		mem_copy( void* dest, const void* src, const uint size );
-SEGAN_LIB_API void		mem_set( void* dest, const sint value, const uint size );
+SEGAN_LIB_API void		mem_set( void* dest, const sint val, const uint size );
 
 #define sx_mem_set_manager( manager )			mem_set_manager( manager )
 #define sx_mem_get_manager()					mem_get_manager()
+#define sx_mem_copy(dest, src, size)			mem_copy( dest, src, size )
+#define sx_mem_set(dest, val, size)				mem_set( dest, val, size )
 
 #if ( SEGAN_MEMLEAK == 1 )
 
 SEGAN_LIB_API void		mem_enable_debug( const bool enable, const uint tag = 0 );
 SEGAN_LIB_API void*		mem_alloc_dbg( const uint sizeinbyte, const wchar* file, const int line );
-SEGAN_LIB_API void		mem_realloc_dbg( void*& p, const uint newsizeinbyte, const char* file, const int line );
+SEGAN_LIB_API void		mem_realloc_dbg( void*& p, const uint newsizeinbyte, const wchar* file, const int line );
 SEGAN_LIB_API void		mem_free_dbg( const void* p );
 SEGAN_LIB_API void		mem_report_debug( CB_Memory callback, const uint tag = 0 );
 SEGAN_LIB_API void		mem_report_debug_to_file( const wchar* fileName, const uint tag = 0 );
@@ -46,18 +48,22 @@ inline    void		operator delete( void *p, const wchar* file, int line ){ mem_fre
 inline    void		operator delete( void *p ){ mem_free_dbg(p); }
 
 //! enable memory debugger and set a new tag. pass -1 to restore previews tag
-#define sx_mem_enable_debug( enable, tag )				mem_enable_debug( enable, tag );
+#define sx_mem_enable_debug( enable, tag )				mem_enable_debug( enable, tag )
 
 //! report memory debugger. pass 0 to show all tags
-#define sx_mem_report_debug( callback, tag )			mem_report_debug( callback, tag );
+#define sx_mem_report_debug( callback, tag )			mem_report_debug( callback, tag )
 
-//! report memory debugger to a file. pass 0 to show all tags
-#define sx_mem_report_debug_to_file( fileName, tag )	mem_report_debug_to_file( fileName, tag );
+//! report memory debugger to output window
+#define sx_mem_report_debug_to_window( tag )			mem_report_debug_to_window( tag )
+
+//! report memory debugger to a file. pass 0 to show all tags, pass -1 to show only memory corruptions
+#define sx_mem_report_debug_to_file( fileName, tag )	mem_report_debug_to_file( fileName, tag )
 
 #define sx_mem_alloc( sizeinbyte )				mem_alloc_dbg( sizeinbyte, _CRT_WIDE(__FILE__), __LINE__ )
 #define sx_mem_realloc( p, newsizeinbyte )		mem_realloc_dbg( (void*&)p, newsizeinbyte, _CRT_WIDE(__FILE__), __LINE__ )
 #define sx_mem_size( p )						mem_size( p )
 #define sx_mem_free( p )						mem_free_dbg( p )
+#define sx_mem_free_and_null( p )				mem_free_dbg( p ); p = null
 
 #define sx_new( obj )							( new( _CRT_WIDE(__FILE__), __LINE__ ) obj )
 #define sx_delete( obj )						{ if (obj) { delete(obj) ; } }				
@@ -70,11 +76,14 @@ inline	  void		operator delete ( void *p ){ mem_free(p); }
 
 #define sx_mem_enable_debug( enable )
 #define sx_mem_report_debug( callback )
+#define sx_mem_report_debug_to_window( tag )
+#define sx_mem_report_debug_to_file( fileName, tag )
 
 #define sx_mem_alloc( sizeinbyte )				mem_alloc( sizeinbyte )
 #define sx_mem_realloc( p, newsizeinbyte )		mem_realloc( (void*&)p, newsizeinbyte )
 #define sx_mem_size( p )						mem_size( p )
 #define sx_mem_free( p )						mem_free( (void*&)p )
+#define sx_mem_free_and_null( p )				mem_free_dbg( p ); p = null
 
 #define sx_new( obj )							( new obj )
 #define sx_delete( obj )						{ if (obj) { delete(obj) ; } }				
@@ -117,11 +126,10 @@ class MemMan_Pool : public MemMan
 public:
 	enum ChunkState
 	{
-		CS_NULL = 0,
-		CS_EMPTY,
-		CS_FULL,
-		
-		CS_FORCE32BIT = 0xffffffff
+		CS_NULL			= 0xf0f0f0f0,
+		CS_EMPTY		= 0xfefefefe,
+		CS_FULL			= 0xfafafafa,
+		CS_FORCE32BIT	= 0xffffffff
 	};
 
 	struct Chunk
@@ -139,6 +147,7 @@ public:
 	{
 		uint memsize = poolSizeInBytes + 0x0fff * sizeof(Chunk);
 		m_pool = (pbyte)mem_alloc( memsize );
+		sx_assert( m_pool );
 #ifdef _DEBUG
 		mem_set( m_pool, 0, memsize );
 #endif
@@ -164,7 +173,7 @@ public:
 	void* Alloc( const uint sizeInByte )
 	{
 		Chunk* ch = m_root;
-		while( ch->state )
+		while( ch->state == CS_EMPTY )
 		{
 			if ( ch->size >= sizeInByte )
 			{
@@ -212,6 +221,7 @@ public:
 		sx_assert( pbyte(p) > m_pool && pbyte(p) < ( m_pool + mem_size(m_pool) ) );
 
 		Chunk* ch = PChunk( pbyte(p) - sizeof(Chunk) );
+		sx_assert( ch->state == CS_FULL );	//	avoid to free a chunk more that once
 
 #ifdef _DEBUG
 		mem_set( (void*)p, 0, ch->size );
