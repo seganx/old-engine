@@ -7,11 +7,9 @@
 #pragma comment(lib,"ws2_32.lib")
 
 
-
 #define NET_MAX_NUM_BUFFER				512		//	number of connection buffer in the stack
 #define NET_MAX_QUEUE_BUFFER			512		//	maximum number of buffer in the queue
 #define NET_MESSAGE_SIZE				512		//	size of connection buffer
-#define NET_MESSAGE_HEADER				8		//	size of header of connection buffer
 #define NET_SERVER_FLAG_TIME			1200	//	time period that server notify all client to see the flag by sending broadcast message
 #define NET_CONNECTION_ALIVE_TIME		1000	//	keep connection alive
 #define NET_CONNECT_REQUEST_TIME		500		//	time period to send request message to connect
@@ -30,25 +28,39 @@ enum NetMessageType
 	NMT_SERVER_CLOSED					//	broad cast message sent by server to notify that the server is closed and no more clients will accepted
 };
 
-
-//  use this buffer in buffer pool and queue of messages
-struct NetMessage
+//	header of network pocket
+struct NetPacketHeader
 {
-	//	header
 	word		id;						//	id of network system to avoid conflict with other network systems
 	byte		type;					//	type of message
 	byte		subtype;				//	sub type of message
 	uint		ack;					//	message number
+};
 
-	//	data
-	char		data[504];				//	message data
+//	structure of network pocket
+struct NetPacket
+{
+	NetPacketHeader	header;				//	header of message
+	char			data[1024];			//	message data
+};
+
+//  use this buffer in buffer pool and queue of messages
+struct NetMessage
+{
+	NetPacket	packet;
 
 	//  additional info
 	NetAddress	address;				//	address of sender
 	uint		size;					//	size of message
 	uint		bytsRecved;				//  hold number of bytes received
 
-	NetMessage( dword _id, dword _type, uint _ack ): id(_id), type(_type), subtype(0), ack(_ack), size(0), bytsRecved(0) {}
+	NetMessage( dword id, dword type, uint ack ): size(0), bytsRecved(0)
+	{
+		packet.header.id		= id;
+		packet.header.type		= type;
+		packet.header.subtype	= 0;
+		packet.header.ack		= ack;
+	}
 	NetMessage( void ) { ZeroMemory( this, sizeof(NetMessage) ); }
 };
 typedef NetMessage* PNetMessage;
@@ -102,7 +114,7 @@ bool Socket::Open( const word port )
 	if ( m_socket == INVALID_SOCKET )
 	{
 #if LOG_NETWORK_ERROR
-		g_logger->Log( L"Error: Can't initialize socket. error code : %d", WSAGetLastError() );
+		g_logger->Log( L"Error: Can't initialize socket. error code : %s !" , net_error_string( WSAGetLastError() ) );
 #endif
 		return false;
 	}
@@ -112,7 +124,7 @@ bool Socket::Open( const word port )
 	if( setsockopt( m_socket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i) ) == SOCKET_ERROR )
 	{
 #if LOG_NETWORK_ERROR
-		g_logger->Log( L"Error: Unable to make socket broadcast! error code : %d", WSAGetLastError() );
+		g_logger->Log( L"Error: Unable to make socket broadcast! error code : %s !" , net_error_string( WSAGetLastError() ) );
 #endif
 		Close();
 		return false;
@@ -126,7 +138,7 @@ bool Socket::Open( const word port )
 	if ( bind( m_socket, (const sockaddr*) &address, sizeof(sockaddr_in) ) == SOCKET_ERROR )
 	{
 #if LOG_NETWORK_ERROR
-		g_logger->Log( L"Error: Unable to bind socket! error code : %d", WSAGetLastError() );
+		g_logger->Log( L"Error: Unable to bind socket! error code : %s !" , net_error_string( WSAGetLastError() ) );
 #endif
 		Close();
 		return false;
@@ -137,7 +149,7 @@ bool Socket::Open( const word port )
 	if ( ioctlsocket( m_socket, FIONBIO, &nonBlocking ) == SOCKET_ERROR )
 	{
 #if LOG_NETWORK_ERROR
-		g_logger->Log( L"Error: Unable to make non-blocking socket! error code : %d", WSAGetLastError() );
+		g_logger->Log( L"Error: Unable to make non-blocking socket! error code : %s !" , net_error_string( WSAGetLastError() ) );
 #endif
 		Close();
 		return false;
@@ -311,7 +323,7 @@ void Connection::Disconnect( void )
 	case CONNECTED:
 		{
 			NetMessage netmsg( s_netInternal->id, NMT_DISCONNECT, 0 );
-			m_socket->Send( m_destination, (char*)&netmsg, NET_MESSAGE_HEADER );
+			m_socket->Send( m_destination, (char*)&netmsg, sizeof(NetPacketHeader) );
 		}
 		break;
 	}
@@ -335,7 +347,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		sx_assert( buffer );
 		
 		//	verify that received message is connection request
-		if ( buffer->bytsRecved && buffer->id == s_netInternal->id && buffer->type == NMT_CONNECT )
+		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && buffer->packet.header.type == NMT_CONNECT )
 		{
 			buffer->bytsRecved = 0;	//	avoid processing message by other connections
 
@@ -344,10 +356,10 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 
 			//  respond to client with welcome message
 			NetMessage netmsg( s_netInternal->id, NMT_WELCOME, m_sntAck );
-			m_socket->Send( m_destination, (char*)&netmsg, NET_MESSAGE_HEADER + net_copy_name( &netmsg, m_name ) );
+			m_socket->Send( m_destination, (char*)&netmsg, sizeof(NetPacketHeader) + net_copy_name( &netmsg, m_name ) );
 
 			//  store client name
-			m_name = (wchar*)buffer->data;
+			m_name = (wchar*)buffer->packet.data;
 
 			//	the connection is connected
 			m_state = CONNECTED;
@@ -360,15 +372,15 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		sx_assert( buffer );
 
 		//	wait for receiving welcome message
-		if ( buffer->bytsRecved && buffer->id == s_netInternal->id && net_check_address( &buffer->address, &m_destination ) && buffer->type == NMT_WELCOME )
+		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && net_check_address( &buffer->address, &m_destination ) && buffer->packet.header.type == NMT_WELCOME )
 		{
 			buffer->bytsRecved = 0;	//	avoid processing message by other connections
 
 			//  copy host name
-			m_name = (wchar*)buffer->data;
+			m_name = (wchar*)buffer->packet.data;
 
 			//  client is connected to the destination
-			m_recAck = buffer->ack;
+			m_recAck = buffer->packet.header.ack;
 			m_sntAck = 0;
 			m_timeout = 0;
 			m_sendTime = 0;
@@ -376,7 +388,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 			m_state = CONNECTED;
 
 			NetMessage msg( s_netInternal->id, NMT_ALIVE, m_sntAck );
-			m_socket->Send( m_destination, (char*)&msg, NET_MESSAGE_HEADER );
+			m_socket->Send( m_destination, (char*)&msg, sizeof(NetPacketHeader) );
 
 			break;
 		}
@@ -396,7 +408,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 			m_sendTime = 0;
 
 			NetMessage netmsg( s_netInternal->id, NMT_CONNECT, 0 );
-			m_socket->Send( m_destination, (char*)&netmsg, NET_MESSAGE_HEADER + net_copy_name( &netmsg, m_name ) );
+			m_socket->Send( m_destination, (char*)&netmsg, sizeof(NetPacketHeader) + net_copy_name( &netmsg, m_name ) );
 		}
 		break;
 
@@ -405,11 +417,11 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		sx_assert( buffer );
 
 		//	message received
-		if ( buffer->bytsRecved && buffer->id == s_netInternal->id && net_check_address( &m_destination, &buffer->address ) )
+		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && net_check_address( &m_destination, &buffer->address ) )
 		{
 			m_timeout = 0;
 
-			switch ( buffer->type )
+			switch ( buffer->packet.header.type )
 			{
 			case NMT_DISCONNECT:
 				buffer->bytsRecved = 0;			//  avoid process buffer by other connections
@@ -422,7 +434,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					for ( int i=0; i<n; i++ )
 					{
 						NetMessage* msg = m_sentList[i];
-						if ( msg->ack == buffer->ack )
+						if ( msg->packet.header.ack == buffer->packet.header.ack )
 						{
 							m_socket->Send( m_destination, (char*)msg, msg->size );
 							break;
@@ -433,12 +445,12 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 
 			case NMT_ALIVE:
 
-				if ( m_recAck == buffer->ack )
+				if ( m_recAck == buffer->packet.header.ack )
 				{
-					if ( buffer->subtype == NMT_USER )
+					if ( buffer->packet.header.subtype == NMT_USER )
 					{
 						//	user callback function
-						m_callBack( this, buffer->data, buffer->bytsRecved );
+						m_callBack( this, buffer->packet.data, buffer->bytsRecved );
 						m_recAck++;
 
 						//	flush stored messages in the list
@@ -447,9 +459,9 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 							for ( int i=0; i<m_msgList.Count(); i++ )
 							{
 								NetMessage* pbuf = m_msgList[i];
-								if ( m_recAck == pbuf->ack )
+								if ( m_recAck == pbuf->packet.header.ack )
 								{
-									m_callBack( this, pbuf->data, pbuf->bytsRecved );
+									m_callBack( this, pbuf->packet.data, pbuf->bytsRecved );
 									m_recAck++;
 							
 									s_netInternal->msgPool.Push( pbuf );
@@ -468,7 +480,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						if ( m_sendQueue.Pop( msg ) )
 						{
 							//	send to destination
-							msg->ack = m_sntAck;
+							msg->packet.header.ack = m_sntAck;
 							m_socket->Send( m_destination, (char*)msg, msg->size );
 							m_sntAck++;
 
@@ -485,9 +497,9 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						}
 					}
 				}
-				else if ( m_recAck < buffer->ack )
+				else if ( m_recAck < buffer->packet.header.ack )
 				{
-					if ( buffer->subtype == NMT_USER )
+					if ( buffer->packet.header.subtype == NMT_USER )
 					{
 						//  verify that if message queue is going too long may be a message is lost
 						if ( m_msgList.Count() < NET_MAX_QUEUE_BUFFER )
@@ -510,7 +522,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					
 					//	request to send lost message
 					NetMessage lostmsg( s_netInternal->id, NMT_ACK, m_recAck );
-					m_socket->Send( m_destination, (char*)&lostmsg, NET_MESSAGE_HEADER );
+					m_socket->Send( m_destination, (char*)&lostmsg, sizeof(NetPacketHeader) );
 					
 				}
 
@@ -533,7 +545,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		{
 			m_sendTime = 0;
 			NetMessage msg( s_netInternal->id, NMT_ALIVE, m_sntAck );
-			m_socket->Send( m_destination, (char*)&msg, NET_MESSAGE_HEADER );
+			m_socket->Send( m_destination, (char*)&msg, sizeof(NetPacketHeader) );
 		}
 
 		break;
@@ -560,11 +572,11 @@ bool Connection::Send( const char* buffer, const int size )
 	{
 		NetMessage* msg;
 		s_netInternal->msgPool.Pop( msg );
-		msg->id = s_netInternal->id;
-		msg->type = NMT_ALIVE;
-		msg->subtype = NMT_USER;
-		msg->size = NET_MESSAGE_HEADER + size;
-		memcpy( msg->data, buffer, size );
+		msg->packet.header.id = s_netInternal->id;
+		msg->packet.header.type = NMT_ALIVE;
+		msg->packet.header.subtype = NMT_USER;
+		msg->size = sizeof(NetPacketHeader) + size;
+		memcpy( msg->packet.data, buffer, size );
 		m_sendQueue.Push( msg );
 
 		return true;
@@ -628,7 +640,7 @@ void Server::Stop( void )
 	{
 		NetMessage buffer( s_netInternal->id, NMT_SERVER_CLOSED, 0 );
 		NetAddress broadcast; ZeroMemory( &broadcast.ip, sizeof(broadcast.ip) ); broadcast.port = m_clientPort;
-		m_socket.Send( broadcast, (char*)&buffer, NET_MESSAGE_HEADER + net_copy_name( &buffer, m_name ) );
+		m_socket.Send( broadcast, (char*)&buffer, sizeof(NetPacketHeader) + net_copy_name( &buffer, m_name ) );
 	}
 
 	for ( int i=0; i<m_clients.Count(); i++ )
@@ -660,7 +672,7 @@ void Server::Run( void )
 	//	notify that this server has stopped client acceptance
 	NetMessage buffer( s_netInternal->id, NMT_SERVER_CLOSED, 0 );
 	NetAddress broadcast; ZeroMemory( &broadcast.ip, sizeof(broadcast.ip) ); broadcast.port = m_clientPort;
-	m_socket.Send( broadcast, (char*)&buffer, NET_MESSAGE_HEADER + net_copy_name( &buffer, m_name ) );
+	m_socket.Send( broadcast, (char*)&buffer, sizeof(NetPacketHeader) + net_copy_name( &buffer, m_name ) );
 
 	for ( int i=0; i<m_clients.Count(); i++ )
 	{
@@ -687,7 +699,7 @@ void Server::Update( const float elpsTime, const float delayTime, const float ti
 
 			NetMessage buffer( s_netInternal->id, NMT_SERVER_OPEN, 0 );
 			NetAddress broadcast; ZeroMemory( &broadcast.ip, sizeof(broadcast.ip) ); broadcast.port = m_clientPort;
-			m_socket.Send( broadcast, (char*)&buffer, NET_MESSAGE_HEADER + net_copy_name( &buffer, m_name ) );
+			m_socket.Send( broadcast, (char*)&buffer, sizeof(NetPacketHeader) + net_copy_name( &buffer, m_name ) );
 
 			for ( int i=0; i<m_clients.Count(); i++ )
 			{
@@ -760,7 +772,7 @@ bool Server::Send( const char* buffer, const int size )
 
 // 	NetMessage netmsg( s_netInternal->id, NMT_USER, m_numSend++ );
 // 	memcpy( netmsg.data, buffer, size );
-// 	return m_socket.Send( m_broadCastAddress, (char*)&netmsg, NET_MESSAGE_HEADER + size );
+// 	return m_socket.Send( m_broadCastAddress, (char*)&netmsg, sizeof(NetPacketHeader) + size );
 }
 
 
@@ -828,13 +840,13 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 		//	listen to the port to find any server
 		buffer.bytsRecved = m_socket.Receive( (char*)&buffer, NET_MESSAGE_SIZE, &buffer.address );
 
-		if ( buffer.bytsRecved && buffer.id == s_netInternal->id && ( buffer.type == NMT_SERVER_OPEN || buffer.type == NMT_SERVER_CLOSED ) ) 
+		if ( buffer.bytsRecved && buffer.packet.header.id == s_netInternal->id && ( buffer.packet.header.type == NMT_SERVER_OPEN || buffer.packet.header.type == NMT_SERVER_CLOSED ) ) 
 		{
 			ServerInfo serverInfo;
 			memcpy( serverInfo.address.ip, buffer.address.ip, 4 );
 			serverInfo.address.port = buffer.address.port;
 
-			if ( buffer.type == NMT_SERVER_OPEN )
+			if ( buffer.packet.header.type == NMT_SERVER_OPEN )
 			{
 				bool itisnew = true;
 				for ( int i=0; i<m_servers.Count(); i++ )
@@ -842,7 +854,7 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 					if ( memcmp( &m_servers[i].address, &serverInfo.address, sizeof(serverInfo.address) ) == 0 )
 					{
 						ZeroMemory( m_servers[i].name, sizeof(serverInfo.name) );
-						memcpy( m_servers[i].name, buffer.data, sizeof(serverInfo.name) );
+						memcpy( m_servers[i].name, buffer.packet.data, sizeof(serverInfo.name) );
 
 						itisnew = false;
 						break;
@@ -851,7 +863,7 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 				if ( itisnew )
 				{
 					ZeroMemory( serverInfo.name, sizeof(serverInfo.name) );
-					memcpy( serverInfo.name, buffer.data, sizeof(serverInfo.name) );
+					memcpy( serverInfo.name, buffer.packet.data, sizeof(serverInfo.name) );
 					m_servers.PushBack( serverInfo );
 				}
 			}
@@ -935,7 +947,7 @@ SEGAN_ENG_API bool sx_net_initialize( const dword netID )
 	{
 
 #if LOG_NETWORK_ERROR
-		g_logger->Log( L"Error: Network initialization on Windows failed! error code : %d " , WSAGetLastError() );
+		g_logger->Log( L"Error: Network initialization on Windows failed! error code : %s !" , net_error_string( WSAGetLastError() ) );
 #endif
 		
 		netInitialized = false;
@@ -958,7 +970,7 @@ SEGAN_ENG_API bool sx_net_initialize( const dword netID )
 	if( netInitialized && ::gethostname( hostName, sizeof(hostName) ) )
 	{
 #if LOG_NETWORK_ERROR
-		g_logger->Log( L"Error: function ::gethostname() failed with error code : %d !", WSAGetLastError() );
+		g_logger->Log( L"Error: function ::gethostname() failed with error code : %s !" , net_error_string( WSAGetLastError() ) );
 #endif
 		netInitialized = false;
 	}
@@ -968,7 +980,7 @@ SEGAN_ENG_API bool sx_net_initialize( const dword netID )
 	if( netInitialized && !pHost )
 	{
 #if LOG_NETWORK_ERROR
-		g_logger->Log( L"Error: function ::gethostbyname() failed with error code : %d !", WSAGetLastError() );
+		g_logger->Log( L"Error: function ::gethostbyname() failed with error code : %s !" , net_error_string( WSAGetLastError() ) );
 #endif
 		netInitialized = false;
 	}
@@ -1144,12 +1156,12 @@ SEGAN_INLINE bool net_check_address( const NetAddress* ad1, const NetAddress* ad
 
 sint net_compare_ack( const PNetMessage& cb1, const PNetMessage& cb2 )
 {
-	return ( cb1->ack > cb2->ack ) ? 1 : ( (cb1->ack < cb2->ack) ? -1 : 0 );
+	return ( cb1->packet.header.ack > cb2->packet.header.ack ) ? 1 : ( (cb1->packet.header.ack < cb2->packet.header.ack) ? -1 : 0 );
 }
 
 sint net_copy_name( NetMessage* msg, const wchar* name )
 {
-	return sx_str_copy( (wchar*)msg->data, 32, name ? name : s_netInternal->name ) * 2;
+	return sx_str_copy( (wchar*)msg->packet.data, 32, name ? name : s_netInternal->name ) * 2;
 }
 
 SEGAN_INLINE void callback_connection_server( Connection* connection, const char* buffer, const uint size )
