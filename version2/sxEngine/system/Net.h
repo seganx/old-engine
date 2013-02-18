@@ -18,15 +18,11 @@
 
 #include "../../sxLib/Lib.h"
 
-#define LOG_NETWORK_INFO		1
-#define LOG_NETWORK_WARNING		1
-#define LOG_NETWORK_ERROR		1
-
 
 //!	callback functions
-typedef void (*CB_Connection)(class Connection* connection, const char* buffer, const uint size);
-typedef void (*CB_Server)(class Server* server, class Connection* client, const char* buffer, const uint size);
-typedef void (*CB_Client)(class Client* client, const char* buffer, const uint size);
+typedef void (*CB_Connection)(class Connection* connection, const byte* buffer, const uint size);
+typedef void (*CB_Server)(class Server* server, class Connection* client, const byte* buffer, const uint size);
+typedef void (*CB_Client)(class Client* client, const byte* buffer, const uint size);
 
 
 //! describe state of net object
@@ -65,10 +61,10 @@ public:
 	void Close( void );
 
 	//! send data to the destination address
-	bool Send( const NetAddress& destination, const char* buffer, const int size );
+	bool Send( const NetAddress& destination, const void* buffer, const int size );
 
 	//! pick up data on the port and fill out address of sender
-	sint Receive( const char* buffer, const int size, NetAddress* OUT sender );
+	sint Receive( const void* buffer, const int size, NetAddress* OUT sender );
 
 public:
 	uint	m_socket;
@@ -104,7 +100,7 @@ public:
 	void Update( struct NetMessage* buffer, const float elpsTime, const float delayTime, const float timeOut );
 
 	//! send a message through the connection
-	bool Send( const char* buffer, const int size );
+	bool Send( const void* buffer, const int sizeinbyte, const bool important = true );
 
 public:
 
@@ -180,7 +176,7 @@ public:
 	void Stop( void );
 
 	//! search for servers on the specified port and update list of servers if servers has been found
-	void Listen( const word serverPort );
+	void Listen( void );
 
 	//! connect to the destination server
 	void Connect( NetAddress& destination );
@@ -205,6 +201,7 @@ public:
 	{
 		wchar		name[32];
 		NetAddress	address;
+		float		age;
 	};
 	Array<ServerInfo>	m_servers;			//	array of servers
 

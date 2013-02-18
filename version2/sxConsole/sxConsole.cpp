@@ -250,7 +250,7 @@ void callback_logger_client( const wchar* message )
 	append_text_to_control( g_logText, message );
 }
 
-void callback_server( Server* server, Connection* client, const char* buffer, const uint size )
+void callback_server( Server* server, Connection* client, const byte* buffer, const uint size )
 {
 	wchar wbuf[1024]; ZeroMemory( wbuf, sizeof(wbuf) );
 	for ( uint i=0; i<size && i<1023 && buffer[i]; i++ )
@@ -261,7 +261,7 @@ void callback_server( Server* server, Connection* client, const char* buffer, co
  	append_text_to_control( g_logText, tmpText );
 }
 
-void callback_client( Client* client, const char* buffer, const uint size )
+void callback_client( Client* client, const byte* buffer, const uint size )
 {
 	wchar wbuf[1024]; ZeroMemory( wbuf, sizeof(wbuf) );
 	for ( int i=0; i<1023 && buffer[i]; i++ )
@@ -405,7 +405,7 @@ int EventCallback( class Window* Sender, const WindowEvent* data )
 						else
 						{
 							g_network->client.Disconnect();
-							g_network->client.Listen(2828);
+							g_network->client.Listen();
 						}
 					}
 					else
@@ -510,7 +510,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	{
 		g_network->client.m_name = L"client";
 		g_network->client.Start( 2727, callback_client );
-		g_network->client.Listen(2828);
+		g_network->client.Listen();
 
 	}
 
