@@ -31,10 +31,10 @@ struct NetPacketHeader
 {
 	word		id;						//	id of network system to avoid conflict with other network systems
 	byte		type;					//	type of message
-	byte		subtype;				//	sub type of message
+	byte		crit;					//	message is critical
 	uint		ack;					//	message number
 
-	NetPacketHeader( const word _id, const byte _type, const uint _ack ): id(_id), type(_type), subtype(0), ack(_ack){}
+	NetPacketHeader( const word _id, const byte _type, const uint _ack ): id(_id), type(_type), crit(false), ack(_ack){}
 	NetPacketHeader( void ){}
 };
 
@@ -455,7 +455,11 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 
 			case NMT_USER:
 				{
-					if ( m_recAck == buffer->packet.header.ack )
+					if ( !buffer->packet.header.crit ) 
+					{
+						m_callBack( this, buffer->packet.data, buffer->bytsRecved );
+					}
+					else if ( m_recAck == buffer->packet.header.ack )
 					{
 						//	user callback function
 						m_callBack( this, buffer->packet.data, buffer->bytsRecved );
@@ -518,16 +522,19 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 								//	send to destination
 								msg->packet.header.ack = m_sntAck;
 								m_socket->Send( m_destination, &msg->packet, msg->size );
-								m_sntAck++;
 
 								//	push the message to the sent items
-								m_sentList.PushBack( msg );
-
-								//	keep sent items limit
-								if ( m_sentList.Count() == NET_MAX_QUEUE_BUFFER )
+								if ( msg->packet.header.crit )
 								{
-									s_netInternal->msgPool.Push( m_sentList[0] );
-									m_sentList.RemoveByIndex( 0 );
+									m_sntAck++;
+									m_sentList.PushBack( msg );
+
+									//	keep sent items limit
+									if ( m_sentList.Count() == NET_MAX_QUEUE_BUFFER )
+									{
+										s_netInternal->msgPool.Push( m_sentList[0] );
+										m_sentList.RemoveByIndex( 0 );
+									}
 								}
 							}
 						}
@@ -537,7 +544,6 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NMT_ACK, m_recAck );
 						m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
-						
 					}
 
 					buffer->bytsRecved = 0;		// notify that buffer handled
@@ -568,7 +574,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 	}
 }
 
-SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, const bool important /*= true */ )
+SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, const bool critical /*= true */ )
 {
 	sx_callstack();
 	sx_assert( buffer && sizeinbyte>0 && sizeinbyte<=NET_PACKET_SIZE );
@@ -587,8 +593,10 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 			{
 				msg->packet.header.id = s_netInternal->id;
 				msg->packet.header.type = NMT_USER;
+				msg->packet.header.crit = critical;
 				msg->size = sizeinbyte + sizeof(NetPacketHeader);
 				memcpy( msg->packet.data, buffer, sizeinbyte );
+
 				m_sendQueue.Push( msg );
 				res = true;
 			}
@@ -763,24 +771,25 @@ void Server::Update( const float elpsTime, const float delayTime, const float ti
 	}
 }
 
-SEGAN_INLINE bool Server::Send( const char* buffer, const int size )
+bool Server::Send( const char* buffer, const int sizeinbyte, const bool critical /*= false */ )
 {
 	sx_assert( buffer );
-	sx_assert( size > 0 );
-	sx_assert( size <= NET_PACKET_SIZE );
+	sx_assert( sizeinbyte > 0 );
+	sx_assert( sizeinbyte <= NET_PACKET_SIZE );
 
 	bool res = true;
 	if ( m_state != STOPPED )
 	{
 		for ( int i=0; res && i<m_clients.Count(); i++ )
 		{
-			res = m_clients[i]->Send( buffer, size );
+			res = m_clients[i]->Send( buffer, sizeinbyte, critical );
 		}
 	}
 
 	return res;
 
 }
+
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -910,9 +919,9 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 	}
 }
 
-bool Client::Send( const char* buffer, const int size )
+bool Client::Send( const char* buffer, const int sizeinbyte, const bool critical /*= false */ )
 {
-	return m_connection.Send( buffer, size );
+	return m_connection.Send( buffer, sizeinbyte, critical );
 }
 
 

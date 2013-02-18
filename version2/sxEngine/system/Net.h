@@ -100,7 +100,7 @@ public:
 	void Update( struct NetMessage* buffer, const float elpsTime, const float delayTime, const float timeOut );
 
 	//! send a message through the connection
-	bool Send( const void* buffer, const int sizeinbyte, const bool important = true );
+	bool Send( const void* buffer, const int sizeinbyte, const bool critical = false );
 
 public:
 
@@ -144,7 +144,7 @@ public:
 	void Update( const float elpsTime, const float delayTime, const float timeOut );
 
 	//! send message to all clients
-	bool Send( const char* buffer, const int size );
+	bool Send( const char* buffer, const int sizeinbyte, const bool critical = false );
 
 public:
 
@@ -188,7 +188,7 @@ public:
 	void Update( const float elpsTime, const float delayTime, const float timeOut );
 
 	//! send a message to the connected server
-	bool Send( const char* buffer, const int size );
+	bool Send( const char* buffer, const int sizeinbyte, const bool critical = false );
 
 public:
 
