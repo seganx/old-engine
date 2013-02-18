@@ -119,7 +119,7 @@ bool FileManager::Package_Create( const wchar* packageName )
 		}
 
 		newPack = sx_new( Package );
-		String::Copy( newPack->name, 128, packageName );
+		sx_str_copy( newPack->name, 128, packageName );
 		m_packs.PushBack( newPack );
 
 		str1024 path = m_root;
@@ -189,7 +189,7 @@ bool FileManager::File_Exist( const wchar* fileName, const wchar* packageName )
 	bool res = false;
 
 	//  check to see if fileName was full file path then check the file directly
-	if ( str1024::IsPathStyle( fileName ) )
+	if ( sx_str_is_pathstyle( fileName ) )
 	{
 		res = sx_os_file_exist( fileName );
 		if ( !res )
@@ -223,7 +223,7 @@ bool FileManager::File_Open( const wchar* fileName, const wchar* packageName, St
 
 	//  check to see if fileName was full file path then open the file directly
 	str1024 path = fileName;
-	if ( str1024::IsFullPath( fileName ) )
+	if ( sx_str_is_fullpath( fileName ) )
 	{
 		FileStream* sfile = sx_new( FileStream );
 		if ( sfile->Open( path, FM_OPEN_READ | FM_SHARE_READ ) )

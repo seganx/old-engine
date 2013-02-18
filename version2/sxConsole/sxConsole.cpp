@@ -453,10 +453,10 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		str256 commandLine = lpCmdLine;
 
 		//  parse the command line
-		if ( commandLine.Find(L"server") > -1 )
-			g_network->isServer = true;
-		else
+		if ( commandLine.Find(L"client") > -1 )
 			g_network->isServer = false;
+		else
+			g_network->isServer = true;
 	}
 
 	String consoleName = L"SeganX Console :: "; consoleName << ( g_network->isServer ? L"server" : L"client" );
@@ -503,13 +503,15 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	if ( g_network->isServer )
 	{
 		g_network->server.m_name = L"server";
-		g_network->server.Start( 2828, 10, callback_server );
-		g_network->server.Listen( 2727 );
+		g_network->server.Start( 2828, 2727, 10, callback_server );
+		g_network->server.Listen();
 	}
 	else
 	{
 		g_network->client.m_name = L"client";
 		g_network->client.Start( 2727, callback_client );
+		g_network->client.Listen(2828);
+
 	}
 
 	sx_engine_start( &MainLoop );

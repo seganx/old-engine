@@ -94,32 +94,38 @@ SEGAN_LIB_INLINE sint sx_str_cmp( const wchar* str1, const char* str2 )
 	return res;
 }
 
-SEGAN_LIB_INLINE void sx_str_copy( wchar* dest, const sint dest_size_in_word, const wchar* src )
+//! copy the src string to the destination string and return number of characters which have copied contain null character
+SEGAN_LIB_INLINE sint sx_str_copy( wchar* dest, const sint dest_size_in_word, const wchar* src )
 {
 	sx_assert(dest);
+	sint res = 0;
 	if ( src )
 	{
-		for ( int i=0; i<dest_size_in_word; i++ )
+		for ( ; res<dest_size_in_word; ++res )
 		{
-			dest[i] = src[i];
-			if ( dest[i] == 0 ) break;
+			dest[res] = src[res];
+			if ( dest[res] == 0 ) break;
 		}
 		dest[dest_size_in_word-1] = 0;
 	}
+	return res;
 }
 
-SEGAN_LIB_INLINE void sx_str_copy( wchar* dest, const sint dest_size_in_word, const char* src )
+//! copy the src string to the destination string and return number of characters which have copied contain null character
+SEGAN_LIB_INLINE sint sx_str_copy( wchar* dest, const sint dest_size_in_word, const char* src )
 {
 	sx_assert(dest);
+	sint res = 0;
 	if ( src )
 	{
-		for ( int i=0; i<dest_size_in_word; i++ )
+		for ( ; res<dest_size_in_word; ++res )
 		{
-			dest[i] = src[i];
-			if ( dest[i] == 0 ) break;
+			dest[res] = src[res];
+			if ( dest[res] == 0 ) break;
 		}
 		dest[dest_size_in_word-1] = 0;
 	}
+	return res;
 }
 
 SEGAN_LIB_INLINE wchar sx_str_upper( wchar c )
@@ -162,7 +168,7 @@ SEGAN_LIB_INLINE const bool sx_str_is_pathstyle( const wchar* filepath )
 }
 
 /*! return true if entry string is as complete filename*/
-SEGAN_LIB_INLINE const bool sx_str_is_fullfilepath( const wchar* filepath )
+SEGAN_LIB_INLINE const bool sx_str_is_fullpath( const wchar* filepath )
 {
 	if ( !filepath ) return false;
 	return ( filepath[1] == ':' || ( filepath[0] == '\\' && filepath[1] == '\\') || ( filepath[0] == '/' && filepath[1] == '/') );
@@ -844,18 +850,6 @@ public:
 		Append( str );
 	}
 
-	String_fix( const String_fix& str ): m_len(0)
-	{
-		m_text[0] = 0;
-		Append( str );
-	}
-
-	String_fix( const String& str ): m_len(0)
-	{
-		m_text[0] = 0;
-		Append( str );
-	}
-
 	~String_fix( void )
 	{
 	}
@@ -1281,12 +1275,6 @@ public:
 	}
 
 	//  operator declarations for = //////////////////////////////////////////////////////////////////////////
-	SEGAN_LIB_INLINE String_fix& operator= ( const String_fix& Str )
-	{
-		SetText( Str.m_text );
-		return *this;
-	}
-
 	SEGAN_LIB_INLINE String_fix& operator= ( const wchar* str )
 	{
 		SetText( str );

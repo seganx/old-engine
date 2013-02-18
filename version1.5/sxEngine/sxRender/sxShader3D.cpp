@@ -21,7 +21,7 @@ namespace sx { namespace d3d {
 
 	bool Shader3D::CompileShader( const WCHAR* code, SQ_ ShaderQuality quality, const WCHAR* userLog /*= NULL*/ )
 	{
-		sx_callstack_param(Shader3D::CompileShader(%s, quality, %s), code, userLog);
+		sx_callstack_param(Shader3D::CompileShader(code, quality, %s), userLog);
 
 		if ( !Device3D::GetDevice() || !code ) return false;
 

@@ -770,7 +770,7 @@ namespace sx { namespace d3d
 
 	bool Resource3D::CreateEffect( const char* srcCode, OUT PD3DXEffect& outEffect, const WCHAR* UserLog /*= NULL*/ )
 	{
-		sx_callstack_param(Resource3D::CreateEffect(code=%s), srcCode);
+		sx_callstack_param(Resource3D::CreateEffect(userlog=%s), UserLog);
 
 		if (!Resource3D_internal::s_EffectPool)
 			D3DXCreateEffectPool(&Resource3D_internal::s_EffectPool);

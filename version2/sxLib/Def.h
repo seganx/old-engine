@@ -79,11 +79,11 @@ typedef byte				*pbyte;
 	#endif
 #endif
 
-#if !defined( SEGAN_API )
-	#if defined( SEGAN_API )
-		#define SEGAN_API		__declspec(dllimport)
+#if !defined( SEGAN_ENG_API )
+	#if defined( SEGAN_ENG_API )
+		#define SEGAN_ENG_API		__declspec(dllimport)
 	#else
-		#define SEGAN_API		__declspec(dllexport)
+		#define SEGAN_ENG_API		__declspec(dllexport)
 	#endif
 #endif
 

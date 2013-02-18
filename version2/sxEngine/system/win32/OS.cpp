@@ -143,16 +143,16 @@ void _get_files_in_dir_x( const wchar* root, const wchar* path, const String& ex
 
 		if ( extenAccepted )
 		{
-			String::Copy( finfo.name, 256, filePath );
-			String::Copy( finfo.name + filePath.Length(), 256 - filePath.Length(), ffd.cFileName );
+			sx_str_copy( finfo.name, 256, filePath );
+			sx_str_copy( finfo.name + filePath.Length(), 256 - filePath.Length(), ffd.cFileName );
 
 			if ( ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-				String::Copy( finfo.type, 32, L"<DIR>" );
+				sx_str_copy( finfo.type, 32, L"<DIR>" );
 			else
 			{
 				str256 ext = ffd.cFileName;
 				ext.ExtractFileExtension().MakeLower();
-				String::Copy( finfo.type, 32, ext );
+				sx_str_copy( finfo.type, 32, ext );
 			}
 
 			filesize.LowPart  = ffd.nFileSizeLow;
@@ -238,7 +238,7 @@ SEGAN_INLINE void sx_os_sleep( const uint miliseconds )
 
 SEGAN_INLINE void sx_os_enter_critical_section( void )
 {
-	sx_callstack_push(sx_os_enter_critical_section());
+	sx_callstack();
 
 	if ( s_system->m_csIndex < MAX_CS_COUNT )
 	{
@@ -254,7 +254,7 @@ SEGAN_INLINE void sx_os_enter_critical_section( void )
 
 SEGAN_INLINE void sx_os_leave_critical_section( void )
 {
-	sx_callstack_push(sx_os_leave_critical_section());
+	sx_callstack();
 
 	if ( s_system->m_csIndex > 0 )
 	{
@@ -323,8 +323,7 @@ const wchar* sx_os_get_time_stamp( void )
 void sx_os_copy_text_to_clipboard( const wchar* text )
 {
 	if ( !text ) return;
-
-	sx_callstack_push(sx_os_copy_text_to_clipboard(%s), text);
+	sx_callstack();
 
 	sint memSize = ( (sint)wcslen(text) + 1 ) * sizeof(wchar);
 	
@@ -345,7 +344,7 @@ void sx_os_copy_text_to_clipboard( const wchar* text )
 
 const wchar* sx_os_paste_text_from_clipboard( void )
 {
-	sx_callstack_push(sx_os_paste_text_from_clipboard());
+	sx_callstack();
 
 	static String res;
 	res.Clear();
@@ -397,7 +396,7 @@ uint sx_os_get_available_memory( void )
 
 void sx_os_get_info( OSInfo& osInfo )
 {
-	sx_callstack_push(_get_os_info());
+	sx_callstack();
 
 	ZeroMemory( &osInfo, sizeof(osInfo) );
 
@@ -514,7 +513,7 @@ void sx_os_get_info( OSInfo& osInfo )
 		else if (si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_INTEL )	res << L", 32-bit";
 	}
 
-	String::Copy( osInfo.desc, 256, res );
+	sx_str_copy( osInfo.desc, 256, res );
 	osInfo.major = osvi.dwMajorVersion;
 	osInfo.minor = osvi.dwMinorVersion;
 }
@@ -578,8 +577,7 @@ void sx_os_get_system_info( SystemInfo& sysInfo )
 void sx_os_get_cpu_status( CPUStatus* pCPUStatus, const sint numberOfCPU )
 {
 	if ( !pCPUStatus || !numberOfCPU ) return;
-
-	sx_callstack_push(sx_os_get_cpu_status(numberOfCPU=%d),numberOfCPU);
+	sx_callstack();
 
 	PROCESSOR_POWER_INFORMATION ppi[MAX_CPU_COUNT];
 	CallNtPowerInformation( ProcessorInformation, null, 0, ppi, sizeof(PROCESSOR_POWER_INFORMATION) * MAX_CPU_COUNT );
@@ -593,7 +591,7 @@ void sx_os_get_cpu_status( CPUStatus* pCPUStatus, const sint numberOfCPU )
 
 void sx_os_get_battery_status( BatteryStatus& batteryStatus )
 {
-	sx_callstack_push(sx_os_get_battery_status());
+	sx_callstack();
 
 	SYSTEM_BATTERY_STATE sbs;
 	CallNtPowerInformation( SystemBatteryState, null, 0, &sbs, sizeof(SYSTEM_BATTERY_STATE) );
@@ -616,7 +614,7 @@ void sx_os_get_battery_status( BatteryStatus& batteryStatus )
 	{
 		str32 tmp;
 		tmp.Format( L"%.2d:%.2d", sint(sbs.EstimatedTime / 3600), sint((sbs.EstimatedTime % 3600) / 60) );
-		String::Copy( batteryStatus.estimatedTime, 8, tmp );
+		sx_str_copy( batteryStatus.estimatedTime, 8, tmp );
 	}
 	else memcpy( batteryStatus.estimatedTime, L"00:00", 12 );
 		
@@ -639,7 +637,7 @@ void sx_os_keep_wakeful( void )
 
 MonitorInfo* sx_os_get_monitor( sint x /*= 0*/, sint y /*= 0 */ )
 {
-	sx_callstack_push(sx_os_get_monitor(%d, %d), x, y);
+	sx_callstack();
 
 	static MonitorInfo monitorInfo;
 
@@ -665,7 +663,7 @@ MonitorInfo* sx_os_get_monitor( sint x /*= 0*/, sint y /*= 0 */ )
 
 DesktopInfo* sx_os_get_desktop( sint x /*= 0*/, sint y /*= 0 */ )
 {
-	sx_callstack_push(sx_os_get_desktop(%d, %d), x, y);
+	sx_callstack();
 
 	static DesktopInfo desktopInfo;
 
@@ -721,7 +719,7 @@ const wchar* sx_os_get_current_dir( void )
 
 void sx_os_set_current_dir( const wchar* path )
 {
-	if ( String::IsFullPath( path ) )
+	if ( sx_str_is_fullpath( path ) )
 		SetCurrentDirectory( path );
 }
 
@@ -829,7 +827,7 @@ const wchar* sx_os_get_drive_label( wchar DriveName )
 void sx_os_get_drive_info( wchar DriveName, DriveInfo& dinfo )
 {
 	str64 str	= sx_os_get_drive_label( DriveName );
-	String::Copy( dinfo.label, 64, str );
+	sx_str_copy( dinfo.label, 64, str );
 
 	dinfo.size	= sx_os_get_drive_space( DriveName );
 	dinfo.free	= sx_os_get_drive_free_space( DriveName );
@@ -838,12 +836,12 @@ void sx_os_get_drive_info( wchar DriveName, DriveInfo& dinfo )
 
 	switch (dinfo.type)
 	{
-	case DRIVE_UNKNOWN:		String::Copy( dinfo.typeName, 64, L"Unknown type" );				break;
-	case DRIVE_REMOVABLE:	String::Copy( dinfo.typeName, 64, L"Removable storage" );			break;
-	case DRIVE_FIXED:		String::Copy( dinfo.typeName, 64, L"Hard drive" );					break;
-	case DRIVE_REMOTE:		String::Copy( dinfo.typeName, 64, L"Remote (network) drive" );		break;
-	case DRIVE_CDROM:		String::Copy( dinfo.typeName, 64, L"CD-ROM drive" );				break;
-	case DRIVE_RAMDISK:		String::Copy( dinfo.typeName, 64, L"RAM Drive" );					break;
+	case DRIVE_UNKNOWN:		sx_str_copy( dinfo.typeName, 64, L"Unknown type" );				break;
+	case DRIVE_REMOVABLE:	sx_str_copy( dinfo.typeName, 64, L"Removable storage" );			break;
+	case DRIVE_FIXED:		sx_str_copy( dinfo.typeName, 64, L"Hard drive" );					break;
+	case DRIVE_REMOTE:		sx_str_copy( dinfo.typeName, 64, L"Remote (network) drive" );		break;
+	case DRIVE_CDROM:		sx_str_copy( dinfo.typeName, 64, L"CD-ROM drive" );				break;
+	case DRIVE_RAMDISK:		sx_str_copy( dinfo.typeName, 64, L"RAM Drive" );					break;
 	}
 }
 
@@ -859,15 +857,15 @@ bool sx_os_get_file_info( const wchar* fileName, FileInfo& finfo )
 	str512 tmpStr;
 
 	tmpStr = fileName;
-	if ( String::IsPathStyle(fileName) )
+	if ( sx_str_is_pathstyle( fileName ) )
 		tmpStr.Delete( tmpStr.Length() - 1 );
 	tmpStr.ExtractFileName();
 	//tmpStr.ExcludeFileExtension();
-	String::Copy( finfo.name, 256, tmpStr );
+	sx_str_copy( finfo.name, 256, tmpStr );
 
 	tmpStr = fileName;
 	tmpStr.ExtractFileExtension();
-	String::Copy( finfo.type, 256, tmpStr );
+	sx_str_copy( finfo.type, 256, tmpStr );
 
 	LARGE_INTEGER filesize;
 	filesize.LowPart  = fileAD.nFileSizeLow;
@@ -926,15 +924,15 @@ void sx_os_get_files( const wchar* path, const wchar* exten, FileInfoArray& file
 
 		if ( extenAccepted )
 		{
-			String::Copy( fileInfo.name, 256, ffd.cFileName );
+			sx_str_copy( fileInfo.name, 256, ffd.cFileName );
 
 			if ( ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-				String::Copy( fileInfo.type, 32, L"<DIR>" );
+				sx_str_copy( fileInfo.type, 32, L"<DIR>" );
 			else
 			{
 				str256 ext = ffd.cFileName;
 				ext.ExtractFileExtension().MakeLower();
-				String::Copy( fileInfo.type, 32, ext );
+				sx_str_copy( fileInfo.type, 32, ext );
 			}
 
 			fileSize.LowPart  = ffd.nFileSizeLow;
@@ -1026,7 +1024,7 @@ bool sx_os_make_dir( const wchar* folderName )
 
 SEGAN_ENG_API bool sx_os_remove_dir( const wchar* folderName, CB_RemoveDir callback /*= null*/, void* userdata /*= null */ )
 {
-	sx_callstack_push(sx_os_remove_dir(folderName=%s),folderName);
+	sx_callstack_param(sx_os_remove_dir(folderName=%s), folderName);
 
 	if ( !sx_os_dir_exist( folderName ) ) return false;
 
@@ -1068,7 +1066,7 @@ SEGAN_ENG_API bool sx_os_remove_dir( const wchar* folderName, CB_RemoveDir callb
 
 SEGAN_ENG_API bool sx_os_copy_dir( const wchar* srcFolder, const wchar* destFolder, CB_CopyDir callback /*= null*/, void* userdata /*= null */ )
 {
-	sx_callstack_push(sx_os_remove_dir(srcFolder=%s,destFolder=%s),srcFolder,destFolder);
+	sx_callstack_param(sx_os_remove_dir(srcFolder=%s, destFolder=%s), srcFolder, destFolder);
 
 	if ( !sx_os_dir_exist( srcFolder ) ) return false;
 
@@ -1128,8 +1126,7 @@ SEGAN_ENG_API bool sx_os_copy_dir( const wchar* srcFolder, const wchar* destFold
 SEGAN_ENG_API bool sx_os_move_dir( const wchar* srcFolder, const wchar* destFolder, CB_CopyDir callback /*= null*/, void* userdata /*= null */ )
 {
 	if ( !srcFolder || !destFolder ) return false;
-
-	sx_callstack_push(sx_os_remove_dir(srcFolder=%s,destFolder=%s),srcFolder,destFolder);
+	sx_callstack_param(sx_os_remove_dir(srcFolder=%s, destFolder=%s), srcFolder, destFolder);
 
 	//  verify that both of them are in the same drive
 	if ( *srcFolder == *destFolder )
@@ -1150,10 +1147,10 @@ bool sx_os_rename_dir( const wchar* srcFolder, const wchar* newName )
 {
 	if ( !srcFolder || !newName ) return false;
 
-	sx_callstack_push(sx_os_remove_dir(srcFolder=%s,newName=%s),srcFolder,newName);
+	sx_callstack_param(sx_os_remove_dir(srcFolder=%s, newName=%s), srcFolder, newName);
 
 	str1024 fldr = srcFolder;
-	if ( String::IsPathStyle( srcFolder ) )
+	if ( sx_str_is_pathstyle( srcFolder ) )
 		fldr.Delete( fldr.Length() - 1 );
 	
 	fldr.ExtractFilePath();

@@ -23,10 +23,14 @@
 #define LOG_NETWORK_ERROR		1
 
 
-//!	callback functions
-typedef void (*CB_Connection)(class Connection* connection, const char* buffer, const uint size);
-typedef void (*CB_Server)(class Server* server, class Connection* client, const char* buffer, const uint size);
-typedef void (*CB_Client)(class Client* client, const char* buffer, const uint size);
+enum NetError
+{
+	NER_UNAVAILABLE = 20,		//	network is not available
+	NER_UNINITIALIZED,			//	server/client is not initialized
+	NER_UNCONNECTED,			//  client is not connected to server
+	NER_INVALID_BUFFER,			//  buffer parameters are invalid
+	NER_INVALID_CLIENT,			//	client socket is not available
+};
 
 
 //! describe state of net object
@@ -42,12 +46,17 @@ enum NetState
 };
 
 
-//! describe network address
+//! describe an network address
 struct NetAddress
 {
 	byte	ip[4];
 	word	port;
 };
+
+//!	callback functions
+typedef void (*CB_Server)(class Server* server, class Connection* client, const char* buffer, const uint size);
+typedef void (*CB_Client)(class Client* client, const char* buffer, const uint size);
+
 
 
 //! basic UPD socket class
@@ -86,18 +95,29 @@ public:
 	~Connection( void );
 
 	//! start the connection on the opened socket. NOTE: this will not open the socket. just initialize the connection.
-	bool Start( Socket* psocket, const NetAddress& destination );
+	bool Start( Socket* psocket );
 
 	//! stop the connection. NOTE: this will not close the socket. just disconnect and finalized the connection
 	void Stop( void );
+
+	//! set the connection to listen mode to wait for the other connection
+	bool Listen( void );
+
+	//! going to try to connect to the destination host
+	void Connect( const NetAddress& destination );
+
+	//! disconnect the connection
+	void Disconnect( void );
 
 	//! update the connection. this function should be called in application loop
 	void Update( struct NetMessage* buffer, const float elpsTime, const float delayTime, const float timeOut );
 
 	//! send a message through the connection
-	bool Send( const char* buffer, const int size, const bool important = false );
+	bool Send( const char* buffer, const int size );
 
 public:
+
+	typedef void (*CB_Connection)(Connection* connection, const char* buffer, const uint size);
 
 	String								m_name;				//	name of connection. this name usually is the destination name
 	Socket*								m_socket;			//	socket used in connection
@@ -126,11 +146,11 @@ public:
 	Server( void );
 	~Server( void );
 
-	bool Start( const word port, const word clientPort, const uint maxClients, CB_Server callback );
+	bool Start( const word port, const uint maxClients, CB_Server callback );
 	void Stop( void );
 
 	//! listen to incoming messages and accept clients if any empty slot exist
-	void Listen( void );
+	void Listen( const word clientPort );
 
 	//! run the game. no more incoming clients will accepted and any empty slot will be closed
 	void Run( void );
@@ -139,18 +159,18 @@ public:
 	void Update( const float elpsTime, const float delayTime, const float timeOut );
 
 	//! send message to all clients
-	bool Send( const char* buffer, const int size, const bool important = false );
+	bool Send( const char* buffer, const int size );
 
 public:
 
 	String					m_name;				//	name of server
-	NetState				m_state;			//	state of the server
 	Socket					m_socket;			//	used to create socket
+	NetAddress				m_broadCastAddress;	//	broadcast address used to rise server flag
+	NetState				m_state;			//	state of the server
 	Array<Connection*>		m_clients;			//	list of clients that already connected
-	word					m_clientPort;		//	broadcast address used to rise server flag
+	CB_Server				m_callback;			//	will call when message received
 	uint					m_numSend;			//	number of packet sent
 	float					m_flagTime;			//	time period of rising flag
-	CB_Server				m_callback;			//	will call when message received
 };
 
 
@@ -183,12 +203,11 @@ public:
 	void Update( const float elpsTime, const float delayTime, const float timeOut );
 
 	//! send a message to the connected server
-	bool Send( const char* buffer, const int size, const bool important = false );
+	bool Send( const char* buffer, const int size );
 
 public:
 
 	String			m_name;				//	name of the client
-	NetState		m_state;			//	state of the server
 	Socket			m_socket;			//	used to create socket
 	Connection		m_connection;		//	connection
 	CB_Client		m_callback;			//	will call when message received
@@ -204,7 +223,7 @@ public:
 
 
 //! initialize network system
-SEGAN_ENG_API bool sx_net_initialize( const dword netID );
+SEGAN_ENG_API hresult sx_net_initialize( const dword netID );
 
 //! finalize network system
 SEGAN_ENG_API void sx_net_finalize( void );

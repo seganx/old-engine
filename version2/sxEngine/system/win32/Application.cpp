@@ -167,7 +167,7 @@ public:
 	void Update(void)
 	{
 		if ( !m_handle ) return;
-		sx_callstack_push(Window_win32::Update());
+		sx_callstack();
 
 		HWND winpos = ( m_option & WINDOW_TOPMOST ) ? HWND_TOPMOST : HWND_TOP;
 		WindowRect* rect = ( m_option & WINDOW_FULLSCREEN ) ? &s_application->fullscreenRect : &m_rect;
@@ -237,7 +237,7 @@ void sx_app_finalize( void )
 
 Window* sx_app_create_window( const wchar* name, WindowBorderType WBT_ borderType /*= WBT_ORDINARY_RESIZABLE*/, bool background /*= true */ )
 {
-	sx_callstack_push(sx_app_create_window(name=%s),name);
+	sx_callstack_param(sx_app_create_window(name=%s), name);
 
 	Window_win32* win = sx_new( Window_win32 );
 	s_application->newOne = win;
@@ -288,7 +288,7 @@ Window* sx_app_create_window( const wchar* name, WindowBorderType WBT_ borderTyp
 void sx_app_destroy_window( Window*& pwindow )
 {
 	if ( !pwindow ) return;
-	sx_callstack_push(sx_app_destroy_window());
+	sx_callstack();
 
 	Window_win32* win = (Window_win32*)pwindow;
 	if ( win->m_handle )
