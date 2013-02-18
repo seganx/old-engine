@@ -42,7 +42,7 @@ enum NetState
 };
 
 
-//! describe network address
+//! describe an network address
 struct NetAddress
 {
 	byte	ip[4];
@@ -86,16 +86,25 @@ public:
 	~Connection( void );
 
 	//! start the connection on the opened socket. NOTE: this will not open the socket. just initialize the connection.
-	bool Start( Socket* psocket, const NetAddress& destination );
+	bool Start( Socket* psocket );
 
 	//! stop the connection. NOTE: this will not close the socket. just disconnect and finalized the connection
 	void Stop( void );
+
+	//! set the connection to listen mode to wait for the other connection
+	bool Listen( void );
+
+	//! going to try to connect to the destination host
+	void Connect( const NetAddress& destination );
+
+	//! disconnect the connection
+	void Disconnect( void );
 
 	//! update the connection. this function should be called in application loop
 	void Update( struct NetMessage* buffer, const float elpsTime, const float delayTime, const float timeOut );
 
 	//! send a message through the connection
-	bool Send( const char* buffer, const int size, const bool important = false );
+	bool Send( const char* buffer, const int size );
 
 public:
 
@@ -139,18 +148,18 @@ public:
 	void Update( const float elpsTime, const float delayTime, const float timeOut );
 
 	//! send message to all clients
-	bool Send( const char* buffer, const int size, const bool important = false );
+	bool Send( const char* buffer, const int size );
 
 public:
 
 	String					m_name;				//	name of server
 	NetState				m_state;			//	state of the server
 	Socket					m_socket;			//	used to create socket
-	Array<Connection*>		m_clients;			//	list of clients that already connected
-	word					m_clientPort;		//	broadcast address used to rise server flag
+	CB_Server				m_callback;			//	will call when message received
 	uint					m_numSend;			//	number of packet sent
 	float					m_flagTime;			//	time period of rising flag
-	CB_Server				m_callback;			//	will call when message received
+	word					m_clientPort;		//	broadcast address used to rise server flag
+	Array<Connection*>		m_clients;			//	list of clients that already connected
 };
 
 
@@ -183,12 +192,11 @@ public:
 	void Update( const float elpsTime, const float delayTime, const float timeOut );
 
 	//! send a message to the connected server
-	bool Send( const char* buffer, const int size, const bool important = false );
+	bool Send( const char* buffer, const int size );
 
 public:
 
 	String			m_name;				//	name of the client
-	NetState		m_state;			//	state of the server
 	Socket			m_socket;			//	used to create socket
 	Connection		m_connection;		//	connection
 	CB_Client		m_callback;			//	will call when message received
