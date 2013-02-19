@@ -79,7 +79,28 @@ static NetInternal* s_netInternal = NULL;
 //////////////////////////////////////////////////////////////////////////
 //	additional functions
 wchar* net_error_string( const sint code );
+
 void net_connection_clear_queue( Connection* con );
+
+SEGAN_INLINE bool net_connection_push_to_queue( NetMessage* buffer, Connection* con )
+{
+	//  verify that if message queue is going too long may be a message is lost
+	if ( con->m_msgList.Count() < NET_MAX_QUEUE_BUFFER )
+	{
+		//	push the message to the queue
+		NetMessage* netmsg;
+		s_netInternal->msgPool.Pop( netmsg );
+		memcpy( netmsg, buffer, sizeof(NetMessage) );
+		con->m_msgList.PushBack( netmsg );
+		return true;
+	}
+	else
+	{
+		con->Disconnect();
+		return false;
+	}
+}
+
 SEGAN_INLINE bool net_check_address( const NetAddress* ad1, const NetAddress* ad2 )
 {
 	return memcmp( ad1, ad2, sizeof(NetAddress) ) == 0;
@@ -148,31 +169,29 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 		currpacket->data[0] += 1;
 
 		//	copy packet data to the data container
-		data.Write( currpacket->data, currsize - sizeof(NetPacket) );
+		data.Write( currpacket->data, currsize - sizeof(NetPacketHeader) );
 
 		//	copy the new packet to the data
 		data.WriteUInt32( packetsize );
 		data.Write( packet, packetsize );
+
+		//	store data to packet
+		data.SetPos(0);
+		data.CopyTo( currpacket->data );
 	}
 
-	return data.Size();
+	return data.Size() + sizeof(NetPacketHeader);
 }
 
 SEGAN_INLINE void net_unmerge_packet( byte* data, Connection* con )
 {
-	NetMessage buffer;
-	buffer.address = con->m_destination;
-
 	sint n = data[0], p = 1;
 	for ( int i=0; i<n; i++ )
 	{
 		uint* size = (uint*)&data[p]; p+=4;
 		NetPacket* packet = (NetPacket*)&data[p];
 
-		buffer.bytsRecved = *size;
-		buffer.packet = *packet;
-
-		con->Update( &buffer, 0, 200, 200 );
+		con->m_callBack( con, packet->data, *size );
 	}
 }
 
@@ -504,7 +523,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					break;
 				}
 
-			case NPT_ACK:						//	search the sent list for requested ack
+			case NPT_ACK:							//	search the sent list for requested ack
 				{
 					int n = m_sentList.Count();
 					for ( int i=0; i<n; i++ )
@@ -552,22 +571,8 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
-						//  verify that if message queue is going too long may be a message is lost
-						if ( m_msgList.Count() < NET_MAX_QUEUE_BUFFER )
-						{
-							//g_logger->Log( L" message listed : %S", buffer->data );
-
-							//	push the message to the queue
-							NetMessage* netmsg;
-							s_netInternal->msgPool.Pop( netmsg );
-							memcpy( netmsg, buffer, sizeof(NetMessage) );
-							m_msgList.PushBack( netmsg );
-						}
-						else
-						{
-							Disconnect();
+						if ( ! net_connection_push_to_queue( buffer, this ) )
 							return;
-						}
 					}
 
 					buffer->bytsRecved = 0;		// notify that buffer handled
@@ -623,7 +628,20 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 
 			case NPT_ZIP:
 				{
-					net_unmerge_packet( buffer->packet.data, this );
+					if ( !buffer->packet.header.crit ) 
+					{
+						net_unmerge_packet( buffer->packet.data, this );
+					}
+					else if ( m_recAck == buffer->packet.header.ack )
+					{
+						net_unmerge_packet( buffer->packet.data, this );
+						m_recAck++;
+					}
+					else if ( m_recAck < buffer->packet.header.ack )
+					{
+						if ( ! net_connection_push_to_queue( buffer, this ) )
+							return;
+					}
 				}
 				break;
 
@@ -678,6 +696,7 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 				if ( msg->packet.header.crit == (byte)critical )
 				{
 					NetPacket packet( s_netInternal->id, NPT_USER, 0 );
+					packet.header.crit = critical;
 					memcpy( packet.data, buffer, sizeinbyte );
 					newsize = net_merge_packet( &msg->packet, msg->size, &packet, sizeinbyte + sizeof(NetPacketHeader) );
 					if ( newsize )
