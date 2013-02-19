@@ -51,6 +51,8 @@ int WindowEventCall( Window* Sender, const WindowEvent* data )
 			curRect.width	= prc.right - prc.left - iW;
 			curRect.height	= prc.bottom - prc.top - iH;
 
+			g_engine->m_logger->Log( L"Window has been resized [ %d x %d ]", curRect.width, curRect.height );
+
 #if 0
 			if ( Sender && Sender->m_name == L"main" )
 			{
@@ -118,7 +120,7 @@ void AppMainLoop( float elpsTime )
 
 #if 1
 
-void clientCallback( Client* client, const char* buffer, const uint size )
+void clientCallback( Client* client, const byte* buffer, const uint size )
 {
 
 }
@@ -184,8 +186,8 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	{
 		client = sx_new( Client );
 		client->m_name.Format( L"editor %s", sx_os_get_user_name() );
-		client->Start( 2727, &clientCallback );
-		client->Listen( 2828 );
+		client->Start( 2727, clientCallback );
+		client->Listen();
 		int tryToConnect = 0;
 		while ( tryToConnect < 100 )
 		{
@@ -384,9 +386,6 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
  	sx_delete_and_null( client );
 #endif
 
-	int* i = 0;
-	int p = *i;
-	if ( p == 1 )
 	sx_engine_finalize();
 
 	sx_detect_crash();

@@ -229,8 +229,8 @@ void on_send_button( void )
 
 	if ( len < 2 ) return;
 
-	g_network->server.Send( buf, len );
-	g_network->client.Send( buf, len );
+	g_network->server.Send( buf, len, true );
+	g_network->client.Send( buf, len, true );
 
 	str512 tmpStr;
 	if ( g_network->isServer )

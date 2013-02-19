@@ -14,16 +14,17 @@
 
 
 //	we use first byte after 4 bytes of protocol ID to identify the message type
-enum NetMessageType
+enum NetPacketType
 {
-	NMT_CONNECT				= 1,		//	a connection message
-	NMT_WELCOME,						//	welcome message
-	NMT_DISCONNECT,						//	disconnect message
-	NMT_ALIVE,							//	keep connection alive
-	NMT_ACK,							//	request lost ack
-	NMT_USER,							//	contain user data
-	NMT_SERVER_OPEN,					//	broad cast message sent by server to notify that the server is open to accept clients
-	NMT_SERVER_CLOSED					//	broad cast message sent by server to notify that the server is closed and no more clients will accepted
+	NPT_CONNECT				= 1,		//	a connection message
+	NPT_WELCOME,						//	welcome message
+	NPT_DISCONNECT,						//	disconnect message
+	NPT_ALIVE,							//	keep connection alive
+	NPT_ACK,							//	request lost ack
+	NPT_USER,							//	contain user data
+	NPT_ZIP,							//	contain array compressed packet
+	NPT_SERVER_OPEN,					//	broad cast message sent by server to notify that the server is open to accept clients
+	NPT_SERVER_CLOSED					//	broad cast message sent by server to notify that the server is closed and no more clients will accepted
 };
 
 //	header of network pocket
@@ -108,7 +109,72 @@ SEGAN_INLINE void callback_connection_client( Connection* connection, const byte
 		client->m_callback( client, buffer, size );
 }
 
+//	merge a packet into data and return new size of data. return 0 if the packets can't be merged
+SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, const NetPacket* packet, const uint packetsize )
+{
+	if ( currsize + packetsize >= NET_PACKET_SIZE ) return 0;
 
+	sx_callstack();
+	MemoryStream data;
+	
+	//	verify that current packet has merged packet
+	if ( currpacket->header.type != NPT_ZIP )
+	{
+		//	set number of packet in the data
+		data.WriteByte(2);
+
+		//	copy the first packet to the data
+		data.WriteUInt32( currsize );
+		data.Write( currpacket, currsize );
+
+		//	copy the second packet to the data
+		data.WriteUInt32( packetsize );
+		data.Write( packet, packetsize );
+
+		//	compress data !!! in the next code :D
+
+		//	store data to packet
+		data.SetPos(0);
+		data.CopyTo( currpacket->data );
+
+		//	change the header of packet
+		currpacket->header.type = NPT_ZIP;
+	}
+	else
+	{
+		//	decompress the data !!! in the next code ;)
+
+		//	update number of packets
+		currpacket->data[0] += 1;
+
+		//	copy packet data to the data container
+		data.Write( currpacket->data, currsize - sizeof(NetPacket) );
+
+		//	copy the new packet to the data
+		data.WriteUInt32( packetsize );
+		data.Write( packet, packetsize );
+	}
+
+	return data.Size();
+}
+
+SEGAN_INLINE void net_unmerge_packet( byte* data, Connection* con )
+{
+	NetMessage buffer;
+	buffer.address = con->m_destination;
+
+	sint n = data[0], p = 1;
+	for ( int i=0; i<n; i++ )
+	{
+		uint* size = (uint*)&data[p]; p+=4;
+		NetPacket* packet = (NetPacket*)&data[p];
+
+		buffer.bytsRecved = *size;
+		buffer.packet = *packet;
+
+		con->Update( &buffer, 0, 200, 200 );
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////
 //	socket implementation
@@ -329,7 +395,7 @@ void Connection::Disconnect( void )
 
 	case CONNECTED:
 		{
-			NetPacketHeader packet( s_netInternal->id, NMT_DISCONNECT, 0 );
+			NetPacketHeader packet( s_netInternal->id, NPT_DISCONNECT, 0 );
 			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
 		}
 		break;
@@ -355,7 +421,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		sx_assert( buffer );
 		
 		//	verify that received message is connection request
-		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && buffer->packet.header.type == NMT_CONNECT )
+		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && buffer->packet.header.type == NPT_CONNECT )
 		{
 			buffer->bytsRecved = 0;	//	avoid processing message by other connections
 
@@ -363,7 +429,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 			m_destination = buffer->address;
 
 			//  respond to client with welcome message
-			NetPacket packet( s_netInternal->id, NMT_WELCOME, m_sntAck );
+			NetPacket packet( s_netInternal->id, NPT_WELCOME, m_sntAck );
 			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) + net_copy_name( &packet, m_name ) );
 
 			//  store client name
@@ -380,7 +446,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		sx_assert( buffer );
 
 		//	wait for receiving welcome message
-		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && net_check_address( &buffer->address, &m_destination ) && buffer->packet.header.type == NMT_WELCOME )
+		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && net_check_address( &buffer->address, &m_destination ) && buffer->packet.header.type == NPT_WELCOME )
 		{
 			buffer->bytsRecved = 0;	//	avoid processing message by other connections
 
@@ -395,7 +461,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 			
 			m_state = CONNECTED;
 
-			NetPacketHeader packet( s_netInternal->id, NMT_ALIVE, m_sntAck );
+			NetPacketHeader packet( s_netInternal->id, NPT_ALIVE, m_sntAck );
 			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
 
 			break;
@@ -415,7 +481,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		{
 			m_sendTime = 0;
 
-			NetPacket packet( s_netInternal->id, NMT_CONNECT, 0 );
+			NetPacket packet( s_netInternal->id, NPT_CONNECT, 0 );
 			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) + net_copy_name( &packet, m_name ) );
 		}
 		break;
@@ -431,14 +497,14 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 
 			switch ( buffer->packet.header.type )
 			{
-			case NMT_DISCONNECT:
+			case NPT_DISCONNECT:
 				{
 					buffer->bytsRecved = 0;			//  avoid process buffer by other connections
 					Disconnect();
 					break;
 				}
 
-			case NMT_ACK:						//	search the sent list for requested ack
+			case NPT_ACK:						//	search the sent list for requested ack
 				{
 					int n = m_sentList.Count();
 					for ( int i=0; i<n; i++ )
@@ -453,7 +519,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 				}
 				break;
 
-			case NMT_USER:
+			case NPT_USER:
 				{
 					if ( !buffer->packet.header.crit ) 
 					{
@@ -468,6 +534,8 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						//	flush stored messages in the list
 						if ( m_msgList.Count() )
 						{
+							m_msgList.Sort( net_compare_ack );
+
 							for ( int i=0; i<m_msgList.Count(); i++ )
 							{
 								NetMessage* pbuf = m_msgList[i];
@@ -494,7 +562,6 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 							s_netInternal->msgPool.Pop( netmsg );
 							memcpy( netmsg, buffer, sizeof(NetMessage) );
 							m_msgList.PushBack( netmsg );
-							m_msgList.Sort( net_compare_ack );
 						}
 						else
 						{
@@ -507,7 +574,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 				}
 				//	break;	continue to send messages
 
-			case NMT_ALIVE:
+			case NPT_ALIVE:
 				{
 					if ( m_recAck == buffer->packet.header.ack )
 					{
@@ -536,19 +603,30 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 										m_sentList.RemoveByIndex( 0 );
 									}
 								}
+								else
+								{
+									s_netInternal->msgPool.Push( msg );
+								}
 							}
 						}
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
 						//	request to send lost message
-						NetPacketHeader packet( s_netInternal->id, NMT_ACK, m_recAck );
+						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
 						m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
 					}
 
 					buffer->bytsRecved = 0;		// notify that buffer handled
 				}
 				break;
+
+			case NPT_ZIP:
+				{
+					net_unmerge_packet( buffer->packet.data, this );
+				}
+				break;
+
 			}	//	switch ( buffer->packet.header.type )
 		}
 		else	//	if ( buffer->bytsRecved && buffer->id == s_netInternal->id && net_check_address( &m_destination, &buffer->address ) )
@@ -566,7 +644,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		if ( m_sendTime > delayTime )
 		{
 			m_sendTime = 0;
-			NetPacketHeader packet( s_netInternal->id, NMT_ALIVE, m_sntAck );
+			NetPacketHeader packet( s_netInternal->id, NPT_ALIVE, m_sntAck );
 			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
 		}
 
@@ -589,10 +667,32 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 	default:
 		{
 			NetMessage* msg;
-			if ( s_netInternal->msgPool.Pop( msg ) )
+			uint newsize = 0;
+
+			//	verify that messages are in the queue
+			if ( m_sendQueue.Count() )
+			{
+				msg = m_sendQueue.Top();
+
+				//	merge only messages with same critical state
+				if ( msg->packet.header.crit == (byte)critical )
+				{
+					NetPacket packet( s_netInternal->id, NPT_USER, 0 );
+					memcpy( packet.data, buffer, sizeinbyte );
+					newsize = net_merge_packet( &msg->packet, msg->size, &packet, sizeinbyte + sizeof(NetPacketHeader) );
+					if ( newsize )
+					{
+						msg->size = newsize;
+						res = true;
+					}
+				}
+			}
+			
+			//	if message can't be merged just send it normally
+			if ( !newsize && s_netInternal->msgPool.Pop( msg ) )
 			{
 				msg->packet.header.id = s_netInternal->id;
-				msg->packet.header.type = NMT_USER;
+				msg->packet.header.type = NPT_USER;
 				msg->packet.header.crit = critical;
 				msg->size = sizeinbyte + sizeof(NetPacketHeader);
 				memcpy( msg->packet.data, buffer, sizeinbyte );
@@ -660,7 +760,7 @@ void Server::Stop( void )
 	//	notify that this server has stopped
 	if ( s_netInternal )
 	{
-		NetPacket packet( s_netInternal->id, NMT_SERVER_CLOSED, 0 );
+		NetPacket packet( s_netInternal->id, NPT_SERVER_CLOSED, 0 );
 		NetAddress broadcast; ZeroMemory( &broadcast.ip, sizeof(broadcast.ip) ); broadcast.port = m_clientPort;
 		m_socket.Send( broadcast, &packet, sizeof(NetPacketHeader) + net_copy_name( &packet, m_name ) );
 	}
@@ -692,7 +792,7 @@ void Server::Run( void )
 
 
 	//	notify that this server has stopped client acceptance
-	NetPacket packet( s_netInternal->id, NMT_SERVER_CLOSED, 0 );
+	NetPacket packet( s_netInternal->id, NPT_SERVER_CLOSED, 0 );
 	NetAddress broadcast; ZeroMemory( &broadcast.ip, sizeof(broadcast.ip) ); broadcast.port = m_clientPort;
 	m_socket.Send( broadcast, &packet, sizeof(NetPacketHeader) + net_copy_name( &packet, m_name ) );
 
@@ -719,7 +819,7 @@ void Server::Update( const float elpsTime, const float delayTime, const float ti
 		{
 			m_flagTime = 0;
 
-			NetPacket packet( s_netInternal->id, NMT_SERVER_OPEN, 0 );
+			NetPacket packet( s_netInternal->id, NPT_SERVER_OPEN, 0 );
 			NetAddress broadcast; ZeroMemory( &broadcast.ip, sizeof(broadcast.ip) ); broadcast.port = m_clientPort;
 			m_socket.Send( broadcast, &packet, sizeof(NetPacketHeader) + net_copy_name( &packet, m_name ) );
 
@@ -856,14 +956,14 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 		//	listen to the port to find any server
 		buffer.bytsRecved = m_socket.Receive( (char*)&buffer, NET_PACKET_SIZE, &buffer.address );
 
-		if ( buffer.bytsRecved && buffer.packet.header.id == s_netInternal->id && ( buffer.packet.header.type == NMT_SERVER_OPEN || buffer.packet.header.type == NMT_SERVER_CLOSED ) ) 
+		if ( buffer.bytsRecved && buffer.packet.header.id == s_netInternal->id && ( buffer.packet.header.type == NPT_SERVER_OPEN || buffer.packet.header.type == NPT_SERVER_CLOSED ) ) 
 		{
 			ServerInfo serverInfo;
 			memcpy( serverInfo.address.ip, buffer.address.ip, 4 );
 			serverInfo.address.port = buffer.address.port;
 			serverInfo.age = 3000;
 
-			if ( buffer.packet.header.type == NMT_SERVER_OPEN )
+			if ( buffer.packet.header.type == NPT_SERVER_OPEN )
 			{
 				bool itisnew = true;
 				for ( int i=0; i<m_servers.Count(); i++ )
@@ -882,7 +982,7 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 					m_servers.PushBack( serverInfo );
 				}
 			}
-			else	//	if ( buffer.type == NMT_SERVER_CLOSED )
+			else	//	if ( buffer.type == NPT_SERVER_CLOSED )
 			{
 				for ( int i=0; i<m_servers.Count(); i++ )
 				{

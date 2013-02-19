@@ -43,8 +43,9 @@ public:
 			newPos = m_size;
 		Seek( ST_BEGIN, newPos );
 	}
+
 	/*! copy from source stream to current stream amount of size in byte. use size=0 to full copy stream. */
-	virtual uint CopyFrom( Stream& source, const uint size = 0 )
+	SEGAN_LIB_INLINE virtual uint CopyFrom( Stream& source, const uint size = 0 )
 	{
 		uint result  = size;
 
@@ -283,6 +284,18 @@ public:
 			m_pointer = m_size;
 		return m_pointer;
 	}
+
+	//! copy data to a buffer and return number of byte copied. use size=0 to full copy stream.
+	SEGAN_LIB_INLINE uint CopyTo( void* buffer, const uint sizeinbyte = 0 )
+	{
+		uint res = sizeinbyte ? sizeinbyte : m_size;
+		if ( m_pointer + res > m_size )
+			res = m_size - m_pointer;
+		memcpy( buffer, m_buffer + m_pointer, res );
+		m_pointer += res;
+		return res;
+	}
+
 
 private:
 	SEGAN_LIB_INLINE void _ReallocBuffer( uint newSize )
