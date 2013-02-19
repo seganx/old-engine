@@ -80,27 +80,6 @@ static NetInternal* s_netInternal = NULL;
 //	additional functions
 wchar* net_error_string( const sint code );
 
-void net_connection_clear_queue( Connection* con );
-
-SEGAN_INLINE bool net_connection_push_to_queue( NetMessage* buffer, Connection* con )
-{
-	//  verify that if message queue is going too long may be a message is lost
-	if ( con->m_msgList.Count() < NET_MAX_QUEUE_BUFFER )
-	{
-		//	push the message to the queue
-		NetMessage* netmsg;
-		s_netInternal->msgPool.Pop( netmsg );
-		memcpy( netmsg, buffer, sizeof(NetMessage) );
-		con->m_msgList.PushBack( netmsg );
-		return true;
-	}
-	else
-	{
-		con->Disconnect();
-		return false;
-	}
-}
-
 SEGAN_INLINE bool net_check_address( const NetAddress* ad1, const NetAddress* ad2 )
 {
 	return memcmp( ad1, ad2, sizeof(NetAddress) ) == 0;
@@ -114,6 +93,121 @@ SEGAN_INLINE sint net_compare_ack( const PNetMessage& cb1, const PNetMessage& cb
 SEGAN_INLINE sint net_copy_name( NetPacket* packet, const wchar* name )
 {
 	return sx_str_copy( (wchar*)packet->data, 32, name ? name : s_netInternal->name ) * 2;
+}
+
+SEGAN_INLINE void net_connection_clear_queue( Connection* con )
+{
+	if ( con->m_msgList.Count() )
+	{
+		for ( int i=0; i<con->m_msgList.Count(); i++ )
+		{
+			NetMessage* pbuf = con->m_msgList[i];
+			s_netInternal->msgPool.Push( pbuf );
+		}
+
+		con->m_msgList.Clear();
+	}
+
+	if ( con->m_sentList.Count() )
+	{
+		for ( int i=0; i<con->m_sentList.Count(); i++ )
+		{
+			NetMessage* pbuf = con->m_sentList[i];
+			s_netInternal->msgPool.Push( pbuf );
+		}
+
+		con->m_sentList.Clear();
+	}
+
+	if ( con->m_sendQueue.Count() )
+	{
+		while ( con->m_sendQueue.Count() )
+		{
+			NetMessage* pbuf;
+			con->m_sendQueue.Pop( pbuf );
+			s_netInternal->msgPool.Push( pbuf );
+		}
+
+		con->m_sendQueue.Clear();
+	}
+}
+
+SEGAN_INLINE void net_connection_flush_list( Connection* con )
+{
+	if ( con->m_msgList.Count() )
+	{
+		con->m_msgList.Sort( net_compare_ack );
+
+		for ( int i=0; i<con->m_msgList.Count(); i++ )
+		{
+			NetMessage* pbuf = con->m_msgList[i];
+			if ( con->m_recAck == pbuf->packet.header.ack )
+			{
+				con->m_callBack( con, pbuf->packet.data, pbuf->bytsRecved );
+				con->m_recAck++;
+
+				s_netInternal->msgPool.Push( pbuf );
+			}
+		}
+		con->m_msgList.Clear();
+	}
+}
+
+SEGAN_INLINE void net_connection_send_from_queue( Connection* con )
+{
+	while ( con->m_sendQueue.Count() )
+	{
+		NetMessage* msg;
+
+		//	pop the message from list
+		if ( con->m_sendQueue.Pop( msg ) )
+		{
+			//	send to destination
+			msg->packet.header.ack = con->m_sntAck;
+			con->m_socket->Send( con->m_destination, &msg->packet, msg->size );
+
+			//	push the message to the sent items
+			if ( msg->packet.header.crit )
+			{
+				con->m_sntAck++;
+				con->m_sentList.PushBack( msg );
+
+				//	keep sent items limit
+				if ( con->m_sentList.Count() == NET_MAX_QUEUE_BUFFER )
+				{
+					s_netInternal->msgPool.Push( con->m_sentList[0] );
+					con->m_sentList.RemoveByIndex( 0 );
+				}
+			}
+			else
+			{
+				s_netInternal->msgPool.Push( msg );
+			}
+		}
+	}
+}
+
+SEGAN_INLINE bool net_connection_push_to_queue( NetMessage* buffer, Connection* con )
+{
+	bool res;
+
+	//  verify that if message queue is going too long may be a message is lost
+	if ( con->m_msgList.Count() < NET_MAX_QUEUE_BUFFER )
+	{
+		//	push the message to the queue
+		NetMessage* netmsg;
+		s_netInternal->msgPool.Pop( netmsg );
+		memcpy( netmsg, buffer, sizeof(NetMessage) );
+		con->m_msgList.PushBack( netmsg );
+		res = true;
+	}
+	else
+	{
+		con->Disconnect();
+		res = false;
+	}
+
+	return res;
 }
 
 SEGAN_INLINE void callback_connection_server( Connection* connection, const byte* buffer, const uint size )
@@ -512,18 +606,20 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		//	message received
 		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && net_check_address( &m_destination, &buffer->address ) )
 		{
+			buffer->bytsRecved = 0;		// notify that buffer handled
 			m_timeout = 0;
 
 			switch ( buffer->packet.header.type )
 			{
 			case NPT_DISCONNECT:
 				{
-					buffer->bytsRecved = 0;			//  avoid process buffer by other connections
+					//  avoid process buffer by other connections
+					buffer->bytsRecved = 0;
 					Disconnect();
 					break;
 				}
 
-			case NPT_ACK:							//	search the sent list for requested ack
+			case NPT_ACK:	//	search the sent list for requested ack
 				{
 					int n = m_sentList.Count();
 					for ( int i=0; i<n; i++ )
@@ -551,31 +647,13 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						m_recAck++;
 
 						//	flush stored messages in the list
-						if ( m_msgList.Count() )
-						{
-							m_msgList.Sort( net_compare_ack );
-
-							for ( int i=0; i<m_msgList.Count(); i++ )
-							{
-								NetMessage* pbuf = m_msgList[i];
-								if ( m_recAck == pbuf->packet.header.ack )
-								{
-									m_callBack( this, pbuf->packet.data, pbuf->bytsRecved );
-									m_recAck++;
-
-									s_netInternal->msgPool.Push( pbuf );
-								}
-							}
-							m_msgList.Clear();
-						}
+						net_connection_flush_list( this );
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
 						if ( ! net_connection_push_to_queue( buffer, this ) )
 							return;
 					}
-
-					buffer->bytsRecved = 0;		// notify that buffer handled
 				}
 				//	break;	continue to send messages
 
@@ -583,37 +661,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 				{
 					if ( m_recAck == buffer->packet.header.ack )
 					{
-						//	send the messages
-						while ( m_sendQueue.Count() )
-						{
-							NetMessage* msg;
-
-							//	pop the message from list
-							if ( m_sendQueue.Pop( msg ) )
-							{
-								//	send to destination
-								msg->packet.header.ack = m_sntAck;
-								m_socket->Send( m_destination, &msg->packet, msg->size );
-
-								//	push the message to the sent items
-								if ( msg->packet.header.crit )
-								{
-									m_sntAck++;
-									m_sentList.PushBack( msg );
-
-									//	keep sent items limit
-									if ( m_sentList.Count() == NET_MAX_QUEUE_BUFFER )
-									{
-										s_netInternal->msgPool.Push( m_sentList[0] );
-										m_sentList.RemoveByIndex( 0 );
-									}
-								}
-								else
-								{
-									s_netInternal->msgPool.Push( msg );
-								}
-							}
-						}
+						net_connection_send_from_queue( this );
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
@@ -621,8 +669,6 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
 						m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
 					}
-
-					buffer->bytsRecved = 0;		// notify that buffer handled
 				}
 				break;
 
@@ -1199,41 +1245,5 @@ wchar* net_error_string( const sint code )
 	}
 }
 
-SEGAN_INLINE void net_connection_clear_queue( Connection* con )
-{
-	if ( con->m_msgList.Count() )
-	{
-		for ( int i=0; i<con->m_msgList.Count(); i++ )
-		{
-			NetMessage* pbuf = con->m_msgList[i];
-			s_netInternal->msgPool.Push( pbuf );
-		}
-
-		con->m_msgList.Clear();
-	}
-
-	if ( con->m_sentList.Count() )
-	{
-		for ( int i=0; i<con->m_sentList.Count(); i++ )
-		{
-			NetMessage* pbuf = con->m_sentList[i];
-			s_netInternal->msgPool.Push( pbuf );
-		}
-
-		con->m_sentList.Clear();
-	}
-
-	if ( con->m_sendQueue.Count() )
-	{
-		while ( con->m_sendQueue.Count() )
-		{
-			NetMessage* pbuf;
-			con->m_sendQueue.Pop( pbuf );
-			s_netInternal->msgPool.Push( pbuf );
-		}
-
-		con->m_sendQueue.Clear();
-	}
-}
 
 #endif
