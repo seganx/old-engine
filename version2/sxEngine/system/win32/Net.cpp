@@ -246,7 +246,8 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 		data.WriteUInt32( packetsize );
 		data.Write( packet, packetsize );
 
-		//	compress data !!! in the next code :D
+		//	compress data
+		//zlib_compress_stream()
 
 		//	store data to packet
 		data.SetPos(0);
@@ -606,7 +607,6 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		//	message received
 		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && net_check_address( &m_destination, &buffer->address ) )
 		{
-			buffer->bytsRecved = 0;		// notify that buffer handled
 			m_timeout = 0;
 
 			switch ( buffer->packet.header.type )
@@ -631,6 +631,8 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 							break;
 						}
 					}
+
+					buffer->bytsRecved = 0;		// notify that buffer handled
 				}
 				break;
 
@@ -655,7 +657,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 							return;
 					}
 				}
-				//	break;	continue to send messages
+				//	break;	continue to process the messages
 
 			case NPT_ALIVE:
 				{
@@ -669,6 +671,8 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
 						m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
 					}
+
+					buffer->bytsRecved = 0;		// notify that buffer handled
 				}
 				break;
 
@@ -688,6 +692,8 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						if ( ! net_connection_push_to_queue( buffer, this ) )
 							return;
 					}
+
+					buffer->bytsRecved = 0;		// notify that buffer handled
 				}
 				break;
 
