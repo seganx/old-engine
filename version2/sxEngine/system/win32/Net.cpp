@@ -10,7 +10,7 @@
 
 #define NET_MAX_NUM_BUFFER				512		//	number of connection buffer in the stack
 #define NET_MAX_QUEUE_BUFFER			512		//	maximum number of buffer in the queue
-#define NET_PACKET_SIZE					512		//	size of connection buffer
+#define NET_PACKET_SIZE					1024	//	size of connection buffer
 #define NET_SERVER_FLAG_TIME			1200	//	time period that server notify all client to see the flag by sending broadcast message
 
 
@@ -43,8 +43,8 @@ struct NetPacketHeader
 //	structure of network pocket
 struct NetPacket
 {
-	NetPacketHeader	header;				//	header of message
-	byte			data[512];			//	message data
+	NetPacketHeader	header;						//	header of message
+	byte			data[NET_PACKET_SIZE];		//	message data
 
 	NetPacket( const word id, const byte type, const uint ack ): header(id, type, ack){}
 	NetPacket( void ){}
@@ -755,7 +755,7 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 	case LISTENING:
 	case DISCONNECTED: res = false; break;
 	default:
-		if ( m_sending.Count() <= 1 )
+		if ( m_sending.Count() <= 10 )
 		{
 			NetMessage* msg;
 			uint newsize = 0;
