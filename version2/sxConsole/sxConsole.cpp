@@ -279,41 +279,32 @@ void MainLoop( float elpsTime )
 
 	if ( g_network->isServer )
 	{
-
-#if 0
-		static float test = 0;
-		static int msgId = 0;
-
-		test += elpsTime;
-		if( test > 100 )
-		{
-			test = 0;
-
-			msgId++;
-
-			MemManFixed_inline<512> tmpStrMem;
-			String tmpStr(0, &tmpStrMem);
-			tmpStr.SetFormatedText( L"%d : this is a test message", msgId );
-
-			int len = 0;
-			char buf[256];
-			for ( ; len<tmpStr.Length(); len++ )
-				buf[len]=(char)tmpStr[len];
-			buf[len++]=0;
-
-			g_network->server.Send( buf, 500 );
-		}
-#endif
 		NetState state = g_network->server.m_clients[0]->m_state;
-		g_network->server.Update( elpsTime, 60, 60000 );
+		g_network->server.Update( elpsTime, 1000, 60000 );
 		if ( state != g_network->server.m_clients[0]->m_state )
 			stateChanged = g_network->server.m_clients[0]->m_state;
 		list_update_server( elpsTime );
 	}
 	else
 	{
+#if 1
+		static int msgId = 0;
+		for( int i=0; i<50; i++ )
+		{
+			msgId++;
+			str512 tmpStr;
+			tmpStr.Format( L"%d : this is a test message", msgId );
+			int len = 0;
+			char buf[256];
+			for ( ; len<tmpStr.Length(); len++ )
+				buf[len]=(char)tmpStr[len];
+			buf[len++]=0;
+
+			g_network->client.Send( buf, len+1, true );
+		}
+#endif
 		NetState state = g_network->client.m_connection.m_state;
-		g_network->client.Update( elpsTime, 60, 60000 );
+		g_network->client.Update( elpsTime, 1000, 60000 );
 		if ( state != g_network->client.m_connection.m_state )
 			stateChanged = g_network->client.m_connection.m_state;
 		list_update_client( elpsTime );

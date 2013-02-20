@@ -112,9 +112,9 @@ public:
 	uint								m_recAck;			//	number of packet received
 	float								m_timeout;			//	if receive time became grater that time out, connection is lost
 	float								m_sendTime;			//	send time to check connection
-	Array<struct NetMessage*>			m_msgList;			//	queue of messages to handle unreliable connections
-	Queue<struct NetMessage*>			m_sendQueue;		//	list of messages that are going to send
-	Array<struct NetMessage*>			m_sentList;			//	list of messages that has been sent
+	Array<struct NetMessage*>			m_unreliable;		//	list of messages to handle unreliable connections
+	Array<struct NetMessage*>			m_sending;			//	list of messages that are going to send
+	Array<struct NetMessage*>			m_sent;				//	list of messages that has been sent
 	CB_Connection						m_callBack;			//	will call when message received
 	void*								m_userData;			//	user data
 

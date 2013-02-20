@@ -584,7 +584,7 @@ public:
 
 	SEGAN_LIB_INLINE wchar& operator[] ( const sint index )
 	{
-		sx_assert( !m_text || index < 0 || index > m_len );
+		sx_assert( m_text && index>=0 && index <= m_len );
 		return m_text[index];
 	}
 
@@ -1159,7 +1159,7 @@ public:
 
 	SEGAN_LIB_INLINE wchar& operator[] ( const sint index )
 	{
-		sx_assert( !m_text || index < 0 || index > m_len );
+		sx_assert( m_text && index>=0 && index <= m_len );
 		return m_text[index];
 	}
 

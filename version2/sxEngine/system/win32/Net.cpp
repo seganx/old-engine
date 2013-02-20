@@ -96,52 +96,50 @@ SEGAN_INLINE sint net_copy_name( NetPacket* packet, const wchar* name )
 	return sx_str_copy( (wchar*)packet->data, 32, name ? name : s_netInternal->name ) * 2;
 }
 
-SEGAN_INLINE void net_connection_clear_queue( Connection* con )
+SEGAN_INLINE bool net_array_pop_front( Array<NetMessage*>& msgarray, OUT NetMessage*& pmsg )
 {
-	if ( con->m_msgList.Count() )
+	sint h = msgarray.Count() - 1;
+	if ( h >= 0 )
 	{
-		for ( int i=0; i<con->m_msgList.Count(); i++ )
-		{
-			NetMessage* pbuf = con->m_msgList[i];
-			s_netInternal->msgPool.Push( pbuf );
-		}
-
-		con->m_msgList.Clear();
+		pmsg = msgarray[h];
+		msgarray.RemoveByIndex( h );
 	}
-
-	if ( con->m_sentList.Count() )
-	{
-		for ( int i=0; i<con->m_sentList.Count(); i++ )
-		{
-			NetMessage* pbuf = con->m_sentList[i];
-			s_netInternal->msgPool.Push( pbuf );
-		}
-
-		con->m_sentList.Clear();
-	}
-
-	if ( con->m_sendQueue.Count() )
-	{
-		while ( con->m_sendQueue.Count() )
-		{
-			NetMessage* pbuf;
-			con->m_sendQueue.Pop( pbuf );
-			s_netInternal->msgPool.Push( pbuf );
-		}
-
-		con->m_sendQueue.Clear();
-	}
+	return ( h >= 0 );
 }
 
-SEGAN_INLINE void net_connection_flush_list( Connection* con )
+SEGAN_INLINE void net_connection_clear_list( Connection* con )
 {
-	if ( con->m_msgList.Count() )
+	for ( int i=0; i<con->m_unreliable.Count(); i++ )
 	{
-		con->m_msgList.Sort( net_compare_ack );
+		NetMessage* pbuf = con->m_unreliable[i];
+		s_netInternal->msgPool.Push( pbuf );
+	}
+	con->m_unreliable.Clear();
 
-		for ( int i=0; i<con->m_msgList.Count(); i++ )
+	for ( int i=0; i<con->m_sent.Count(); i++ )
+	{
+		NetMessage* pbuf = con->m_sent[i];
+		s_netInternal->msgPool.Push( pbuf );
+	}
+	con->m_sent.Clear();
+
+	for ( int i=0; i<con->m_sent.Count(); i++ )
+	{
+		NetMessage* pbuf = con->m_sent[i];
+		s_netInternal->msgPool.Push( pbuf );
+	}
+	con->m_sending.Clear();
+}
+
+SEGAN_INLINE void net_connection_flush_unreliablelist( Connection* con )
+{
+	if ( con->m_unreliable.Count() )
+	{
+		con->m_unreliable.Sort( net_compare_ack );
+
+		for ( int i=0; i<con->m_unreliable.Count(); i++ )
 		{
-			NetMessage* pbuf = con->m_msgList[i];
+			NetMessage* pbuf = con->m_unreliable[i];
 			if ( con->m_recAck == pbuf->packet.header.ack )
 			{
 				con->m_callBack( con, pbuf->packet.data, pbuf->bytsRecved );
@@ -150,63 +148,51 @@ SEGAN_INLINE void net_connection_flush_list( Connection* con )
 				s_netInternal->msgPool.Push( pbuf );
 			}
 		}
-		con->m_msgList.Clear();
+		con->m_unreliable.Clear();
 	}
 }
 
-SEGAN_INLINE void net_connection_send_from_queue( Connection* con )
+SEGAN_INLINE void net_connection_flush_sendinglist( Connection* con )
 {
-	while ( con->m_sendQueue.Count() )
+	NetMessage* msg;
+	while ( net_array_pop_front( con->m_sending, msg ) )
 	{
-		NetMessage* msg;
+		//	send to destination
+		msg->packet.header.ack = con->m_sntAck;
+		con->m_socket->Send( con->m_destination, &msg->packet, msg->size );
 
-		//	pop the message from list
-		if ( con->m_sendQueue.Pop( msg ) )
+		//	push the message to the sent items
+		if ( msg->packet.header.crit )
 		{
-			//	send to destination
-			msg->packet.header.ack = con->m_sntAck;
-			con->m_socket->Send( con->m_destination, &msg->packet, msg->size );
+			con->m_sntAck++;
+			con->m_sent.PushBack( msg );
 
-			//	push the message to the sent items
-			if ( msg->packet.header.crit )
+			//	keep sent items limit
+			if ( con->m_sent.Count() == NET_MAX_QUEUE_BUFFER )
 			{
-				con->m_sntAck++;
-				con->m_sentList.PushBack( msg );
-
-				//	keep sent items limit
-				if ( con->m_sentList.Count() == NET_MAX_QUEUE_BUFFER )
-				{
-					s_netInternal->msgPool.Push( con->m_sentList[0] );
-					con->m_sentList.RemoveByIndex( 0 );
-				}
-			}
-			else
-			{
-				s_netInternal->msgPool.Push( msg );
+				s_netInternal->msgPool.Push( con->m_sent[0] );
+				con->m_sent.RemoveByIndex( 0 );
 			}
 		}
+
+		s_netInternal->msgPool.Push( msg );
 	}
 }
 
-SEGAN_INLINE bool net_connection_push_to_queue( NetMessage* buffer, Connection* con )
+SEGAN_INLINE bool net_connection_hold_unreliable( NetMessage* buffer, Connection* con )
 {
-	bool res;
-
 	//  verify that if message queue is going too long may be a message is lost
-	if ( con->m_msgList.Count() < NET_MAX_QUEUE_BUFFER )
+	bool res = ( con->m_unreliable.Count() < NET_MAX_QUEUE_BUFFER );
+
+	if ( res )
 	{
 		//	push the message to the queue
 		NetMessage* netmsg;
 		s_netInternal->msgPool.Pop( netmsg );
 		memcpy( netmsg, buffer, sizeof(NetMessage) );
-		con->m_msgList.PushBack( netmsg );
-		res = true;
+		con->m_unreliable.PushBack( netmsg );
 	}
-	else
-	{
-		con->Disconnect();
-		res = false;
-	}
+	else con->Disconnect();
 
 	return res;
 }
@@ -258,6 +244,7 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 			//	change the header of packet
 			currpacket->header.type = NPT_ZIP;
 		}
+		sx_assert(res);
 	}
 	else
 	{
@@ -283,8 +270,7 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 			res = zlib_compress( currpacket->data, NET_PACKET_SIZE, data, data.Size() );
 			if ( res )
 			{
-				data.CopyTo( currpacket->data );
-				res = data.Size() + sizeof(NetPacketHeader);
+				res += sizeof(NetPacketHeader);
 			}	
 		}	
 	}
@@ -452,8 +438,9 @@ Connection::Connection( void )
 , m_recAck(0)
 , m_timeout(0)
 , m_sendTime(0)
-, m_msgList(32)
-, m_sentList(32)
+, m_unreliable(32)
+, m_sending(32)
+, m_sent(32)
 , m_callBack(0)
 , m_userData(0)
 {
@@ -485,7 +472,7 @@ void Connection::Stop( void )
 		Disconnect();
 	m_state = STOPPED;
 
-	net_connection_clear_queue( this );
+	net_connection_clear_list( this );
 }
 
 bool Connection::Listen( void )
@@ -504,7 +491,7 @@ bool Connection::Listen( void )
 	m_timeout = 0;
 	m_state = LISTENING;
 
-	net_connection_clear_queue( this );
+	net_connection_clear_list( this );
 
 	return true;
 }
@@ -530,7 +517,7 @@ void Connection::Connect( const NetAddress& destination )
 	m_timeout = 0;
 	m_state = CONNECTING;
 
-	net_connection_clear_queue( this );
+	net_connection_clear_list( this );
 
 }
 
@@ -551,7 +538,7 @@ void Connection::Disconnect( void )
 
 	m_state = DISCONNECTED;
 
-	net_connection_clear_queue( this );
+	net_connection_clear_list( this );
 
 }
 
@@ -655,17 +642,16 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 
 			case NPT_ACK:	//	search the sent list for requested ack
 				{
-					int n = m_sentList.Count();
+					int n = m_sent.Count();
 					for ( int i=0; i<n; i++ )
 					{
-						NetMessage* msg = m_sentList[i];
+						NetMessage* msg = m_sent[i];
 						if ( msg->packet.header.ack == buffer->packet.header.ack )
 						{
 							m_socket->Send( m_destination, &msg->packet, msg->size );
 							break;
 						}
 					}
-
 					buffer->bytsRecved = 0;		// notify that buffer handled
 				}
 				break;
@@ -683,11 +669,11 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						m_recAck++;
 
 						//	flush stored messages in the list
-						net_connection_flush_list( this );
+						net_connection_flush_unreliablelist( this );
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
-						if ( ! net_connection_push_to_queue( buffer, this ) )
+						if ( ! net_connection_hold_unreliable( buffer, this ) )
 							return;
 					}
 				}
@@ -697,7 +683,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 				{
 					if ( m_recAck == buffer->packet.header.ack )
 					{
-						net_connection_send_from_queue( this );
+						net_connection_flush_sendinglist( this );
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
@@ -723,7 +709,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
-						if ( ! net_connection_push_to_queue( buffer, this ) )
+						if ( ! net_connection_hold_unreliable( buffer, this ) )
 							return;
 					}
 
@@ -774,9 +760,9 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 			uint newsize = 0;
 
 			//	verify that messages are in the queue
-			if ( m_sendQueue.Count() )
+			if ( m_sending.Count() )
 			{
-				msg = m_sendQueue.Top();
+				msg = m_sending[ m_sending.Count() - 1 ];
 
 				//	merge only messages with same critical state
 				if ( msg->packet.header.crit == (byte)critical )
@@ -802,7 +788,7 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 				msg->size = sizeinbyte + sizeof(NetPacketHeader);
 				memcpy( msg->packet.data, buffer, sizeinbyte );
 
-				m_sendQueue.Push( msg );
+				m_sending.PushBack( msg );
 				res = true;
 			}
 		}
