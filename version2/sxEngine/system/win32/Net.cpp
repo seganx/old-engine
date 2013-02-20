@@ -283,8 +283,8 @@ SEGAN_INLINE void net_unmerge_packet( byte* data, Connection* con )
 	sint n = data[0], p = 1;
 	for ( int i=0; i<n; i++ )
 	{
-		uint* size = (uint*)&data[p]; p+=4;
-		NetPacket* packet = (NetPacket*)&data[p];
+		uint* size = (uint*)&data[p];				p += 4;
+		NetPacket* packet = (NetPacket*)&data[p];	p += *size;
 
 		con->m_callBack( con, packet->data, *size );
 	}
@@ -855,6 +855,7 @@ void Server::Listen( void )
 		m_clients[i]->Listen();
 
 	m_state = LISTENING;
+	m_flagTime = 1000;
 }
 
 void Server::Run( void )

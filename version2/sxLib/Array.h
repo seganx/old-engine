@@ -26,6 +26,7 @@ class Array
 public:
 	typedef sint (*compFunc)( const T& item1, const T& item2 );
 
+
 	Array( sint sampler = 0 )
 		: m_item(null)
 		, m_count(0)
@@ -314,7 +315,6 @@ public:
 
 	SEGAN_LIB_INLINE void Sort( compFunc cmpFunc = null )
 	{
-		if ( !cmpFunc ) cmpFunc = &_cmpFuncDefault;
 		if ( m_count > 1 ) QuickSort( cmpFunc, 0, m_count-1 );
 	}
 
