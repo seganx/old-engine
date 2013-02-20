@@ -296,6 +296,10 @@ public:
 		return res;
 	}
 
+	SEGAN_LIB_INLINE operator const void* ( void ) const
+	{
+		return m_buffer + m_pointer;
+	}
 
 private:
 	SEGAN_LIB_INLINE void _ReallocBuffer( uint newSize )

@@ -51,7 +51,8 @@ int WindowEventCall( Window* Sender, const WindowEvent* data )
 			curRect.width	= prc.right - prc.left - iW;
 			curRect.height	= prc.bottom - prc.top - iH;
 
-			g_engine->m_logger->Log( L"Window has been resized [ %d x %d ]", curRect.width, curRect.height );
+			static int counter = 0;
+			g_engine->m_logger->Log( L"%d > Window has been resized [ %d x %d ]", counter++, curRect.width, curRect.height );
 
 #if 0
 			if ( Sender && Sender->m_name == L"main" )
@@ -142,7 +143,7 @@ void loggerCallback( const wchar* message )
 	msg[i++]=0;
 
 	client->Update( 5, 60, 5000 );
-	client->Send( msg, i );
+	client->Send( msg, i, false );
 	client->Update( 0, 60, 5000 );
 }
 
@@ -189,9 +190,9 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		client->Start( 2727, clientCallback );
 		client->Listen();
 		int tryToConnect = 0;
-		while ( tryToConnect < 100 )
+		while ( tryToConnect < 500 )
 		{
-			client->Update( 20, 60, 5000 );
+			client->Update( 10, 60, 5000 );
 
 			if ( client->m_servers.Count() )
 			{
@@ -202,7 +203,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			}
 
 			tryToConnect++;
-			sx_os_sleep(20);
+			sx_os_sleep(50);
 		}
 	}
 #endif

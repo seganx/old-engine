@@ -19,8 +19,12 @@
 
 #include "System_def.h"
 
-bool zlib_compress_stream( Stream& srcStream, Stream& destStream, uint srcSize = 0, uint complevel = 6 );
+/*!	compress src buffer to the destination buffer and return size of compressed buffer.
+return zero if compression process failed */
+uint zlib_compress( void* dest, const uint destSize, const void* src, const uint srcSize, uint complevel = 6 );
 
-bool zlib_decompress_stream( Stream& srcStream,  Stream& destStream);
+/*! decompress src buffer to the destination buffer and return the size of decompressed buffer.
+return zero if decompression process failed */
+uint zlib_decompress( void* dest, const uint destSize, const void* src, const uint srcSize );
 
 #endif	//	GUARD_Zip_HEADER_FILE

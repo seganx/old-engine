@@ -2,6 +2,7 @@
 
 #include "../Net.h"
 #include "../Log.h"
+#include "../Zip.h"
 
 #include <winsock2.h>
 #pragma comment(lib,"ws2_32.lib")
@@ -230,6 +231,7 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 	if ( currsize + packetsize >= NET_PACKET_SIZE ) return 0;
 
 	sx_callstack();
+	uint res = 0;
 	MemoryStream data;
 	
 	//	verify that current packet has merged packet
@@ -246,26 +248,42 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 		data.WriteUInt32( packetsize );
 		data.Write( packet, packetsize );
 
-		//	compress data
-		//zlib_compress_stream()
-
-		//	store data to packet
+		//	compress data to pack
 		data.SetPos(0);
-		data.CopyTo( currpacket->data );
+		res = zlib_compress( currpacket->data, 512, data, data.Size() );
+		if ( !res )
+		{
+			data.CopyTo( currpacket->data );
+			res = data.Size();
+		}
 
 		//	change the header of packet
 		currpacket->header.type = NPT_ZIP;
 	}
 	else
 	{
-		//	decompress the data !!! in the next code ;)
+		uint srcsize = currsize - sizeof(NetPacketHeader); 
 
-		//	update number of packets
-		currpacket->data[0] += 1;
+		//	decompress the data
+		byte dcdata[2048];
+		uint dcsize = zlib_decompress( dcdata, 2048, currpacket->data, srcsize );
+		if ( dcsize )
+		{
+			//	update number of packets
+			dcdata[0] += 1;
 
-		//	copy packet data to the data container
-		data.Write( currpacket->data, currsize - sizeof(NetPacketHeader) );
+			//	copy packet data to the data container
+			data.Write( dcdata, dcsize );
+		}
+		else	//	if decompression failed try to translate current data
+		{
+			//	update number of packets
+			currpacket->data[0] += 1;
 
+			//	copy packet data to the data container
+			data.Write( currpacket->data, srcsize );
+		}
+		
 		//	copy the new packet to the data
 		data.WriteUInt32( packetsize );
 		data.Write( packet, packetsize );
@@ -273,9 +291,12 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 		//	store data to packet
 		data.SetPos(0);
 		data.CopyTo( currpacket->data );
+
+		res = data.Size();
+		
 	}
 
-	return data.Size() + sizeof(NetPacketHeader);
+	return res + sizeof(NetPacketHeader);
 }
 
 SEGAN_INLINE void net_unmerge_packet( byte* data, Connection* con )
