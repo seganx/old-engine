@@ -18,6 +18,9 @@
 
 #define MEMO_MAX_LENGTH		200000
 
+#define NET_DELAY_TIME		60
+#define NET_TIME_OUT		60000
+
 ConsoleNetwork s_consoleNetworkLocal;
 extern ConsoleNetwork * g_network = &s_consoleNetworkLocal;
 
@@ -280,7 +283,7 @@ void MainLoop( float elpsTime )
 	if ( g_network->isServer )
 	{
 		NetState state = g_network->server.m_clients[0]->m_state;
-		g_network->server.Update( elpsTime, 1000, 60000 );
+		g_network->server.Update( elpsTime, NET_DELAY_TIME, NET_TIME_OUT );
 		if ( state != g_network->server.m_clients[0]->m_state )
 			stateChanged = g_network->server.m_clients[0]->m_state;
 		list_update_server( elpsTime );
@@ -304,7 +307,7 @@ void MainLoop( float elpsTime )
 		}
 #endif
 		NetState state = g_network->client.m_connection.m_state;
-		g_network->client.Update( elpsTime, 1000, 60000 );
+		g_network->client.Update( elpsTime, NET_DELAY_TIME, NET_TIME_OUT );
 		if ( state != g_network->client.m_connection.m_state )
 			stateChanged = g_network->client.m_connection.m_state;
 		list_update_client( elpsTime );

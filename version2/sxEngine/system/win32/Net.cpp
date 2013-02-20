@@ -755,6 +755,7 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 	case LISTENING:
 	case DISCONNECTED: res = false; break;
 	default:
+		if ( m_sending.Count() <= 1 )
 		{
 			NetMessage* msg;
 			uint newsize = 0;
