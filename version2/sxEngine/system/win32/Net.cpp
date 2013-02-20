@@ -288,9 +288,14 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 		data.WriteUInt32( packetsize );
 		data.Write( packet, packetsize );
 
-		//	store data to packet
+		//	compress data to pack
 		data.SetPos(0);
-		data.CopyTo( currpacket->data );
+		res = zlib_compress( currpacket->data, 512, data, data.Size() );
+		if ( !res )
+		{
+			data.CopyTo( currpacket->data );
+			res = data.Size();
+		}
 
 		res = data.Size();
 		
@@ -299,16 +304,36 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 	return res + sizeof(NetPacketHeader);
 }
 
-SEGAN_INLINE void net_unmerge_packet( byte* data, Connection* con )
+SEGAN_INLINE void net_unmerge_packet( byte* data, const uint msgSize, Connection* con )
 {
-	sint n = data[0], p = 1;
-	for ( int i=0; i<n; i++ )
-	{
-		uint* size = (uint*)&data[p];				p += 4;
-		NetPacket* packet = (NetPacket*)&data[p];	p += *size;
+	uint srcsize = msgSize - sizeof(NetPacketHeader); 
 
-		con->m_callBack( con, packet->data, *size );
+	//	decompress the data
+	byte dcdata[2048];
+	uint dcsize = zlib_decompress( dcdata, 2048, data, srcsize );
+	if ( dcsize )
+	{
+		sint n = dcdata[0], p = 1;
+		for ( int i=0; i<n; i++ )
+		{
+			uint* size = (uint*)&dcdata[p];				p += 4;
+			NetPacket* packet = (NetPacket*)&dcdata[p];	p += *size;
+
+			con->m_callBack( con, packet->data, *size );
+		}
 	}
+	else	//	if decompression failed try to process current data
+	{
+		sint n = data[0], p = 1;
+		for ( int i=0; i<n && n<64; i++ )
+		{
+			uint* size = (uint*)&data[p];				p += 4;
+			NetPacket* packet = (NetPacket*)&data[p];	p += *size;
+
+			con->m_callBack( con, packet->data, *size );
+		}
+	}
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -701,11 +726,11 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 				{
 					if ( !buffer->packet.header.crit ) 
 					{
-						net_unmerge_packet( buffer->packet.data, this );
+						net_unmerge_packet( buffer->packet.data, buffer->bytsRecved, this );
 					}
 					else if ( m_recAck == buffer->packet.header.ack )
 					{
-						net_unmerge_packet( buffer->packet.data, this );
+						net_unmerge_packet( buffer->packet.data, buffer->bytsRecved, this );
 						m_recAck++;
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
