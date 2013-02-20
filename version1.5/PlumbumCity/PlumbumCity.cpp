@@ -4,6 +4,14 @@
 #include "GameConfig.h"
 
 
+#define NET_ACTIVATE	1
+#define NET_DELAY_TIME	60
+#define NET_TIMEOUT		5000
+
+//////////////////////////////////////////////////////////////////////////
+//  SOME GLOBAL VARIABLES
+Client* client = null;
+
 //////////////////////////////////////////////////////////////////////////
 //		static internal variables and objects
 static sx::sys::Window		s_window;			//	main application window
@@ -97,6 +105,33 @@ public:
 	float						m_time;
 };
 
+void clientCallback( Client* client, const byte* buffer, const uint size )
+{
+
+}
+
+void loggerCallback( const wchar* message )
+{
+#if NET_ACTIVATE
+	if ( !message || !client ) return;
+	sx_callstack();
+
+	char msg[512] = {0};
+
+	int i = 0;
+	wchar* c = (wchar*)message;
+	while ( *c && i<511 )
+	{
+		msg[i] = (char)(*c);
+		c++;
+		i++;
+	}
+	msg[i++]=0;
+
+	client->Send( msg, i, false );
+	client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
+#endif
+}
 
 UINT MainMsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -122,6 +157,7 @@ UINT MainMsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 void MainLoop(float elpsTime)
 {
 	sx_callstack();
+	client->Update( elpsTime, NET_DELAY_TIME, NET_TIMEOUT );
 
 	if ( elpsTime > 1000 ) return;
 
@@ -165,6 +201,38 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	if ( !mutex || GetLastError() == ERROR_ALREADY_EXISTS )
 		return 0;
 	sx::cmn::Randomize();
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//	connect to console
+#if NET_ACTIVATE
+	{
+		//	initialize net system
+		sx_net_initialize( 0x27272727 );
+
+		client = sx_new( Client );
+		client->m_name.Format( L"editor %s", sx::sys::GetUserName() );
+		client->Start( 2727, clientCallback );
+		client->Listen();
+		int tryToConnect = 0;
+		while ( tryToConnect < 500 )
+		{
+			client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
+
+			if ( client->m_servers.Count() )
+			{
+				client->Connect( client->m_servers[0].address );
+
+				client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
+				break;
+			}
+
+			tryToConnect++;
+			Sleep(50);
+		}
+	}
+	sxLog::SetCallback( loggerCallback );
+#endif
 
 	//  load configuration
 	Config::LoadConfig();
@@ -271,6 +339,11 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 	//  close handles
 	CloseHandle(mutex);
+
+#if NET_ACTIVATE
+	sx_delete_and_null( client );
+	sx_net_finalize();
+#endif
 
 	sx_detect_crash();
 

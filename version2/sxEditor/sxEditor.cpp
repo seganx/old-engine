@@ -5,6 +5,10 @@
 //#include <Windows.h>
 #include <stdio.h>
 
+
+#define NET_DELAY_TIME	60
+#define NET_TIMEOUT		5000
+
 //////////////////////////////////////////////////////////////////////////
 //  SOME GLOBAL VARIABLES
 Window* winMain = null;
@@ -74,7 +78,7 @@ void AppMainLoop( float elpsTime )
 {
 	sx_mem_enable_debug( true, 2 );
 
-	client->Update( elpsTime, 60, 5000 );
+	client->Update( elpsTime, NET_DELAY_TIME, NET_TIMEOUT );
 
 #if 0
 
@@ -142,9 +146,9 @@ void loggerCallback( const wchar* message )
 	}
 	msg[i++]=0;
 
-	client->Update( 5, 60, 5000 );
+	client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
 	client->Send( msg, i, false );
-	client->Update( 0, 60, 5000 );
+	client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
 }
 
 void mem_CallBack( const wchar* file, const uint line, const uint size, const uint tag, const bool corrupted )
@@ -158,7 +162,7 @@ void mem_CallBack( const wchar* file, const uint line, const uint size, const ui
 	else
 		len = sprintf_s( msg, 512, "WARNING : memory leak detected on %S - line %d - size %d - tag %d", file, line, size, tag );
 	client->Send( msg, len+1 );
-	client->Update( 0, 60, 5000 );
+	client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
 }
 
 #endif
@@ -192,13 +196,13 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		int tryToConnect = 0;
 		while ( tryToConnect < 500 )
 		{
-			client->Update( 10, 60, 5000 );
+			client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
 
 			if ( client->m_servers.Count() )
 			{
 				client->Connect( client->m_servers[0].address );
 
-				client->Update( 10, 60, 5000 );
+				client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
 				break;
 			}
 
@@ -218,7 +222,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		winChild->SetRect( 50, 500, 200, 150 );
 		winChild->SetVisible( true );
 
-		client->Send( "window created !", 16 );
+		client->Send( "window created !", 17 );
 	}
 #endif
 

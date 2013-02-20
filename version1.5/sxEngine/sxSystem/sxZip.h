@@ -25,4 +25,13 @@ namespace sx { namespace sys
 	bool ZDecompressStream(Stream& srcStream, Stream& destStream);
 } }	// namespace sx { namespace sys
 
+
+/*!	compress src buffer to the destination buffer and return size of compressed buffer.
+return zero if compression process failed */
+uint zlib_compress( void* dest, const uint destSize, const void* src, const uint srcSize, uint complevel = 6 );
+
+/*! decompress src buffer to the destination buffer and return the size of decompressed buffer.
+return zero if decompression process failed */
+uint zlib_decompress( void* dest, const uint destSize, const void* src, const uint srcSize );
+
 #endif // GUARD_sxZip_HEADER_FILE

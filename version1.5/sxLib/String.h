@@ -24,6 +24,41 @@
 #endif
 
 
+//! copy the src string to the destination string and return number of characters which have copied contain null character
+SEGAN_LIB_INLINE sint sx_str_copy( wchar* dest, const sint dest_size_in_word, const wchar* src )
+{
+	sx_assert(dest);
+	sint res = 0;
+	if ( src )
+	{
+		for ( ; res<dest_size_in_word; ++res )
+		{
+			dest[res] = src[res];
+			if ( dest[res] == 0 ) break;
+		}
+		dest[dest_size_in_word-1] = 0;
+	}
+	return res;
+}
+
+//! copy the src string to the destination string and return number of characters which have copied contain null character
+SEGAN_LIB_INLINE sint sx_str_copy( wchar* dest, const sint dest_size_in_word, const char* src )
+{
+	sx_assert(dest);
+	sint res = 0;
+	if ( src )
+	{
+		for ( ; res<dest_size_in_word; ++res )
+		{
+			dest[res] = src[res];
+			if ( dest[res] == 0 ) break;
+		}
+		dest[dest_size_in_word-1] = 0;
+	}
+	return res;
+}
+
+
 /*! 
 string class stores strings of wide characters
 */

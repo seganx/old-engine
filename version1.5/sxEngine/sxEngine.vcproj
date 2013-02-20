@@ -335,6 +335,14 @@
 			Name="System"
 			>
 			<File
+				RelativePath=".\sxSystem\Net.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\sxSystem\Net.h"
+				>
+			</File>
+			<File
 				RelativePath=".\sxSystem\sxFile.cpp"
 				>
 			</File>

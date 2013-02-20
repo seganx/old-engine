@@ -34,6 +34,9 @@ public:
 	void Log(const WCHAR* logmessage){
 		if ( !logmessage ) return;
 
+		if (_callback)
+			_callback(logmessage);
+
 		if (SEGAN_SET_HAS(_mode, LM_CONSOLE))
 			wprintf(logmessage);	
 
@@ -42,9 +45,6 @@ public:
 
 		if (SEGAN_SET_HAS(_mode, LM_FILE))
 			_filestream->Write(logmessage, (int)wcslen(logmessage)*sizeof(WCHAR));
-
-		if (_callback)
-			_callback(logmessage);
 
 	}
 
@@ -116,7 +116,7 @@ public:
 
 	WCHAR*				m_buffer;
 };
-static LoggerClass _logger(LM_CONSOLE, NULL, NULL);
+static LoggerClass _logger(0, NULL, NULL);
 
 void sxLog::Log( const WCHAR* format, ... )
 {
@@ -129,7 +129,7 @@ void sxLog::Log( const WCHAR* format, ... )
 	va_list argList;
 	va_start(argList, format);
 
-	int strLen = _vscwprintf( format, argList ) + 1;
+	int strLen = _vscwprintf( format, argList ) + 5;
 	const int additionaLen = 32 * sizeof(wchar);	//	additional char length of time stamp and char return
 	wchar* buffer = (wchar*)mem_alloc( additionaLen + strLen * sizeof(wchar) );
 
@@ -147,11 +147,27 @@ void sxLog::Log( const WCHAR* format, ... )
 	va_end(argList);
 
 	// fill end of line
-	buffer[strLen++] = '\r';
-	buffer[strLen++] = '\n';
-	buffer[strLen] = 0;
+	buffer[strLen+1] = '\n';
+	buffer[strLen+2] = 0;
 
-	_logger.Log(buffer );
+	if (_logger._callback)
+		_logger._callback(buffer);
+
+	if (SEGAN_SET_HAS(_logger._mode, LM_CONSOLE))
+		wprintf(buffer);	
+
+	if (SEGAN_SET_HAS(_logger._mode, LM_WINDOW) && _logger._window)
+		SendMessage(_logger._window, WM_SX_LOGGER, (WPARAM)buffer, 0);
+
+	if (SEGAN_SET_HAS(_logger._mode, LM_FILE))
+	{
+		// fill end of line
+		buffer[strLen++] = '\r';
+		buffer[strLen++] = '\n';
+		buffer[strLen] = 0;
+
+		_logger._filestream->Write(buffer, strLen*sizeof(WCHAR));
+	}
 
 	mem_free( buffer );
 
@@ -170,7 +186,28 @@ void sxLog::Log_( const WCHAR* format, ... )
 	int len = vswprintf_s( _logger.m_buffer, LOG_MAX_SIZE, format, argList );
 	va_end(argList);
 
-	_logger.Log( _logger.m_buffer );
+	// fill end of line
+	_logger.m_buffer[len+1] = '\n';
+	_logger.m_buffer[len+2] = 0;
+
+	if (_logger._callback)
+		_logger._callback(_logger.m_buffer);
+
+	if (SEGAN_SET_HAS(_logger._mode, LM_CONSOLE))
+		wprintf(_logger.m_buffer);	
+
+	if (SEGAN_SET_HAS(_logger._mode, LM_WINDOW) && _logger._window)
+		SendMessage(_logger._window, WM_SX_LOGGER, (WPARAM)_logger.m_buffer, 0);
+
+	if (SEGAN_SET_HAS(_logger._mode, LM_FILE))
+	{
+		// fill end of line
+		_logger.m_buffer[len++] = '\r';
+		_logger.m_buffer[len++] = '\n';
+		_logger.m_buffer[len] = 0;
+
+		_logger._filestream->Write(_logger.m_buffer, len*sizeof(WCHAR));
+	}
 
 	_logger._cs.Leave();
 }

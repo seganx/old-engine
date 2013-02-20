@@ -19,5 +19,6 @@
 #include "sxTaskMan.h"
 #include "sxWindow.h"
 #include "sxZip.h"
+#include "Net.h"
 
 #endif // GUARD_sxSystem_HEADER_FILE

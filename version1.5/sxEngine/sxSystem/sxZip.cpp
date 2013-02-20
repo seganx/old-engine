@@ -117,3 +117,23 @@ bool ZDecompressStream( Stream& srcStream, Stream& destStream )
 }
 
 } } // namespace sx { namespace sys
+
+
+uint zlib_compress( void* dest, const uint destSize, const void* src, const uint srcSize, uint complevel /*= 6 */ )
+{
+	uLongf res = destSize;
+	if ( compress2( (Bytef*)dest, &res, (Bytef*)src, srcSize, complevel ) == Z_OK )
+		return res;
+	else
+		return 0;
+}
+
+uint zlib_decompress( void* dest, const uint destSize, const void* src, const uint srcSize )
+{
+	uLongf res = destSize;
+	if ( uncompress( (Bytef*)dest, &res, (Bytef*)src, srcSize ) == Z_OK )
+		return res;
+	else
+		return 0;
+}
+

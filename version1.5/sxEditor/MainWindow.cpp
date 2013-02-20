@@ -22,7 +22,7 @@ void MainWin::InitWindow( void )
 	s_Win.SetVisible(true);
 
 	sx::sys::Application::Create_Window(&MainWin::s_Win);
-	sxLog::SetWindow( MainWin::s_Win.GetHandle() );
+	//sxLog::SetWindow( MainWin::s_Win.GetHandle() );
 }
 
 void MainWin::OnRect( sx::sys::Window* Sender, WindowRect& newRect )

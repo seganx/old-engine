@@ -284,6 +284,22 @@ public:
 		return m_pointer;
 	}
 
+	//! copy data to a buffer and return number of byte copied. use size=0 to full copy stream.
+	SEGAN_LIB_INLINE uint CopyTo( void* buffer, const uint sizeinbyte = 0 )
+	{
+		uint res = sizeinbyte ? sizeinbyte : m_size;
+		if ( m_pointer + res > m_size )
+			res = m_size - m_pointer;
+		memcpy( buffer, m_buffer + m_pointer, res );
+		m_pointer += res;
+		return res;
+	}
+
+	SEGAN_LIB_INLINE operator const void* ( void ) const
+	{
+		return m_buffer + m_pointer;
+	}
+
 private:
 	SEGAN_LIB_INLINE void _ReallocBuffer( uint newSize )
 	{
