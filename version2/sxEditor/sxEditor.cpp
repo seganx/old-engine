@@ -52,7 +52,7 @@ int WindowEventCall( Window* Sender, const WindowEvent* data )
 			curRect.height	= prc.bottom - prc.top - iH;
 
 			static int counter = 0;
-			g_engine->m_logger->Log( L"%d > Window has been resized [ %d x %d ]", counter++, curRect.width, curRect.height );
+			g_engine->m_logger->Log_( L"%d > Window has been resized [ %d x %d ]", counter++, curRect.width, curRect.height );
 
 #if 0
 			if ( Sender && Sender->m_name == L"main" )
@@ -157,7 +157,7 @@ void mem_CallBack( const wchar* file, const uint line, const uint size, const ui
 		len = sprintf_s( msg, 512, "ERROR : memory corruption detected on %S - line %d - size %d - tag %d", file, line, size, tag );
 	else
 		len = sprintf_s( msg, 512, "WARNING : memory leak detected on %S - line %d - size %d - tag %d", file, line, size, tag );
-	client->Send( msg, len );
+	client->Send( msg, len+1 );
 	client->Update( 0, 60, 5000 );
 }
 

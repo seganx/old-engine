@@ -295,10 +295,7 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 		{
 			data.CopyTo( currpacket->data );
 			res = data.Size();
-		}
-
-		res = data.Size();
-		
+		}		
 	}
 
 	return res + sizeof(NetPacketHeader);

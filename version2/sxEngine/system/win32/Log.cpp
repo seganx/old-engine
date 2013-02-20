@@ -79,21 +79,24 @@ void Logger::Log( const wchar* format, ... )
 	va_end(argList);
 
 	// fill end of line
-	buffer[strLen++] = '\r';
-	buffer[strLen++] = '\n';
-	buffer[strLen] = 0;
+	buffer[strLen+1] = '\n';
+	buffer[strLen+2] = 0;
 
 	if ( m_mode & LM_CONSOLE )
 		wprintf( buffer );
 
+	if ( m_callback )
+		m_callback( buffer );
+
 	if ( m_mode & LM_FILE )
 	{
+		buffer[strLen++] = '\r';
+		buffer[strLen++] = '\n';
+		buffer[strLen] = 0;
+
 		fwrite( buffer, sizeof(wchar), strLen, m_fileStream );
 		fflush( m_fileStream );
 	}
-
-	if ( m_callback )
-		m_callback( buffer );
 
 	mem_free( buffer );
 
@@ -107,23 +110,31 @@ void Logger::Log_( const wchar* format, ... )
 
 	va_list argList;
 	va_start(argList, format);
-	int strLen = _vscwprintf( format, argList ) + 1;
+	int strLen = _vscwprintf( format, argList ) + 5;
 	wchar* buffer = (wchar*)mem_alloc( strLen * sizeof(wchar) );
-
 	strLen = vswprintf_s( buffer, strLen, format, argList );
 	va_end(argList);
+
+	// fill end of line
+	buffer[strLen+1] = '\n';
+	buffer[strLen+2] = 0;
 
 	if ( m_mode & LM_CONSOLE )
 		wprintf( buffer );
 
+	if ( m_callback )
+		m_callback( buffer );
+
 	if ( m_mode & LM_FILE )
 	{
+		// fill end of line
+		buffer[strLen++] = '\r';
+		buffer[strLen++] = '\n';
+		buffer[strLen] = 0;
+
 		fwrite( buffer, sizeof(wchar), strLen, m_fileStream );
 		fflush( m_fileStream );
 	}
-
-	if ( m_callback )
-		m_callback( buffer );
 
 	mem_free( buffer );
 
