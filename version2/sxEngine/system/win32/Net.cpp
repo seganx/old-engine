@@ -535,7 +535,7 @@ void Connection::Disconnect( void )
 
 SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elpsTime, const float delayTime, const float timeOut )
 {
-	static sint needAck = 0;
+	static float needAck = 0;
 
 	switch ( m_state )
 	{
@@ -646,7 +646,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 							break;
 						}
 					}
-					needAck = ( m_sntAck - buffer->packet.header.ack ) / 2;
+					needAck = ( (float)m_sntAck - (float)buffer->packet.header.ack ) / 2.0f;
 
 					char tmpstr[128] = {0};
 					if ( founded )
@@ -691,7 +691,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
-						needAck = ( m_recAck - buffer->packet.header.ack ) / 2;
+						needAck = ( (float)m_recAck - (float)buffer->packet.header.ack ) / 2.0f;
 
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
@@ -715,7 +715,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
-						needAck = ( m_recAck - buffer->packet.header.ack ) / 2;
+						needAck = ( (float)m_recAck - (float)buffer->packet.header.ack ) / 2.0f;
 
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
@@ -742,7 +742,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		}
 
 		//	keep connection alive
-		m_sendTime += elpsTime + ( m_sendTime > 0 ? (float)needAck : 0 );
+		m_sendTime += elpsTime + ( m_sendTime > 0 ? needAck : 0 );
 		if ( m_sendTime > delayTime )
 		{
 			m_sendTime = 0;
