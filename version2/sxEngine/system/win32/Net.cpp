@@ -694,7 +694,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
-						needAck = ( (float)m_recAck - (float)buffer->packet.header.ack ) * 8.0f;
+						needAck = ( (float)m_recAck - (float)buffer->packet.header.ack ) * 6.0f;
 
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
@@ -718,7 +718,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
-						needAck = ( (float)m_recAck - (float)buffer->packet.header.ack ) * 8.0f;
+						needAck = ( (float)m_recAck - (float)buffer->packet.header.ack ) * 6.0f;
 
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
