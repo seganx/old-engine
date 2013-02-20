@@ -6,7 +6,7 @@
 
 #define NET_ACTIVATE	1
 #define NET_DELAY_TIME	60
-#define NET_TIMEOUT		5000
+#define NET_TIMEOUT		60000
 
 //////////////////////////////////////////////////////////////////////////
 //  SOME GLOBAL VARIABLES

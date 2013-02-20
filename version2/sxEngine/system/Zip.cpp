@@ -13,9 +13,6 @@
 	#endif
 #endif
 
-#define	SX_Z_BUFF_MAXSIZE		262144	// 256KB
-
-
 uint zlib_compress( void* dest, const uint destSize, const void* src, const uint srcSize, uint complevel /*= 6 */ )
 {
 	uLongf res = destSize;

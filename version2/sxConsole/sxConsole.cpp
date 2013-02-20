@@ -305,7 +305,7 @@ void MainLoop( float elpsTime )
 		}
 #endif
 		NetState state = g_network->server.m_clients[0]->m_state;
-		g_network->server.Update( elpsTime, 60, 5000 );
+		g_network->server.Update( elpsTime, 60, 60000 );
 		if ( state != g_network->server.m_clients[0]->m_state )
 			stateChanged = g_network->server.m_clients[0]->m_state;
 		list_update_server( elpsTime );
@@ -313,7 +313,7 @@ void MainLoop( float elpsTime )
 	else
 	{
 		NetState state = g_network->client.m_connection.m_state;
-		g_network->client.Update( elpsTime, 60, 5000 );
+		g_network->client.Update( elpsTime, 60, 60000 );
 		if ( state != g_network->client.m_connection.m_state )
 			stateChanged = g_network->client.m_connection.m_state;
 		list_update_client( elpsTime );
