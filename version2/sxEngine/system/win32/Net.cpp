@@ -535,7 +535,7 @@ void Connection::Disconnect( void )
 
 SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elpsTime, const float delayTime, const float timeOut )
 {
-	static float needAck = 0;
+	static sint needAck = 0;
 
 	switch ( m_state )
 	{
@@ -646,13 +646,13 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 							break;
 						}
 					}
-					needAck = ( m_sntAck - buffer->packet.header.ack ) / 2.0f;
+					needAck = ( m_sntAck - buffer->packet.header.ack ) / 2;
 
 					char tmpstr[128] = {0};
 					if ( founded )
-						sprintf_s( tmpstr, "need ack %d / %d	:	funded ", buffer->packet.header.ack, m_sntAck );
+						sprintf_s( tmpstr, "need ack %d / %d	founded ", buffer->packet.header.ack, m_sntAck );
 					else
-						sprintf_s( tmpstr, "need ack %d / %d	:	!!!!!! ", buffer->packet.header.ack, m_sntAck );
+						sprintf_s( tmpstr, "need ack %d / %d	!!!!!!! ", buffer->packet.header.ack, m_sntAck );
 					m_callBack( this, (byte*)tmpstr, 8 );
 
 					buffer->bytsRecved = 0;		// notify that buffer handled
@@ -691,7 +691,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
-						needAck = ( m_recAck - buffer->packet.header.ack ) / 2.0f;
+						needAck = ( m_recAck - buffer->packet.header.ack ) / 2;
 
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
@@ -715,7 +715,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
-						needAck = ( m_recAck - buffer->packet.header.ack ) / 2.0f;
+						needAck = ( m_recAck - buffer->packet.header.ack ) / 2;
 
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
@@ -742,7 +742,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		}
 
 		//	keep connection alive
-		m_sendTime += elpsTime + needAck > 0 ? needAck : 0;
+		m_sendTime += elpsTime + ( m_sendTime > 0 ? (float)needAck : 0 );
 		if ( m_sendTime > delayTime )
 		{
 			m_sendTime = 0;
