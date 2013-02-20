@@ -156,29 +156,32 @@ SEGAN_INLINE void net_connection_flush_unreliablelist( Connection* con )
 
 SEGAN_INLINE void net_connection_flush_sendinglist( Connection* con )
 {
-	NetMessage* msg;
-	while( net_array_pop_front( con->m_sending, msg ) )
+	for ( int i=0; i<2; i++ )
 	{
-		//	send to destination
-		msg->packet.header.ack = con->m_sntAck;
-		con->m_socket->Send( con->m_destination, &msg->packet, msg->size );
-
-		//	push the message to the sent items
-		if ( msg->packet.header.crit )
+		NetMessage* msg;
+		if( net_array_pop_front( con->m_sending, msg ) )
 		{
-			con->m_sntAck++;
-			con->m_sent.PushBack( msg );
+			//	send to destination
+			msg->packet.header.ack = con->m_sntAck;
+			con->m_socket->Send( con->m_destination, &msg->packet, msg->size );
 
-			//	keep sent items limit
-			if ( con->m_sent.Count() == ( NET_MAX_QUEUE_BUFFER - 10 ) )
+			//	push the message to the sent items
+			if ( msg->packet.header.crit )
 			{
-				s_netInternal->msgPool.Push( con->m_sent[0] );
-				con->m_sent.RemoveByIndex( 0 );
+				con->m_sntAck++;
+				con->m_sent.PushBack( msg );
+
+				//	keep sent items limit
+				if ( con->m_sent.Count() == ( NET_MAX_QUEUE_BUFFER - 10 ) )
+				{
+					s_netInternal->msgPool.Push( con->m_sent[0] );
+					con->m_sent.RemoveByIndex( 0 );
+				}
 			}
-		}
-		else 
-		{
-			s_netInternal->msgPool.Push( msg );
+			else 
+			{
+				s_netInternal->msgPool.Push( msg );
+			}
 		}
 	}
 }
@@ -691,7 +694,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
-						needAck = ( (float)m_recAck - (float)buffer->packet.header.ack ) / 2.0f;
+						needAck = ( (float)m_recAck - (float)buffer->packet.header.ack ) * 8.0f;
 
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
@@ -715,7 +718,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
-						needAck = ( (float)m_recAck - (float)buffer->packet.header.ack ) / 2.0f;
+						needAck = ( (float)m_recAck - (float)buffer->packet.header.ack ) * 8.0f;
 
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
