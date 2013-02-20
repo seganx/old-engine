@@ -156,7 +156,7 @@ SEGAN_INLINE void net_connection_flush_unreliablelist( Connection* con )
 SEGAN_INLINE void net_connection_flush_sendinglist( Connection* con )
 {
 	NetMessage* msg;
-	while ( net_array_pop_front( con->m_sending, msg ) )
+	if( net_array_pop_front( con->m_sending, msg ) )
 	{
 		//	send to destination
 		msg->packet.header.ack = con->m_sntAck;
@@ -287,8 +287,7 @@ SEGAN_INLINE void net_unmerge_packet( byte* data, const uint msgSize, Connection
 
 	//	decompress the data
 	byte dcdata[2048];
-	uint dcsize = zlib_decompress( dcdata, 2048, data, srcsize );
-	if ( dcsize )
+	if ( zlib_decompress( dcdata, 2048, data, srcsize ) )
 	{
 		sint n = dcdata[0], p = 1;
 		for ( int i=0; i<n; i++ )
@@ -299,18 +298,6 @@ SEGAN_INLINE void net_unmerge_packet( byte* data, const uint msgSize, Connection
 			con->m_callBack( con, packet->data, *size );
 		}
 	}
-	else	//	if decompression failed try to process current data
-	{
-		sint n = data[0], p = 1;
-		for ( int i=0; i<n && n<64; i++ )
-		{
-			uint* size = (uint*)&data[p];				p += 4;
-			NetPacket* packet = (NetPacket*)&data[p];	p += *size;
-
-			con->m_callBack( con, packet->data, *size );
-		}
-	}
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -547,6 +534,7 @@ void Connection::Disconnect( void )
 
 SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elpsTime, const float delayTime, const float timeOut )
 {
+	static float needAck = 0;
 
 	switch ( m_state )
 	{
@@ -655,6 +643,8 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 							break;
 						}
 					}
+					needAck = elpsTime * 0.5f;
+
 					buffer->bytsRecved = 0;		// notify that buffer handled
 				}
 				break;
@@ -687,6 +677,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					if ( m_recAck == buffer->packet.header.ack )
 					{
 						net_connection_flush_sendinglist( this );
+						needAck = 0;
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
@@ -712,6 +703,10 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
+						//	request to send lost message
+						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
+						m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
+
 						if ( ! net_connection_hold_unreliable( buffer, this ) )
 							return;
 					}
@@ -733,7 +728,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		}
 
 		//	keep connection alive
-		m_sendTime += elpsTime;
+		m_sendTime += elpsTime + needAck;
 		if ( m_sendTime > delayTime )
 		{
 			m_sendTime = 0;

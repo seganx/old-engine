@@ -294,7 +294,7 @@ void MainLoop( float elpsTime )
 		if ( state == CONNECTED )
 		{
 			static int msgId = 0;
-			for( int i=0; i<5; i++ )
+			for( int i=0; i<1; i++ )
 			{
 				msgId++;
 				str512 tmpStr;
@@ -322,7 +322,7 @@ void MainLoop( float elpsTime )
 	case DISCONNECTED:	append_text_to_control( g_logText, L"Disconnected ..." );	break;
 	}
 	
-	sx_os_sleep( 1 );
+	sx_os_sleep( 16 );
 }
 
 LRESULT WINAPI InputLineWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
