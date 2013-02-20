@@ -293,19 +293,26 @@ void MainLoop( float elpsTime )
 		NetState state = g_network->client.m_connection.m_state;
 		if ( state == CONNECTED )
 		{
+			static float msgtime = 0;
 			static int msgId = 0;
-			for( int i=0; i<5; i++ )
+			msgtime += elpsTime;
+			if ( msgtime > 60 )
 			{
-				msgId++;
-				str512 tmpStr;
-				tmpStr.Format( L"%d : this is a test message", msgId );
-				int len = 0;
-				char buf[256];
-				for ( ; len<tmpStr.Length(); len++ )
-					buf[len]=(char)tmpStr[len];
-				buf[len++]=0;
+				msgtime = 0;
 
-				g_network->client.Send( buf, len+1, true );
+				for( int i=0; i<10; i++ )
+				{
+					msgId++;
+					str512 tmpStr;
+					tmpStr.Format( L"%d : this is a test message", msgId );
+					int len = 0;
+					char buf[256];
+					for ( ; len<tmpStr.Length(); len++ )
+						buf[len]=(char)tmpStr[len];
+					buf[len++]=0;
+
+					g_network->client.Send( buf, len+1, true );
+				}
 			}
 		}
 		g_network->client.Update( elpsTime, NET_DELAY_TIME, NET_TIME_OUT );
@@ -322,7 +329,7 @@ void MainLoop( float elpsTime )
 	case DISCONNECTED:	append_text_to_control( g_logText, L"Disconnected ..." );	break;
 	}
 	
-	sx_os_sleep( 16 );
+	sx_os_sleep( 1 );
 }
 
 LRESULT WINAPI InputLineWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {

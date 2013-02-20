@@ -11,7 +11,7 @@
 
 #define NET_MAX_NUM_BUFFER				512		//	number of connection buffer in the stack
 #define NET_MAX_QUEUE_BUFFER			512		//	maximum number of buffer in the queue
-#define NET_PACKET_SIZE					1024	//	size of connection buffer
+#define NET_PACKET_SIZE					512		//	size of connection buffer
 #define NET_SERVER_FLAG_TIME			1200	//	time period that server notify all client to see the flag by sending broadcast message
 
 
