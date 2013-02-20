@@ -233,7 +233,7 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 	sx_callstack();
 	uint res = 0;
 	MemoryStream data;
-	
+
 	//	verify that current packet has merged packet
 	if ( currpacket->header.type != NPT_ZIP )
 	{
@@ -250,15 +250,14 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 
 		//	compress data to pack
 		data.SetPos(0);
-		res = zlib_compress( currpacket->data, 512, data, data.Size() );
-		if ( !res )
+		res = zlib_compress( currpacket->data, NET_PACKET_SIZE, data, data.Size(), 9 );
+		if ( res )
 		{
-			data.CopyTo( currpacket->data );
-			res = data.Size();
-		}
+			res += sizeof(NetPacketHeader);
 
-		//	change the header of packet
-		currpacket->header.type = NPT_ZIP;
+			//	change the header of packet
+			currpacket->header.type = NPT_ZIP;
+		}
 	}
 	else
 	{
@@ -274,31 +273,23 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 
 			//	copy packet data to the data container
 			data.Write( dcdata, dcsize );
-		}
-		else	//	if decompression failed try to translate current data
-		{
-			//	update number of packets
-			currpacket->data[0] += 1;
 
-			//	copy packet data to the data container
-			data.Write( currpacket->data, srcsize );
-		}
-		
-		//	copy the new packet to the data
-		data.WriteUInt32( packetsize );
-		data.Write( packet, packetsize );
+			//	copy the new packet to the data
+			data.WriteUInt32( packetsize );
+			data.Write( packet, packetsize );
 
-		//	compress data to pack
-		data.SetPos(0);
-		res = zlib_compress( currpacket->data, 512, data, data.Size() );
-		if ( !res )
-		{
-			data.CopyTo( currpacket->data );
-			res = data.Size();
-		}		
+			//	compress data to pack
+			data.SetPos(0);
+			res = zlib_compress( currpacket->data, NET_PACKET_SIZE, data, data.Size() );
+			if ( res )
+			{
+				data.CopyTo( currpacket->data );
+				res = data.Size() + sizeof(NetPacketHeader);
+			}	
+		}	
 	}
 
-	return res + sizeof(NetPacketHeader);
+	return res;
 }
 
 SEGAN_INLINE void net_unmerge_packet( byte* data, const uint msgSize, Connection* con )

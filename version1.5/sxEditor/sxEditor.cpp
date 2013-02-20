@@ -7,14 +7,8 @@
 #include "EditorScene.h"
 #include "EditorObject.h"
 
+extern Client* g_client = null;
 
-#define NET_ACTIVATE	1
-#define NET_DELAY_TIME	60
-#define NET_TIMEOUT		60000
-
-//////////////////////////////////////////////////////////////////////////
-//  SOME GLOBAL VARIABLES
-Client* client = null;
 
 //! if LM_WINDOWS activated a pointer of this structure will post in WPARAM
 struct msgLogger
@@ -47,28 +41,29 @@ void clientCallback( Client* client, const byte* buffer, const uint size )
 
 }
 
+
 void loggerCallback( const wchar* message )
 {
 	sx_callstack();
 #if NET_ACTIVATE
-	if ( !message || !client ) return;
+	if ( !message || !g_client ) return;
 
 	Editor::SetLabelTips( message, 10000.0f );
 
-	char msg[512] = {0};
-
-	int i = 0;
-	wchar* c = (wchar*)message;
-	while ( *c && i<511 )
-	{
-		msg[i] = (char)(*c);
-		c++;
-		i++;
-	}
-	msg[i++]=0;
-
-	client->Send( msg, i, false );
-	client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
+// 	char msg[512] = {0};
+// 
+// 	int i = 0;
+// 	wchar* c = (wchar*)message;
+// 	while ( *c && i<511 )
+// 	{
+// 		msg[i] = (char)(*c);
+// 		c++;
+// 		i++;
+// 	}
+// 	msg[i++]=0;
+// 
+// 	g_client->Send( msg, i, false );
+// 	g_client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
 #else
 	if ( !message ) return;
 	Editor::SetLabelTips( message, 10000.0f );
@@ -147,7 +142,7 @@ void MainLoop(float elpsTime)
 {
 	sx_callstack();
 
-	client->Update( elpsTime, NET_DELAY_TIME, NET_TIMEOUT );
+	g_client->Update( elpsTime, NET_DELAY_TIME, NET_TIMEOUT );
 
 	//	force to fast task update
 	for ( int i=0; i<60; i++ )
@@ -244,20 +239,20 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		//	initialize net system
 		sx_net_initialize( 0x27272727 );
 
-		client = sx_new( Client );
-		client->m_name.Format( L"editor %s", sx::sys::GetUserName() );
-		client->Start( 2727, clientCallback );
-		client->Listen();
+		g_client = sx_new( Client );
+		g_client->m_name.Format( L"editor %s", sx::sys::GetUserName() );
+		g_client->Start( 2727, clientCallback );
+		g_client->Listen();
 		int tryToConnect = 0;
 		while ( tryToConnect < 500 )
 		{
-			client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
+			g_client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
 
-			if ( client->m_servers.Count() )
+			if ( g_client->m_servers.Count() )
 			{
-				client->Connect( client->m_servers[0].address );
+				g_client->Connect( g_client->m_servers[0].address );
 
-				client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
+				g_client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
 				break;
 			}
 
@@ -341,7 +336,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	sx::snd::Device::Destroy();
 
 #if NET_ACTIVATE
-	sx_delete_and_null( client );
+	sx_delete_and_null( g_client );
 	sx_net_finalize();
 #endif
 

@@ -344,7 +344,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	sx::sys::ScreenSaverSetDefault();
 
 	//  close handles
-	CloseHandle(mutex);
+	CloseHandle( mutex );
 
 #if NET_ACTIVATE
 	sx_delete_and_null( client );

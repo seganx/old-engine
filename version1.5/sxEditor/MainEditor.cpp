@@ -673,5 +673,22 @@ void Editor::SetLabelTips( const WCHAR* strTips, const float tipTime )
 {
 	g_strTips = strTips;
 	g_tipsTime = tipTime;
+
+	if ( !strTips || !g_client ) return;
+
+	char msg[512] = {0};
+
+	int i = 0;
+	wchar* c = (wchar*)strTips;
+	while ( *c && i<511 )
+	{
+		msg[i] = (char)(*c);
+		c++;
+		i++;
+	}
+	msg[i++]=0;
+
+ 	g_client->Send( msg, i, false );
+ 	g_client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
 }
 
