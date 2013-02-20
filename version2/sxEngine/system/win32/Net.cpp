@@ -146,9 +146,10 @@ SEGAN_INLINE void net_connection_flush_unreliablelist( Connection* con )
 				con->m_recAck++;
 
 				s_netInternal->msgPool.Push( pbuf );
+
+				con->m_unreliable.RemoveByIndex(i--);
 			}
 		}
-		con->m_unreliable.Clear();
 	}
 }
 
@@ -174,8 +175,10 @@ SEGAN_INLINE void net_connection_flush_sendinglist( Connection* con )
 				con->m_sent.RemoveByIndex( 0 );
 			}
 		}
-
-		s_netInternal->msgPool.Push( msg );
+		else 
+		{
+			s_netInternal->msgPool.Push( msg );
+		}
 	}
 }
 
@@ -755,7 +758,7 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 	case LISTENING:
 	case DISCONNECTED: res = false; break;
 	default:
-		if ( m_sending.Count() <= 10 )
+		if ( 1 || m_sending.Count() <= 10 )
 		{
 			NetMessage* msg;
 			uint newsize = 0;

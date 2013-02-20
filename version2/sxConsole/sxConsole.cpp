@@ -290,23 +290,24 @@ void MainLoop( float elpsTime )
 	}
 	else
 	{
-#if 1
-		static int msgId = 0;
-		for( int i=0; i<50; i++ )
-		{
-			msgId++;
-			str512 tmpStr;
-			tmpStr.Format( L"%d : this is a test message", msgId );
-			int len = 0;
-			char buf[256];
-			for ( ; len<tmpStr.Length(); len++ )
-				buf[len]=(char)tmpStr[len];
-			buf[len++]=0;
-
-			g_network->client.Send( buf, len+1, true );
-		}
-#endif
 		NetState state = g_network->client.m_connection.m_state;
+		if ( state == CONNECTED )
+		{
+			static int msgId = 0;
+			for( int i=0; i<5; i++ )
+			{
+				msgId++;
+				str512 tmpStr;
+				tmpStr.Format( L"%d : this is a test message", msgId );
+				int len = 0;
+				char buf[256];
+				for ( ; len<tmpStr.Length(); len++ )
+					buf[len]=(char)tmpStr[len];
+				buf[len++]=0;
+
+				g_network->client.Send( buf, len+1, true );
+			}
+		}
 		g_network->client.Update( elpsTime, NET_DELAY_TIME, NET_TIME_OUT );
 		if ( state != g_network->client.m_connection.m_state )
 			stateChanged = g_network->client.m_connection.m_state;
