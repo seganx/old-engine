@@ -4,6 +4,7 @@
 #include "../Log.h"
 #include "../Zip.h"
 
+#include <stdio.h>
 #include <winsock2.h>
 #pragma comment(lib,"ws2_32.lib")
 
@@ -156,7 +157,7 @@ SEGAN_INLINE void net_connection_flush_unreliablelist( Connection* con )
 SEGAN_INLINE void net_connection_flush_sendinglist( Connection* con )
 {
 	NetMessage* msg;
-	if( net_array_pop_front( con->m_sending, msg ) )
+	while( net_array_pop_front( con->m_sending, msg ) )
 	{
 		//	send to destination
 		msg->packet.header.ack = con->m_sntAck;
@@ -169,7 +170,7 @@ SEGAN_INLINE void net_connection_flush_sendinglist( Connection* con )
 			con->m_sent.PushBack( msg );
 
 			//	keep sent items limit
-			if ( con->m_sent.Count() == NET_MAX_QUEUE_BUFFER )
+			if ( con->m_sent.Count() == ( NET_MAX_QUEUE_BUFFER - 10 ) )
 			{
 				s_netInternal->msgPool.Push( con->m_sent[0] );
 				con->m_sent.RemoveByIndex( 0 );
@@ -633,6 +634,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 
 			case NPT_ACK:	//	search the sent list for requested ack
 				{
+					bool founded = false;
 					int n = m_sent.Count();
 					for ( int i=0; i<n; i++ )
 					{
@@ -640,10 +642,18 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						if ( msg->packet.header.ack == buffer->packet.header.ack )
 						{
 							m_socket->Send( m_destination, &msg->packet, msg->size );
+							founded = true;
 							break;
 						}
 					}
-					needAck = elpsTime;
+					needAck = ( m_sntAck - buffer->packet.header.ack ) / 2.0f;
+
+					char tmpstr[128] = {0};
+					if ( founded )
+						sprintf_s( tmpstr, "need ack %d / %d	:	funded ", buffer->packet.header.ack, m_sntAck );
+					else
+						sprintf_s( tmpstr, "need ack %d / %d	:	!!!!!! ", buffer->packet.header.ack, m_sntAck );
+					m_callBack( this, (byte*)tmpstr, 8 );
 
 					buffer->bytsRecved = 0;		// notify that buffer handled
 				}
@@ -677,15 +687,15 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					if ( m_recAck == buffer->packet.header.ack )
 					{
 						net_connection_flush_sendinglist( this );
-						needAck = 0;
+						//needAck = 0;
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
+						needAck = ( m_recAck - buffer->packet.header.ack ) / 2.0f;
+
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
 						m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
-
-						needAck = - elpsTime * 0.75f;
 					}
 
 					buffer->bytsRecved = 0;		// notify that buffer handled
@@ -705,10 +715,11 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 					}
 					else if ( m_recAck < buffer->packet.header.ack )
 					{
+						needAck = ( m_recAck - buffer->packet.header.ack ) / 2.0f;
+
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
 						m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
-						needAck = - elpsTime * 0.75f;
 
 						if ( ! net_connection_hold_unreliable( buffer, this ) )
 							return;
@@ -731,7 +742,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 		}
 
 		//	keep connection alive
-		m_sendTime += elpsTime + needAck;
+		m_sendTime += elpsTime + needAck > 0 ? needAck : 0;
 		if ( m_sendTime > delayTime )
 		{
 			m_sendTime = 0;
