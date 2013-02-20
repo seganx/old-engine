@@ -643,7 +643,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 							break;
 						}
 					}
-					needAck = elpsTime * 0.5f;
+					needAck = elpsTime;
 
 					buffer->bytsRecved = 0;		// notify that buffer handled
 				}
@@ -684,6 +684,8 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
 						m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
+
+						needAck = - elpsTime * 0.75f;
 					}
 
 					buffer->bytsRecved = 0;		// notify that buffer handled
@@ -706,6 +708,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 						//	request to send lost message
 						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
 						m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
+						needAck = - elpsTime * 0.75f;
 
 						if ( ! net_connection_hold_unreliable( buffer, this ) )
 							return;
@@ -753,7 +756,6 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 	case LISTENING:
 	case DISCONNECTED: res = false; break;
 	default:
-		if ( 1 || m_sending.Count() <= 10 )
 		{
 			NetMessage* msg;
 			uint newsize = 0;
@@ -790,6 +792,7 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 				m_sending.PushBack( msg );
 				res = true;
 			}
+
 		}
 	}
 

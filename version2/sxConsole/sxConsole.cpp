@@ -305,7 +305,7 @@ void MainLoop( float elpsTime )
 					buf[len]=(char)tmpStr[len];
 				buf[len++]=0;
 
-				g_network->client.Send( buf, len+1, true );
+				g_network->client.Send( buf, len+1, false );
 			}
 		}
 		g_network->client.Update( elpsTime, NET_DELAY_TIME, NET_TIME_OUT );
