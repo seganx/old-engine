@@ -287,7 +287,8 @@ SEGAN_INLINE void net_con_flush_unreliablelist( Connection* con )
 
 				s_netInternal->msgPool.Push( pbuf );
 
-				con->m_unreliable.RemoveByIndex(i--);
+				con->m_unreliable.RemoveByIndex(i);
+				i--;
 			}
 		}
 	}
@@ -397,7 +398,7 @@ SEGAN_INLINE bool net_con_connecting( Connection* con, NetMessage* netmsg )
 SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 {
 	byte msgType = netmsg->packet.header.type;
-	byte msgAck = netmsg->packet.header.ack;
+	uint msgAck = netmsg->packet.header.ack;
 
 	switch ( msgType )
 	{
