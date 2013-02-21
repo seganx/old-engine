@@ -11,6 +11,7 @@
 
 #define NET_MAX_UNRELIABLE_LIST			32		//	maximum number of unreliable messages in list
 #define NET_MAX_SENT_LIST				64		//	maximum number of messages stored in sent list
+#define NET_MAX_SENDING_LIST			3		//	maximum number of messages in sending list
 #define NET_MAX_NUM_BUFFER				512		//	number of connection buffer in the stack
 #define NET_MAX_PACKET_SIZE				1024	//	size of packet data
 #define NET_SERVER_FLAG_TIME			1200	//	time period that server notify all client to see the flag by sending broadcast message
@@ -797,11 +798,15 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 			uint newsize = 0;
 
 			//	verify that messages are in the queue
-			if ( m_sending.Count() )
+			const uint sndcount = m_sending.Count();
+			if ( sndcount )
 			{
-				msg = m_sending[ m_sending.Count() - 1 ];
+				if ( sndcount > NET_MAX_SENDING_LIST )
+					g_logger->Log( L"NET : warning : try to send too much data in the single pass !" );
 
-				//	merge only messages with same critical state
+				msg = m_sending[ sndcount - 1 ];
+
+				//	merge only messages with the same critical state
 				if ( msg->packet.header.crit == (byte)critical )
 				{
 					NetPacket packet( s_netInternal->id, NPT_USER, 0 );

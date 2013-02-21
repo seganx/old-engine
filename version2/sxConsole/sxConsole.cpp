@@ -275,7 +275,8 @@ void callback_client( Client* client, const byte* buffer, const uint size )
 	append_text_to_control( g_logText, tmpText );
 }
 
-
+static float msgtime = 0;
+static int msgId = 0;
 void MainLoop( float elpsTime )
 {
 	NetState stateChanged = STOPPED;
@@ -291,27 +292,21 @@ void MainLoop( float elpsTime )
 	else
 	{
 		NetState state = g_network->client.m_connection.m_state;
-		if ( state == CONNECTED )
+		if ( 0 && state == CONNECTED )
 		{
-			static float msgtime = 0;
-			static int msgId = 0;
 			msgtime += elpsTime;
-			if ( msgtime > 1 )
+			if ( msgtime > NET_DELAY_TIME )
 			{
 				msgtime = 0;
 
-				for( int i=0; i<50; i++ )
+				for( int i=0; i<10; i++ )
 				{
 					msgId++;
-					str512 tmpStr;
-					tmpStr.Format( L"%d : this is a test message", msgId );
-					int len = 0;
-					char buf[256];
-					for ( ; len<tmpStr.Length(); len++ )
-						buf[len]=(char)tmpStr[len];
-					buf[len++]=0;
-
-					g_network->client.Send( buf, len+1, true );
+					char buf[512];
+					for ( int c=0; c < 128; ++c )
+						buf[c] = (char)( ( (c+1) * msgId ) );
+					buf[127] = 0;
+					g_network->client.Send( buf, 128, true );
 				}
 			}
 		}
