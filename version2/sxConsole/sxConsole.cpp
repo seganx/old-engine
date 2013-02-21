@@ -296,7 +296,7 @@ void MainLoop( float elpsTime )
 			static float msgtime = 0;
 			static int msgId = 0;
 			msgtime += elpsTime;
-			if ( msgtime > 60 )
+			if ( msgtime > 10 )
 			{
 				msgtime = 0;
 

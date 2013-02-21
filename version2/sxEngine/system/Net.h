@@ -118,6 +118,9 @@ public:
 	CB_Connection						m_callBack;			//	will call when message received
 	void*								m_userData;			//	user data
 
+	//	additional
+	float								m_needAck;
+
 };
 
 
