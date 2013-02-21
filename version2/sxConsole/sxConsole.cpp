@@ -296,11 +296,11 @@ void MainLoop( float elpsTime )
 			static float msgtime = 0;
 			static int msgId = 0;
 			msgtime += elpsTime;
-			if ( msgtime > 10 )
+			if ( msgtime > 1 )
 			{
 				msgtime = 0;
 
-				for( int i=0; i<10; i++ )
+				for( int i=0; i<50; i++ )
 				{
 					msgId++;
 					str512 tmpStr;

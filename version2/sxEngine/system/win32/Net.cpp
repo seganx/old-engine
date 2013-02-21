@@ -9,10 +9,10 @@
 #pragma comment(lib,"ws2_32.lib")
 
 
+#define NET_MAX_UNRELIABLE_LIST			32		//	maximum number of unreliable messages in list
 #define NET_MAX_SENT_LIST				64		//	maximum number of messages stored in sent list
 #define NET_MAX_NUM_BUFFER				512		//	number of connection buffer in the stack
-#define NET_MAX_QUEUE_BUFFER			512		//	maximum number of buffer in the queue
-#define NET_PACKET_SIZE					512		//	size of connection buffer
+#define NET_MAX_PACKET_SIZE				1024	//	size of packet data
 #define NET_SERVER_FLAG_TIME			1200	//	time period that server notify all client to see the flag by sending broadcast message
 
 
@@ -46,7 +46,7 @@ struct NetPacketHeader
 struct NetPacket
 {
 	NetPacketHeader	header;						//	header of message
-	byte			data[NET_PACKET_SIZE];		//	message data
+	byte			data[NET_MAX_PACKET_SIZE];		//	message data
 
 	NetPacket( const word id, const byte type, const uint ack ): header(id, type, ack){}
 	NetPacket( void ){}
@@ -126,7 +126,7 @@ SEGAN_INLINE void callback_connection_client( Connection* connection, const byte
 //	merge a packet into data and return new size of data. return 0 if the packets can't be merged
 SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, const NetPacket* packet, const uint packetsize )
 {
-	if ( currsize + packetsize >= NET_PACKET_SIZE ) return 0;
+	if ( currsize + packetsize >= NET_MAX_PACKET_SIZE ) return 0;
 
 	sx_callstack();
 	uint res = 0;
@@ -148,7 +148,7 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 
 		//	compress data to pack
 		data.SetPos(0);
-		res = zlib_compress( currpacket->data, NET_PACKET_SIZE, data, data.Size(), 9 );
+		res = zlib_compress( currpacket->data, NET_MAX_PACKET_SIZE, data, data.Size(), 9 );
 		if ( res )
 		{
 			res += sizeof(NetPacketHeader);
@@ -179,7 +179,7 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 
 			//	compress data to pack
 			data.SetPos(0);
-			res = zlib_compress( currpacket->data, NET_PACKET_SIZE, data, data.Size() );
+			res = zlib_compress( currpacket->data, NET_MAX_PACKET_SIZE, data, data.Size() );
 			if ( res )
 			{
 				res += sizeof(NetPacketHeader);
@@ -296,32 +296,29 @@ SEGAN_INLINE void net_con_flush_unreliablelist( Connection* con )
 
 SEGAN_INLINE void net_con_flush_sendinglist( Connection* con )
 {
-	for ( int i=0; i<2; i++ )
+	NetMessage* msg;
+	while ( net_array_pop_front( con->m_sending, msg ) )
 	{
-		NetMessage* msg;
-		if( net_array_pop_front( con->m_sending, msg ) )
+		//	send to destination
+		msg->packet.header.ack = con->m_sntAck;
+		con->m_socket->Send( con->m_destination, &msg->packet, msg->size );
+
+		//	push the message to the sent items
+		if ( msg->packet.header.crit )
 		{
-			//	send to destination
-			msg->packet.header.ack = con->m_sntAck;
-			con->m_socket->Send( con->m_destination, &msg->packet, msg->size );
+			con->m_sntAck++;
+			con->m_sent.PushBack( msg );
 
-			//	push the message to the sent items
-			if ( msg->packet.header.crit )
+			//	keep sent items limit
+			if ( con->m_sent.Count() == NET_MAX_SENT_LIST )
 			{
-				con->m_sntAck++;
-				con->m_sent.PushBack( msg );
-
-				//	keep sent items limit
-				if ( con->m_sent.Count() == ( NET_MAX_QUEUE_BUFFER / 2 ) )
-				{
-					s_netInternal->msgPool.Push( con->m_sent[0] );
-					con->m_sent.RemoveByIndex( 0 );
-				}
+				s_netInternal->msgPool.Push( con->m_sent[0] );
+				con->m_sent.RemoveByIndex( 0 );
 			}
-			else 
-			{
-				s_netInternal->msgPool.Push( msg );
-			}
+		}
+		else 
+		{
+			s_netInternal->msgPool.Push( msg );
 		}
 	}
 }
@@ -329,7 +326,7 @@ SEGAN_INLINE void net_con_flush_sendinglist( Connection* con )
 SEGAN_INLINE bool net_con_hold_unreliable( NetMessage* buffer, Connection* con )
 {
 	//  verify that if message queue is going too long may be a message is lost
-	bool res = ( con->m_unreliable.Count() < NET_MAX_QUEUE_BUFFER );
+	bool res = ( con->m_unreliable.Count() < NET_MAX_UNRELIABLE_LIST );
 
 	if ( res )
 	{
@@ -399,6 +396,7 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 {
 	byte msgType = netmsg->packet.header.type;
 	uint msgAck = netmsg->packet.header.ack;
+	uint rcvAck = con->m_recAck;
 
 	switch ( msgType )
 	{
@@ -424,7 +422,7 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 			con->m_callBack( con, netmsg->packet.data, netmsg->size );
 		}
 		//	check the message ack
-		else if ( con->m_recAck == msgAck )
+		else if ( rcvAck == msgAck )
 		{
 			//	user callback function
 			con->m_callBack( con, netmsg->packet.data, netmsg->size );
@@ -441,7 +439,7 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 		{
 			net_unmerge_packet( netmsg->packet.data, netmsg->size, con );
 		}
-		else if ( con->m_recAck == msgAck )
+		else if ( rcvAck  == msgAck )
 		{
 			net_unmerge_packet( netmsg->packet.data, netmsg->size, con );
 			con->m_recAck++;
@@ -453,7 +451,7 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 
 	case NPT_ALIVE:
 		//	check the message ack
-		if ( con->m_recAck == msgAck )
+		if ( rcvAck == msgAck )
 		{
 			net_con_flush_sendinglist( con );
 		}
@@ -461,12 +459,12 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 	}	//	switch ( buffer->packet.header.type )
 
 	//	if ack for received message is greater that current ack so we have lost a message
-	if ( con->m_recAck < msgAck )
+	if ( rcvAck < msgAck )
 	{
-		con->m_needAck = ( (float)con->m_recAck - (float)msgAck ) * 6.0f;
+		con->m_needAck = ( (float)rcvAck - (float)msgAck ) * 6.0f;
 
 		//	request to send lost message
-		NetPacketHeader packet( s_netInternal->id, NPT_ACK, con->m_recAck );
+		NetPacketHeader packet( s_netInternal->id, NPT_ACK, rcvAck );
 		con->m_socket->Send( con->m_destination, &packet, sizeof(NetPacketHeader) );
 
 		//	queue the received message to flush after the lost message founded;
@@ -784,7 +782,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* netmsg, const float elp
 SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, const bool critical /*= true */ )
 {
 	sx_callstack();
-	sx_assert( buffer && sizeinbyte>0 && sizeinbyte<=NET_PACKET_SIZE );
+	sx_assert( buffer && sizeinbyte>0 && sizeinbyte<=NET_MAX_PACKET_SIZE );
 
 	bool res = false;
 	
@@ -969,7 +967,7 @@ void Server::Update( const float elpsTime, const float delayTime, const float ti
 	case RUNNING:
 		{
 			NetMessage buffer;
-			buffer.size = m_socket.Receive( &buffer, NET_PACKET_SIZE, &buffer.address );
+			buffer.size = m_socket.Receive( &buffer, NET_MAX_PACKET_SIZE, &buffer.address );
 
 			for ( int i=0; i<m_clients.Count(); i++ )
 			{
@@ -1007,7 +1005,7 @@ bool Server::Send( const char* buffer, const int sizeinbyte, const bool critical
 {
 	sx_assert( buffer );
 	sx_assert( sizeinbyte > 0 );
-	sx_assert( sizeinbyte <= NET_PACKET_SIZE );
+	sx_assert( sizeinbyte <= NET_MAX_PACKET_SIZE );
 
 	bool res = true;
 	if ( m_state != STOPPED )
@@ -1086,7 +1084,7 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 	case LISTENING:
 
 		//	listen to the port to find any server
-		buffer.size = m_socket.Receive( (char*)&buffer, NET_PACKET_SIZE, &buffer.address );
+		buffer.size = m_socket.Receive( (char*)&buffer, NET_MAX_PACKET_SIZE, &buffer.address );
 
 		if ( buffer.size && buffer.packet.header.id == s_netInternal->id && ( buffer.packet.header.type == NPT_SERVER_OPEN || buffer.packet.header.type == NPT_SERVER_CLOSED ) ) 
 		{
@@ -1144,7 +1142,7 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 
 	default:
 		{
-			buffer.size = m_socket.Receive( (char*)&buffer, NET_PACKET_SIZE, &buffer.address );
+			buffer.size = m_socket.Receive( (char*)&buffer, NET_MAX_PACKET_SIZE, &buffer.address );
 			m_connection.Update( &buffer, elpsTime, delayTime, timeOut );
 		}
 		break;
