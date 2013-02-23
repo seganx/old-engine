@@ -19,7 +19,7 @@
 #define MEMO_MAX_LENGTH		10000
 
 #define NET_DELAY_TIME		60
-#define NET_TIME_OUT		60000
+#define NET_TIME_OUT		15000
 
 ConsoleNetwork s_consoleNetworkLocal;
 extern ConsoleNetwork * g_network = &s_consoleNetworkLocal;
