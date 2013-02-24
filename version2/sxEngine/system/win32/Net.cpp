@@ -777,7 +777,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* netmsg, const float elp
 
 		//	keep connection synchronize
 		m_sendTime += elpsTime;// + m_needAck;
-		if ( m_sendTime < 0 ) m_sendTime = 0;
+		//if ( m_sendTime < 0 ) m_sendTime = 0;
 		if ( m_sendTime > delayTime )
 		{
 			m_sendTime = 0;
@@ -1178,29 +1178,29 @@ SEGAN_INLINE float Client::GetMaxUpdateTime( void )
 	sint n = m_connection.m_sending.Count();
 	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
 	float p = float(s) + 1;
-//	float r = ( m_connection.m_needAck + p * p ) * 100.0f;
 	float r = ( p * p ) * 100.0f;
 	float d = r - res;
-	res += d > 0 ? d * 0.002f : d * 0.0015f;
+	res += d > 0 ? d * 0.004f : d * 0.003f;
 	return res;
 }
 
 SEGAN_INLINE bool Client::CanSend( const float elpsTime )
 {
-	static float res = 0;
+	static float maxTime = 0;
+
 	sint n = m_connection.m_sending.Count();
 	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
 	float p = float(s) + 1;
-	//float r = ( m_connection.m_needAck + p * p ) * 100.0f;
 	float r = ( p * p ) * 100.0f;
-	float d = r - res;
-	res += d > 0 ? d * 0.002f : d * 0.0015f;
+	float d = r - maxTime;
+	maxTime += d > 0 ? d * 0.004f : d * 0.003f;
 
-	static float t = 0;
-	t += elpsTime;
-	if ( t > res )
+	static float utime = 0;
+
+	utime += elpsTime;
+	if ( utime > maxTime )
 	{
-		t = 0;
+		utime = 0;
 		return true;
 	}
 	else

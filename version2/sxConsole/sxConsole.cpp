@@ -296,16 +296,15 @@ void MainLoop( float elpsTime )
 		if ( 1 && state == CONNECTED )
 		{
 			float pressure = g_network->client.GetMaxUpdateTime();
-			str64 title; title.Format( L"pressure : %.2f", pressure );
+			str64 title; title.Format( L"max send time : %.2f", pressure );
 			winMain->SetTitle( title );
 
 			msgtime += elpsTime;
-			//if ( msgtime > pressure )
 			if ( g_network->client.CanSend( elpsTime ) )
 			{
 				msgtime = 0;
 
-				for( int i=0; i<20; i++ )
+				for( int i=0; i<10; i++ )
 				{
 					msgId++;
 					char buf[512];
