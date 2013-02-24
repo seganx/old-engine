@@ -16,7 +16,7 @@
 #define ID_LOG_TEXT			105
 #define ID_TEXT				106
 
-#define MEMO_MAX_LENGTH		50000
+#define MEMO_MAX_LENGTH		10000
 
 #define NET_DELAY_TIME		60
 #define NET_TIME_OUT		15000

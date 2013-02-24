@@ -283,11 +283,13 @@ SEGAN_INLINE void net_con_flush_unreliablelist( Connection* con )
 			NetMessage* pbuf = con->m_unreliable[i];
 			if ( con->m_recAck == pbuf->packet.header.ack )
 			{
-				con->m_callBack( con, pbuf->packet.data, pbuf->size );
+				if ( pbuf->packet.header.type == NPT_ZIP )
+					net_unmerge_packet( pbuf->packet.data, pbuf->size, con );
+				else
+					con->m_callBack( con, pbuf->packet.data, pbuf->size );
 				con->m_recAck++;
 
 				s_netInternal->msgPool.Push( pbuf );
-
 				con->m_unreliable.RemoveByIndex(i);
 				i--;
 			}
@@ -455,11 +457,12 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 		if ( rcvAck == msgAck )
 		{
 			net_con_flush_sendinglist( con );
+			con->m_needAck = 0;
 		}
 		break;
 	}	//	switch ( buffer->packet.header.type )
 
-	//	if ack for received message is greater that current ack so we have lost a message
+	//	if ack for received message is greater that current ack so we have message lost
 	if ( rcvAck < msgAck )
 	{
 		con->m_needAck = ( (float)rcvAck - (float)msgAck ) * 6.0f;
@@ -768,7 +771,8 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* netmsg, const float elp
 		}
 
 		//	keep connection alive
-		m_sendTime += elpsTime + ( m_sendTime > 0 ? m_needAck : 0 );
+		m_sendTime += elpsTime + m_needAck;
+		if ( m_sendTime < 0 ) m_sendTime = 0;
 		if ( m_sendTime > delayTime )
 		{
 			m_sendTime = 0;
