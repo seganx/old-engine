@@ -398,7 +398,7 @@ SEGAN_INLINE bool net_con_connecting( Connection* con, NetMessage* netmsg )
 SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 {
 	byte msgType = netmsg->packet.header.type;
-	uint msgAck = netmsg->packet.header.ack;
+	uint msgRcAck = netmsg->packet.header.ack;
 	uint rcvAck = con->m_recAck;
 
 	switch ( msgType )
@@ -415,7 +415,7 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 			con->Disconnect();
 			return false;
 		}
-		con->m_needAck = ( (float)con->m_sntAck - (float)msgAck ) / 2.0f;
+		con->m_needAck = ( (float)con->m_sntAck - (float)msgRcAck ) / 2.0f;
 		return true;
 
 	case NPT_USER:
@@ -425,7 +425,7 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 			con->m_callBack( con, netmsg->packet.data, netmsg->size );
 		}
 		//	check the message ack
-		else if ( rcvAck == msgAck )
+		else if ( rcvAck == msgRcAck )
 		{
 			//	user callback function
 			con->m_callBack( con, netmsg->packet.data, netmsg->size );
@@ -442,7 +442,7 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 		{
 			net_unmerge_packet( netmsg->packet.data, netmsg->size, con );
 		}
-		else if ( rcvAck  == msgAck )
+		else if ( rcvAck  == msgRcAck )
 		{
 			net_unmerge_packet( netmsg->packet.data, netmsg->size, con );
 			con->m_recAck++;
@@ -453,19 +453,24 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 		break;
 
 	case NPT_SYNC:
-		//	check the message ack
-		if ( rcvAck == msgAck )
 		{
-			net_con_flush_sendinglist( con );
-			con->m_needAck = 0;
+			uint msgSnAck = *( (u32*)netmsg->packet.data );
+			uint sntAck = con->m_sntAck;
+
+			//	check the message ack
+			if ( rcvAck == msgRcAck && sntAck == msgSnAck )
+			{
+				net_con_flush_sendinglist( con );
+				con->m_needAck = 0;
+			}
 		}
 		break;
 	}	//	switch ( buffer->packet.header.type )
 
 	//	if ack for received message is greater that current ack so we have message lost
-	if ( rcvAck < msgAck )
+	if ( rcvAck < msgRcAck )
 	{
-		con->m_needAck = ( (float)rcvAck - (float)msgAck ) * 6.0f;
+		con->m_needAck = ( (float)rcvAck - (float)msgRcAck ) * 6.0f;
 
 		//	request to send lost message
 		NetPacketHeader packet( s_netInternal->id, NPT_ACK, rcvAck );
@@ -776,8 +781,12 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* netmsg, const float elp
 		if ( m_sendTime > delayTime )
 		{
 			m_sendTime = 0;
-			NetPacketHeader packet( s_netInternal->id, NPT_SYNC, m_sntAck );
-			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
+
+			NetPacket packet( s_netInternal->id, NPT_SYNC, m_sntAck );
+			u32* rcAck = (u32*)packet.data;
+			*rcAck = m_recAck;
+
+			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) + sizeof(u32) );
 		}
 
 		break;
