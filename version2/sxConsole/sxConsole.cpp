@@ -16,7 +16,7 @@
 #define ID_LOG_TEXT			105
 #define ID_TEXT				106
 
-#define MEMO_MAX_LENGTH		10000
+#define MEMO_MAX_LENGTH		50000
 
 #define NET_DELAY_TIME		60
 #define NET_TIME_OUT		15000
@@ -292,10 +292,11 @@ void MainLoop( float elpsTime )
 	else
 	{
 		NetState state = g_network->client.m_connection.m_state;
-		if ( 0 && state == CONNECTED )
+		if ( 1 && state == CONNECTED )
 		{
+			uint pressure = g_network->client.GetPressure();
 			msgtime += elpsTime;
-			if ( msgtime > NET_DELAY_TIME )
+			if ( msgtime > ( NET_DELAY_TIME + pressure * 100 ) )
 			{
 				msgtime = 0;
 

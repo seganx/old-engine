@@ -413,7 +413,7 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 			con->Disconnect();
 			return false;
 		}
-		con->m_needAck = ( (float)con->m_sntAck - (float)msgAck ) / 2.0f;
+//		con->m_needAck = ( (float)con->m_sntAck - (float)msgAck ) / 2.0f;
 		return true;
 
 	case NPT_USER:
@@ -462,7 +462,7 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 	//	if ack for received message is greater that current ack so we have lost a message
 	if ( rcvAck < msgAck )
 	{
-		con->m_needAck = ( (float)rcvAck - (float)msgAck ) * 6.0f;
+//		con->m_needAck = ( (float)rcvAck - (float)msgAck ) * 6.0f;
 
 		//	request to send lost message
 		NetPacketHeader packet( s_netInternal->id, NPT_ACK, rcvAck );
@@ -616,7 +616,7 @@ Connection::Connection( void )
 , m_sent(32)
 , m_callBack(0)
 , m_userData(0)
-, m_needAck(0)
+//, m_needAck(0)
 {
 	ZeroMemory( &m_destination, sizeof(m_destination) );
 }
@@ -754,9 +754,9 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* netmsg, const float elp
 		if ( netmsg->size && netmsg->packet.header.id == s_netInternal->id && net_check_address( &m_destination, &netmsg->address ) )
 		{
 			m_timeout = 0;
-			bool goout = !net_con_connected( this, netmsg );
+			bool isOK = net_con_connected( this, netmsg );
 			netmsg->size = 0;	//  avoid process netmsg by other connections
-			if ( goout ) return;
+			if ( !isOK ) return;
 		}
 		else
 		{
@@ -768,7 +768,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* netmsg, const float elp
 		}
 
 		//	keep connection alive
-		m_sendTime += elpsTime + ( m_sendTime > 0 ? m_needAck : 0 );
+		m_sendTime += elpsTime;// + ( m_sendTime > 0 ? m_needAck : 0 );
 		if ( m_sendTime > delayTime )
 		{
 			m_sendTime = 0;
@@ -801,8 +801,8 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 			const uint sndcount = m_sending.Count();
 			if ( sndcount )
 			{
-				if ( sndcount > NET_MAX_SENDING_LIST )
-					g_logger->Log( L"NET : warning : try to send too much data in the single pass !" );
+				if ( sndcount > NET_MAX_SENDING_LIST + 1 )
+					g_logger->Log( L"NET : warning : try to send too much data in the single pass ! : %d", sndcount );
 
 				msg = m_sending[ sndcount - 1 ];
 
@@ -1154,9 +1154,15 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 	}
 }
 
-bool Client::Send( const char* buffer, const int sizeinbyte, const bool critical /*= false */ )
+SEGAN_INLINE bool Client::Send( const char* buffer, const int sizeinbyte, const bool critical /*= false */ )
 {
 	return m_connection.Send( buffer, sizeinbyte, critical );
+}
+
+SEGAN_INLINE uint Client::GetPressure( void )
+{
+	int n = m_connection.m_sending.Count();
+	return ( n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : 0 );
 }
 
 

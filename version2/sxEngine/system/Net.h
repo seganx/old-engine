@@ -119,7 +119,7 @@ public:
 	void*								m_userData;			//	user data
 
 	//	additional
-	float								m_needAck;
+	//float								m_needAck;
 
 };
 
@@ -192,6 +192,9 @@ public:
 
 	//! send a message to the connected server
 	bool Send( const char* buffer, const int sizeinbyte, const bool critical = false );
+
+	//! return the number of packets in the sending queue
+	uint GetPressure( void );
 
 public:
 

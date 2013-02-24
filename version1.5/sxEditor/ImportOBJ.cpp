@@ -156,7 +156,7 @@ const WCHAR* MakeName(const WCHAR* baseName, const WCHAR* name)
 void objMesh_to_geometry(objMesh* om, sx::d3d::PGeometry3D gm)
 {
 	//  OBJ mesh containers
-	Map<UINT, UINT>	vertexCache;
+	Map<UINT, UINT>		vertexCache;
 	Array<objVertex>	vertices;
 	Array<D3DFace>		faces;
 
@@ -543,13 +543,13 @@ void ImportOBJFile( const WCHAR* FileName, OUT sx::core::ArrayPNode& nodeList, I
 				ZeroMemory(&F, sizeof(objFace));
 				for (int i=0; i<4; i++)
 				{
-					F.v[i] = toker.Next().ToInt() - 1;
+					F.v[i] = abs( toker.Next().ToInt() - 1 );
 					tmp = toker.LookatNext();	if ( tmp != '/' ) continue;
 					tmp = toker.Next();
-					F.t[i] = toker.Next().ToInt() - 1;
+					F.t[i] = abs( toker.Next().ToInt() - 1 );
 					tmp = toker.LookatNext();	if ( tmp != '/' ) continue;
 					tmp = toker.Next();
-					F.n[i] = toker.Next().ToInt() - 1;
+					F.n[i] = abs( toker.Next().ToInt() - 1 );
 				}
 
 				//  prepare face as triangle
