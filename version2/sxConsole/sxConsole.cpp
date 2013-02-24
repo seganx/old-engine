@@ -296,7 +296,7 @@ void MainLoop( float elpsTime )
 		{
 			uint pressure = g_network->client.GetPressure();
 			msgtime += elpsTime;
-			if ( msgtime > ( NET_DELAY_TIME + pressure * 100 ) )
+			if ( msgtime > ( NET_DELAY_TIME + pressure * 200 ) )
 			{
 				msgtime = 0;
 
