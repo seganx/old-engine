@@ -21,6 +21,7 @@
 #define NET_DELAY_TIME		60
 #define NET_TIME_OUT		15000
 
+Window* winMain = NULL;
 ConsoleNetwork s_consoleNetworkLocal;
 extern ConsoleNetwork * g_network = &s_consoleNetworkLocal;
 
@@ -294,14 +295,17 @@ void MainLoop( float elpsTime )
 		NetState state = g_network->client.m_connection.m_state;
 		if ( 1 && state == CONNECTED )
 		{
-			float pressure = g_network->client.GetPressure();
-			msgtime += elpsTime - pressure * 0.2f;
-//			if ( msgtime < 0 ) msgtime = 0;
-			if ( msgtime > ( NET_DELAY_TIME + pressure * 100.0f ) )
+			float pressure = g_network->client.GetMaxUpdateTime();
+			str64 title; title.Format( L"pressure : %.2f", pressure );
+			winMain->SetTitle( title );
+
+			msgtime += elpsTime;
+			//if ( msgtime > pressure )
+			if ( g_network->client.CanSend( elpsTime ) )
 			{
 				msgtime = 0;
 
-				for( int i=0; i<10; i++ )
+				for( int i=0; i<20; i++ )
 				{
 					msgId++;
 					char buf[512];
@@ -495,7 +499,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	//////////////////////////////////////////////////////////////////////////
 
 	MonitorInfo* monInfo = sx_os_get_desktop();
-	Window* winMain = sx_app_create_window( consoleName, WBT_ORDINARY_RESIZABLE, false );
+	winMain = sx_app_create_window( consoleName, WBT_ORDINARY_RESIZABLE, false );
 	winMain->SetRect( monInfo->workingWidth - 400, monInfo->workingHeight - 500, 350, 400 );
 	winMain->SetVisible( true );
 

@@ -814,7 +814,7 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 			const uint sndcount = m_sending.Count();
 			if ( sndcount )
 			{
-				if ( sndcount > NET_MAX_SENDING_LIST + 1 )
+				if ( sndcount > NET_MAX_SENDING_LIST + 5 )
 					g_logger->Log( L"NET : warning : try to send too much data in the single pass ! : %d", sndcount );
 
 				msg = m_sending[ sndcount - 1 ];
@@ -1172,12 +1172,37 @@ SEGAN_INLINE bool Client::Send( const char* buffer, const int sizeinbyte, const 
 	return m_connection.Send( buffer, sizeinbyte, critical );
 }
 
-SEGAN_INLINE float Client::GetPressure( void )
+SEGAN_INLINE float Client::GetMaxUpdateTime( void )
 {
+	static float res = 0;
 	sint n = m_connection.m_sending.Count();
-	sint p = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : 0;
-	float a = m_connection.m_needAck;
-	return ( p + a );
+	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
+	float p = float(s) + 1;
+	float r = ( m_connection.m_needAck + p * p ) * 100.0f;
+	float d = r - res;
+	res += d > 0 ? d * 0.002f : d * 0.0015f;
+	return res;
+}
+
+SEGAN_INLINE bool Client::CanSend( const float elpsTime )
+{
+	static float res = 0;
+	sint n = m_connection.m_sending.Count();
+	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
+	float p = float(s) + 1;
+	float r = ( m_connection.m_needAck + p * p ) * 100.0f;
+	float d = r - res;
+	res += d > 0 ? d * 0.002f : d * 0.0015f;
+
+	static float t = 0;
+	t += elpsTime;
+	if ( t > res )
+	{
+		t = 0;
+		return true;
+	}
+	else
+		return false;
 }
 
 
