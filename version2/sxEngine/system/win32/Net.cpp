@@ -754,7 +754,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* netmsg, const float elp
 		if ( netmsg->size && netmsg->packet.header.id == s_netInternal->id && net_check_address( &m_destination, &netmsg->address ) )
 		{
 			m_timeout = 0;
-			bool goout = net_con_connected( this, netmsg );
+			bool goout = !net_con_connected( this, netmsg );
 			netmsg->size = 0;	//  avoid process netmsg by other connections
 			if ( goout ) return;
 		}
