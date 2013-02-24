@@ -23,7 +23,7 @@ enum NetPacketType
 	NPT_CONNECT				= 1,		//	a connection message
 	NPT_WELCOME,						//	welcome message
 	NPT_DISCONNECT,						//	disconnect message
-	NPT_ALIVE,							//	keep connection alive
+	NPT_SYNC,							//	keep connection synchronize
 	NPT_ACK,							//	request lost ack
 	NPT_USER,							//	contain user data
 	NPT_ZIP,							//	contain array compressed packet
@@ -300,7 +300,7 @@ SEGAN_INLINE void net_con_flush_unreliablelist( Connection* con )
 SEGAN_INLINE void net_con_flush_sendinglist( Connection* con )
 {
 	NetMessage* msg;
-	while ( net_array_pop_front( con->m_sending, msg ) )
+	for( int z = 0; z < NET_MAX_SENDING_LIST && net_array_pop_front( con->m_sending, msg ); ++z )
 	{
 		//	send to destination
 		msg->packet.header.ack = con->m_sntAck;
@@ -452,7 +452,7 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 		}
 		break;
 
-	case NPT_ALIVE:
+	case NPT_SYNC:
 		//	check the message ack
 		if ( rcvAck == msgAck )
 		{
@@ -770,13 +770,13 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* netmsg, const float elp
 			}
 		}
 
-		//	keep connection alive
+		//	keep connection synchronize
 		m_sendTime += elpsTime + m_needAck;
 		if ( m_sendTime < 0 ) m_sendTime = 0;
 		if ( m_sendTime > delayTime )
 		{
 			m_sendTime = 0;
-			NetPacketHeader packet( s_netInternal->id, NPT_ALIVE, m_sntAck );
+			NetPacketHeader packet( s_netInternal->id, NPT_SYNC, m_sntAck );
 			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
 		}
 
@@ -1163,10 +1163,12 @@ SEGAN_INLINE bool Client::Send( const char* buffer, const int sizeinbyte, const 
 	return m_connection.Send( buffer, sizeinbyte, critical );
 }
 
-SEGAN_INLINE uint Client::GetPressure( void )
+SEGAN_INLINE float Client::GetPressure( void )
 {
-	int n = m_connection.m_sending.Count();
-	return ( n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : 0 );
+	sint n = m_connection.m_sending.Count();
+	sint p = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : 0;
+	float a = m_connection.m_needAck;
+	return ( p + a );
 }
 
 

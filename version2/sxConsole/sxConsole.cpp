@@ -294,9 +294,10 @@ void MainLoop( float elpsTime )
 		NetState state = g_network->client.m_connection.m_state;
 		if ( 1 && state == CONNECTED )
 		{
-			uint pressure = g_network->client.GetPressure();
-			msgtime += elpsTime;
-			if ( msgtime > ( NET_DELAY_TIME + pressure * 200 ) )
+			float pressure = g_network->client.GetPressure();
+			msgtime += elpsTime - pressure * 0.2f;
+//			if ( msgtime < 0 ) msgtime = 0;
+			if ( msgtime > ( NET_DELAY_TIME + pressure * 100.0f ) )
 			{
 				msgtime = 0;
 

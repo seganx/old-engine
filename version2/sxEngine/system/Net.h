@@ -191,7 +191,7 @@ public:
 	bool Send( const char* buffer, const int sizeinbyte, const bool critical = false );
 
 	//! return the number of packets in the sending queue
-	uint GetPressure( void );
+	float GetPressure( void );
 
 public:
 
