@@ -261,7 +261,7 @@ void callback_server( Server* server, Connection* client, const byte* buffer, co
 
 	for ( int i=0; i<1023; i++ )
 	{
-		if ( i < 5 )
+		if ( 0 && i < 5 )
 		{
 			bool isAlphabet = ( 'a' <= buffer[i] && buffer[i] <= 'z' ) || ( 'A' <= buffer[i] && buffer[i] <= 'Z' ) ;
 			bool isDigit = isdigit( buffer[i] ) != 0;
@@ -282,7 +282,7 @@ void callback_client( Client* client, const byte* buffer, const uint size )
 
 	for ( int i=0; i<1023; i++ )
 	{
-		if ( i < 5 )
+		if ( 0 && i < 5 )
 		{
 			bool isAlphabet = ( 'a' <= buffer[i] && buffer[i] <= 'z' ) || ( 'A' <= buffer[i] && buffer[i] <= 'Z' ) ;
 			bool isDigit = isdigit( buffer[i] ) != 0 ;
