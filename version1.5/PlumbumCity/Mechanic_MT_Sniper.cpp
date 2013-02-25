@@ -23,10 +23,10 @@ namespace GM
 		, m_rotOffset(0,0,0)
 		, m_rotMax(0.5f, 1.0f, 0)
 		, m_fire(0)
-		, m_magazineCap(0)
 		, m_bullets(0)
-		, m_reloadTime(0)
+		, m_firedCount(0)
 		, m_selected(false)
+		, m_lblBullet(null)
 	{
 		sx_callstack();
 	}
@@ -40,11 +40,23 @@ namespace GM
 	void Mechanic_MT_Sniper::Initialize( void )
 	{
 		sx_callstack();
+
+		m_lblBullet = sx_new( sx::gui::Label );
+		m_lblBullet->SetSize( float2(70, 25) );
+		m_lblBullet->Position().Set( -450.0f, 240.0f, 0.0f );
+		m_lblBullet->GetElement(0)->Color().a = 0.0f;
+		m_lblBullet->GetElement(1)->Color().a = 0.85f;
+		m_lblBullet->SetFont( L"Font_rob_twedit_info.fnt" );
+
+		g_game->m_gui->Add_Back( m_lblBullet );
 	}
 
 	void Mechanic_MT_Sniper::Finalize( void )
 	{
 		sx_callstack();
+
+		g_game->m_gui->Remove( m_lblBullet );
+		sx_delete_and_null( m_lblBullet );
 	}
 
 	void Mechanic_MT_Sniper::ProcessInput( bool& inputHandled, float elpsTime )
@@ -108,7 +120,7 @@ namespace GM
 			//	just check the number of bullets and player does fire
 			if ( SEGAN_KEYDOWN(0, SX_INPUT_KEY_MOUSE_LEFT) )
 			{
-				if ( !m_fire )
+				if ( (!m_fire) && (m_firedCount < m_bullets) )
 				{
 					m_fire = 1;
 				}
@@ -161,7 +173,7 @@ namespace GM
 			const float dy = m_rotOffset.y - m_rot.y;
 			const float dz = m_rotOffset.z - m_rot.z;
 
-			float blendTime = elpsTime * 0.005f;
+			const float blendTime = elpsTime * 0.005f;
 			m_rot.y += dy * blendTime;
 			m_rot.x += dx * blendTime;
 			m_rot.z += dz * blendTime;
@@ -170,9 +182,9 @@ namespace GM
 
 		//  compute max shoot time depend on fire rate
 		const float	maxShootTime = (m_attack.rate > 0.01f) ? (1000.0f / m_attack.rate) : 500.0f;
-		if (  m_fire &&  m_shootTime > maxShootTime )
+		if ( m_fire && (m_shootTime > maxShootTime) && (m_firedCount < m_bullets) )
 		{
-			m_shootTime = 0;
+			m_shootTime = 0.0f;
 
 			//  rotate and show the pipe
 			msg_Mesh msgMesh( 0, SX_MESH_INVISIBLE );
@@ -249,6 +261,8 @@ namespace GM
 							script.GetFloat(i, L"fireRate", m_attack.rate);
 							script.GetFloat(i, L"maxPhi", m_rotMax.y);
 							script.GetFloat(i, L"maxTheta", m_rotMax.x);
+							script.GetInteger(i, L"bulletsCount", m_bullets);
+
 							if ( script.GetString(i, L"bullet", tmpStr) )
 							{
 								String::Copy( m_attack.bullet, 64, tmpStr );
@@ -276,26 +290,32 @@ namespace GM
 		case GMT_GAME_END:
 		case GMT_GAME_RESETING:
 		case GMT_GAME_RESET:
-			if ( m_node )
 			{
-				m_node->GetChildByName(L"weapon", m_nodeWeapon);
-				m_node->GetChildByName(L"pipe0", m_nodePipe);
-
-				//  stop particle spray
-				msg_Particle msgPrtcl(0, SX_PARTICLE_SPRAY, 0, true );
-				m_node->MsgProc( MT_PARTICLE, &msgPrtcl );
-			}
-
-			//  invisible meshes of fire and stop particles
-			if ( m_nodeWeapon )
-			{
-				m_nodeWeapon->SetRotation(0,0,0);
-				if ( m_nodePipe )
+				if ( m_node )
 				{
-					msg_Mesh msgMesh( SX_MESH_INVISIBLE );
-					m_nodePipe->MsgProc( MT_MESH, &msgMesh );
+					m_node->GetChildByName(L"weapon", m_nodeWeapon);
+					m_node->GetChildByName(L"pipe0", m_nodePipe);
+
+					//  stop particle spray
+					msg_Particle msgPrtcl(0, SX_PARTICLE_SPRAY, 0, true );
+					m_node->MsgProc( MT_PARTICLE, &msgPrtcl );
 				}
+
+				//  invisible meshes of fire and stop particles
+				if ( m_nodeWeapon )
+				{
+					m_nodeWeapon->SetRotation(0,0,0);
+					if ( m_nodePipe )
+					{
+						msg_Mesh msgMesh( SX_MESH_INVISIBLE );
+						m_nodePipe->MsgProc( MT_MESH, &msgMesh );
+					}
+				}
+
+				m_firedCount = 0;
+				m_shootTime = 0.0f;
 			}
+			//break;
 		case GMT_WAVE_FINISHED:
 			{
 				LeaveManual();
@@ -340,6 +360,11 @@ namespace GM
 			SetFocused( false );
 			g_game->m_mouseMode = MS_Null;
 		}
+
+		m_shootCount = 0;
+		m_fire = 0;
+
+		m_lblBullet->AddProperty( SX_GUI_PROPERTY_VISIBLE );
 	}
 
 	void Mechanic_MT_Sniper::LeaveManual( void )
@@ -354,6 +379,8 @@ namespace GM
 		m_nodeCamera = NULL;
 		m_nodeWeapon = NULL;
 		m_nodePipe = NULL;
+
+		m_lblBullet->RemProperty( SX_GUI_PROPERTY_VISIBLE );
 	}
 
 	void Mechanic_MT_Sniper::UpdateCamera( float elpsTime )
@@ -459,7 +486,12 @@ namespace GM
 		ProjectileManager::AddProjectile(proj);
 
 		--m_fire;
-		m_rotOffset.x -= 0.025f;
+		m_rotOffset.x -= 0.03f;
+		++m_firedCount;
+
+		str128 str;
+		str.Format( L"%d/%d", m_firedCount, m_bullets );
+		m_lblBullet->SetText(str);
 	}
 
 } // namespace GM

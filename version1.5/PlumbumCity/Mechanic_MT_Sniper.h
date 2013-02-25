@@ -70,10 +70,11 @@ namespace GM
 		float3				m_rotMax;			//	maximum rotation value
 
 		int					m_fire;				//  fire order for weapon
-		int					m_magazineCap;		//	capacity of each magazine
 		int					m_bullets;			//	number of bullets in weapon
-		float				m_reloadTime;		//	time of reload for weapon
+		int					m_firedCount;
 		bool				m_selected;			//	true of this tower has been selected
+
+		sx::gui::Label*		m_lblBullet;
 	};
 
 

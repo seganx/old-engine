@@ -28,8 +28,13 @@ namespace GM
 		, m_fire(0)
 		, m_magazineCap(0)
 		, m_bullets(0)
+		, m_firedCount(0)
 		, m_reloadTime(0)
+		, m_reload(0)
 		, m_selected(false)
+		, m_reloadBar(null)
+		, m_lblMagazine(null)
+		, m_lblBullet(null)
 	{
 		sx_callstack();
 
@@ -45,11 +50,46 @@ namespace GM
 	void Mechanic_MT_Machinegun::Initialize( void )
 	{
 		sx_callstack();
+
+		m_reloadBar = sx_new( sx::gui::ProgressBar );
+		m_reloadBar->SetSize( float2(256, 32) );
+		m_reloadBar->AddProperty( SX_GUI_PROPERTY_PROGRESSUV );
+		m_reloadBar->AddProperty( SX_GUI_PROPERTY_BILLBOARD );
+		m_reloadBar->AddProperty( SX_GUI_PROPERTY_3DSPACE );
+
+		m_reloadBar->GetElement(0)->SetTextureSrc( L"gui_healthBar0.txr" );
+		m_reloadBar->GetElement(1)->SetTextureSrc( L"gui_healthBar1.txr" );
+
+		m_lblMagazine = sx_new( sx::gui::Label );
+		m_lblMagazine->SetSize( float2(70, 25) );
+		m_lblMagazine->Position().Set( -450.0f, 270.0f, 0.0f );
+		m_lblMagazine->GetElement(0)->Color().a = 0.0f;
+		m_lblMagazine->GetElement(1)->Color().a = 0.85f;
+		m_lblMagazine->SetFont( L"Font_rob_twedit_info.fnt" );
+
+		m_lblBullet = sx_new( sx::gui::Label );
+		m_lblBullet->SetSize( float2(70, 25) );
+		m_lblBullet->Position().Set( -450.0f, 240.0f, 0.0f );
+		m_lblBullet->GetElement(0)->Color().a = 0.0f;
+		m_lblBullet->GetElement(1)->Color().a = 0.85f;
+		m_lblBullet->SetFont( L"Font_rob_twedit_info.fnt" );
+
+		g_game->m_gui->Add_Back( m_reloadBar );
+		g_game->m_gui->Add_Back( m_lblMagazine );
+		g_game->m_gui->Add_Back( m_lblBullet );
 	}
 
 	void Mechanic_MT_Machinegun::Finalize( void )
 	{
 		sx_callstack();
+
+		g_game->m_gui->Remove( m_reloadBar );
+		g_game->m_gui->Remove( m_lblMagazine );	
+		g_game->m_gui->Remove( m_lblBullet );
+
+		sx_delete_and_null( m_reloadBar );
+		sx_delete_and_null( m_lblMagazine );
+		sx_delete_and_null( m_lblBullet );
 	}
 
 	void Mechanic_MT_Machinegun::ProcessInput( bool& inputHandled, float elpsTime )
@@ -112,8 +152,10 @@ namespace GM
 			//	just check the number of bullets and player does fire
 			if ( SEGAN_KEYDOWN(0, SX_INPUT_KEY_MOUSE_LEFT) || SEGAN_KEYHOLD(0, SX_INPUT_KEY_MOUSE_LEFT) )
 			{
-				if ( !m_fire )
+				if ( (!m_fire) && (m_firedCount < m_bullets) && (m_reload <= 0.0f) )
+				{
 					m_fire = MANUAL_MACHINEGUN_FIRE;
+				}
 			}
 
 			m_RotOffset.x += SEGAN_MOUSE_RLY(0) * 0.002f;
@@ -135,67 +177,89 @@ namespace GM
 
 	void Mechanic_MT_Machinegun::Update( float elpsTime )
 	{
-		if ( NotInGame() || !m_nodeWeapon || !m_nodePipe[0] ) return;
+		if ( m_reload > 0.0f )
+		{
+			m_reload -= elpsTime * 0.001f;
+			m_reloadBar->SetMax( m_reloadTime );
+			m_reloadBar->SetValue( m_reload );
+
+			if ( m_reload <= 0.0f )
+			{
+				m_reload = 0.0f;
+				m_reloadBar->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+			}
+		}
+
+		if ( NotInGame() || !m_nodeWeapon || !m_nodePipe[0] ) { return; }
+
 		sx_callstack();
+
 		m_shootTime += elpsTime;
 
 		if ( g_game->m_mouseMode == MS_ManualTower && IsFocused() )
+		{
 			UpdateCamera( elpsTime );
+		}
 
 		//  invisible meshes of fire
 		if ( m_shootTime < 200 && m_shootTime > 40 )
 		{
 			msg_Mesh msgMesh( SX_MESH_INVISIBLE );
+
 			for (int i=0; i<4; i++)
 			{
 				if ( m_nodePipe[i] )
+				{
 					m_nodePipe[i]->MsgProc( MT_MESH, &msgMesh );
+				}
 			}
 		}
 
 		//	Blend Direction
 		{
-			float dx = m_RotOffset.x - m_Rot.x;
-			float dy = m_RotOffset.y - m_Rot.y;
-			float dz = m_RotOffset.z - m_Rot.z;
+			const float dx = m_RotOffset.x - m_Rot.x;
+			const float dy = m_RotOffset.y - m_Rot.y;
+			const float dz = m_RotOffset.z - m_Rot.z;
 
-			float blendTime = elpsTime * 0.005f;
+			const float blendTime = elpsTime * 0.005f;
 			m_Rot.y += dy * blendTime;
 			m_Rot.x += dx * blendTime;
 			m_Rot.z += dz * blendTime;
 			m_nodeWeapon->SetRotation( m_Rot.x, m_Rot.y, m_Rot.z );
 		}
 
-		//  compute max shoot time depend on fire rate
-		const float	maxShootTime = ( (m_attack.rate > 0.01f) ? (1000.0f / m_attack.rate) : 500.0f ) / MANUAL_MACHINEGUN_FIRE;
-		if (  m_fire &&  m_shootTime > maxShootTime )
+		if ( !m_reload )
 		{
-			m_shootTime = 0;
-
-			//  rotate and show the pipe
-			msg_Mesh msgMesh( 0, SX_MESH_INVISIBLE );
-			m_nodePipe[ m_pipeIndex ]->MsgProc( MT_MESH, &msgMesh );
-			m_nodePipe[ m_pipeIndex ]->SetRotation( 0, 0, sx::cmn::Random(6.0f) );
-
-			//  play a sound
-			msg_SoundPlay msgSound(true, sx::cmn::Random(1000), 0, L"fire" );
-			m_node->MsgProc( MT_SOUND_PLAY, &msgSound );
-
-			//	spray bullet particle
-			str256 bulletShell = L"bullet_shell"; bulletShell << m_pipeIndex;
-			msg_Particle msgPar( SX_PARTICLE_SPRAY, 0, bulletShell );
-			m_nodeWeapon->MsgProc( MT_PARTICLE, &msgPar );
-
-			m_shootCount++;
-			if ( m_shootCount > 15 )
+			//  compute max shoot time depend on fire rate
+			const float	maxShootTime = ( (m_attack.rate > 0.01f) ? (1000.0f / m_attack.rate) : 500.0f ) / MANUAL_MACHINEGUN_FIRE;
+			if ( m_fire && (m_shootTime > maxShootTime) && (m_firedCount < m_bullets) )
 			{
-				msg_Particle msgPrtcl(SX_PARTICLE_SPRAY);
-				m_nodePipe[ m_pipeIndex ]->MsgProc( MT_PARTICLE, &msgPrtcl);
-				m_shootCount = sx::cmn::Random(5);
+				m_shootTime = 0;
+
+				//  rotate and show the pipe
+				msg_Mesh msgMesh( 0, SX_MESH_INVISIBLE );
+				m_nodePipe[ m_pipeIndex ]->MsgProc( MT_MESH, &msgMesh );
+				m_nodePipe[ m_pipeIndex ]->SetRotation( 0, 0, sx::cmn::Random(6.0f) );
+
+				//  play a sound
+				msg_SoundPlay msgSound(true, sx::cmn::Random(1000), 0, L"fire" );
+				m_node->MsgProc( MT_SOUND_PLAY, &msgSound );
+
+				//	spray bullet particle
+				str256 bulletShell = L"bullet_shell"; bulletShell << m_pipeIndex;
+				msg_Particle msgPar( SX_PARTICLE_SPRAY, 0, bulletShell );
+				m_nodeWeapon->MsgProc( MT_PARTICLE, &msgPar );
+
+				m_shootCount++;
+				if ( m_shootCount > 15 )
+				{
+					msg_Particle msgPrtcl(SX_PARTICLE_SPRAY);
+					m_nodePipe[ m_pipeIndex ]->MsgProc( MT_PARTICLE, &msgPrtcl);
+					m_shootCount = sx::cmn::Random(5);
+				}
+
+				ShootTheBullet( &m_attack, false );
 			}
-
-			ShootTheBullet( &m_attack, false );
-
 		}
 	}
 
@@ -223,7 +287,9 @@ namespace GM
 					if ( script.GetString(i, L"Type", tmpStr) && tmpStr == L"ManualTower" )
 					{
 						if ( !script.GetString(i, L"Name", tmpStr) )
+						{
 							continue;
+						}
 
 						if ( tmpStr == L"Machinegun" )
 						{
@@ -231,10 +297,7 @@ namespace GM
 							{
 								sx::core::ArrayPNode nodes(16);
 								sx::core::Scene::GetNodesByName( tmpStr, nodes );
-								if ( nodes.Count() )
-									m_node = nodes[0];
-								else
-									m_node = null;
+								m_node = nodes.Count() ? nodes[0] : null;
 							}
 
 							script.GetFloat(i, L"stunValue", m_attack.stunValue);
@@ -244,6 +307,10 @@ namespace GM
 							script.GetFloat(i, L"fireRate", m_attack.rate);
 							script.GetFloat(i, L"maxPhi", m_RotMax.y);
 							script.GetFloat(i, L"maxTheta", m_RotMax.x);
+							script.GetInteger(i, L"magazineCap", m_magazineCap);
+							script.GetInteger(i, L"bulletsCount", m_bullets);
+							script.GetFloat(i, L"reloadTime", m_reloadTime);
+
 							if ( script.GetString(i, L"bullet", tmpStr) )
 							{
 								String::Copy( m_attack.bullet, 64, tmpStr );
@@ -271,35 +338,55 @@ namespace GM
 		case GMT_GAME_END:
 		case GMT_GAME_RESETING:
 		case GMT_GAME_RESET:
-			if ( m_node )
 			{
-				m_node->GetChildByName(L"weapon", m_nodeWeapon);
-				m_node->GetChildByName(L"pipe0", m_nodePipe[0]);
-				m_node->GetChildByName(L"pipe1", m_nodePipe[1]);
-				m_node->GetChildByName(L"pipe2", m_nodePipe[2]);
-				m_node->GetChildByName(L"pipe3", m_nodePipe[3]);
-
-				//  stop particle spray
-				msg_Particle msgPrtcl(0, SX_PARTICLE_SPRAY, 0, true );
-				m_node->MsgProc( MT_PARTICLE, &msgPrtcl );
-			}
-
-			//  invisible meshes of fire and stop particles
-			if ( m_nodeWeapon )
-			{
-				m_nodeWeapon->SetRotation( 0, 0, 0 );
-				for (int i=0; i<4; i++)
+				if ( m_node )
 				{
-					if ( m_nodePipe[i] )
+					m_node->GetChildByName(L"weapon", m_nodeWeapon);
+					m_node->GetChildByName(L"pipe0", m_nodePipe[0]);
+					m_node->GetChildByName(L"pipe1", m_nodePipe[1]);
+					m_node->GetChildByName(L"pipe2", m_nodePipe[2]);
+					m_node->GetChildByName(L"pipe3", m_nodePipe[3]);
+
+					//  stop particle spray
+					msg_Particle msgPrtcl(0, SX_PARTICLE_SPRAY, 0, true );
+					m_node->MsgProc( MT_PARTICLE, &msgPrtcl );
+				}
+
+				//  invisible meshes of fire and stop particles
+				if ( m_nodeWeapon )
+				{
+					m_nodeWeapon->SetRotation( 0, 0, 0 );
+					for (int i=0; i<4; i++)
 					{
-						msg_Mesh msgMesh( SX_MESH_INVISIBLE );
-						m_nodePipe[i]->MsgProc( MT_MESH, &msgMesh );
+						if ( m_nodePipe[i] )
+						{
+							msg_Mesh msgMesh( SX_MESH_INVISIBLE );
+							m_nodePipe[i]->MsgProc( MT_MESH, &msgMesh );
+						}
 					}
 				}
+
+				m_firedCount = 0;
+				m_reload;
+
+				const float3 addPos( 0, m_node->GetBox_local().Max.y + 0.5f, 0 );
+				m_reloadBar->Position() = m_node->GetPosition_world() + addPos;
+				m_reloadBar->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+
+				str128 str;
+				
+				str.Format( L"%dx%d", m_bullets / m_magazineCap, m_magazineCap );
+				m_lblMagazine->SetText(str);
+
+				str.Format( L"0/%d", m_magazineCap );
+				m_lblBullet->SetText(str);
 			}
+			//break;
 		case GMT_WAVE_FINISHED:
-			LeaveManual();
-			m_selected = false;
+			{	
+				LeaveManual();
+				m_selected = false;
+			}
 			break;	//	GMT_GAME_RESET
 		}
 	}
@@ -344,6 +431,13 @@ namespace GM
 			SetFocused( false );
 			g_game->m_mouseMode = MS_Null;
 		}
+
+		m_shootCount = 0;
+		m_shootTime = 0.0f;
+		m_fire = 0;
+
+		m_lblMagazine->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+		m_lblBullet->AddProperty( SX_GUI_PROPERTY_VISIBLE );
 	}
 
 	void Mechanic_MT_Machinegun::LeaveManual( void )
@@ -354,8 +448,11 @@ namespace GM
 		}
 
 		m_nodeCamera = null;
-		m_nodeWeapon = NULL;
+		m_nodeWeapon = null;
 		ZeroMemory( m_nodePipe, sizeof(m_nodePipe) );
+
+		m_lblMagazine->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+		m_lblBullet->RemProperty( SX_GUI_PROPERTY_VISIBLE );
 	}
 
 	void Mechanic_MT_Machinegun::UpdateCamera( float elpsTime )
@@ -412,7 +509,7 @@ namespace GM
 		float3 face(0,0,1), dir, pos;
 		dir.Transform_Norm( face, m_nodeWeapon->GetMatrix_world() );
 		pos	= m_nodePipe[ m_pipeIndex ]->GetPosition_world();
-		pos	+= dir * 3;
+		pos	+= dir * 3.0f;
 
 		//	search for a target to damage to
 		Entity* target = null;
@@ -463,7 +560,6 @@ namespace GM
 			ProjectileManager::AddProjectile(proj);
 		}
 
-
 		//  change pipe index
 		switch (m_pipeIndex)
 		{
@@ -472,8 +568,25 @@ namespace GM
 		case 2:	m_pipeIndex = m_nodePipe[3] ? 3 : 0;	break;
 		case 3:	m_pipeIndex = 0; break;
 		}
-		m_fire--;
+
+		--m_fire;
 		m_RotOffset.x -= 0.01f;
+		++m_firedCount;
+
+		str128 str;
+
+		const int consumed = (m_firedCount / m_magazineCap) * m_magazineCap;
+		str.Format( L"%d/%d", (m_firedCount % m_bullets) - consumed, m_magazineCap );
+		m_lblBullet->SetText(str);
+
+		if ( (m_firedCount % m_magazineCap) == 0 )
+		{
+			m_fire = 0;
+			m_reload = m_reloadTime;
+			str.Format( L"%dx%d", (m_bullets - m_firedCount) / m_magazineCap, m_magazineCap );
+			m_lblMagazine->SetText(str);
+			m_reloadBar->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+		}
 	}
 
 } // namespace GM

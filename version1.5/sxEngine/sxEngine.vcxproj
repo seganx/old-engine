@@ -120,6 +120,7 @@
     <ClCompile Include="sxRender\sxTask3D.cpp" />
     <ClCompile Include="sxRender\sxTexture3D.cpp" />
     <ClCompile Include="sxRender\sxUI3D.cpp" />
+    <ClCompile Include="sxSystem\Net.cpp" />
     <ClCompile Include="sxSystem\sxFile.cpp" />
     <ClCompile Include="sxSystem\sxFileMan.cpp" />
     <ClCompile Include="sxSystem\sxLog.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="sxRender\sxTask3D.h" />
     <ClInclude Include="sxRender\sxTexture3D.h" />
     <ClInclude Include="sxRender\sxUI3D.h" />
+    <ClInclude Include="sxSystem\Net.h" />
     <ClInclude Include="sxSystem\sxFile.h" />
     <ClInclude Include="sxSystem\sxFileMan.h" />
     <ClInclude Include="sxSystem\sxLog.h" />

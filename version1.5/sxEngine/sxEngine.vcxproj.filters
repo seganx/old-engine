@@ -262,6 +262,9 @@
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="sxEngine.cpp" />
+    <ClCompile Include="sxSystem\Net.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sxRender\sxAnimation.h">
@@ -541,6 +544,9 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="sxEngine.h" />
+    <ClInclude Include="sxSystem\Net.h">
+      <Filter>System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="sxEngine.rc">

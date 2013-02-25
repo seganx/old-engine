@@ -69,8 +69,14 @@ namespace GM
 		int					m_fire;				//  fire order for weapon
 		int					m_magazineCap;		//	capacity of each magazine
 		int					m_bullets;			//	number of bullets in weapon
+		int					m_firedCount;
 		float				m_reloadTime;		//	time of reload for weapon
+		float				m_reload;
 		bool				m_selected;			//	true of this tower has been selected
+
+		sx::gui::ProgressBar*	m_reloadBar;
+		sx::gui::Label*		m_lblMagazine;
+		sx::gui::Label*		m_lblBullet;
 	};
 
 

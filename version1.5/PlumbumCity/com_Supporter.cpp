@@ -94,7 +94,7 @@ void com_Supporter::Update( float elpsTime )
 		m_energy -= addEnergy;
 		g_game->m_player->m_energy += addEnergy;
 
-		for ( int i=0; i<m_towers.Count(); i++ )
+		for ( int i = 0; i < m_towers.Count(); ++i )
 		{
 			if ( m_towers[i] && m_towers[i]->m_health.icur > 0 )
 			{
