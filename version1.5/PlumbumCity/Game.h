@@ -74,6 +74,7 @@ public:
 	int						m_game_currentLevel;		//  index of current level. 0 = GUI mode
 	int						m_game_nextLevel;			//  index of current level. 0 = GUI mode
 	bool					m_game_paused;				//  game paused
+	bool					m_game_waves_comming;		//	waves are coming
 	bool					m_app_Paused;				//  application paused
 	bool					m_app_Closing;				//  application is closing
 	int						m_app_Loading;				//  application is loading resources. value is number of objects to load

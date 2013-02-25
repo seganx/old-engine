@@ -576,13 +576,14 @@ namespace GM
 		str128 str;
 
 		const int consumed = (m_firedCount / m_magazineCap) * m_magazineCap;
-		str.Format( L"%d/%d", (m_firedCount % m_bullets) - consumed, m_magazineCap );
+		const int m = (m_firedCount == m_bullets) ? 0 : m_magazineCap - ((m_firedCount % m_bullets) - consumed);
+		str.Format( L"%d/%d", m, m_magazineCap );
 		m_lblBullet->SetText(str);
 
 		if ( (m_firedCount % m_magazineCap) == 0 )
 		{
 			m_fire = 0;
-			m_reload = m_reloadTime;
+			m_reload = (m_firedCount == m_bullets) ? 0.0f : m_reloadTime;
 			str.Format( L"%dx%d", (m_bullets - m_firedCount) / m_magazineCap, m_magazineCap );
 			m_lblMagazine->SetText(str);
 			m_reloadBar->AddProperty( SX_GUI_PROPERTY_VISIBLE );

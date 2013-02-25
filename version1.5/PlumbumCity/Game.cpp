@@ -68,6 +68,7 @@ Game::Game( void )
 ,	m_game_currentLevel(-1)
 ,	m_game_nextLevel(0)
 ,	m_game_paused(false)
+,	m_game_waves_comming(false)
 ,	m_app_Paused(false)
 ,	m_app_Loading(0)
 ,	m_app_Closing(false)
@@ -368,6 +369,7 @@ void Game::ClearLevel( void )
 {
 	sx_callstack();
 
+	m_game_waves_comming = false;
 	m_gui->m_gameSpeed->SetValue( 1.0f );
 	ProjectileManager::ClearProjectiles();
 	EntityManager::ClearEntities();
@@ -380,6 +382,7 @@ void Game::ClearLevel( void )
 
 void Game::Reset( void )
 {
+	g_game->m_game_waves_comming = false;
 	PostMessage( 0, GMT_GAME_RESETING, 0 );
 	PostMessage( 0, GMT_GAME_RESET, 0 );
 	m_gui->ShowTips( L" Game Restarted !", 0xffff0000 );

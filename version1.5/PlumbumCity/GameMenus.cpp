@@ -1841,6 +1841,7 @@ void MenuConfirmExit::OnClick( sx::gui::PControl sender )
 		{
 			g_game->PostMessage( 0, GMT_GAME_END, NULL );
 			g_game->m_gui->m_victory->ApplyChangesToProfile();
+			g_game->m_game_waves_comming = false;
 		}
 
 		else if ( g_game->m_gui->m_gameOver->IsVisible() )
@@ -2520,6 +2521,7 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 
 			//	notify that game has been end
 			g_game->PostMessage( 0, GMT_GAME_END, NULL );
+			g_game->m_game_waves_comming = false;
 
 			//	apply changes
 			ApplyChangesToProfile();

@@ -3,13 +3,11 @@
 #include "Game.h"
 #include "Player.h"
 
-
 com_Supporter::com_Supporter( void ): Component()
 	,	m_node(0)
 	,	m_time(0)
 	,	m_energy(0)
 	,	m_repair(0)
-	,	m_started(false)
 	,	m_towers(512)
 {
 	sx_callstack();
@@ -59,7 +57,6 @@ void com_Supporter::Initialize( void )
 	m_time		= 0.0f;
 	m_energy	= 0.0f;
 	m_repair	= 0.0f;
-	m_started	= false;
 	m_owner->m_experience = 0.0f;	
 }
 
@@ -72,7 +69,7 @@ void com_Supporter::Update( float elpsTime )
 {
 	sx_callstack();
 
-	if ( !m_started || !m_owner || m_owner->m_health.icur < 1 || !m_owner->m_node )
+	if ( (!g_game->m_game_waves_comming) || (!m_owner) || (m_owner->m_health.icur < 1) || (!m_owner->m_node) )
 	{
 		return;
 	}
@@ -115,11 +112,6 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 
 	switch ( msg )
 	{
-	case GMT_WAVE_STARTED:
-		{
-			m_started = true;
-		}
-		break;
 	case GMT_I_INITIALIZED:
 		if ( data )
 		{
@@ -147,7 +139,6 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 				}
 			}
 		}
-		break;
 	case GMT_I_FINALIZED:
 		if ( data )
 		{

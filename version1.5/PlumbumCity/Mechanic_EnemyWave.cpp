@@ -365,6 +365,7 @@ namespace GM
 		{
 			if (m_waveIndex == 0)
 			{
+				g_game->m_game_waves_comming = true;
 				EntityManager::MsgProc(0, GMT_WAVE_STARTED, NULL);
 			}
 

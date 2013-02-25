@@ -43,7 +43,6 @@ public:
 	float				m_time;
 	float				m_energy;
 	float				m_repair;
-	bool				m_started;
 
 	Array<Entity*>		m_towers;
 

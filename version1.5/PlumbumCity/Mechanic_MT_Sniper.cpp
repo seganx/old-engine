@@ -34,7 +34,6 @@ namespace GM
 	Mechanic_MT_Sniper::~Mechanic_MT_Sniper( void )
 	{
 		sx_callstack();
-
 	}
 
 	void Mechanic_MT_Sniper::Initialize( void )
