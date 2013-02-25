@@ -300,7 +300,7 @@ SEGAN_INLINE void net_con_flush_unreliablelist( Connection* con )
 SEGAN_INLINE void net_con_flush_sendinglist( Connection* con )
 {
 	NetMessage* msg;
-	for( int z = 0; z < NET_MAX_SENDING_LIST && net_array_pop_front( con->m_sending, msg ); ++z )
+	for( int z = 0; z <= NET_MAX_SENDING_LIST && net_array_pop_front( con->m_sending, msg ); ++z )
 	{
 		//	send to destination
 		msg->packet.header.ack = con->m_sntAck;
@@ -1054,7 +1054,7 @@ SEGAN_INLINE float Server::GetMaxUpdateTime( void )
 	float p = float(s) + 1;
 	float r = ( p * p ) * 100.0f;
 	float d = r - res;
-	res += d * 0.05f;
+	res += d * 0.01f;
 	return res;
 }
 
@@ -1074,7 +1074,7 @@ SEGAN_INLINE bool Server::CanSend( const float elpsTime )
 	float p = float(s) + 1;
 	float r = ( p * p ) * 100.0f;
 	float d = r - maxTime;
-	maxTime += d * 0.05f;
+	maxTime += d * 0.01f;
 
 	static float utime = 0;
 
@@ -1230,7 +1230,7 @@ SEGAN_INLINE float Client::GetMaxUpdateTime( void )
 	float r = ( p * p ) * 100.0f;
 	float d = r - res;
 	res += d * 0.05f;
-	return res;
+	return 16.0f + res;
 }
 
 SEGAN_INLINE bool Client::CanSend( const float elpsTime )
@@ -1247,7 +1247,7 @@ SEGAN_INLINE bool Client::CanSend( const float elpsTime )
 	static float utime = 0;
 
 	utime += elpsTime;
-	if ( utime > maxTime )
+	if ( utime > ( 16.0f + maxTime ) )
 	{
 		utime = 0;
 		return true;

@@ -317,7 +317,7 @@ void MainLoop( float elpsTime )
 			{
 				msgtime = 0;
 
-				for( int i=0; i<10; i++ )
+				for( int i=0; i<5; i++ )
 				{
 					msgId++;
 					char buf[512];
@@ -347,7 +347,7 @@ void MainLoop( float elpsTime )
 			{
 				msgtime = 0;
 
-				for( int i=0; i<10; i++ )
+				for( int i=0; i<2; i++ )
 				{
 					msgId++;
 					char buf[512];
