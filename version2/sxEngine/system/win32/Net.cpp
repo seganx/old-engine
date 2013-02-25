@@ -1055,7 +1055,7 @@ SEGAN_INLINE float Server::GetMaxUpdateTime( void )
 	float r = ( p * p ) * 100.0f;
 	float d = r - res;
 	res += d * 0.01f;
-	return res;
+	return 16.0f + res;
 }
 
 SEGAN_INLINE bool Server::CanSend( const float elpsTime )
@@ -1079,7 +1079,7 @@ SEGAN_INLINE bool Server::CanSend( const float elpsTime )
 	static float utime = 0;
 
 	utime += elpsTime;
-	if ( utime > maxTime )
+	if ( utime > ( 16.0f + maxTime ) )
 	{
 		utime = 0;
 		return true;
@@ -1229,7 +1229,7 @@ SEGAN_INLINE float Client::GetMaxUpdateTime( void )
 	float p = float(s) + 1;
 	float r = ( p * p ) * 100.0f;
 	float d = r - res;
-	res += d * 0.05f;
+	res += d * 0.01f;
 	return 16.0f + res;
 }
 
@@ -1242,7 +1242,7 @@ SEGAN_INLINE bool Client::CanSend( const float elpsTime )
 	float p = float(s) + 1;
 	float r = ( p * p ) * 100.0f;
 	float d = r - maxTime;
-	maxTime += d * 0.05f;
+	maxTime += d * 0.01f;
 
 	static float utime = 0;
 
