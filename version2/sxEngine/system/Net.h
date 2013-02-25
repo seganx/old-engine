@@ -146,6 +146,21 @@ public:
 	//! send message to all clients
 	bool Send( const char* buffer, const int sizeinbyte, const bool critical = false );
 
+	/*! return the maximum time needed to send data queued
+	the returned value can be used as delay time in application side
+	to avoid data accumulation on the network.
+	also the application can use Server::CanSend() to determinde when
+	update the networked objects instead of using this */
+	float GetMaxUpdateTime( void );
+
+	/*! return true if the network system is ready to send new messages.
+	the application can call Send() in anywhere but calling Send() function
+	in the if ( Server::CanSend( elpstime ) ) { } block will help the traffic
+	balancer to avoid data accumulation on the network.
+	also the application can use Server::GetMaxUpdateTime() to compute delay
+	time and take control over the traffic balancer instead of using this. */
+	bool CanSend( const float elpsTime );
+
 public:
 
 	String					m_name;				//	name of server

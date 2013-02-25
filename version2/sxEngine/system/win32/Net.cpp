@@ -1038,6 +1038,55 @@ bool Server::Send( const char* buffer, const int sizeinbyte, const bool critical
 
 }
 
+SEGAN_INLINE float Server::GetMaxUpdateTime( void )
+{
+	static float res = 0;
+
+	//	find maximum sending queue
+	sint n = 0;
+	sint c = m_clients.Count();
+	for ( int i=0; i<c; i++ )
+	{
+		sint sc = m_clients[i]->m_sending.Count();
+		if ( sc > n ) n = sc;
+	}
+	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
+	float p = float(s) + 1;
+	float r = ( p * p ) * 100.0f;
+	float d = r - res;
+	res += d * 0.05f;
+	return res;
+}
+
+SEGAN_INLINE bool Server::CanSend( const float elpsTime )
+{
+	static float maxTime = 0;
+
+	//	find maximum sending queue
+	sint n = 0;
+	sint c = m_clients.Count();
+	for ( int i=0; i<c; i++ )
+	{
+		sint sc = m_clients[i]->m_sending.Count();
+		if ( sc > n ) n = sc;
+	}
+	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
+	float p = float(s) + 1;
+	float r = ( p * p ) * 100.0f;
+	float d = r - maxTime;
+	maxTime += d * 0.05f;
+
+	static float utime = 0;
+
+	utime += elpsTime;
+	if ( utime > maxTime )
+	{
+		utime = 0;
+		return true;
+	}
+	else return false;
+}
+
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -1180,7 +1229,7 @@ SEGAN_INLINE float Client::GetMaxUpdateTime( void )
 	float p = float(s) + 1;
 	float r = ( p * p ) * 100.0f;
 	float d = r - res;
-	res += d > 0 ? d * 0.004f : d * 0.003f;
+	res += d * 0.05f;
 	return res;
 }
 
@@ -1193,7 +1242,7 @@ SEGAN_INLINE bool Client::CanSend( const float elpsTime )
 	float p = float(s) + 1;
 	float r = ( p * p ) * 100.0f;
 	float d = r - maxTime;
-	maxTime += d > 0 ? d * 0.004f : d * 0.003f;
+	maxTime += d * 0.05f;
 
 	static float utime = 0;
 
@@ -1203,8 +1252,7 @@ SEGAN_INLINE bool Client::CanSend( const float elpsTime )
 		utime = 0;
 		return true;
 	}
-	else
-		return false;
+	else return false;
 }
 
 

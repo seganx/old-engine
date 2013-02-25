@@ -184,6 +184,7 @@ void create_btn_send( void )
 
 void append_text_to_control( HWND control, const wchar* text )
 {
+//	return;
 	if ( !text ) return;
 	
 	int i;
@@ -285,6 +286,28 @@ void MainLoop( float elpsTime )
 	if ( g_network->isServer )
 	{
 		NetState state = g_network->server.m_clients[0]->m_state;
+		if ( 1 && state == CONNECTED )
+		{
+			float pressure = g_network->server.GetMaxUpdateTime();
+			str64 title; title.Format( L"max send time : %.2f", pressure );
+			winMain->SetTitle( title );
+
+			msgtime += elpsTime;
+			if ( g_network->server.CanSend( elpsTime ) )
+			{
+				msgtime = 0;
+
+				for( int i=0; i<0; i++ )
+				{
+					msgId++;
+					char buf[512];
+					for ( int c=0; c < 128; ++c )
+						buf[c] = (char)( ( (c+1) * msgId ) );
+					buf[127] = 0;
+					g_network->server.Send( buf, 128, true );
+				}
+			}
+		}
 		g_network->server.Update( elpsTime, NET_DELAY_TIME, NET_TIME_OUT );
 		if ( state != g_network->server.m_clients[0]->m_state )
 			stateChanged = g_network->server.m_clients[0]->m_state;
