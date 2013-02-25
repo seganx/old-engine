@@ -208,7 +208,7 @@ public:
 	/*! return the maximum time needed to send data queued
 	the returned value can be used as delay time in application side
 	to avoid data accumulation on the network.
-	also the application can use Client::CanSend() to determinde when
+	also the application can use Client::CanSend() to determined when
 	update the networked objects instead of using this */
 	float GetMaxUpdateTime( void );
 
