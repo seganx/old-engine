@@ -257,9 +257,19 @@ void callback_logger_client( const wchar* message )
 
 void callback_server( Server* server, Connection* client, const byte* buffer, const uint size )
 {
-	wchar wbuf[1024]; ZeroMemory( wbuf, sizeof(wbuf) );
-	for ( uint i=0; i<size && i<1023 && buffer[i]; i++ )
+	wchar wbuf[1024] = {0};
+
+	for ( int i=0; i<1023; i++ )
+	{
+		if ( i < 5 )
+		{
+			bool isAlphabet = ( 'a' <= buffer[i] && buffer[i] <= 'z' ) || ( 'A' <= buffer[i] && buffer[i] <= 'Z' ) ;
+			bool isDigit = isdigit( buffer[i] ) != 0;
+			if ( ( !isAlphabet && !isDigit ) || buffer[i]==0 )
+				return;
+		}
 		wbuf[i] = buffer[i];
+	}
 
  	str2048 tmpText;
 	tmpText.Format( L"%s : %s", client->m_name.Text(), wbuf );
@@ -268,9 +278,19 @@ void callback_server( Server* server, Connection* client, const byte* buffer, co
 
 void callback_client( Client* client, const byte* buffer, const uint size )
 {
-	wchar wbuf[1024]; ZeroMemory( wbuf, sizeof(wbuf) );
-	for ( int i=0; i<1023 && buffer[i]; i++ )
+	wchar wbuf[1024] = {0};
+
+	for ( int i=0; i<1023; i++ )
+	{
+		if ( i < 5 )
+		{
+			bool isAlphabet = ( 'a' <= buffer[i] && buffer[i] <= 'z' ) || ( 'A' <= buffer[i] && buffer[i] <= 'Z' ) ;
+			bool isDigit = isdigit( buffer[i] ) != 0 ;
+			if ( ( !isAlphabet && !isDigit ) || buffer[i]==0 )
+				return;
+		}
 		wbuf[i] = buffer[i];
+	}
 
 	str2048 tmpText;
 	tmpText.Format( L"%s : %s", client->m_connection.m_name.Text(), wbuf );
@@ -297,7 +317,7 @@ void MainLoop( float elpsTime )
 			{
 				msgtime = 0;
 
-				for( int i=0; i<0; i++ )
+				for( int i=0; i<10; i++ )
 				{
 					msgId++;
 					char buf[512];
