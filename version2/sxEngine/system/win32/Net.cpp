@@ -415,7 +415,6 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 			con->Disconnect();
 			return false;
 		}
-//		con->m_needAck = ( (float)con->m_sntAck - (float)msgRcAck ) / 2.0f;
 		return true;
 
 	case NPT_USER:
@@ -461,7 +460,6 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 			if ( rcvAck == msgRcAck && sntAck == msgSnAck )
 			{
 				net_con_flush_sendinglist( con );
-//				con->m_needAck = 0;
 			}
 		}
 		break;
@@ -470,8 +468,6 @@ SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
 	//	if ack for received message is greater that current ack so we have message lost
 	if ( rcvAck < msgRcAck )
 	{
-//		con->m_needAck = ( (float)rcvAck - (float)msgRcAck ) * 6.0f;
-
 		//	request to send lost message
 		NetPacketHeader packet( s_netInternal->id, NPT_ACK, rcvAck );
 		con->m_socket->Send( con->m_destination, &packet, sizeof(NetPacketHeader) );
@@ -624,7 +620,6 @@ Connection::Connection( void )
 , m_sent(32)
 , m_callBack(0)
 , m_userData(0)
-//, m_needAck(0)
 {
 	ZeroMemory( &m_destination, sizeof(m_destination) );
 }
@@ -776,9 +771,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* netmsg, const float elp
 		}
 
 		//	keep connection synchronize
-		m_sendTime += elpsTime;// + m_needAck;
-		//if ( m_sendTime < 0 ) m_sendTime = 0;
-		if ( m_sendTime > delayTime )
+		if ( ( m_sendTime += elpsTime ) > delayTime )
 		{
 			m_sendTime = 0;
 

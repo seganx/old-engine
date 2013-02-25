@@ -117,7 +117,6 @@ public:
 	Array<struct NetMessage*>			m_sent;				//	list of messages that has been sent
 	CB_Connection						m_callBack;			//	will call when message received
 	void*								m_userData;			//	user data
-	//float								m_needAck;
 };
 
 

@@ -317,7 +317,7 @@ void MainLoop( float elpsTime )
 			{
 				msgtime = 0;
 
-				for( int i=0; i<5; i++ )
+				for( int i=0; i<0; i++ )
 				{
 					msgId++;
 					char buf[512];
@@ -347,13 +347,14 @@ void MainLoop( float elpsTime )
 			{
 				msgtime = 0;
 
-				for( int i=0; i<2; i++ )
+				for( int i=0; i<0; i++ )
 				{
 					msgId++;
 					char buf[512];
 					for ( int c=0; c < 128; ++c )
 						buf[c] = (char)( ( (c+1) * msgId ) );
 					buf[127] = 0;
+
 					g_network->client.Send( buf, 128, true );
 				}
 			}
