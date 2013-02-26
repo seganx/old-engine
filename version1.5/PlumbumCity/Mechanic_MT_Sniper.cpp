@@ -22,6 +22,8 @@ namespace GM
 		, m_rot(0,0,0)
 		, m_rotOffset(0,0,0)
 		, m_rotMax(0.5f, 1.0f, 0)
+		, m_fov(PI / 8.0f)
+		, m_forceFeedback(0.03f)
 		, m_fire(0)
 		, m_bullets(0)
 		, m_firedCount(0)
@@ -260,6 +262,8 @@ namespace GM
 							script.GetFloat(i, L"fireRate", m_attack.rate);
 							script.GetFloat(i, L"maxPhi", m_rotMax.y);
 							script.GetFloat(i, L"maxTheta", m_rotMax.x);
+							script.GetFloat(i, L"fov", m_fov);
+							script.GetFloat(i, L"forceFeedback", m_forceFeedback);
 							script.GetInteger(i, L"bulletsCount", m_bullets);
 
 							if ( script.GetString(i, L"bullet", tmpStr) )
@@ -390,13 +394,13 @@ namespace GM
 		sx::core::Camera camera;
 		camera.Far = CAMERA_FAR;
 		camera.Aspect = SEGAN_VP_WIDTH / SEGAN_VP_HEIGHT;
-		camera.FOV = PI / 8.0f;//(1.7f + camera.Aspect);
+		camera.FOV = m_fov;
 		camera.Eye = m_nodeCamera->GetPosition_world();
 
 		float3 dir(0, 0, 0.1f);
 		dir.Transform_Norm( dir, m_nodeCamera->GetMatrix_world() );
 		camera.Eye += dir;
-		camera.At = camera.Eye + dir * 10;
+		camera.At = camera.Eye + dir * 10.0f;
 		camera.Up.Set(0, 1, 0);
 
 		sx::core::PCamera pCam = sx::core::Renderer::GetCamera();
@@ -486,7 +490,7 @@ namespace GM
 		ProjectileManager::AddProjectile(proj);
 
 		--m_fire;
-		m_rotOffset.x -= 0.03f;
+		m_rotOffset.x -= m_forceFeedback;
 		++m_firedCount;
 
 		str128 str;

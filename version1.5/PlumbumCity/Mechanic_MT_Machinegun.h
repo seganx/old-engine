@@ -66,6 +66,8 @@ namespace GM
 		float3				m_Rot;				//  direction of weapon
 		float3				m_RotOffset;		//  offset of direction
 		float3				m_RotMax;			//	maximum rotation value
+		float				m_shakeMagnitude;
+		float				m_forceFeedback;
 		int					m_fire;				//  fire order for weapon
 		int					m_magazineCap;		//	capacity of each magazine
 		int					m_bullets;			//	number of bullets in weapon

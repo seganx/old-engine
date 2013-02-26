@@ -25,6 +25,8 @@ namespace GM
 		, m_Rot(0,0,0)
 		, m_RotOffset(0,0,0)
 		, m_RotMax(0.5f, 1.0f, 0)
+		, m_shakeMagnitude(1.0f)
+		, m_forceFeedback(0.01f)
 		, m_fire(0)
 		, m_magazineCap(0)
 		, m_bullets(0)
@@ -322,6 +324,8 @@ namespace GM
 							script.GetFloat(i, L"fireRate", m_attack.rate);
 							script.GetFloat(i, L"maxPhi", m_RotMax.y);
 							script.GetFloat(i, L"maxTheta", m_RotMax.x);
+							script.GetFloat(i, L"shakeMagnitude", m_shakeMagnitude);
+							script.GetFloat(i, L"forceFeedback", m_forceFeedback);
 							script.GetInteger(i, L"magazineCap", m_magazineCap);
 							script.GetInteger(i, L"bulletsCount", m_bullets);
 							script.GetFloat(i, L"reloadTime", m_reloadTime);
@@ -482,13 +486,15 @@ namespace GM
 		float3 dir(0, 0, 0.1f);
 		if ( m_fire )
 		{
-			dir.x += sx_random_f_limit(-0.0005f, 0.0005f);
-			dir.y += sx_random_f_limit(-0.0005f, 0.0005f);
-			dir.z += sx_random_f_limit(-0.002f, 0.002f);
+			const float extent_1 = 0.0005f * m_shakeMagnitude;
+			const float extent_2 = 0.002f * m_shakeMagnitude;
+			dir.x += sx_random_f_limit(-extent_1, extent_1);
+			dir.y += sx_random_f_limit(-extent_1, extent_1);
+			dir.z += sx_random_f_limit(-extent_2, extent_2);
 		}
 		dir.Transform_Norm( dir, m_nodeCamera->GetMatrix_world() );
 		camera.Eye += dir;
-		camera.At = camera.Eye + dir * 10;
+		camera.At = camera.Eye + dir * 10.0f;
 		camera.Up.Set(0, 1, 0);
 
 		sx::core::PCamera pCam = sx::core::Renderer::GetCamera();
@@ -586,7 +592,7 @@ namespace GM
 		}
 
 		--m_fire;
-		m_RotOffset.x -= 0.01f;
+		m_RotOffset.x -= m_forceFeedback;
 		++m_firedCount;
 
 		if ( (m_firedCount % m_magazineCap) == 0 )
