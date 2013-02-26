@@ -289,10 +289,13 @@ namespace GM
 			}
 			break;	//	GMT_LEVEL_CLEAR
 
+		case GMT_GAME_RESETING:
+			m_attack.projectile = 0;
+			break;
+		case GMT_GAME_RESET:
+			MsgProc( 0, GMT_LEVEL_LOAD, 0 );
 		case GMT_GAME_START:
 		case GMT_GAME_END:
-		case GMT_GAME_RESETING:
-		case GMT_GAME_RESET:
 			{
 				if ( m_node )
 				{
