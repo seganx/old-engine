@@ -187,6 +187,21 @@ namespace GM
 			{
 				m_reload = 0.0f;
 				m_reloadBar->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+				m_lblMagazine->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
+				str128 str;
+				m_lblBullet->SetText(str);
+				str.Format( L"%dx%d", ((m_bullets - m_firedCount) / m_magazineCap) - 1, m_magazineCap );
+				m_lblMagazine->SetText(str);
+				m_lblBullet->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
+				str.Format( L"%d/%d", m_magazineCap, m_magazineCap );
+				m_lblBullet->SetText(str);
+			}
+			else
+			{
+				str128 str;
+				const int reloaded = m_magazineCap - static_cast<const int>((m_reload / m_reloadTime) * m_magazineCap);
+				str.Format( L"%d/%d", reloaded, m_magazineCap );
+				m_lblBullet->SetText(str);
 			}
 		}
 
@@ -367,7 +382,7 @@ namespace GM
 				}
 
 				m_firedCount = 0;
-				m_reload;
+				m_reload = 0;
 
 				const float3 addPos( 0, m_node->GetBox_local().Max.y + 0.5f, 0 );
 				m_reloadBar->Position() = m_node->GetPosition_world() + addPos;
@@ -375,13 +390,14 @@ namespace GM
 
 				str128 str;
 				
-				str.Format( L"%dx%d", m_bullets / m_magazineCap, m_magazineCap );
+				str.Format( L"%dx%d", (m_bullets / m_magazineCap) - 1, m_magazineCap );
 				m_lblMagazine->SetText(str);
 
-				str.Format( L"0/%d", m_magazineCap );
+				str.Format( L"%d/%d", m_magazineCap, m_magazineCap );
 				m_lblBullet->SetText(str);
 			}
 			//break;
+		case GMT_GAME_PAUSED:
 		case GMT_WAVE_FINISHED:
 			{	
 				LeaveManual();
@@ -573,20 +589,33 @@ namespace GM
 		m_RotOffset.x -= 0.01f;
 		++m_firedCount;
 
-		str128 str;
-
-		const int consumed = (m_firedCount / m_magazineCap) * m_magazineCap;
-		const int m = (m_firedCount == m_bullets) ? 0 : m_magazineCap - ((m_firedCount % m_bullets) - consumed);
-		str.Format( L"%d/%d", m, m_magazineCap );
-		m_lblBullet->SetText(str);
-
 		if ( (m_firedCount % m_magazineCap) == 0 )
 		{
 			m_fire = 0;
-			m_reload = (m_firedCount == m_bullets) ? 0.0f : m_reloadTime;
-			str.Format( L"%dx%d", (m_bullets - m_firedCount) / m_magazineCap, m_magazineCap );
-			m_lblMagazine->SetText(str);
-			m_reloadBar->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+			str128 str;
+
+			if ( m_firedCount != m_bullets )
+			{
+				m_reload = m_reloadTime;
+				m_reloadBar->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+			}
+			else
+			{
+				m_lblMagazine->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
+				str.Format( L"0x%d", m_magazineCap );
+				m_lblMagazine->SetText(str);
+			}
+
+			m_lblBullet->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
+			str.Format( L"0/%d", m_magazineCap );
+			m_lblBullet->SetText(str);
+		}
+		else
+		{
+			const int remainder = (m_firedCount == m_bullets) ? 0 : m_magazineCap - (m_firedCount % m_magazineCap);
+			str128 str;
+			str.Format( L"%d/%d", remainder, m_magazineCap );
+			m_lblBullet->SetText(str);
 		}
 	}
 

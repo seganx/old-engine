@@ -315,6 +315,7 @@ namespace GM
 				m_shootTime = 0.0f;
 			}
 			//break;
+		case GMT_GAME_PAUSED:
 		case GMT_WAVE_FINISHED:
 			{
 				LeaveManual();
@@ -489,7 +490,17 @@ namespace GM
 		++m_firedCount;
 
 		str128 str;
-		str.Format( L"%d/%d", m_firedCount, m_bullets );
+
+		if ( m_firedCount != m_bullets )
+		{
+			str.Format( L"%d/%d", m_firedCount, m_bullets );
+		}
+		else
+		{
+			m_lblBullet->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
+			str.Format( L"0/%d", m_bullets );
+		}
+
 		m_lblBullet->SetText(str);
 	}
 
