@@ -4,13 +4,16 @@
 #include "sxLog.h"
 #include "sxZip.h"
 
+#include <stdio.h>
 //#include <winsock2.h>
 #pragma comment(lib,"ws2_32.lib")
 
 
+#define NET_MAX_UNRELIABLE_LIST			32		//	maximum number of unreliable messages in list
+#define NET_MAX_SENT_LIST				64		//	maximum number of messages stored in sent list
+#define NET_MAX_SENDING_LIST			3		//	maximum number of messages in sending list
 #define NET_MAX_NUM_BUFFER				512		//	number of connection buffer in the stack
-#define NET_MAX_QUEUE_BUFFER			512		//	maximum number of buffer in the queue
-#define NET_PACKET_SIZE					512		//	size of connection buffer
+#define NET_MAX_PACKET_SIZE				1024	//	size of packet data
 #define NET_SERVER_FLAG_TIME			1200	//	time period that server notify all client to see the flag by sending broadcast message
 
 
@@ -20,7 +23,7 @@ enum NetPacketType
 	NPT_CONNECT				= 1,		//	a connection message
 	NPT_WELCOME,						//	welcome message
 	NPT_DISCONNECT,						//	disconnect message
-	NPT_ALIVE,							//	keep connection alive
+	NPT_SYNC,							//	keep connection synchronize
 	NPT_ACK,							//	request lost ack
 	NPT_USER,							//	contain user data
 	NPT_ZIP,							//	contain array compressed packet
@@ -43,8 +46,8 @@ struct NetPacketHeader
 //	structure of network pocket
 struct NetPacket
 {
-	NetPacketHeader	header;				//	header of message
-	byte			data[512];			//	message data
+	NetPacketHeader	header;						//	header of message
+	byte			data[NET_MAX_PACKET_SIZE];		//	message data
 
 	NetPacket( const word id, const byte type, const uint ack ): header(id, type, ack){}
 	NetPacket( void ){}
@@ -56,8 +59,7 @@ struct NetMessage
 	NetPacket	packet;
 
 	NetAddress	address;				//	address of sender
-	uint		size;					//	size of message
-	uint		bytsRecved;				//  hold number of bytes received
+	uint		size;					//	size of received message
 
 	NetMessage( void ) { ZeroMemory( this, sizeof(NetMessage) ); }
 };
@@ -96,120 +98,17 @@ SEGAN_INLINE sint net_copy_name( NetPacket* packet, const wchar* name )
 	return sx_str_copy( (wchar*)packet->data, 32, name ? name : s_netInternal->name ) * 2;
 }
 
-SEGAN_INLINE void net_connection_clear_queue( Connection* con )
+SEGAN_INLINE bool net_array_pop_front( Array<NetMessage*>& msgarray, OUT NetMessage*& pmsg )
 {
-	if ( con->m_msgList.Count() )
+	sint h = msgarray.Count() - 1;
+	if ( h >= 0 )
 	{
-		for ( int i=0; i<con->m_msgList.Count(); i++ )
-		{
-			NetMessage* pbuf = con->m_msgList[i];
-			s_netInternal->msgPool.Push( pbuf );
-		}
-
-		con->m_msgList.Clear();
+		pmsg = msgarray[h];
+		msgarray.RemoveByIndex( h );
 	}
-
-	if ( con->m_sentList.Count() )
-	{
-		for ( int i=0; i<con->m_sentList.Count(); i++ )
-		{
-			NetMessage* pbuf = con->m_sentList[i];
-			s_netInternal->msgPool.Push( pbuf );
-		}
-
-		con->m_sentList.Clear();
-	}
-
-	if ( con->m_sendQueue.Count() )
-	{
-		while ( con->m_sendQueue.Count() )
-		{
-			NetMessage* pbuf;
-			con->m_sendQueue.Pop( pbuf );
-			s_netInternal->msgPool.Push( pbuf );
-		}
-
-		con->m_sendQueue.Clear();
-	}
+	return ( h >= 0 );
 }
 
-SEGAN_INLINE void net_connection_flush_list( Connection* con )
-{
-	if ( con->m_msgList.Count() )
-	{
-		con->m_msgList.Sort( net_compare_ack );
-
-		for ( int i=0; i<con->m_msgList.Count(); i++ )
-		{
-			NetMessage* pbuf = con->m_msgList[i];
-			if ( con->m_recAck == pbuf->packet.header.ack )
-			{
-				con->m_callBack( con, pbuf->packet.data, pbuf->bytsRecved );
-				con->m_recAck++;
-
-				s_netInternal->msgPool.Push( pbuf );
-			}
-		}
-		con->m_msgList.Clear();
-	}
-}
-
-SEGAN_INLINE void net_connection_send_from_queue( Connection* con )
-{
-	while ( con->m_sendQueue.Count() )
-	{
-		NetMessage* msg;
-
-		//	pop the message from list
-		if ( con->m_sendQueue.Pop( msg ) )
-		{
-			//	send to destination
-			msg->packet.header.ack = con->m_sntAck;
-			con->m_socket->Send( con->m_destination, &msg->packet, msg->size );
-
-			//	push the message to the sent items
-			if ( msg->packet.header.crit )
-			{
-				con->m_sntAck++;
-				con->m_sentList.PushBack( msg );
-
-				//	keep sent items limit
-				if ( con->m_sentList.Count() == NET_MAX_QUEUE_BUFFER )
-				{
-					s_netInternal->msgPool.Push( con->m_sentList[0] );
-					con->m_sentList.RemoveByIndex( 0 );
-				}
-			}
-			else
-			{
-				s_netInternal->msgPool.Push( msg );
-			}
-		}
-	}
-}
-
-SEGAN_INLINE bool net_connection_push_to_queue( NetMessage* buffer, Connection* con )
-{
-	bool res;
-
-	//  verify that if message queue is going too long may be a message is lost
-	if ( con->m_msgList.Count() < NET_MAX_QUEUE_BUFFER )
-	{
-		//	push the message to the queue
-		NetMessage* netmsg;
-		s_netInternal->msgPool.Pop( netmsg );
-		memcpy( netmsg, buffer, sizeof(NetMessage) );
-		con->m_msgList.PushBack( netmsg );
-		res = true;
-	}
-	else
-	{
-		con->Disconnect();
-		res = false;
-	}
-
-	return res;
-}
 
 SEGAN_INLINE void callback_connection_server( Connection* connection, const byte* buffer, const uint size )
 {
@@ -228,12 +127,12 @@ SEGAN_INLINE void callback_connection_client( Connection* connection, const byte
 //	merge a packet into data and return new size of data. return 0 if the packets can't be merged
 SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, const NetPacket* packet, const uint packetsize )
 {
-	if ( currsize + packetsize >= NET_PACKET_SIZE ) return 0;
+	if ( currsize + packetsize >= NET_MAX_PACKET_SIZE ) return 0;
 
 	sx_callstack();
 	uint res = 0;
 	MemoryStream data;
-	
+
 	//	verify that current packet has merged packet
 	if ( currpacket->header.type != NPT_ZIP )
 	{
@@ -250,7 +149,7 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 
 		//	compress data to pack
 		data.SetPos(0);
-		res = zlib_compress( currpacket->data, NET_PACKET_SIZE, data, data.Size() );
+		res = zlib_compress( currpacket->data, NET_MAX_PACKET_SIZE, data, data.Size(), 9 );
 		if ( res )
 		{
 			res += sizeof(NetPacketHeader);
@@ -258,6 +157,7 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 			//	change the header of packet
 			currpacket->header.type = NPT_ZIP;
 		}
+		sx_assert(res);
 	}
 	else
 	{
@@ -280,11 +180,10 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 
 			//	compress data to pack
 			data.SetPos(0);
-			res = zlib_compress( currpacket->data, NET_PACKET_SIZE, data, data.Size() );
+			res = zlib_compress( currpacket->data, NET_MAX_PACKET_SIZE, data, data.Size() );
 			if ( res )
 			{
-				data.CopyTo( currpacket->data );
-				res = data.Size() + sizeof(NetPacketHeader);
+				res += sizeof(NetPacketHeader);
 			}	
 		}	
 	}
@@ -292,14 +191,14 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 	return res;
 }
 
+//	unmerge the packed and call the connection callback
 SEGAN_INLINE void net_unmerge_packet( byte* data, const uint msgSize, Connection* con )
 {
 	uint srcsize = msgSize - sizeof(NetPacketHeader); 
 
 	//	decompress the data
 	byte dcdata[2048];
-	uint dcsize = zlib_decompress( dcdata, 2048, data, srcsize );
-	if ( dcsize )
+	if ( zlib_decompress( dcdata, 2048, data, srcsize ) )
 	{
 		sint n = dcdata[0], p = 1;
 		for ( int i=0; i<n; i++ )
@@ -310,19 +209,283 @@ SEGAN_INLINE void net_unmerge_packet( byte* data, const uint msgSize, Connection
 			con->m_callBack( con, packet->data, *size );
 		}
 	}
-	else	//	if decompression failed try to process current data
-	{
-		sint n = data[0], p = 1;
-		for ( int i=0; i<n && n<64; i++ )
-		{
-			uint* size = (uint*)&data[p];				p += 4;
-			NetPacket* packet = (NetPacket*)&data[p];	p += *size;
+}
 
-			con->m_callBack( con, packet->data, *size );
+SEGAN_INLINE bool net_con_msg_is_ack_request( Connection* con, NetMessage* netmsg )
+{
+	bool result = false;
+
+	//	verify that there is any item in the sent list
+	const uint csent = con->m_sent.Count();
+	if ( csent )
+	{
+		// messages are placed in the sent list consecutively. so we can simple compute the index of an ack
+		const uint rqack = netmsg->packet.header.ack;
+		const uint first = con->m_sent[0]->packet.header.ack;
+		const uint index = rqack - first;
+
+		// check to see the index bound of the list
+		if ( index < csent )
+		{
+			NetMessage* msg = con->m_sent[index];
+			if ( msg->packet.header.ack == rqack )
+			{
+				con->m_socket->Send( con->m_destination, &msg->packet, msg->size );
+				result = true;
+			}
 		}
 	}
 
+#if 1	//	just for debug
+	char tmpstr[128] = {0};
+	if ( result )
+		sprintf_s( tmpstr, "need ack %d / %d	founded ", netmsg->packet.header.ack, con->m_sntAck );
+	else
+		sprintf_s( tmpstr, "need ack %d / %d	!!!!!!! ", netmsg->packet.header.ack, con->m_sntAck );
+	con->m_callBack( con, (byte*)tmpstr, 8 );
+#endif
+
+	return result;
 }
+
+SEGAN_INLINE void net_con_clear_all_list( Connection* con )
+{
+	for ( int i=0; i<con->m_unreliable.Count(); i++ )
+	{
+		NetMessage* pbuf = con->m_unreliable[i];
+		s_netInternal->msgPool.Push( pbuf );
+	}
+	con->m_unreliable.Clear();
+
+	for ( int i=0; i<con->m_sent.Count(); i++ )
+	{
+		NetMessage* pbuf = con->m_sent[i];
+		s_netInternal->msgPool.Push( pbuf );
+	}
+	con->m_sent.Clear();
+
+	for ( int i=0; i<con->m_sending.Count(); i++ )
+	{
+		NetMessage* pbuf = con->m_sending[i];
+		s_netInternal->msgPool.Push( pbuf );
+	}
+	con->m_sending.Clear();
+}
+
+SEGAN_INLINE void net_con_flush_unreliablelist( Connection* con )
+{
+	if ( con->m_unreliable.Count() )
+	{
+		con->m_unreliable.Sort( net_compare_ack );
+
+		for ( int i=0; i<con->m_unreliable.Count(); i++ )
+		{
+			NetMessage* pbuf = con->m_unreliable[i];
+			if ( con->m_recAck == pbuf->packet.header.ack )
+			{
+				if ( pbuf->packet.header.type == NPT_ZIP )
+					net_unmerge_packet( pbuf->packet.data, pbuf->size, con );
+				else
+					con->m_callBack( con, pbuf->packet.data, pbuf->size );
+				con->m_recAck++;
+
+				s_netInternal->msgPool.Push( pbuf );
+				con->m_unreliable.RemoveByIndex(i);
+				i--;
+			}
+		}
+	}
+}
+
+SEGAN_INLINE void net_con_flush_sendinglist( Connection* con )
+{
+	NetMessage* msg;
+	for( int z = 0; z <= NET_MAX_SENDING_LIST && net_array_pop_front( con->m_sending, msg ); ++z )
+	{
+		//	send to destination
+		msg->packet.header.ack = con->m_sntAck;
+		con->m_socket->Send( con->m_destination, &msg->packet, msg->size );
+
+		//	push the message to the sent items
+		if ( msg->packet.header.crit )
+		{
+			con->m_sntAck++;
+			con->m_sent.PushBack( msg );
+
+			//	keep sent items limit
+			if ( con->m_sent.Count() == NET_MAX_SENT_LIST )
+			{
+				s_netInternal->msgPool.Push( con->m_sent[0] );
+				con->m_sent.RemoveByIndex( 0 );
+			}
+		}
+		else 
+		{
+			s_netInternal->msgPool.Push( msg );
+		}
+	}
+}
+
+SEGAN_INLINE bool net_con_hold_unreliable( NetMessage* buffer, Connection* con )
+{
+	//  verify that if message queue is going too long may be a message is lost
+	bool res = ( con->m_unreliable.Count() < NET_MAX_UNRELIABLE_LIST );
+
+	if ( res )
+	{
+		//	push the message to the queue
+		NetMessage* netmsg;
+		s_netInternal->msgPool.Pop( netmsg );
+		memcpy( netmsg, buffer, sizeof(NetMessage) );
+		con->m_unreliable.PushBack( netmsg );
+	}
+	else con->Disconnect();
+
+	return res;
+}
+
+SEGAN_INLINE void net_con_listening( Connection* con, NetMessage* netmsg )
+{
+	if ( netmsg->size && netmsg->packet.header.id == s_netInternal->id && netmsg->packet.header.type == NPT_CONNECT )
+	{
+		netmsg->size = 0;	//	avoid processing message by other connections
+
+		//  store client address
+		con->m_destination = netmsg->address;
+
+		//  respond to client with welcome message
+		NetPacket packet( s_netInternal->id, NPT_WELCOME, con->m_sntAck );
+		con->m_socket->Send( con->m_destination, &packet, sizeof(NetPacketHeader) + net_copy_name( &packet, con->m_name ) );
+
+		//  store client name
+		con->m_name = (wchar*)netmsg->packet.data;
+
+		//	the connection is connected
+		con->m_state = CONNECTED;
+	}
+}
+
+SEGAN_INLINE bool net_con_connecting( Connection* con, NetMessage* netmsg )
+{
+	bool result = false;
+
+	if ( 
+		netmsg->size && 
+		netmsg->packet.header.id == s_netInternal->id && 
+		netmsg->packet.header.type == NPT_WELCOME &&
+		net_check_address( &netmsg->address, &con->m_destination )
+		)
+	{
+		netmsg->size = 0;	//	avoid processing message by the other connections
+
+		//  copy host name
+		con->m_name = (wchar*)netmsg->packet.data;
+
+		//  client is connected to the destination
+		con->m_recAck = netmsg->packet.header.ack;
+		con->m_sntAck = 0;
+		con->m_timeout = 0;
+		con->m_sendTime = 0;
+		con->m_state = CONNECTED;
+
+		result = true;
+	}
+
+	return result;
+}
+
+//	return false of the message is unreliable
+SEGAN_INLINE bool net_con_connected( Connection* con, NetMessage* netmsg )
+{
+	byte msgType = netmsg->packet.header.type;
+	uint msgRcAck = netmsg->packet.header.ack;
+	uint rcvAck = con->m_recAck;
+
+	switch ( msgType )
+	{
+	case NPT_DISCONNECT:
+		con->Disconnect();
+		return true;
+
+	case NPT_ACK:
+		//	search the sent list for requested ack
+		if ( ! net_con_msg_is_ack_request( con, netmsg ) )
+		{
+			sxLog::Log( L"Net : error(disconnected) : can't find the requested message in the sent list " );
+			con->Disconnect();
+			return false;
+		}
+		return true;
+
+	case NPT_USER:
+		//	verify that message is critical
+		if ( !netmsg->packet.header.crit )
+		{
+			con->m_callBack( con, netmsg->packet.data, netmsg->size );
+		}
+		//	check the message ack
+		else if ( rcvAck == msgRcAck )
+		{
+			//	user callback function
+			con->m_callBack( con, netmsg->packet.data, netmsg->size );
+			con->m_recAck++;
+
+			//	flush stored messages in the list
+			net_con_flush_unreliablelist( con );
+		}
+		break;
+
+	case NPT_ZIP:
+		//	verify that message is critical
+		if ( !netmsg->packet.header.crit ) 
+		{
+			net_unmerge_packet( netmsg->packet.data, netmsg->size, con );
+		}
+		else if ( rcvAck  == msgRcAck )
+		{
+			net_unmerge_packet( netmsg->packet.data, netmsg->size, con );
+			con->m_recAck++;
+
+			//	flush stored messages in the list
+			net_con_flush_unreliablelist( con );
+		}
+		break;
+
+	case NPT_SYNC:
+		{
+			uint msgSnAck = *( (u32*)netmsg->packet.data );
+			uint sntAck = con->m_sntAck;
+
+			//	check the message ack
+			if ( rcvAck == msgRcAck && sntAck == msgSnAck )
+			{
+				net_con_flush_sendinglist( con );
+			}
+		}
+		break;
+	}	//	switch ( buffer->packet.header.type )
+
+	//	if ack for received message is greater that current ack so we have message lost
+	if ( rcvAck < msgRcAck )
+	{
+		//	request to send lost message
+		NetPacketHeader packet( s_netInternal->id, NPT_ACK, rcvAck );
+		con->m_socket->Send( con->m_destination, &packet, sizeof(NetPacketHeader) );
+
+		//	queue the received message to flush after the lost message founded;
+		if ( msgType == NPT_USER || msgType == NPT_ZIP )
+		{
+			if ( ! net_con_hold_unreliable( netmsg, con ) )
+			{
+				netmsg->size = 0;		// notify that netmsg handled
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //	socket implementation
@@ -452,8 +615,9 @@ Connection::Connection( void )
 , m_recAck(0)
 , m_timeout(0)
 , m_sendTime(0)
-, m_msgList(32)
-, m_sentList(32)
+, m_unreliable(32)
+, m_sending(32)
+, m_sent(32)
 , m_callBack(0)
 , m_userData(0)
 {
@@ -485,7 +649,7 @@ void Connection::Stop( void )
 		Disconnect();
 	m_state = STOPPED;
 
-	net_connection_clear_queue( this );
+	net_con_clear_all_list( this );
 }
 
 bool Connection::Listen( void )
@@ -504,7 +668,7 @@ bool Connection::Listen( void )
 	m_timeout = 0;
 	m_state = LISTENING;
 
-	net_connection_clear_queue( this );
+	net_con_clear_all_list( this );
 
 	return true;
 }
@@ -530,7 +694,7 @@ void Connection::Connect( const NetAddress& destination )
 	m_timeout = 0;
 	m_state = CONNECTING;
 
-	net_connection_clear_queue( this );
+	net_con_clear_all_list( this );
 
 }
 
@@ -551,13 +715,12 @@ void Connection::Disconnect( void )
 
 	m_state = DISCONNECTED;
 
-	net_connection_clear_queue( this );
+	net_con_clear_all_list( this );
 
 }
 
-SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elpsTime, const float delayTime, const float timeOut )
+SEGAN_INLINE void Connection::Update( struct NetMessage* netmsg, const float elpsTime, const float delayTime, const float timeOut )
 {
-
 	switch ( m_state )
 	{
 	case STARTED:
@@ -565,191 +728,58 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 	case DISCONNECTED: return;
 
 	case LISTENING:
-
-		sx_assert( buffer );
-		
 		//	verify that received message is connection request
-		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && buffer->packet.header.type == NPT_CONNECT )
-		{
-			buffer->bytsRecved = 0;	//	avoid processing message by other connections
-
-			//  store client address
-			m_destination = buffer->address;
-
-			//  respond to client with welcome message
-			NetPacket packet( s_netInternal->id, NPT_WELCOME, m_sntAck );
-			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) + net_copy_name( &packet, m_name ) );
-
-			//  store client name
-			m_name = (wchar*)buffer->packet.data;
-
-			//	the connection is connected
-			m_state = CONNECTED;
-		}
-		
+		net_con_listening( this, netmsg );		
 		break;
 
 	case CONNECTING:
-
-		sx_assert( buffer );
-
 		//	wait for receiving welcome message
-		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && net_check_address( &buffer->address, &m_destination ) && buffer->packet.header.type == NPT_WELCOME )
-		{
-			buffer->bytsRecved = 0;	//	avoid processing message by other connections
-
-			//  copy host name
-			m_name = (wchar*)buffer->packet.data;
-
-			//  client is connected to the destination
-			m_recAck = buffer->packet.header.ack;
-			m_sntAck = 0;
-			m_timeout = 0;
-			m_sendTime = 0;
-			
-			m_state = CONNECTED;
-
-			NetPacketHeader packet( s_netInternal->id, NPT_ALIVE, m_sntAck );
-			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
-
+		if ( net_con_connecting( this, netmsg ) )
 			break;
-		}
 
 		//  check connection timeout
-		m_timeout += elpsTime;
-		if ( m_timeout > timeOut )
+		if ( ( m_timeout += elpsTime ) > timeOut )
 		{
 			Disconnect();
 			break;
 		}
 
 		//  send request data to connect
-		m_sendTime += elpsTime;
-		if ( m_sendTime > delayTime )
+		if ( ( m_sendTime += elpsTime ) > delayTime )
 		{
 			m_sendTime = 0;
-
 			NetPacket packet( s_netInternal->id, NPT_CONNECT, 0 );
 			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) + net_copy_name( &packet, m_name ) );
 		}
 		break;
 
 	case CONNECTED:
-
-		sx_assert( buffer );
-
-		//	message received
-		if ( buffer->bytsRecved && buffer->packet.header.id == s_netInternal->id && net_check_address( &m_destination, &buffer->address ) )
+		if ( netmsg->size && netmsg->packet.header.id == s_netInternal->id && net_check_address( &m_destination, &netmsg->address ) )
 		{
 			m_timeout = 0;
-
-			switch ( buffer->packet.header.type )
-			{
-			case NPT_DISCONNECT:
-				{
-					//  avoid process buffer by other connections
-					buffer->bytsRecved = 0;
-					Disconnect();
-					break;
-				}
-
-			case NPT_ACK:	//	search the sent list for requested ack
-				{
-					int n = m_sentList.Count();
-					for ( int i=0; i<n; i++ )
-					{
-						NetMessage* msg = m_sentList[i];
-						if ( msg->packet.header.ack == buffer->packet.header.ack )
-						{
-							m_socket->Send( m_destination, &msg->packet, msg->size );
-							break;
-						}
-					}
-
-					buffer->bytsRecved = 0;		// notify that buffer handled
-				}
-				break;
-
-			case NPT_USER:
-				{
-					if ( !buffer->packet.header.crit ) 
-					{
-						m_callBack( this, buffer->packet.data, buffer->bytsRecved );
-					}
-					else if ( m_recAck == buffer->packet.header.ack )
-					{
-						//	user callback function
-						m_callBack( this, buffer->packet.data, buffer->bytsRecved );
-						m_recAck++;
-
-						//	flush stored messages in the list
-						net_connection_flush_list( this );
-					}
-					else if ( m_recAck < buffer->packet.header.ack )
-					{
-						if ( ! net_connection_push_to_queue( buffer, this ) )
-							return;
-					}
-				}
-				//	break;	continue to process the messages
-
-			case NPT_ALIVE:
-				{
-					if ( m_recAck == buffer->packet.header.ack )
-					{
-						net_connection_send_from_queue( this );
-					}
-					else if ( m_recAck < buffer->packet.header.ack )
-					{
-						//	request to send lost message
-						NetPacketHeader packet( s_netInternal->id, NPT_ACK, m_recAck );
-						m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
-					}
-
-					buffer->bytsRecved = 0;		// notify that buffer handled
-				}
-				break;
-
-			case NPT_ZIP:
-				{
-					if ( !buffer->packet.header.crit ) 
-					{
-						net_unmerge_packet( buffer->packet.data, buffer->bytsRecved, this );
-					}
-					else if ( m_recAck == buffer->packet.header.ack )
-					{
-						net_unmerge_packet( buffer->packet.data, buffer->bytsRecved, this );
-						m_recAck++;
-					}
-					else if ( m_recAck < buffer->packet.header.ack )
-					{
-						if ( ! net_connection_push_to_queue( buffer, this ) )
-							return;
-					}
-
-					buffer->bytsRecved = 0;		// notify that buffer handled
-				}
-				break;
-
-			}	//	switch ( buffer->packet.header.type )
+			bool isOK = net_con_connected( this, netmsg );
+			netmsg->size = 0;	//  avoid process netmsg by other connections
+			if ( !isOK ) return;
 		}
-		else	//	if ( buffer->bytsRecved && buffer->id == s_netInternal->id && net_check_address( &m_destination, &buffer->address ) )
+		else
 		{
-			m_timeout += elpsTime;
-			if ( m_timeout > timeOut )
+			if ( ( m_timeout += elpsTime ) > timeOut )
 			{
 				Disconnect();
 				break;
 			}
 		}
 
-		//	keep connection alive
-		m_sendTime += elpsTime;
-		if ( m_sendTime > delayTime )
+		//	keep connection synchronize
+		if ( ( m_sendTime += elpsTime ) > delayTime )
 		{
 			m_sendTime = 0;
-			NetPacketHeader packet( s_netInternal->id, NPT_ALIVE, m_sntAck );
-			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) );
+
+			NetPacket packet( s_netInternal->id, NPT_SYNC, m_sntAck );
+			u32* rcAck = (u32*)packet.data;
+			*rcAck = m_recAck;
+
+			m_socket->Send( m_destination, &packet, sizeof(NetPacketHeader) + sizeof(u32) );
 		}
 
 		break;
@@ -759,7 +789,7 @@ SEGAN_INLINE void Connection::Update( struct NetMessage* buffer, const float elp
 SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, const bool critical /*= true */ )
 {
 	sx_callstack();
-	sx_assert( buffer && sizeinbyte>0 && sizeinbyte<=NET_PACKET_SIZE );
+	sx_assert( buffer && sizeinbyte>0 && sizeinbyte<=NET_MAX_PACKET_SIZE );
 
 	bool res = false;
 	
@@ -774,11 +804,15 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 			uint newsize = 0;
 
 			//	verify that messages are in the queue
-			if ( m_sendQueue.Count() )
+			const uint sndcount = m_sending.Count();
+			if ( sndcount )
 			{
-				msg = m_sendQueue.Top();
+				if ( sndcount > NET_MAX_SENDING_LIST + 5 )
+					sxLog::Log( L"NET : warning : try to send too much data in the single pass ! : %d", sndcount );
 
-				//	merge only messages with same critical state
+				msg = m_sending[ sndcount - 1 ];
+
+				//	merge only messages with the same critical state
 				if ( msg->packet.header.crit == (byte)critical )
 				{
 					NetPacket packet( s_netInternal->id, NPT_USER, 0 );
@@ -802,9 +836,10 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 				msg->size = sizeinbyte + sizeof(NetPacketHeader);
 				memcpy( msg->packet.data, buffer, sizeinbyte );
 
-				m_sendQueue.Push( msg );
+				m_sending.PushBack( msg );
 				res = true;
 			}
+
 		}
 	}
 
@@ -943,7 +978,7 @@ void Server::Update( const float elpsTime, const float delayTime, const float ti
 	case RUNNING:
 		{
 			NetMessage buffer;
-			buffer.bytsRecved = m_socket.Receive( &buffer, NET_PACKET_SIZE, &buffer.address );
+			buffer.size = m_socket.Receive( &buffer, NET_MAX_PACKET_SIZE, &buffer.address );
 
 			for ( int i=0; i<m_clients.Count(); i++ )
 			{
@@ -981,7 +1016,7 @@ bool Server::Send( const char* buffer, const int sizeinbyte, const bool critical
 {
 	sx_assert( buffer );
 	sx_assert( sizeinbyte > 0 );
-	sx_assert( sizeinbyte <= NET_PACKET_SIZE );
+	sx_assert( sizeinbyte <= NET_MAX_PACKET_SIZE );
 
 	bool res = true;
 	if ( m_state != STOPPED )
@@ -994,6 +1029,55 @@ bool Server::Send( const char* buffer, const int sizeinbyte, const bool critical
 
 	return res;
 
+}
+
+SEGAN_INLINE float Server::GetMaxUpdateTime( void )
+{
+	static float res = 0;
+
+	//	find maximum sending queue
+	sint n = 0;
+	sint c = m_clients.Count();
+	for ( int i=0; i<c; i++ )
+	{
+		sint sc = m_clients[i]->m_sending.Count();
+		if ( sc > n ) n = sc;
+	}
+	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
+	float p = float(s) + 1;
+	float r = ( p * p ) * 50.0f;
+	float d = r - res;
+	res += d * 0.03f;
+	return 10.0f + res;
+}
+
+SEGAN_INLINE bool Server::CanSend( const float elpsTime )
+{
+	static float maxTime = 0;
+
+	//	find maximum sending queue
+	sint n = 0;
+	sint c = m_clients.Count();
+	for ( int i=0; i<c; i++ )
+	{
+		sint sc = m_clients[i]->m_sending.Count();
+		if ( sc > n ) n = sc;
+	}
+	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
+	float p = float(s) + 1;
+	float r = ( p * p ) * 50.0f;
+	float d = r - maxTime;
+	maxTime += d * 0.03f;
+
+	static float utime = 0;
+
+	utime += elpsTime;
+	if ( utime > ( 10.0f + maxTime ) )
+	{
+		utime = 0;
+		return true;
+	}
+	else return false;
 }
 
 
@@ -1060,9 +1144,9 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 	case LISTENING:
 
 		//	listen to the port to find any server
-		buffer.bytsRecved = m_socket.Receive( (char*)&buffer, NET_PACKET_SIZE, &buffer.address );
+		buffer.size = m_socket.Receive( (char*)&buffer, NET_MAX_PACKET_SIZE, &buffer.address );
 
-		if ( buffer.bytsRecved && buffer.packet.header.id == s_netInternal->id && ( buffer.packet.header.type == NPT_SERVER_OPEN || buffer.packet.header.type == NPT_SERVER_CLOSED ) ) 
+		if ( buffer.size && buffer.packet.header.id == s_netInternal->id && ( buffer.packet.header.type == NPT_SERVER_OPEN || buffer.packet.header.type == NPT_SERVER_CLOSED ) ) 
 		{
 			ServerInfo serverInfo;
 			memcpy( serverInfo.address.ip, buffer.address.ip, 4 );
@@ -1100,7 +1184,7 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 				}
 			}
 
-			buffer.bytsRecved = 0;
+			buffer.size = 0;
 		}
 		else
 		{
@@ -1118,16 +1202,50 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 
 	default:
 		{
-			buffer.bytsRecved = m_socket.Receive( (char*)&buffer, NET_PACKET_SIZE, &buffer.address );
+			buffer.size = m_socket.Receive( (char*)&buffer, NET_MAX_PACKET_SIZE, &buffer.address );
 			m_connection.Update( &buffer, elpsTime, delayTime, timeOut );
 		}
 		break;
 	}
 }
 
-bool Client::Send( const char* buffer, const int sizeinbyte, const bool critical /*= false */ )
+SEGAN_INLINE bool Client::Send( const char* buffer, const int sizeinbyte, const bool critical /*= false */ )
 {
 	return m_connection.Send( buffer, sizeinbyte, critical );
+}
+
+SEGAN_INLINE float Client::GetMaxUpdateTime( void )
+{
+	static float res = 0;
+	sint n = m_connection.m_sending.Count();
+	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
+	float p = float(s) + 1;
+	float r = ( p * p ) * 50.0f;
+	float d = r - res;
+	res += d * 0.03f;
+	return 10.0f + res;
+}
+
+SEGAN_INLINE bool Client::CanSend( const float elpsTime )
+{
+	static float maxTime = 0;
+
+	sint n = m_connection.m_sending.Count();
+	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
+	float p = float(s) + 1;
+	float r = ( p * p ) * 50.0f;
+	float d = r - maxTime;
+	maxTime += d * 0.03f;
+
+	static float utime = 0;
+
+	utime += elpsTime;
+	if ( utime > ( 10.0f + maxTime ) )
+	{
+		utime = 0;
+		return true;
+	}
+	else return false;
 }
 
 

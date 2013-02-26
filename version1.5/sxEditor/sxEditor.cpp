@@ -257,7 +257,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 			}
 
 			tryToConnect++;
-			Sleep(50);
+			Sleep(10);
 		}
 	}
 	sxLog::SetCallback( loggerCallback );

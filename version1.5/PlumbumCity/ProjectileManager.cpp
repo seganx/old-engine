@@ -38,21 +38,21 @@ void ProjectileManager::LoadTypes( void )
 
 	for (int i=0; i<script.GetObjectCount(); i++)
 	{
-		str512 tmpStr, tmpName;
-		if ( script.GetString(i, L"Type", tmpStr) )
+		str512 tmpStr, tmpName, tmpType;
+		if ( script.GetString(i, L"Type", tmpType) )
 		{
 			if ( !script.GetString(i, L"Name", tmpName) )
 				continue;
 			Projectile* proj = NULL;
 
-			script.GetString(i, L"Type", tmpStr);
-			if ( tmpStr == L"BULLET" )
+			script.GetString(i, L"Type", tmpType);
+			if ( tmpType == L"BULLET" )
 				proj = sx_new( projectile_Bullet );
-			else if ( tmpStr == L"BOMB" )
+			else if ( tmpType == L"BOMB" )
 				proj = sx_new( Projectile_BOMB );
-			else if ( tmpStr == L"MISSILE" )
+			else if ( tmpType == L"MISSILE" )
 				proj = sx_new( projectile_Missile );
-			else if ( tmpStr == L"CLUSTERBOMB" )
+			else if ( tmpType == L"CLUSTERBOMB" )
 			{
 				projectile_ClusterBomb* cproj = sx_new( projectile_ClusterBomb );
 				script.GetString( i, L"miniBomb", tmpStr );
@@ -90,7 +90,7 @@ void ProjectileManager::LoadTypes( void )
 			{
 				if ( Config::GetData()->display_Debug == 3 )
 				{
-					sxLog::Log( L"Projectile registered with type '%s' and name '%s'", tmpStr.Text(), tmpName.Text() );
+					sxLog::Log( L"Projectile registered with type '%s' and name '%s'", tmpType.Text(), tmpName.Text() );
 				}
 			}
 		}

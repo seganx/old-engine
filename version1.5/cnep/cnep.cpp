@@ -217,7 +217,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		sx_net_initialize( 0x27272727 );
 
 		client = sx_new( Client );
-		client->m_name.Format( L"editor %s", sx::sys::GetUserName() );
+		client->m_name.Format( L"RoB %s", sx::sys::GetUserName() );
 		client->Start( 2727, clientCallback );
 		client->Listen();
 		int tryToConnect = 0;
@@ -234,7 +234,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 			}
 
 			tryToConnect++;
-			Sleep(50);
+			Sleep(10);
 		}
 	}
 	sxLog::SetCallback( loggerCallback );

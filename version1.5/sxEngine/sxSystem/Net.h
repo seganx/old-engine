@@ -112,12 +112,11 @@ public:
 	uint								m_recAck;			//	number of packet received
 	float								m_timeout;			//	if receive time became grater that time out, connection is lost
 	float								m_sendTime;			//	send time to check connection
-	Array<struct NetMessage*>			m_msgList;			//	queue of messages to handle unreliable connections
-	Queue<struct NetMessage*>			m_sendQueue;		//	list of messages that are going to send
-	Array<struct NetMessage*>			m_sentList;			//	list of messages that has been sent
+	Array<struct NetMessage*>			m_unreliable;		//	list of messages to handle unreliable connections
+	Array<struct NetMessage*>			m_sending;			//	list of messages that are going to send
+	Array<struct NetMessage*>			m_sent;				//	list of messages that has been sent
 	CB_Connection						m_callBack;			//	will call when message received
 	void*								m_userData;			//	user data
-
 };
 
 
@@ -145,6 +144,21 @@ public:
 
 	//! send message to all clients
 	bool Send( const char* buffer, const int sizeinbyte, const bool critical = false );
+
+	/*! return the maximum time needed to send data queued
+	the returned value can be used as delay time in application side
+	to avoid data accumulation on the network.
+	also the application can use Server::CanSend() to determinde when
+	update the networked objects instead of using this */
+	float GetMaxUpdateTime( void );
+
+	/*! return true if the network system is ready to send new messages.
+	the application can call Send() in anywhere but calling Send() function
+	in the if ( Server::CanSend( elpstime ) ) { } block will help the traffic
+	balancer to avoid data accumulation on the network.
+	also the application can use Server::GetMaxUpdateTime() to compute delay
+	time and take control over the traffic balancer instead of using this. */
+	bool CanSend( const float elpsTime );
 
 public:
 
@@ -189,6 +203,22 @@ public:
 
 	//! send a message to the connected server
 	bool Send( const char* buffer, const int sizeinbyte, const bool critical = false );
+
+	/*! return the maximum time needed to send data queued
+	the returned value can be used as delay time in application side
+	to avoid data accumulation on the network.
+	also the application can use Client::CanSend() to determined when
+	update the networked objects instead of using this */
+	float GetMaxUpdateTime( void );
+
+	/*! return true if the network system is ready to send new messages.
+	the application can call Send() in anywhere but calling Send() function
+	in the if ( Client::CanSend( elpstime ) ) { } block will help the traffic
+	balancer to avoid data accumulation on the network.
+	also the application can use Client::GetMaxUpdateTime() to compute delay
+	time and take control over the traffic balancer instead of using this.
+	*/
+	bool CanSend( const float elpsTime );
 
 public:
 
