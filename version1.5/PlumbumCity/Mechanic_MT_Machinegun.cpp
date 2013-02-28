@@ -192,7 +192,15 @@ namespace GM
 				m_lblMagazine->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
 				str128 str;
 				m_lblBullet->SetText(str);
-				str.Format( L"%dx%d", ((m_bullets - m_firedCount) / m_magazineCap) - 1, m_magazineCap );
+				if ( m_firedCount != m_bullets )
+				{
+					str.Format( L"%dx%d", ((m_bullets - m_firedCount) / m_magazineCap) - 1, m_magazineCap );
+				}
+				else
+				{
+					m_lblMagazine->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
+					str.Format( L"0x%d", m_magazineCap );				
+				}
 				m_lblMagazine->SetText(str);
 				m_lblBullet->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
 				str.Format( L"%d/%d", m_magazineCap, m_magazineCap );
@@ -608,12 +616,6 @@ namespace GM
 			{
 				m_reload = m_reloadTime;
 				m_reloadBar->AddProperty( SX_GUI_PROPERTY_VISIBLE );
-			}
-			else
-			{
-				m_lblMagazine->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
-				str.Format( L"0x%d", m_magazineCap );
-				m_lblMagazine->SetText(str);
 			}
 
 			m_lblBullet->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
