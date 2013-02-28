@@ -568,6 +568,23 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuMap::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
 
+	//	create game mode
+	m_mode_scroll = sx_new( sx::gui::TrackBar );
+	m_mode_scroll->SetMax(2);
+	m_mode_scroll->SetUserTag( 1 );
+	m_mode_scroll->SetParent( m_back );
+	m_mode_scroll->SetSize( float2(130, 32) );
+	m_mode_scroll->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
+	m_mode_scroll->GetElement(0)->Color().a = 0.0f;
+	m_mode_scroll->GetElement(1)->Color().a = 0.01f;
+	m_mode_scroll->Position().Set( -317.0f, 295.0f, 0.0f );
+	SEGAN_GUI_SET_ONSCROLL( m_mode_scroll, MenuMap::OnScroll );
+
+	sx::gui::Panel* panel = sx_new( sx::gui::Panel );
+	panel->SetParent( m_mode_scroll );
+	panel->SetSize( float2( 80, 32 ) );
+	panel->GetElement(0)->SetTextureSrc( L"gui_menu_map_diff.txr" );
+
 	//	create difficulty
 	m_diff_scroll = sx_new( sx::gui::TrackBar );
 	m_diff_scroll->SetMax(2);
@@ -580,7 +597,7 @@ void MenuMap::Initialize( void )
 	m_diff_scroll->Position().Set( -317.0f, 265.0f, 0.0f );
 	SEGAN_GUI_SET_ONSCROLL( m_diff_scroll, MenuMap::OnScroll );
 
-	sx::gui::Panel* panel = sx_new( sx::gui::Panel );
+	panel = sx_new( sx::gui::Panel );
 	panel->SetParent( m_diff_scroll );
 	panel->SetSize( float2( 80, 32 ) );
 	panel->GetElement(0)->SetTextureSrc( L"gui_menu_map_diff.txr" );
@@ -732,6 +749,10 @@ void MenuMap::Update( float elpsTime )
 		m_diff_scroll->GetElement(1)->Matrix().GetTranslation(x, y, z);
 		sx::gui::Panel* panel = (sx::gui::PPanel)m_diff_scroll->GetChild(0);
 		panel->Position().Set( x, y, z );
+
+		m_mode_scroll->GetElement(1)->Matrix().GetTranslation(x, y, z);
+		panel = (sx::gui::PPanel)m_mode_scroll->GetChild(0);
+		panel->Position().Set( x, y, z );
 	}
 
 	Menu::Update(elpsTime);
@@ -762,6 +783,7 @@ void MenuMap::Show( void )
 	m_chooser->State_SetIndex( m_selectedLevel );
 
 	//	load from player profile
+	m_mode_scroll->SetValue( (float)g_game->m_player->m_profile.curGameMode );
 	m_diff_scroll->SetValue( (float)g_game->m_player->m_profile.curDifficulty );
 
 	Menu::Show();
@@ -897,6 +919,7 @@ void MenuMap::OnScroll( sx::gui::PControl sender )
 		break;
 	}
 
+	g_game->m_player->m_profile.curGameMode = int( m_mode_scroll->GetValue() + 0.5f );
 	g_game->m_player->m_profile.curDifficulty = int( m_diff_scroll->GetValue() + 0.5f );
 
 	switch ( g_game->m_player->m_profile.curDifficulty )
@@ -1108,7 +1131,38 @@ void MenuProfile::Initialize( void )
 			memcpy( &m_profiles[3], &profilev1[3], sizeof(PlayerProfile_v2) );
 
 		}
-		else if ( version == 3 )
+		else if ( version == 2 )
+		{
+			file.Read( &m_profIndex, sizeof(m_profIndex) );
+
+			struct PlayerProfile_v3
+			{
+				//	version 1
+				WCHAR			name[32];
+				int				achievements[15];
+				int				upgrades[44];
+				int				stars[10];
+				int				level;
+				int				people;
+
+				//	version 2
+				int				level_selected;
+				int				level_played;
+
+				//	version 3
+				int				curDifficulty;
+				int				difficulty[10];
+			};
+			PlayerProfile_v3 profilev1[4];
+			file.Read( profilev1, sizeof(profilev1) );
+
+			memcpy( &m_profiles[0], &profilev1[0], sizeof(PlayerProfile_v3) );
+			memcpy( &m_profiles[1], &profilev1[1], sizeof(PlayerProfile_v3) );
+			memcpy( &m_profiles[2], &profilev1[2], sizeof(PlayerProfile_v3) );
+			memcpy( &m_profiles[3], &profilev1[3], sizeof(PlayerProfile_v3) );
+
+		}
+		else if ( version == 4 )
 		{
 			file.Read( &m_profIndex, sizeof(m_profIndex) );
 			file.Read( m_profiles, sizeof(m_profiles) );
@@ -1325,7 +1379,7 @@ void MenuProfile::SaveProfile( void )
 	sx::sys::FileStream	file;
 	if ( file.Open( fileName, FM_CREATE ) )
 	{
-		int version = 3;
+		int version = 4;
 		file.Write( &version, sizeof(version) );
 
 		file.Write( &m_profIndex, sizeof(m_profIndex) );
@@ -2852,7 +2906,14 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 			if ( g_game->m_miniGame )
 				str << L"config_mini.txt";
 			else
-				str << L"config.txt";
+			{
+				switch ( g_game->m_game_mode )
+				{
+				case 0 : str << L"config_default.txt"; break;
+				case 1 : str << L"config_warrior.txt"; break;
+				case 2 : str << L"config_legend.txt"; break;
+				}
+			}
 
 			Scripter script;
 			script.Load( str );

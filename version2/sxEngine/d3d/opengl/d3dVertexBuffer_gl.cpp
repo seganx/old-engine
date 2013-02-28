@@ -72,6 +72,6 @@ void d3dVertexBuffer_gl::Unlock( void )
 
 SEGAN_INLINE void d3dVertexBuffer_gl::SetToDevice( uint streamIndex )
 {
-	assert( m_device );
+	sx_assert( m_device );
 	m_device->SetVertexBuffer( this, streamIndex );
 }

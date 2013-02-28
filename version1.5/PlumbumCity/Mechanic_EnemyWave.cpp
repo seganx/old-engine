@@ -444,7 +444,14 @@ namespace GM
 		if ( g_game->m_miniGame )
 			str << L"waves_mini.txt";
 		else
-			str << L"waves.txt";
+		{
+			switch ( g_game->m_game_mode )
+			{
+			case 0 : str << L"waves_default.txt"; break;
+			case 1 : str << L"waves_warrior.txt"; break;
+			case 2 : str << L"waves_legend.txt"; break;
+			}
+		}
 
 		Scripter script;
 		script.Load( str );

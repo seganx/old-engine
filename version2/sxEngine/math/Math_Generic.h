@@ -11,194 +11,194 @@
 
 #include "Math.h"
 
-SEGAN_INLINE float gen_matrix_det( Matrix& mat )
+SEGAN_INLINE float gen_matrix_det( Matrix* mat )
 {
-	float tmp0 = ( ( mat._33 * mat._14 ) - ( mat._13 * mat._34 ) );
-	float tmp1 = ( ( mat._43 * mat._24 ) - ( mat._23 * mat._44 ) );
-	float tmp2 = ( ( mat._12 * mat._33 ) - ( mat._32 * mat._13 ) );
-	float tmp3 = ( ( mat._22 * mat._43 ) - ( mat._42 * mat._23 ) );
-	float tmp4 = ( ( mat._32 * mat._14 ) - ( mat._12 * mat._34 ) );
-	float tmp5 = ( ( mat._42 * mat._24 ) - ( mat._22 * mat._44 ) );
-	float dx = ( ( ( mat._32 * tmp1 ) - ( mat._34 * tmp3 ) ) - ( mat._33 * tmp5 ) );
-	float dy = ( ( ( mat._42 * tmp0 ) - ( mat._44 * tmp2 ) ) - ( mat._43 * tmp4 ) );
-	float dz = ( ( ( mat._14 * tmp3 ) + ( mat._13 * tmp5 ) ) - ( mat._12 * tmp1 ) );
-	float dw = ( ( ( mat._24 * tmp2 ) + ( mat._23 * tmp4 ) ) - ( mat._22 * tmp0 ) );
-	return ( ( ( mat._11 * dx ) + ( mat._21 * dy ) ) + ( mat._31 * dz ) ) + ( mat._41 * dw );
+	float tmp0 = ( ( mat->m22 * mat->m03 ) - ( mat->m02 * mat->m23 ) );
+	float tmp1 = ( ( mat->m32 * mat->m13 ) - ( mat->m12 * mat->m33 ) );
+	float tmp2 = ( ( mat->m01 * mat->m22 ) - ( mat->m21 * mat->m02 ) );
+	float tmp3 = ( ( mat->m11 * mat->m32 ) - ( mat->m31 * mat->m12 ) );
+	float tmp4 = ( ( mat->m21 * mat->m03 ) - ( mat->m01 * mat->m23 ) );
+	float tmp5 = ( ( mat->m31 * mat->m13 ) - ( mat->m11 * mat->m33 ) );
+	float dx = ( ( ( mat->m21 * tmp1 ) - ( mat->m23 * tmp3 ) ) - ( mat->m22 * tmp5 ) );
+	float dy = ( ( ( mat->m31 * tmp0 ) - ( mat->m33 * tmp2 ) ) - ( mat->m32 * tmp4 ) );
+	float dz = ( ( ( mat->m03 * tmp3 ) + ( mat->m02 * tmp5 ) ) - ( mat->m01 * tmp1 ) );
+	float dw = ( ( ( mat->m13 * tmp2 ) + ( mat->m12 * tmp4 ) ) - ( mat->m11 * tmp0 ) );
+	return ( ( ( mat->m00 * dx ) + ( mat->m10 * dy ) ) + ( mat->m20 * dz ) ) + ( mat->m30 * dw );
 }
 
-SEGAN_INLINE void gen_matrix_Transpose( Matrix* res, const Matrix* mat )
+SEGAN_INLINE void gen_matrix_transpose( Matrix* res, const Matrix* mat )
 {
 	Matrix outMat;
 	
-	outMat._12 = mat->_21;
-	outMat._13 = mat->_31;
-	outMat._14 = mat->_41;
+	outMat.m01 = mat->m10;
+	outMat.m02 = mat->m20;
+	outMat.m03 = mat->m30;
 
-	outMat._21 = mat->_12;
-	outMat._23 = mat->_32;
-	outMat._24 = mat->_42;
+	outMat.m10 = mat->m01;
+	outMat.m12 = mat->m21;
+	outMat.m13 = mat->m31;
 
-	outMat._31 = mat->_13;
-	outMat._32 = mat->_23;
-	outMat._34 = mat->_43;
+	outMat.m20 = mat->m02;
+	outMat.m21 = mat->m12;
+	outMat.m23 = mat->m32;
 
-	outMat._41 = mat->_14;
-	outMat._42 = mat->_24;
-	outMat._43 = mat->_34;
+	outMat.m30 = mat->m03;
+	outMat.m31 = mat->m13;
+	outMat.m32 = mat->m23;
 
 	*res = outMat;
 }
 
-SEGAN_INLINE void gen_matrix_Inverse( Matrix* res, const Matrix* mat )
+SEGAN_INLINE void gen_matrix_inv( Matrix* res, const Matrix* mat )
 {
-	float tmp0 = ( ( mat->_33 * mat->_14 ) - ( mat->_13 * mat->_34 ) );
-	float tmp1 = ( ( mat->_43 * mat->_24 ) - ( mat->_23 * mat->_44 ) );
-	float tmp2 = ( ( mat->_12 * mat->_33 ) - ( mat->_32 * mat->_13 ) );
-	float tmp3 = ( ( mat->_22 * mat->_43 ) - ( mat->_42 * mat->_23 ) );
-	float tmp4 = ( ( mat->_32 * mat->_14 ) - ( mat->_12 * mat->_34 ) );
-	float tmp5 = ( ( mat->_42 * mat->_24 ) - ( mat->_22 * mat->_44 ) );
+	float tmp0 = ( ( mat->m22 * mat->m03 ) - ( mat->m02 * mat->m23 ) );
+	float tmp1 = ( ( mat->m32 * mat->m13 ) - ( mat->m12 * mat->m33 ) );
+	float tmp2 = ( ( mat->m01 * mat->m22 ) - ( mat->m21 * mat->m02 ) );
+	float tmp3 = ( ( mat->m11 * mat->m32 ) - ( mat->m31 * mat->m12 ) );
+	float tmp4 = ( ( mat->m21 * mat->m03 ) - ( mat->m01 * mat->m23 ) );
+	float tmp5 = ( ( mat->m31 * mat->m13 ) - ( mat->m11 * mat->m33 ) );
 
 	float res0[4];
-	res0[0] = ( ( ( mat->_32 * tmp1 ) - ( mat->_34 * tmp3 ) ) - ( mat->_33 * tmp5 ) );
-	res0[1] = ( ( ( mat->_42 * tmp0 ) - ( mat->_44 * tmp2 ) ) - ( mat->_43 * tmp4 ) );
-	res0[2] = ( ( ( mat->_14 * tmp3 ) + ( mat->_13 * tmp5 ) ) - ( mat->_12 * tmp1 ) );
-	res0[3] = ( ( ( mat->_24 * tmp2 ) + ( mat->_23 * tmp4 ) ) - ( mat->_22 * tmp0 ) );
+	res0[0] = ( ( ( mat->m21 * tmp1 ) - ( mat->m23 * tmp3 ) ) - ( mat->m22 * tmp5 ) );
+	res0[1] = ( ( ( mat->m31 * tmp0 ) - ( mat->m33 * tmp2 ) ) - ( mat->m32 * tmp4 ) );
+	res0[2] = ( ( ( mat->m03 * tmp3 ) + ( mat->m02 * tmp5 ) ) - ( mat->m01 * tmp1 ) );
+	res0[3] = ( ( ( mat->m13 * tmp2 ) + ( mat->m12 * tmp4 ) ) - ( mat->m11 * tmp0 ) );
 
-	float detInv = ( 1.0f / ( ( ( ( mat->_11 * res0[0] ) + ( mat->_21 * res0[1] ) ) + ( mat->_31 * res0[2] ) ) + ( mat->_41 * res0[3] ) ) );
+	float detInv = ( 1.0f / ( ( ( ( mat->m00 * res0[0] ) + ( mat->m10 * res0[1] ) ) + ( mat->m20 * res0[2] ) ) + ( mat->m30 * res0[3] ) ) );
 
 	float res1[4];
-	res1[0] = mat->_31 * tmp1;
-	res1[1] = mat->_41 * tmp0;
-	res1[2] = mat->_11 * tmp1;
-	res1[3] = mat->_21 * tmp0;
+	res1[0] = mat->m20 * tmp1;
+	res1[1] = mat->m30 * tmp0;
+	res1[2] = mat->m00 * tmp1;
+	res1[3] = mat->m10 * tmp0;
 	
 	float res2[4];	
-	res2[0] = mat->_31 * tmp5;
-	res2[1] = mat->_41 * tmp4;
-	res2[2] = mat->_11 * tmp5;
-	res2[3] = mat->_21 * tmp4;
+	res2[0] = mat->m20 * tmp5;
+	res2[1] = mat->m30 * tmp4;
+	res2[2] = mat->m00 * tmp5;
+	res2[3] = mat->m10 * tmp4;
 
 	float res3[4];
-	res3[0] = mat->_31 * tmp3;
-	res3[1] = mat->_41 * tmp2;
-	res3[2] = mat->_11 * tmp3;
-	res3[3] = mat->_21 * tmp2;
+	res3[0] = mat->m20 * tmp3;
+	res3[1] = mat->m30 * tmp2;
+	res3[2] = mat->m00 * tmp3;
+	res3[3] = mat->m10 * tmp2;
 
-	tmp0 = ( ( mat->_31 * mat->_12 ) - ( mat->_11 * mat->_32 ) );
-	tmp1 = ( ( mat->_41 * mat->_22 ) - ( mat->_21 * mat->_42 ) );
-	tmp2 = ( ( mat->_31 * mat->_14 ) - ( mat->_11 * mat->_34 ) );
-	tmp3 = ( ( mat->_41 * mat->_24 ) - ( mat->_21 * mat->_44 ) );
-	tmp4 = ( ( mat->_31 * mat->_13 ) - ( mat->_11 * mat->_33 ) );
-	tmp5 = ( ( mat->_41 * mat->_23 ) - ( mat->_21 * mat->_43 ) );
+	tmp0 = ( ( mat->m20 * mat->m01 ) - ( mat->m00 * mat->m21 ) );
+	tmp1 = ( ( mat->m30 * mat->m11 ) - ( mat->m10 * mat->m31 ) );
+	tmp2 = ( ( mat->m20 * mat->m03 ) - ( mat->m00 * mat->m23 ) );
+	tmp3 = ( ( mat->m30 * mat->m13 ) - ( mat->m10 * mat->m33 ) );
+	tmp4 = ( ( mat->m20 * mat->m02 ) - ( mat->m00 * mat->m22 ) );
+	tmp5 = ( ( mat->m30 * mat->m12 ) - ( mat->m10 * mat->m32 ) );
 
-	res2[0] =  ( ( ( mat->_34 * tmp1 ) - ( mat->_32 * tmp3 ) ) + res2[0] );
-	res2[1] =  ( ( ( mat->_44 * tmp0 ) - ( mat->_42 * tmp2 ) ) + res2[1] );
-	res2[2] =  ( ( ( mat->_12 * tmp3 ) - ( mat->_14 * tmp1 ) ) - res2[2] );
-	res2[3] =  ( ( ( mat->_22 * tmp2 ) - ( mat->_24 * tmp0 ) ) - res2[3] );
+	res2[0] =  ( ( ( mat->m23 * tmp1 ) - ( mat->m21 * tmp3 ) ) + res2[0] );
+	res2[1] =  ( ( ( mat->m33 * tmp0 ) - ( mat->m31 * tmp2 ) ) + res2[1] );
+	res2[2] =  ( ( ( mat->m01 * tmp3 ) - ( mat->m03 * tmp1 ) ) - res2[2] );
+	res2[3] =  ( ( ( mat->m11 * tmp2 ) - ( mat->m13 * tmp0 ) ) - res2[3] );
 
-	res3[0] =  ( ( ( mat->_32 * tmp5 ) - ( mat->_33 * tmp1 ) ) + res3[0] );
-	res3[1] =  ( ( ( mat->_42 * tmp4 ) - ( mat->_43 * tmp0 ) ) + res3[1] );
-	res3[2] =  ( ( ( mat->_13 * tmp1 ) - ( mat->_12 * tmp5 ) ) - res3[2] );
-	res3[3] =  ( ( ( mat->_23 * tmp0 ) - ( mat->_22 * tmp4 ) ) - res3[3] );
+	res3[0] =  ( ( ( mat->m21 * tmp5 ) - ( mat->m22 * tmp1 ) ) + res3[0] );
+	res3[1] =  ( ( ( mat->m31 * tmp4 ) - ( mat->m32 * tmp0 ) ) + res3[1] );
+	res3[2] =  ( ( ( mat->m02 * tmp1 ) - ( mat->m01 * tmp5 ) ) - res3[2] );
+	res3[3] =  ( ( ( mat->m12 * tmp0 ) - ( mat->m11 * tmp4 ) ) - res3[3] );
 
-	res1[0] =  ( ( ( mat->_33 * tmp3 ) - ( mat->_34 * tmp5 ) ) - res1[0] );
-	res1[1] =  ( ( ( mat->_43 * tmp2 ) - ( mat->_44 * tmp4 ) ) - res1[1] );
-	res1[2] =  ( ( ( mat->_14 * tmp5 ) - ( mat->_13 * tmp3 ) ) + res1[2] );
-	res1[3] =  ( ( ( mat->_24 * tmp4 ) - ( mat->_23 * tmp2 ) ) + res1[3] );
+	res1[0] =  ( ( ( mat->m22 * tmp3 ) - ( mat->m23 * tmp5 ) ) - res1[0] );
+	res1[1] =  ( ( ( mat->m32 * tmp2 ) - ( mat->m33 * tmp4 ) ) - res1[1] );
+	res1[2] =  ( ( ( mat->m03 * tmp5 ) - ( mat->m02 * tmp3 ) ) + res1[2] );
+	res1[3] =  ( ( ( mat->m13 * tmp4 ) - ( mat->m12 * tmp2 ) ) + res1[3] );
 
-	res->_11 = res0[0] * detInv;
-	res->_12 = res0[1] * detInv;
-	res->_13 = res0[2] * detInv;
-	res->_14 = res0[3] * detInv;
+	res->m00 = res0[0] * detInv;
+	res->m01 = res0[1] * detInv;
+	res->m02 = res0[2] * detInv;
+	res->m03 = res0[3] * detInv;
 
-	res->_21 = res1[0] * detInv;
-	res->_22 = res1[1] * detInv;
-	res->_23 = res1[2] * detInv;
-	res->_24 = res1[3] * detInv;
+	res->m10 = res1[0] * detInv;
+	res->m11 = res1[1] * detInv;
+	res->m12 = res1[2] * detInv;
+	res->m13 = res1[3] * detInv;
 
-	res->_31 = res2[0] * detInv;
-	res->_32 = res2[1] * detInv;
-	res->_33 = res2[2] * detInv;
-	res->_44 = res2[3] * detInv;
+	res->m20 = res2[0] * detInv;
+	res->m21 = res2[1] * detInv;
+	res->m22 = res2[2] * detInv;
+	res->m33 = res2[3] * detInv;
 
-	res->_41 = res3[0] * detInv;
-	res->_42 = res3[1] * detInv;
-	res->_43 = res3[2] * detInv;
-	res->_44 = res3[3] * detInv;
+	res->m30 = res3[0] * detInv;
+	res->m31 = res3[1] * detInv;
+	res->m32 = res3[2] * detInv;
+	res->m33 = res3[3] * detInv;
 }
 
-SEGAN_INLINE void gen_matrix_add( Matrix& OUT resMat, const Matrix& mat1, const Matrix& mat2 )
+SEGAN_INLINE void gen_matrix_add( Matrix* res, const Matrix* mat1, const Matrix* mat2 )
 {
-	resMat._11 = mat1._11 + mat2._11;
-	resMat._21 = mat1._21 + mat2._21;
-	resMat._31 = mat1._31 + mat2._31;
-	resMat._41 = mat1._41 + mat2._41;
+	res->m00 = mat1->m00 + mat2->m00;
+	res->m10 = mat1->m10 + mat2->m10;
+	res->m20 = mat1->m20 + mat2->m20;
+	res->m30 = mat1->m30 + mat2->m30;
 
-	resMat._12 = mat1._12 + mat2._12;
-	resMat._22 = mat1._22 + mat2._22;
-	resMat._32 = mat1._32 + mat2._32;
-	resMat._42 = mat1._42 + mat2._42;
+	res->m01 = mat1->m01 + mat2->m01;
+	res->m11 = mat1->m11 + mat2->m11;
+	res->m21 = mat1->m21 + mat2->m21;
+	res->m31 = mat1->m31 + mat2->m31;
 
-	resMat._13 = mat1._13 + mat2._13;
-	resMat._23 = mat1._23 + mat2._23;
-	resMat._33 = mat1._33 + mat2._33;
-	resMat._43 = mat1._43 + mat2._43;
+	res->m02 = mat1->m02 + mat2->m02;
+	res->m12 = mat1->m12 + mat2->m12;
+	res->m22 = mat1->m22 + mat2->m22;
+	res->m32 = mat1->m32 + mat2->m32;
 
-	resMat._14 = mat1._14 + mat2._14;
-	resMat._24 = mat1._24 + mat2._24;
-	resMat._34 = mat1._34 + mat2._34;
-	resMat._44 = mat1._44 + mat2._44;
+	res->m03 = mat1->m03 + mat2->m03;
+	res->m13 = mat1->m13 + mat2->m13;
+	res->m23 = mat1->m23 + mat2->m23;
+	res->m33 = mat1->m33 + mat2->m33;
 }
 
-SEGAN_INLINE void gen_matrix_sub( Matrix& OUT resMat, const Matrix& mat1, const Matrix& mat2 )
+SEGAN_INLINE void gen_matrix_sub( Matrix* res, const Matrix* mat1, const Matrix* mat2 )
 {
-	resMat._11 = mat1._11 - mat2._11;
-	resMat._21 = mat1._21 - mat2._21;
-	resMat._31 = mat1._31 - mat2._31;
-	resMat._41 = mat1._41 - mat2._41;
+	res->m00 = mat1->m00 - mat2->m00;
+	res->m10 = mat1->m10 - mat2->m10;
+	res->m20 = mat1->m20 - mat2->m20;
+	res->m30 = mat1->m30 - mat2->m30;
 
-	resMat._12 = mat1._12 - mat2._12;
-	resMat._22 = mat1._22 - mat2._22;
-	resMat._32 = mat1._32 - mat2._32;
-	resMat._42 = mat1._42 - mat2._42;
+	res->m01 = mat1->m01 - mat2->m01;
+	res->m11 = mat1->m11 - mat2->m11;
+	res->m21 = mat1->m21 - mat2->m21;
+	res->m31 = mat1->m31 - mat2->m31;
 
-	resMat._13 = mat1._13 - mat2._13;
-	resMat._23 = mat1._23 - mat2._23;
-	resMat._33 = mat1._33 - mat2._33;
-	resMat._43 = mat1._43 - mat2._43;
+	res->m02 = mat1->m02 - mat2->m02;
+	res->m12 = mat1->m12 - mat2->m12;
+	res->m22 = mat1->m22 - mat2->m22;
+	res->m32 = mat1->m32 - mat2->m32;
 
-	resMat._14 = mat1._14 - mat2._14;
-	resMat._24 = mat1._24 - mat2._24;
-	resMat._34 = mat1._34 - mat2._34;
-	resMat._44 = mat1._44 - mat2._44;
+	res->m03 = mat1->m03 - mat2->m03;
+	res->m13 = mat1->m13 - mat2->m13;
+	res->m23 = mat1->m23 - mat2->m23;
+	res->m33 = mat1->m33 - mat2->m33;
 }
 
 
-SEGAN_INLINE void gen_matrix_mul( Matrix& OUT resMat, const Matrix& mat1, const Matrix& mat2 )
+SEGAN_INLINE void gen_matrix_mul( Matrix* res, const Matrix* mat1, const Matrix* mat2 )
 {
 	Matrix outMat;
 
-	outMat._11 = mat1._11 * mat2._11 + mat1._12 * mat2._21 + mat1._13 * mat2._31 + mat1._14 * mat2._41;
-	outMat._12 = mat1._11 * mat2._12 + mat1._12 * mat2._22 + mat1._13 * mat2._32 + mat1._14 * mat2._42;
-	outMat._13 = mat1._11 * mat2._13 + mat1._12 * mat2._23 + mat1._13 * mat2._33 + mat1._14 * mat2._43;
-	outMat._14 = mat1._11 * mat2._14 + mat1._12 * mat2._24 + mat1._13 * mat2._34 + mat1._14 * mat2._44;
+	outMat.m00 = mat1->m00 * mat2->m00 + mat1->m01 * mat2->m10 + mat1->m02 * mat2->m20 + mat1->m03 * mat2->m30;
+	outMat.m01 = mat1->m00 * mat2->m01 + mat1->m01 * mat2->m11 + mat1->m02 * mat2->m21 + mat1->m03 * mat2->m31;
+	outMat.m02 = mat1->m00 * mat2->m02 + mat1->m01 * mat2->m12 + mat1->m02 * mat2->m22 + mat1->m03 * mat2->m32;
+	outMat.m03 = mat1->m00 * mat2->m03 + mat1->m01 * mat2->m13 + mat1->m02 * mat2->m23 + mat1->m03 * mat2->m33;
 
-	outMat._21 = mat1._21 * mat2._11 + mat1._22 * mat2._21 + mat1._23 * mat2._31 + mat1._24 * mat2._41;
-	outMat._22 = mat1._21 * mat2._12 + mat1._22 * mat2._22 + mat1._23 * mat2._32 + mat1._24 * mat2._42;
-	outMat._23 = mat1._21 * mat2._13 + mat1._22 * mat2._23 + mat1._23 * mat2._33 + mat1._24 * mat2._43;
-	outMat._24 = mat1._21 * mat2._14 + mat1._22 * mat2._24 + mat1._23 * mat2._34 + mat1._24 * mat2._44;
+	outMat.m10 = mat1->m10 * mat2->m00 + mat1->m11 * mat2->m10 + mat1->m12 * mat2->m20 + mat1->m13 * mat2->m30;
+	outMat.m11 = mat1->m10 * mat2->m01 + mat1->m11 * mat2->m11 + mat1->m12 * mat2->m21 + mat1->m13 * mat2->m31;
+	outMat.m12 = mat1->m10 * mat2->m02 + mat1->m11 * mat2->m12 + mat1->m12 * mat2->m22 + mat1->m13 * mat2->m32;
+	outMat.m13 = mat1->m10 * mat2->m03 + mat1->m11 * mat2->m13 + mat1->m12 * mat2->m23 + mat1->m13 * mat2->m33;
 
-	outMat._31 = mat1._31 * mat2._11 + mat1._32 * mat2._21 + mat1._33 * mat2._31 + mat1._34 * mat2._41;
-	outMat._32 = mat1._31 * mat2._12 + mat1._32 * mat2._22 + mat1._33 * mat2._32 + mat1._34 * mat2._42;
-	outMat._33 = mat1._31 * mat2._13 + mat1._32 * mat2._23 + mat1._33 * mat2._33 + mat1._34 * mat2._43;
-	outMat._34 = mat1._31 * mat2._14 + mat1._32 * mat2._24 + mat1._33 * mat2._34 + mat1._34 * mat2._44;
+	outMat.m20 = mat1->m20 * mat2->m00 + mat1->m21 * mat2->m10 + mat1->m22 * mat2->m20 + mat1->m23 * mat2->m30;
+	outMat.m21 = mat1->m20 * mat2->m01 + mat1->m21 * mat2->m11 + mat1->m22 * mat2->m21 + mat1->m23 * mat2->m31;
+	outMat.m22 = mat1->m20 * mat2->m02 + mat1->m21 * mat2->m12 + mat1->m22 * mat2->m22 + mat1->m23 * mat2->m32;
+	outMat.m23 = mat1->m20 * mat2->m03 + mat1->m21 * mat2->m13 + mat1->m22 * mat2->m23 + mat1->m23 * mat2->m33;
 
-	outMat._41 = mat1._41 * mat2._11 + mat1._42 * mat2._21 + mat1._43 * mat2._31 + mat1._44 * mat2._41;
-	outMat._42 = mat1._41 * mat2._12 + mat1._42 * mat2._22 + mat1._43 * mat2._32 + mat1._44 * mat2._42;
-	outMat._43 = mat1._41 * mat2._13 + mat1._42 * mat2._23 + mat1._43 * mat2._33 + mat1._44 * mat2._43;
-	outMat._44 = mat1._41 * mat2._14 + mat1._42 * mat2._24 + mat1._43 * mat2._34 + mat1._44 * mat2._44;
+	outMat.m30 = mat1->m30 * mat2->m00 + mat1->m31 * mat2->m10 + mat1->m32 * mat2->m20 + mat1->m33 * mat2->m30;
+	outMat.m31 = mat1->m30 * mat2->m01 + mat1->m31 * mat2->m11 + mat1->m32 * mat2->m21 + mat1->m33 * mat2->m31;
+	outMat.m32 = mat1->m30 * mat2->m02 + mat1->m31 * mat2->m12 + mat1->m32 * mat2->m22 + mat1->m33 * mat2->m32;
+	outMat.m33 = mat1->m30 * mat2->m03 + mat1->m31 * mat2->m13 + mat1->m32 * mat2->m23 + mat1->m33 * mat2->m33;
 
-	resMat = outMat;
+	*res = outMat;
 }
 
 SEGAN_INLINE void gen_matrix_setrotate_pyr( Matrix* m, const float pitch, const float yaw, const float roll )
@@ -209,44 +209,111 @@ SEGAN_INLINE void gen_matrix_setrotate_pyr( Matrix* m, const float pitch, const 
 	sx_sin_cos( roll, sZ, cZ );
 	float tmp0 = ( cZ * sY );
 	float tmp1 = ( sZ * sY );
-	m->_11 = ( cZ * cY );
-	m->_12 = ( sZ * cY );
-	m->_13 = - sY;
-	m->_14 = 0.0f;
+	m->m00 = ( cZ * cY );
+	m->m01 = ( sZ * cY );
+	m->m02 = - sY;
+	m->m03 = 0.0f;
 
-	m->_21 = ( tmp0 * sX ) - ( sZ * cX );
-	m->_22 = ( tmp1 * sX ) + ( cZ * cX );
-	m->_23 = ( cY * sX );
-	m->_24 = 0.0f;
+	m->m10 = ( tmp0 * sX ) - ( sZ * cX );
+	m->m11 = ( tmp1 * sX ) + ( cZ * cX );
+	m->m12 = ( cY * sX );
+	m->m13 = 0.0f;
 
-	m->_31 = ( tmp0 * cX ) + ( sZ * sX );
-	m->_32 = ( tmp1 * cX ) - ( cZ * sX );
-	m->_33 = ( cY * cX );
-	m->_34 = 0.0f;
+	m->m20 = ( tmp0 * cX ) + ( sZ * sX );
+	m->m21 = ( tmp1 * cX ) - ( cZ * sX );
+	m->m22 = ( cY * cX );
+	m->m23 = 0.0f;
 
-	m->_44 = 1;
+	m->m33 = 1;
 }
 
 SEGAN_INLINE void gen_matrix_scale( Matrix* m, const float x, const float y, const float z )
 {
-	m->_11 = x;
-	m->_12 = 0.0f;
-	m->_13 = 0.0f;
-	m->_14 = 0.0f;
-	m->_21 = 0.0f;
-	m->_22 = y;
-	m->_23 = 0.0f;
-	m->_24 = 0.0f;
-	m->_31 = 0.0f;
-	m->_32 = 0.0f;
-	m->_33 = z;
-	m->_34 = 0.0f;
-	m->_41 = 0.0f;
-	m->_42 = 0.0f;
-	m->_43 = 0.0f;
-	m->_44 = 1.0f;
+	m->m00 = x;
+	m->m01 = 0.0f;
+	m->m02 = 0.0f;
+	m->m03 = 0.0f;
+	m->m10 = 0.0f;
+	m->m11 = y;
+	m->m12 = 0.0f;
+	m->m13 = 0.0f;
+	m->m20 = 0.0f;
+	m->m21 = 0.0f;
+	m->m22 = z;
+	m->m23 = 0.0f;
+	m->m30 = 0.0f;
+	m->m31 = 0.0f;
+	m->m32 = 0.0f;
+	m->m33 = 1.0f;
 }
 
+SEGAN_INLINE void gen_matrix_lookat( Matrix* m, const float* eye, const float* at, const float* up )
+{
+	float dir[3] = { at[0] - eye[0], at[1] - eye[1], at[2] - eye[2] };
+	float dirlen = sx_sqrt_fast( dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2] );
+	dir[0] /= dirlen;
+	dir[1] /= dirlen;
+	dir[2] /= dirlen;
+
+	float side[3] = { dir[1] * up[2] - dir[2] * up[1], dir[2] * up[0] - dir[0] * up[2], dir[0] * up[1] - dir[1] * up[0] };
+	float sidelen = sx_sqrt_fast( side[0] * side[0] + side[1] * side[1] + side[2] * side[2] );
+	side[0] /= sidelen;
+	side[1] /= sidelen;
+	side[2] /= sidelen;
+
+	float upd[3] = { side[1] * dir[2] - side[2] * dir[1], side[2] * dir[0] - side[0] * dir[2], side[0] * dir[1] - side[1] * dir[0] };
+	float uplen = sx_sqrt_fast( upd[0] * upd[0] + upd[1] * upd[1] + upd[2] * upd[2] );
+	upd[0] /= uplen;
+	upd[1] /= uplen;
+	upd[2] /= uplen;
+
+	m->m00 = side[0];
+	m->m01 = upd[0];
+	m->m02 = dir[0];
+	m->m03 = 0;
+
+	m->m10 = side[1];
+	m->m11 = upd[1];
+	m->m12 = dir[1];
+	m->m13 = 0;
+
+	m->m20 = side[2];
+	m->m21 = upd[2];
+	m->m22 = dir[2];
+	m->m23 = 0;
+
+	m->m30 = - ( side[0] * eye[0] + side[1] * eye[1] + side[2] * eye[2] );
+	m->m31 = - ( upd[0]  * eye[0] + upd[1]  * eye[1] + upd[2]  * eye[2] );
+	m->m32 = - ( dir[0]  * eye[0] + dir[1]  * eye[1] + dir[2]  * eye[2] );
+	m->m33 = 1.0f;
+}
+
+SEGAN_INLINE void gen_matrix_direction( Matrix* m, const float* dir, const float* up )
+{
+	float fwr[3] = { - dir[0], - dir[1], - dir[2] };
+	float dirlen = sx_sqrt_fast( fwr[0] * fwr[0] + fwr[1] * fwr[1] + fwr[2] * fwr[2] );
+	fwr[0] /= dirlen;
+	fwr[1] /= dirlen;
+	fwr[2] /= dirlen;
+
+	//float side[3] = { fwr[1] * up[2] - fwr[2] * up[1], fwr[2] * up[0] - fwr[0] * up[2], fwr[0] * up[1] - fwr[1] * up[0] };
+	float side[3] = { fwr[1] * up[2] - fwr[2] * up[1], fwr[2] * up[0] - fwr[0] * up[2], fwr[0] * up[1] - fwr[1] * up[0] };
+	float sidelen = sx_sqrt_fast( side[0] * side[0] + side[1] * side[1] + side[2] * side[2] );
+	side[0] /= sidelen;
+	side[1] /= sidelen;
+	side[2] /= sidelen;
+
+	float upd[3] = { side[1] * fwr[2] - side[2] * fwr[1], side[2] * fwr[0] - side[0] * fwr[2], side[0] * fwr[1] - side[1] * fwr[0] };
+	float uplen = sx_sqrt_fast( upd[0] * upd[0] + upd[1] * upd[1] + upd[2] * upd[2] );
+	upd[0] /= uplen;
+	upd[1] /= uplen;
+	upd[2] /= uplen;
+
+	m->m00 = side[0];	m->m01 = side[1];	m->m02 = side[2];	m->m03 = 0;
+	m->m10 = upd[0];	m->m11 = upd[1];	m->m12 = upd[2];	m->m13 = 0;
+	m->m20 = fwr[0];	m->m21 = fwr[1];	m->m22 = fwr[2];	m->m23 = 0;
+	m->m30 = 0;			m->m31 = 0;			m->m32 = 0;			m->m33 = 1.0f;
+}
 
 #endif	//	GUARD_Math_Generic_HEADER_FILE
 

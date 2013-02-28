@@ -266,6 +266,9 @@ struct PlayerProfile
 	int				curDifficulty;
 	int				difficulty[10];
 
+	// version 4
+	int				curGameMode;
+
 	PlayerProfile( void ){
 		Reset();
 	}

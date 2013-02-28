@@ -12,9 +12,9 @@
 
 #include "d3dDevice_gl.h"
 
-class SEGAN_API	d3dVertexBuffer_gl : public d3dVertexBuffer
+class SEGAN_ENG_API	d3dVertexBuffer_gl : public d3dVertexBuffer
 {
-	SEGAN_IMPLEMENT_STERILE_CLASS(d3dVertexBuffer_gl);
+	SEGAN_STERILE_CLASS(d3dVertexBuffer_gl);
 
 public:
 

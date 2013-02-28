@@ -348,7 +348,14 @@ namespace GM
 				if ( g_game->m_miniGame )
 					str << L"config_mini.txt";
 				else
-					str << L"config.txt";
+				{
+					switch ( g_game->m_game_mode )
+					{
+					case 0 : str << L"config_default.txt"; break;
+					case 1 : str << L"config_warrior.txt"; break;
+					case 2 : str << L"config_legend.txt"; break;
+					}
+				}
 
 				Scripter script;
 				script.Load( str );

@@ -7,14 +7,14 @@
 
 
 #define NET_DELAY_TIME	60
-#define NET_TIMEOUT		5000
+#define NET_TIMEOUT		10000
 
 //////////////////////////////////////////////////////////////////////////
 //  SOME GLOBAL VARIABLES
 Window* winMain = null;
 Client* client = null;
 
-#if 0
+#if 1
 d3dVertexBuffer* vbo_pos = null;
 d3dVertexBuffer* vbo_col = null;
 d3dVertexBuffer* vbo_tx0 = null;
@@ -58,11 +58,11 @@ int WindowEventCall( Window* Sender, const WindowEvent* data )
 			static int counter = 0;
 			g_engine->m_logger->Log_( L"%d > Window has been resized [ %d x %d ]", counter++, curRect.width, curRect.height );
 
-#if 0
+#if 1
 			if ( Sender && Sender->m_name == L"main" )
 			{
 				if ( g_engine->m_device3D && ( g_engine->m_device3D->m_creationData.flag & SX_D3D_FULLSCREEN ) == 0  )
-					g_engine->m_device3D->SetSize( curRect.Width, curRect.Height, -1 );
+					g_engine->m_device3D->SetSize( curRect.width, curRect.height, -1 );
 			}
 #endif
 			return 0;
@@ -80,12 +80,27 @@ void AppMainLoop( float elpsTime )
 
 	client->Update( elpsTime, NET_DELAY_TIME, NET_TIMEOUT );
 
-#if 0
-
+#if 1
 	if ( g_engine->m_device3D && g_engine->m_device3D->BeginScene() )
 	{
+		Matrix mat;
+		mat.PerspectiveFov( PI / 3.0f, (float)g_engine->m_device3D->m_viewport.height / (float)g_engine->m_device3D->m_viewport.width, 0.5f, 1000.0f );
+		g_engine->m_device3D->SetMatrix( MM_PROJECTION, mat );
+
+		static float timer = 0;
+		timer =  (float)( 0.0001f * sx_os_get_timer() );
+		//float eye[3] = { 5.0f * sx_sin(timer), 5.0f, 10.0f * sx_cos(timer)	};
+		float eye[3] = { 2.0f , 5.0f, 5.0f };
+		float at[3] = { 0.0f, 0.0f, 0.0f };
+		float up[3] = { 0.0f, 1.0f, 0.0f };
+		mat.LookAt( eye, at, up );
+		g_engine->m_device3D->SetMatrix( MM_VIEW, mat );
+
+		g_engine->m_device3D->SetTexture( null );
+
 		g_engine->m_device3D->ClearScreen( 0xffbbbbff );
 
+#if 0
 		g_engine->m_device3D->SetTexture( tex_000 );
 
 		g_engine->m_device3D->SetVertexBuffer( vbo_pos, 0 );
@@ -104,15 +119,23 @@ void AppMainLoop( float elpsTime )
 			pos[2] = sx_sin_fast( s_time * 0.005f );
 			vbo_pos->Unlock();
 		}
+#endif
 
 		g_engine->m_device3D->SetTexture( tex_001 );
+
+		float d[3] = { 1.0f, 1.0f, 1.0f }, u[3] = { 0.0f, 1.0f, 0.0f };
+		mat.SetDirection( d, u );
+		mat.Identity();
+		mat.SetRotationPitchYawRoll(0, 0, sx_os_get_timer() * 0.0001f );
+		//Matrix mview = g_engine->m_device3D->GetMatrix( MM_VIEW );
+		//mat.Inverse( mview );
+		g_engine->m_device3D->SetMatrix( MM_WORLD, mat );
 
 		g_engine->m_device3D->EndScene();
 
 		g_engine->m_device3D->Present();
 
-		//MemManFixed_inline<512> strMem;
-		String str;
+		str128 str;
 		str.Format( L"fps : %d - ft : %.2f", g_engine->m_device3D->m_debugInfo.fps, g_engine->m_device3D->m_debugInfo.frameTime );
 		winMain->SetTitle( str );
 	}
@@ -226,12 +249,14 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	}
 #endif
 
-#if 0
+#if 1
+	g_engine->m_device3D = sx_d3d_create_device( SX_D3D_CREATE_GL );
+	g_engine->m_device3D->Initialize( winMain->GetHandle() );
+	g_engine->m_device3D->SetSize( -1, -1, 0 /*| SX_D3D_VSYNC*/ /*| SX_D3D_FULLSCREEN*/ );
+#endif
 
-		g_engine->m_device3D = sx_d3d_create_device( SX_D3D_CREATE_GL );
-		g_engine->m_device3D->Initialize( winMain->GetHandle() );
-		g_engine->m_device3D->SetSize( -1, -1, 0 /*| SX_D3D_VSYNC*/ /*| SX_D3D_FULLSCREEN*/ );
-
+#if 1
+	{
 		sx_mem_enable_debug( true, 1 );
 
 		g_engine->m_device3D->CreateVertexBuffer( vbo_pos );

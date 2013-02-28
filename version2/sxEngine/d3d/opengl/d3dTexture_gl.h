@@ -11,9 +11,9 @@
 
 #include "d3dDevice_gl.h"
 
-class SEGAN_API d3dTexture_gl : public d3dTexture
+class SEGAN_ENG_API d3dTexture_gl : public d3dTexture
 {
-	SEGAN_IMPLEMENT_STERILE_CLASS( d3dTexture_gl );
+	SEGAN_STERILE_CLASS( d3dTexture_gl );
 
 public:
 

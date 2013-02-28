@@ -217,7 +217,7 @@ void d3dDevice_dx::Finalize( void )
 
 bool d3dDevice_dx::SetSize( const uint width, const uint height, const dword SX_D3D_ flag )
 {
-	assert( m_device3D );
+	sx_assert( m_device3D );
 
 	//  validate data and save current flags
 	if ( flag != -1 )	m_creationData.flag = flag;
@@ -316,7 +316,7 @@ void d3dDevice_dx::DestroyShader( d3dShader*& IN_OUT shader )
 
 SEGAN_INLINE void d3dDevice_dx::SetViewport( const d3dViewport* viewport )
 {
-	assert( m_device3D );
+	sx_assert( m_device3D );
 
 	m_viewport = *viewport;
 	D3DVIEWPORT9 vp;
@@ -327,6 +327,39 @@ SEGAN_INLINE void d3dDevice_dx::SetViewport( const d3dViewport* viewport )
 	vp.MinZ		= 0;
 	vp.MaxZ		= 1;
 	m_device3D->SetViewport( &vp );
+}
+
+void d3dDevice_dx::SetMatrix( const d3dMatrixMode mode, const float* matrix )
+{
+	switch ( mode )
+	{
+	case MM_WORLD:
+		m_world = matrix;
+		m_device3D->SetTransform( D3DTS_WORLD, (D3DMATRIX*)&m_world );
+		break;
+
+	case MM_VIEW:
+		m_view = matrix;
+		m_device3D->SetTransform( D3DTS_VIEW, (D3DMATRIX*)&m_view );
+		break;
+
+	case MM_PROJECTION:
+		m_projection = matrix;
+		m_device3D->SetTransform( D3DTS_PROJECTION, (D3DMATRIX*)&m_projection );
+		break;
+	}
+}
+
+const float* d3dDevice_dx::GetMatrix( const d3dMatrixMode mode )
+{
+	float* res = null;
+	switch ( mode )
+	{
+	case MM_WORLD:			res = &m_world.m00;			break;
+	case MM_VIEW:			res = &m_view.m00;			break;
+	case MM_PROJECTION:		res = &m_projection.m00;	break;
+	}
+	return res;
 }
 
 void d3dDevice_dx::DrawPrimitive( const d3dPrimitiveType primType, const int firstVertex, const int vertexCount )
@@ -341,7 +374,7 @@ void d3dDevice_dx::DrawIndexedPrimitive( const d3dPrimitiveType primType, const 
 
 bool d3dDevice_dx::BeginScene( void )
 {
-	assert( m_device3D );
+	sx_assert( m_device3D );
 
 	switch ( m_device3D->TestCooperativeLevel() )
 	{
@@ -368,21 +401,7 @@ bool d3dDevice_dx::BeginScene( void )
 
 void d3dDevice_dx::EndScene( void )
 {
-	assert( m_device3D );
-
-	float eye[3] = { 5, 10, 10 };
-	float at[3]	 = { 0, 0, 0 };
-	float up[3]	 = { 0, 1, 0 };
-
-  	Matrix mat;
- 	mat.LookAt( eye, at, up );
- 	m_device3D->SetTransform( D3DTS_VIEW, (D3DMATRIX*)&mat );
- 
- 	mat.PerspectiveFov( PI / 3.0f, 1, 0.5f, 1000.0f );
- 	m_device3D->SetTransform( D3DTS_PROJECTION, (D3DMATRIX*)&mat );
-// 
-// 	mat.Identity();
-// 	m_device3D->SetTransform( D3DTS_WORLD, (D3DMATRIX*)&mat );
+	sx_assert( m_device3D );
 
 	D3DMATERIAL9 mtl; ZeroMemory( &mtl, sizeof(mtl) );
 	{
@@ -413,7 +432,7 @@ void d3dDevice_dx::EndScene( void )
 
 void d3dDevice_dx::Present( void )
 {
-	assert( m_device3D );
+	sx_assert( m_device3D );
 	static int    s_frameCount	= 0;
 	static double s_countTime	= 0;
 	static double s_frameTime	= sx_os_get_timer();
@@ -438,28 +457,28 @@ void d3dDevice_dx::Present( void )
 
 void d3dDevice_dx::ClearScreen( const dword bgcolor )
 {
-	assert( m_device3D );
+	sx_assert( m_device3D );
 
 	m_device3D->Clear( 0, null, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, bgcolor, 1.0f, 0 );
 }
 
 void d3dDevice_dx::ClearTarget( const dword bgcolor )
 {
-	assert( m_device3D );
+	sx_assert( m_device3D );
 
 	m_device3D->Clear( 0, null, D3DCLEAR_TARGET, bgcolor, 1.0f, 0 );
 }
 
 void d3dDevice_dx::ClearZBuffer( void )
 {
-	assert( m_device3D );
+	sx_assert( m_device3D );
 
 	m_device3D->Clear( 0, null, D3DCLEAR_ZBUFFER, 0, 1.0f, 0 );
 }
 
 void d3dDevice_dx::SetClipPlane( const uint index, const float* pplane )
 {
-	assert( m_device3D );
+	sx_assert( m_device3D );
 
 	m_device3D->SetClipPlane( index, pplane );
 	
@@ -467,7 +486,7 @@ void d3dDevice_dx::SetClipPlane( const uint index, const float* pplane )
 
 void d3dDevice_dx::GetClipPlane( const uint index, float* pplane )
 {
-	assert( m_device3D );
+	sx_assert( m_device3D );
 
 	m_device3D->GetClipPlane( index, pplane );
 }
@@ -577,7 +596,7 @@ void d3dDevice_dx::PostReset( void )
 
 void d3dDevice_dx::ResetStates( void )
 {
-	assert( m_device3D );
+	sx_assert( m_device3D );
 
 	m_rs_zEnabled		= true;
 	m_rs_zWritable		= true;
@@ -639,6 +658,7 @@ void d3dDevice_dx::SetIndexBuffer( const d3dIndexBuffer* indexBuffer )
 {
 
 }
+
 
 
 //////////////////////////////////////////////////////////////////////////

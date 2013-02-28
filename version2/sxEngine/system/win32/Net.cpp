@@ -1312,7 +1312,7 @@ SEGAN_ENG_API bool sx_net_initialize( const dword netID )
 			s_netInternal->msgPool.Push( (NetMessage*)mem_alloc( sizeof(NetMessage) ) );
 
 		g_logger->Log(  L"Network system initialized successfully on Windows." );
-		g_logger->Log_( L"    Name:		%s \r\n" , s_netInternal->name );
+		g_logger->Log_( L"    Name:		%s" , s_netInternal->name );
 		g_logger->Log_( L"    IP:			%d.%d.%d.%d \r\n\r\n" , 
 			s_netInternal->address.ip[0], s_netInternal->address.ip[1], s_netInternal->address.ip[2], s_netInternal->address.ip[3] );
 	}

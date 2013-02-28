@@ -54,7 +54,7 @@ SEGAN_ENG_API Engine* engine_get_singleton( EngineConfig* config /*= null */ )
 	sx_thread_initilize();
 
 	//	initialize math functions
-	//sx_math_initialize( s_config.math_force_use_generic );
+	sx_math_initialize( s_config.math_force_use_generic );
 
 	//	initialize application
 	sx_app_initialize( s_config.window_event_callback );
@@ -145,7 +145,7 @@ void engine_finalize( void )
 	sx_app_finalize();
 
 	//	finalize math functions
-	//sx_math_finalize();
+	sx_math_finalize();
 
 	//	finalize thread manager
 	sx_thread_finalize();

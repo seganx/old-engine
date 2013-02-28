@@ -69,10 +69,11 @@ public:
 	Achievement				m_achievements[15];			// achievements
 	MouseState				m_mouseMode;				// state mode of mouse
 
-	float					m_difficultyValue;				//	difficulty value
+	float					m_difficultyValue;			//	difficulty value
 	int						m_difficultyLevel;			//	difficulty level
 	int						m_game_currentLevel;		//  index of current level. 0 = GUI mode
 	int						m_game_nextLevel;			//  index of current level. 0 = GUI mode
+	int						m_game_mode;				//  game mode : 0=default, 1=warrior, 2=legend
 	bool					m_game_paused;				//  game paused
 	bool					m_game_waves_comming;		//	waves are coming
 	bool					m_app_Paused;				//  application paused

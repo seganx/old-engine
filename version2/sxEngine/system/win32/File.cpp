@@ -15,19 +15,19 @@ FileStream::~FileStream()
 	Close();
 }
 
-bool FileStream::Open( const wchar* FileName, const dword FM_ mode )
+bool FileStream::Open( const wchar* filename, const dword FM_ mode )
 {
-	m_fileName = FileName;
+	m_fileName = filename;
 
 	if ( mode == FM_CREATE ) {
-		m_handle = CreateFile( FileName, GENERIC_WRITE, 0, null, CREATE_ALWAYS, 0, null );
+		m_handle = CreateFile( filename, GENERIC_WRITE, 0, null, CREATE_ALWAYS, 0, null );
 	} else {
 		const dword AccessMode[3] = {GENERIC_READ, GENERIC_WRITE, GENERIC_READ | GENERIC_WRITE};
 		const dword ShareMode[4] = {0, FILE_SHARE_READ, FILE_SHARE_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE};
 
 		if ( ((mode & 3) <= FM_OPEN_READ_WRITE) && ((mode & 0xF0) <= FM_SHARE_READ_WRITE) ) {
 			m_handle = CreateFile(
-				FileName, 
+				filename, 
 				AccessMode[(mode & 3)], 
 				ShareMode[((mode & 0xF0) >> 4)], 
 				null,
@@ -41,7 +41,7 @@ bool FileStream::Open( const wchar* FileName, const dword FM_ mode )
 	if ( m_handle == INVALID_HANDLE_VALUE )
 	{
 		m_handle = null;
-		g_logger->Log( L"Error : Opening file '%s' failed !", FileName );
+		g_logger->Log( L"Error : Opening file '%s' failed !", filename );
 		return false;
 	}
 	else

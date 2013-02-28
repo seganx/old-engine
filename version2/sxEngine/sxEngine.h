@@ -13,8 +13,8 @@
 #include "../sxLib/Lib.h"
 
 #include "System/System.h"
-// #include "Math/Math.h"
-// #include "d3d/d3dDevice.h"
+#include "Math/Math.h"
+#include "d3d/d3dDevice.h"
 
 
 //! structure of engine configuration

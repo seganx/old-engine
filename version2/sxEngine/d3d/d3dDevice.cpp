@@ -109,17 +109,17 @@ d3dDevice::~d3dDevice( void )
 //////////////////////////////////////////////////////////////////////////
 //	
 //////////////////////////////////////////////////////////////////////////
-SEGAN_API void sx_d3d_initialize( dword flag )
+SEGAN_ENG_API void sx_d3d_initialize( dword flag )
 {
 
 }
 
-SEGAN_API void sx_d3d_finalize( void )
+SEGAN_ENG_API void sx_d3d_finalize( void )
 {
 
 }
 
-SEGAN_API d3dDevice* sx_d3d_create_device( dword flag )
+SEGAN_ENG_API d3dDevice* sx_d3d_create_device( dword flag )
 {
 	switch ( flag )
 	{
@@ -129,7 +129,7 @@ SEGAN_API d3dDevice* sx_d3d_create_device( dword flag )
 	return null;
 }
 
-SEGAN_API void sx_d3d_destroy_device( d3dDevice* &pdevice )
+SEGAN_ENG_API void sx_d3d_destroy_device( d3dDevice* &pdevice )
 {
 	sx_delete_and_null( pdevice );
 }

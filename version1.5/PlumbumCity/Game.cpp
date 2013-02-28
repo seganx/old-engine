@@ -67,6 +67,7 @@ Game::Game( void )
 ,	m_difficultyLevel(0)
 ,	m_game_currentLevel(-1)
 ,	m_game_nextLevel(0)
+,	m_game_mode(0)
 ,	m_game_paused(false)
 ,	m_game_waves_comming(false)
 ,	m_app_Paused(false)
@@ -271,7 +272,12 @@ void Game::LoadLevel( void )
 
 	//  load the scene
 	str = GetLevelPath();
-	str << L"scene.scene";
+	switch ( m_game_mode )
+	{
+	case 0 : str << L"scene_default.scene"; break;
+	case 1 : str << L"scene_warrior.scene"; break;
+	case 2 : str << L"scene_legend.scene"; break;
+	}
 	sx::sys::FileStream file;
 	if ( file.Open(str, FM_OPEN_READ) )
 	{

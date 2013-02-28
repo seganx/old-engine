@@ -13,9 +13,9 @@
 
 #include "d3dDevice_gl.h"
 
-class SEGAN_API	d3dIndexBuffer_gl : public d3dIndexBuffer
+class SEGAN_ENG_API	d3dIndexBuffer_gl : public d3dIndexBuffer
 {
-	SEGAN_IMPLEMENT_STERILE_CLASS(d3dIndexBuffer_gl);
+	SEGAN_STERILE_CLASS(d3dIndexBuffer_gl);
 
 public:
 

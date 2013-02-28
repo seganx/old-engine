@@ -9,7 +9,7 @@
 #ifndef GUARD_Device3D_HEADER_FILE
 #define GUARD_Device3D_HEADER_FILE
 
-#include "../lib/Lib.h"
+#include "../../sxLib/Lib.h"
 
 
 //! flags of rendering device
@@ -41,6 +41,17 @@ enum d3dFormat
 	FMT_32BITENUM = 0xffffffff
 };
 #define FMT_
+
+//! matrix modes
+enum d3dMatrixMode
+{
+	MM_WORLD = 0,
+	MM_VIEW,
+	MM_PROJECTION,
+
+	MM_32BITENUM = 0xffffffff
+};
+#define MM_
 
 //! primitives supported by draw-primitive API
 enum d3dPrimitiveType
@@ -179,9 +190,9 @@ struct d3dShaderDesc
 };
 
 //! abstract class of hardware vertex buffer
-class SEGAN_API d3dVertexBuffer
+class SEGAN_ENG_API d3dVertexBuffer
 {
-	SEGAN_IMPLEMENT_STERILE_CLASS( d3dVertexBuffer );
+	SEGAN_STERILE_CLASS( d3dVertexBuffer );
 
 public:
 
@@ -204,9 +215,9 @@ public:
 };
 
 //! abstract class of hardware index buffer
-class SEGAN_API d3dIndexBuffer
+class SEGAN_ENG_API d3dIndexBuffer
 {
-	SEGAN_IMPLEMENT_STERILE_CLASS( d3dIndexBuffer );
+	SEGAN_STERILE_CLASS( d3dIndexBuffer );
 
 public:
 
@@ -229,9 +240,9 @@ public:
 };
 
 //! abstract class of texture
-class SEGAN_API d3dTexture
+class SEGAN_ENG_API d3dTexture
 {
-	SEGAN_IMPLEMENT_STERILE_CLASS( d3dTexture );
+	SEGAN_STERILE_CLASS( d3dTexture );
 
 public:
 
@@ -266,9 +277,9 @@ public:
 };
 
 //! abstract class of shader
-class SEGAN_API d3dShader
+class SEGAN_ENG_API d3dShader
 {
-	SEGAN_IMPLEMENT_STERILE_CLASS( d3dShader );
+	SEGAN_STERILE_CLASS( d3dShader );
 
 public:
 
@@ -285,9 +296,9 @@ public:
 };
 
 //! abstract class of rendering device
-class SEGAN_API d3dDevice
+class SEGAN_ENG_API d3dDevice
 {
-	SEGAN_IMPLEMENT_STERILE_CLASS( d3dDevice );
+	SEGAN_STERILE_CLASS( d3dDevice );
 
 public:
 
@@ -338,6 +349,12 @@ public:
 
 	//! set rendering view port
 	virtual void SetViewport( const d3dViewport* viewport ) = 0;
+
+	//! set matrix
+	virtual void SetMatrix( const d3dMatrixMode mode, const float* matrix ) = 0;
+
+	//! return selected matrix
+	virtual const float* GetMatrix( const d3dMatrixMode mode ) = 0;
 
 	//! draw primitive shapes
 	virtual void DrawPrimitive(const d3dPrimitiveType primType, const int firstVertex, const int vertexCount) = 0;
@@ -394,16 +411,16 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 //! initialize 3d device depend on platform specification
-SEGAN_API void sx_d3d_initialize( dword flag );
+SEGAN_ENG_API void sx_d3d_initialize( dword flag );
 
 //! finalize 3d device
-SEGAN_API void sx_d3d_finalize( void );
+SEGAN_ENG_API void sx_d3d_finalize( void );
 
 //! create and return a new 3d device. the new device can be draw shapes after initialization 
-SEGAN_API d3dDevice* sx_d3d_create_device( dword flag );
+SEGAN_ENG_API d3dDevice* sx_d3d_create_device( dword flag );
 
 //! destroy created device
-SEGAN_API void sx_d3d_destroy_device( d3dDevice* &pdevice );
+SEGAN_ENG_API void sx_d3d_destroy_device( d3dDevice* &pdevice );
 
 
 #endif	//	GUARD_Device3D_HEADER_FILE

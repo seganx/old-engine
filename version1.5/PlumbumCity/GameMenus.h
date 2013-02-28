@@ -110,6 +110,7 @@ public:
 	sx::gui::Button*	m_goback;
 	sx::gui::PanelEx*	m_chooser;
 	sx::gui::TrackBar*	m_diff_scroll;
+	sx::gui::TrackBar*	m_mode_scroll;
 	sx::gui::Label*		m_diff_label;
 	str512				m_diff_norm_text;
 	str512				m_diff_hard_text;

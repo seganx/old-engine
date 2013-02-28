@@ -13,6 +13,7 @@ Desc:		This file contain the class of device 3d used OpenGL
 
 
 #include "../d3dDevice.h"
+#include "../../math/Math.h"
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -26,10 +27,9 @@ Desc:		This file contain the class of device 3d used OpenGL
 //////////////////////////////////////////////////////////////////////////
 //	OPENGL DEVICE
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_API d3dDevice_gl: public d3dDevice
+class SEGAN_ENG_API d3dDevice_gl: public d3dDevice
 {
-	SEGAN_IMPLEMENT_MEMORY_DLL( d3dDevice_gl );
-	SEGAN_IMPLEMENT_STERILE_CLASS( d3dDevice_gl );
+	SEGAN_STERILE_CLASS( d3dDevice_gl );
 
 public:
 
@@ -65,6 +65,10 @@ public:
 	virtual void DestroyShader( d3dShader*& IN_OUT shader );
 	
 	virtual void SetViewport( const d3dViewport* viewport );
+
+	virtual void SetMatrix( const d3dMatrixMode mode, const float* matrix );
+
+	virtual const float* GetMatrix( const d3dMatrixMode mode );
 
 	virtual void DrawPrimitive(const d3dPrimitiveType primType, const int firstVertex, const int vertexCount);
 
@@ -129,6 +133,10 @@ public:
 	Array<d3dIndexBuffer*>		m_indexBufferArray;
 	Array<d3dTexture*>			m_textureArray;
 	Array<d3dShader*>			m_shaderArray;
+
+	Matrix						m_world;
+	Matrix						m_view;
+	Matrix						m_projection;
 };
 
 
@@ -136,8 +144,8 @@ public:
 //	additional helper functions
 //////////////////////////////////////////////////////////////////////////
 
-SEGAN_INLINE SEGAN_API void sx_glBindBuffer( GLenum target, GLuint buffer );
-SEGAN_INLINE SEGAN_API void sx_glBindTexture( GLenum target, GLuint texture );
+SEGAN_INLINE SEGAN_ENG_API void sx_glBindBuffer( GLenum target, GLuint buffer );
+SEGAN_INLINE SEGAN_ENG_API void sx_glBindTexture( GLenum target, GLuint texture );
 
 #endif	//	GUARD_d3dDevice_gl_HEADER_FILE
 

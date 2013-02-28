@@ -11,26 +11,18 @@
 
 #include "../../sxLib/Lib.h"
 
-#include <xmmintrin.h>
-#include <emmintrin.h>
-#include <assert.h>
-
-#define USE_SSE2_LDDQU
-#ifdef USE_SSE2_LDDQU
-#include <intrin.h>  //used for _mm_lddqu_si128
-#endif //USE_SSE2_LDDQU
 
 //! initialize math system to choose instruction sets. pass true to force using generic math library
-SEGAN_API void sx_math_initialize( bool useGenericMath = false );
+SEGAN_ENG_API void sx_math_initialize( bool useGenericMath = false );
 
 //! finalize math system
-SEGAN_API void sx_math_finalize( void );
+SEGAN_ENG_API void sx_math_finalize( void );
 
 
 //////////////////////////////////////////////////////////////////////////
 //	standard matrix 4x4
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_API Matrix
+class SEGAN_ENG_API Matrix
 {
 public:
 	Matrix() {};
@@ -42,6 +34,8 @@ public:
 		float f31, float f32, float f33, float f34,
 		float f41, float f42, float f43, float f44
 		);
+
+	SEGAN_INLINE operator const float* ( void ) const { return &m00; }
 
 	//! zero all elements of this matrix
 	void Empty( void );
@@ -73,12 +67,18 @@ public:
 	//! divide two matrix and put the result to this. this = m1 / m2
 	void Divide( const Matrix& m1, const Matrix& m2 );
  
-	//! set rotation of this matrix in pitch/yaw/roll system
+	//! make this as a rotation matrix in pitch/yaw/roll system
 	void SetRotationPitchYawRoll( const float pitch, const float yaw, const float roll );
 
 	//! get rotation params in pitch/yaw/roll system
 	void GetRotationPitchYawRoll( float& OUT pitch, float& OUT yaw, float& OUT roll );
  
+	//! make this as a direction matrix
+	void SetDirection( const float* dir, const float* up );
+
+	//! get direction of this matrix. dir and/or up vector can be null
+	void GetDirection( float* OUT dir, float* OUT up = null ); 
+
  	//! set translation of this matrix without change of rotation
  	void SetTranslation( const float x, const float y, const float z );
  
@@ -98,18 +98,16 @@ public:
 
 	union {
 		struct {
-			float	_11, _12, _13, _14;
-			float   _21, _22, _23, _24;
-			float   _31, _32, _33, _34;
-			float   _41, _42, _43, _44;
+			float	m00, m01, m02, m03;
+			float   m10, m11, m12, m13;
+			float   m20, m21, m22, m23;
+			float   m30, m31, m32, m33;
 		};
 
 		float	m[4][4];
-
-		__m128	m128[4];
 	};
 };
-typedef Matrix *PMatrix;
+typedef Matrix float4x4;
 
 
 #if 0
@@ -117,7 +115,7 @@ typedef Matrix *PMatrix;
 //////////////////////////////////////////////////////////////////////////
 //	VECTOR 2D
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_API Vector2 : public D3DXVECTOR2
+class SEGAN_ENG_API Vector2 : public D3DXVECTOR2
 {
 public:
 	Vector2( void );
@@ -152,7 +150,7 @@ typedef Vector2	*PVector2, float2, *pfloat2;
 //////////////////////////////////////////////////////////////////////////
 //	VECTOR 3D
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_API Vector3 : public D3DXVECTOR3
+class SEGAN_ENG_API Vector3 : public D3DXVECTOR3
 {
 public:
 	Vector3( void );
@@ -198,7 +196,7 @@ typedef Vector3 *PVector3, Vector, *PVector, float3, *pfloat3;
 //////////////////////////////////////////////////////////////////////////
 //	VECTOR 4D
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_API Vector4 : public D3DXVECTOR4
+class SEGAN_ENG_API Vector4 : public D3DXVECTOR4
 {
 public:
 	Vector4();
@@ -261,7 +259,7 @@ typedef Vector4 *PVector4, float4, *pfloat4;
 //////////////////////////////////////////////////////////////////////////
 //	QUATERNION
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_API Quaternion : public D3DXQUATERNION
+class SEGAN_ENG_API Quaternion : public D3DXQUATERNION
 {
 public:
 	Quaternion();
@@ -337,7 +335,7 @@ typedef Quaternion *PQuaternion, floatQ, *pfloatQ;
 //////////////////////////////////////////////////////////////////////////
 //	PLANE
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_API Plane : public D3DXPLANE
+class SEGAN_ENG_API Plane : public D3DXPLANE
 {
 public:
 	//! setup a plane from 3 vectors in space
@@ -357,7 +355,7 @@ typedef Plane *PPlane;
 //////////////////////////////////////////////////////////////////////////
 //	FRUSTUM
 //////////////////////////////////////////////////////////////////////////
-struct SEGAN_API Frustum
+struct SEGAN_ENG_API Frustum
 {
 	union{
 		struct{
@@ -386,7 +384,7 @@ typedef Frustum *PFrustum;
 //////////////////////////////////////////////////////////////////////////
 //	3D RECTANGLE
 //////////////////////////////////////////////////////////////////////////
-struct SEGAN_API Rect3D
+struct SEGAN_ENG_API Rect3D
 {
 	union{
 		struct{
@@ -416,7 +414,7 @@ struct SEGAN_API Rect3D
 //	AXIS ALIGNED BOX
 //////////////////////////////////////////////////////////////////////////
 struct OBBox;
-struct SEGAN_API AABox
+struct SEGAN_ENG_API AABox
 {
 	Vector Min;
 	Vector Max;
@@ -444,7 +442,7 @@ typedef AABox *PAABox;
 //////////////////////////////////////////////////////////////////////////
 //	ORIENTED BOX
 //////////////////////////////////////////////////////////////////////////
-struct SEGAN_API OBBox
+struct SEGAN_ENG_API OBBox
 {
 	Vector v[8];
 
@@ -464,7 +462,7 @@ typedef OBBox *POBBox;
 //////////////////////////////////////////////////////////////////////////
 //	SPHERE
 //////////////////////////////////////////////////////////////////////////
-struct SEGAN_API Sphere
+struct SEGAN_ENG_API Sphere
 {
 	union{
 		struct
@@ -511,7 +509,7 @@ typedef Sphere *PSphere;
 //////////////////////////////////////////////////////////////////////////
 //	RAY
 //////////////////////////////////////////////////////////////////////////
-struct SEGAN_API Ray
+struct SEGAN_ENG_API Ray
 {
 	float3 pos;			//  origin of the ray
 	float3 dir;			//  direction of the ray

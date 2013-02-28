@@ -11,6 +11,7 @@
 
 
 #include "../d3dDevice.h"
+#include "../../math/Math.h"
 
 
 #include <d3d9.h>
@@ -20,10 +21,9 @@
 #pragma comment( lib, "d3dx9.lib" )
 
 
-class SEGAN_API d3dDevice_dx: public d3dDevice
+class SEGAN_ENG_API d3dDevice_dx: public d3dDevice
 {
-	SEGAN_IMPLEMENT_MEMORY_DLL( d3dDevice_dx );
-	SEGAN_IMPLEMENT_STERILE_CLASS( d3dDevice_dx );
+	SEGAN_STERILE_CLASS( d3dDevice_dx );
 
 public:
 
@@ -60,6 +60,10 @@ public:
 
 	virtual void SetViewport( const d3dViewport* viewport );
 
+	virtual void SetMatrix( const d3dMatrixMode mode, const float* matrix );
+
+	virtual const float* GetMatrix( const d3dMatrixMode mode );
+
 	virtual void DrawPrimitive(const d3dPrimitiveType primType, const int firstVertex, const int vertexCount);
 
 	virtual void DrawIndexedPrimitive(const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount);
@@ -94,17 +98,21 @@ public:
 		LPDIRECT3DSURFACE9		depthSurface;
 		LPDIRECT3DSURFACE9		colorSurface;
 		LPDIRECT3DSTATEBLOCK9	resetStateBlock;
-	}														m_initData;
-	LPDIRECT3D9												m_direct3D;
-	IDirect3DDevice9*										m_device3D;
-	Array<LPDIRECT3DRESOURCE9>								m_resources;
-	bool													m_rs_zEnabled;
-	bool													m_rs_zWritable;
-	bool													m_rs_culling;
-	bool													m_rs_alphaBlend;
-	bool													m_rs_Anisotropy;
-	bool													m_rs_wireFrame;
-	bool													m_rs_fog;
+	}							m_initData;
+	LPDIRECT3D9					m_direct3D;
+	IDirect3DDevice9*			m_device3D;
+	Array<LPDIRECT3DRESOURCE9>	m_resources;
+	bool						m_rs_zEnabled;
+	bool						m_rs_zWritable;
+	bool						m_rs_culling;
+	bool						m_rs_alphaBlend;
+	bool						m_rs_Anisotropy;
+	bool						m_rs_wireFrame;
+	bool						m_rs_fog;
+
+	Matrix						m_world;
+	Matrix						m_view;
+	Matrix						m_projection;
 };
 
 

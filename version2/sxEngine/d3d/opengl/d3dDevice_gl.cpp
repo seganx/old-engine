@@ -34,6 +34,9 @@ d3dDevice_gl::d3dDevice_gl( void )
 	m_initParam.colorBits = 32;
 	m_initParam.depthBits = 16;
 
+	m_world.Identity();
+	m_view.Identity();
+	m_projection.Identity();
 }
 
 d3dDevice_gl::~d3dDevice_gl( void )
@@ -194,6 +197,7 @@ void d3dDevice_gl::Initialize( const handle displayHandle )
 		glClearStencil( 0 );
 		glDepthFunc( GL_LEQUAL );
 		glFrontFace( GL_CCW );
+		glEnable(  GL_CULL_FACE );
  		glPixelStorei( GL_PACK_ALIGNMENT,   1 );
  		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
@@ -363,6 +367,54 @@ SEGAN_INLINE void d3dDevice_gl::SetViewport( const d3dViewport* viewport )
 	m_viewport = *viewport;
 }
 
+SEGAN_INLINE void d3dDevice_gl::SetMatrix( const d3dMatrixMode mode, const float* matrix )
+{
+	switch ( mode )
+	{
+	case MM_WORLD:
+		{
+			m_world = matrix;
+
+			Matrix modelview;
+			modelview.Multiply( m_world, m_view );
+			glMatrixMode( GL_MODELVIEW );
+			glLoadMatrixf( &modelview.m00 );
+		}
+		break;
+
+	case MM_VIEW:
+		{
+			m_view = matrix;
+
+			Matrix modelview;
+			modelview.Multiply( m_world, m_view );
+			glMatrixMode( GL_MODELVIEW );
+			glLoadMatrixf( &modelview.m00 );
+		}
+		break;
+
+	case MM_PROJECTION:
+		{
+			m_projection = matrix;
+			glMatrixMode( GL_PROJECTION );
+			glLoadMatrixf( &m_projection.m00 );
+		}
+		break;
+	}
+}
+
+SEGAN_INLINE const float* d3dDevice_gl::GetMatrix( const d3dMatrixMode mode )
+{
+	float* res = null;
+	switch ( mode )
+	{
+	case MM_WORLD:			res = &m_world.m00;			break;
+	case MM_VIEW:			res = &m_view.m00;			break;
+	case MM_PROJECTION:		res = &m_projection.m00;	break;
+	}
+	return res;
+}
+
 SEGAN_INLINE void d3dDevice_gl::DrawPrimitive(const d3dPrimitiveType primType, const int firstVertex, const int vertexCount)
 {
 	ApplyTextureBuffer();
@@ -389,20 +441,6 @@ bool d3dDevice_gl::BeginScene( void )
 	InvalidateRect( m_initParam.hwnd, NULL, FALSE );
 #endif
 
-	Matrix mat;
-	mat.PerspectiveFov( PI / 3.0f, (float)m_viewport.height / (float)m_viewport.width, 0.5f, 1000.0f );
-	glMatrixMode( GL_PROJECTION );
-	glLoadMatrixf( &mat._11 );
-
-	static float timer = 0;
-	timer =  (float)( 0.0001f * sx_os_get_timer() );
-	float eye[3] = { 5.0f * sx_sin(timer), 0.0f, 30.0f * sx_cos(timer)	};
-	float at[3] = { 0.0f, 0.0f, 0.0f };
-	float up[3] = { 0.0f, 1.0f, 0.0f };
-	mat.LookAt( eye, at, up );
-	glMatrixMode( GL_MODELVIEW );
-	glLoadMatrixf( &mat._11 );
-
 	glViewport( m_viewport.x, m_viewport.y, m_viewport.width, m_viewport.height );
 
 	return true;
@@ -410,31 +448,13 @@ bool d3dDevice_gl::BeginScene( void )
 
 void d3dDevice_gl::EndScene( void )
 {
-//  	glTranslatef( -1.5f,0.0f,0.0f );
-//  	glBegin( GL_TRIANGLES );
-//  	glColor3f( 1.0f,0.0f,0.0f );
-//  	glVertex3f( 0.0f, 1.0f, 0.10f );
-//  	glColor3f( 0.0f,1.0f,0.0f );
-//  	glVertex3f( -1.0f,-1.0f, 0.10f );
-//  	glColor3f( 0.0f,0.0f,1.0f );
-//  	glVertex3f( 1.0f,-1.0f, 0.10f );
-//  	glEnd();
-//  
-
-// 	{
-// 		BufferStates* tx = &( m_textureBuffer[0] );
-//		glEnable( tx->target );
-// 		glBindTexture( tx->target, tx->current );
-// 	}
-	
 	ApplyTextureBuffer();
-  	glTranslatef( 3.0f,0.0f,0.0f );
   	glColor3f( 1.0f,1.0f,1.0f );
   	glBegin( GL_QUADS );
-  	glTexCoord2f( 0, 0 );	glVertex3f( -1.0f, 1.0f, 0.0f );
-  	glTexCoord2f( 1, 0 );	glVertex3f(  1.0f, 1.0f, 0.0f );
-  	glTexCoord2f( 1, 1 );	glVertex3f(  1.0f,-1.0f, 0.0f );
-  	glTexCoord2f( 0, 1 );	glVertex3f( -1.0f,-1.0f, 0.0f );
+  	glTexCoord2f( 0, 0 );	glVertex3f( 1.0f, 1.0f, 1.0f );
+  	glTexCoord2f( 1, 0 );	glVertex3f(-1.0f, 1.0f, 1.0f );
+  	glTexCoord2f( 1, 1 );	glVertex3f(-1.0f,-1.0f, 1.0f );
+  	glTexCoord2f( 0, 1 );	glVertex3f( 1.0f,-1.0f, 1.0f );
   	glEnd();
 }
 
@@ -482,6 +502,29 @@ void d3dDevice_gl::ClearScreen( const dword bgcolor )
 	glDepthMask( GL_TRUE );
 
 	glClear( clearBits );
+
+	m_world.Identity();
+	SetMatrix( MM_WORLD, m_world );
+
+	ApplyTextureBuffer();
+
+	glColor3f( 1.0f, 0.0f, 0.0f );
+	glBegin( GL_LINES );
+	glVertex3f(-1.0f, 0.0f, 0.0f );
+	glVertex3f( 2.0f, 0.0f, 0.0f );
+	glEnd();
+
+	glColor3f( 0.0f, 1.0f, 0.0f );
+	glBegin( GL_LINES );
+	glVertex3f( 0.0f,-1.0f, 0.0f );
+	glVertex3f( 0.0f, 2.0f, 0.0f );
+	glEnd();
+
+	glColor3f( 0.0f, 0.0f, 1.0f );
+	glBegin( GL_LINES );
+	glVertex3f( 0.0f, 0.0f,-1.0f );
+	glVertex3f( 0.0f, 0.0f, 2.0f );
+	glEnd();
 }
 
 void d3dDevice_gl::ClearTarget( const dword bgcolor )
@@ -729,10 +772,11 @@ void d3dDevice_gl::ApplyTextureBuffer( void )
 
 
 
+
 //////////////////////////////////////////////////////////////////////////
 //	additional helper function
 //////////////////////////////////////////////////////////////////////////
-SEGAN_INLINE SEGAN_API void sx_glBindBuffer( GLenum target, GLuint buffer )
+SEGAN_INLINE SEGAN_ENG_API void sx_glBindBuffer( GLenum target, GLuint buffer )
 {
 	static GLuint targets[2] = { 0, 0 };
 	
@@ -760,7 +804,7 @@ SEGAN_INLINE SEGAN_API void sx_glBindBuffer( GLenum target, GLuint buffer )
 	}
 }
 
-SEGAN_INLINE SEGAN_API void sx_glBindTexture( GLenum target, GLuint texture )
+SEGAN_INLINE SEGAN_ENG_API void sx_glBindTexture( GLenum target, GLuint texture )
 {
 	static GLuint targets[4] = { 0, 0, 0, 0 };
 

@@ -73,6 +73,6 @@ void d3dIndexBuffer_gl::Unlock( void )
 
 SEGAN_INLINE void d3dIndexBuffer_gl::SetToDevice( void )
 {
-	assert( m_device );
+	sx_assert( m_device );
 	m_device->SetIndexBuffer( this );
 }

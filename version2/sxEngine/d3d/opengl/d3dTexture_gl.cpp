@@ -147,7 +147,7 @@ void d3dTexture_gl::SetDesc( d3dTextureDesc& desc )
 	if ( m_desc.mipmaps )
 	{
 		m_desc.mipmaps = 0;
-		sint size = min( m_desc.width, m_desc.height );
+		sint size = sx_min_i( m_desc.width, m_desc.height );
 		while ( size > 1 )
 		{
 			size /= 2;
@@ -258,6 +258,6 @@ SEGAN_INLINE uint d3dTexture_gl::GetDataSize( uint level )
 
 SEGAN_INLINE void d3dTexture_gl::SetToDevice( uint stage )
 {
-	assert( m_device );
+	sx_assert( m_device );
 	m_device->SetTexture( this, stage );
 }
