@@ -350,7 +350,7 @@ SEGAN_INLINE void Matrix::GetRotationPitchYawRoll( float& OUT pitch, float& OUT 
 	} 
 }
 
-void Matrix::SetDirection( const float* dir, const float* up )
+SEGAN_INLINE void Matrix::SetDirection( const float* dir, const float* up )
 {
 #if 0
 	Matrix lookat;
@@ -362,7 +362,7 @@ void Matrix::SetDirection( const float* dir, const float* up )
 #endif
 }
 
-void Matrix::GetDirection( float* OUT dir, float* OUT up /*= null */ )
+SEGAN_INLINE void Matrix::GetDirection( float* OUT dir, float* OUT up /*= null */ )
 {
 #if 0
 	float d[3] = { 0.0f, 0.0f, 1.0f };
@@ -385,7 +385,7 @@ void Matrix::GetDirection( float* OUT dir, float* OUT up /*= null */ )
 #endif
 }
 
-void Matrix::SetTranslation( const float x, const float y, const float z )
+SEGAN_INLINE void Matrix::SetTranslation( const float x, const float y, const float z )
 {
 	m30 = x;
 	m31 = y;
@@ -393,7 +393,35 @@ void Matrix::SetTranslation( const float x, const float y, const float z )
 	m33 = 1.0f;
 }
 
-void Matrix::Scale( const float x, const float y, const float z )
+SEGAN_INLINE void Matrix::TransformNormal( float* OUT dest, const float* src )
+{
+#if SEGAN_MATH_SIMD
+	switch ( s_math_module )
+	{
+	case MM_GENERIC:	gen_matrix_transform_norm( dest, src, this );	break;
+	case MM_SSE:		gen_matrix_transform_norm( dest, src, this );	break;
+	case MM_SSE2:		sse_matrix_transform_norm( dest, src, this );	break;
+	}
+#else
+	gen_matrix_transform_norm( dest, src, this );
+#endif
+}
+
+SEGAN_INLINE void Matrix::TransformPoint( float* OUT dest, const float* src )
+{
+#if SEGAN_MATH_SIMD
+	switch ( s_math_module )
+	{
+	case MM_GENERIC:	gen_matrix_transform_point( dest, src, this );	break;
+	case MM_SSE:		gen_matrix_transform_point( dest, src, this );	break;
+	case MM_SSE2:		sse_matrix_transform_point( dest, src, this );	break;
+	}
+#else
+	gen_matrix_transform_point( dest, src, this );
+#endif
+}
+
+SEGAN_INLINE void Matrix::Scale( const float x, const float y, const float z )
 {
 #if SEGAN_MATH_SIMD
 	switch ( s_math_module )
@@ -472,4 +500,5 @@ void Matrix::Orthographic( float width, float height, float nearZ, float farZ )
 	m32 = nearZ * znzf;
 	m33 = 1.0f;
 }
+
 

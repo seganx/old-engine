@@ -125,10 +125,10 @@ void AppMainLoop( float elpsTime )
 
 		float d[3] = { 1.0f, 1.0f, 1.0f }, u[3] = { 0.0f, 1.0f, 0.0f };
 		mat.SetDirection( d, u );
-		mat.Identity();
-		mat.SetRotationPitchYawRoll(0, 0, sx_os_get_timer() * 0.0001f );
-		//Matrix mview = g_engine->m_device3D->GetMatrix( MM_VIEW );
-		//mat.Inverse( mview );
+//		mat.Identity();
+//		mat.SetRotationPitchYawRoll( 0, 0, (float)sx_os_get_timer() * 0.005f );
+//		Matrix mview = g_engine->m_device3D->GetMatrix( MM_VIEW );
+//		mat.Inverse( mview );
 		g_engine->m_device3D->SetMatrix( MM_WORLD, mat );
 
 		g_engine->m_device3D->EndScene();
@@ -217,7 +217,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		client->Start( 2727, clientCallback );
 		client->Listen();
 		int tryToConnect = 0;
-		while ( tryToConnect < 500 )
+		while ( tryToConnect < 50 )
 		{
 			client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
 
@@ -230,7 +230,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			}
 
 			tryToConnect++;
-			sx_os_sleep(50);
+			sx_os_sleep(10);
 		}
 	}
 #endif
@@ -252,7 +252,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 #if 1
 	g_engine->m_device3D = sx_d3d_create_device( SX_D3D_CREATE_GL );
 	g_engine->m_device3D->Initialize( winMain->GetHandle() );
-	g_engine->m_device3D->SetSize( -1, -1, 0 /*| SX_D3D_VSYNC*/ /*| SX_D3D_FULLSCREEN*/ );
+	g_engine->m_device3D->SetSize( -1, -1, 0 | SX_D3D_VSYNC /*| SX_D3D_FULLSCREEN*/ );
 #endif
 
 #if 1
@@ -399,6 +399,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		g_engine->m_device3D->DestroyVertexBuffer( vbo_tx0 );
 		g_engine->m_device3D->DestroyVertexBuffer( vbo_pos );
 		
+		sx_d3d_destroy_device( g_engine->m_device3D );
 	}
 #else
 	sx_engine_start( &AppMainLoop );

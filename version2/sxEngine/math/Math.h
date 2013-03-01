@@ -81,6 +81,12 @@ public:
 
  	//! set translation of this matrix without change of rotation
  	void SetTranslation( const float x, const float y, const float z );
+
+	//! transform src vector by this matrix to the dest vector
+	void TransformNormal( float* OUT dest, const float* src );
+
+	//! transform src point by this matrix to the dest point
+	void TransformPoint( float* OUT dest, const float* src );
  
  	//! make this to an scaling matrix. Use this with care. some objects in 3d space have no absolute scale. like rigid bodies, triggers, etc
  	void Scale( const float x, const float y, const float z );

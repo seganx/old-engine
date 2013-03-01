@@ -403,31 +403,16 @@ void d3dDevice_dx::EndScene( void )
 {
 	sx_assert( m_device3D );
 
-	D3DMATERIAL9 mtl; ZeroMemory( &mtl, sizeof(mtl) );
 	{
-		mtl.Ambient = D3DXCOLOR(1, 0, 0, 1);
+		D3DMATERIAL9 mtl; ZeroMemory( &mtl, sizeof(mtl) );
+		mtl.Ambient = D3DXCOLOR( 0.5f, 0, 0.5f, 1.0f );
 		mtl.Diffuse = mtl.Ambient;
 		m_device3D->SetMaterial( &mtl );
-		float vx[6] = { 2, 0, 0, -1, 0, 0 };	
-		m_device3D->DrawPrimitiveUP( D3DPT_LINESTRIP, 1, &vx, 12);
+		float vx[9] = { 1, 1, 5, 2, 1, 5, 2, 2, 5 };	
+		m_device3D->DrawPrimitiveUP( D3DPT_LINESTRIP, 2, &vx, 12);
 	}
-	{
-		mtl.Ambient = D3DXCOLOR(0, 1, 0, 1);
-		mtl.Diffuse = mtl.Ambient;
-		m_device3D->SetMaterial( &mtl );
-		float vx[6] = { 0, 2, 0, 0, -1, 0 };	
-		m_device3D->DrawPrimitiveUP( D3DPT_LINESTRIP, 1, &vx, 12);
-	}
-	{
-		mtl.Ambient = D3DXCOLOR(0, 0, 1, 1);
-		mtl.Diffuse = mtl.Ambient;
-		m_device3D->SetMaterial( &mtl );
-		float vx[6] = { 0, 0, 2, 0, 0, -1 };	
-		m_device3D->DrawPrimitiveUP( D3DPT_LINESTRIP, 1, &vx, 12);
-	}
-	
-	m_device3D->EndScene();
 
+	m_device3D->EndScene();
 }
 
 void d3dDevice_dx::Present( void )
@@ -460,6 +445,30 @@ void d3dDevice_dx::ClearScreen( const dword bgcolor )
 	sx_assert( m_device3D );
 
 	m_device3D->Clear( 0, null, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, bgcolor, 1.0f, 0 );
+
+	D3DMATERIAL9 mtl; ZeroMemory( &mtl, sizeof(mtl) );
+	{
+		mtl.Ambient = D3DXCOLOR(1, 0, 0, 1);
+		mtl.Diffuse = mtl.Ambient;
+		m_device3D->SetMaterial( &mtl );
+		float vx[6] = { 2, 0, 0, -1, 0, 0 };	
+		m_device3D->DrawPrimitiveUP( D3DPT_LINESTRIP, 1, &vx, 12);
+	}
+	{
+		mtl.Ambient = D3DXCOLOR(0, 1, 0, 1);
+		mtl.Diffuse = mtl.Ambient;
+		m_device3D->SetMaterial( &mtl );
+		float vx[6] = { 0, 2, 0, 0, -1, 0 };	
+		m_device3D->DrawPrimitiveUP( D3DPT_LINESTRIP, 1, &vx, 12);
+	}
+	{
+		mtl.Ambient = D3DXCOLOR(0, 0, 1, 1);
+		mtl.Diffuse = mtl.Ambient;
+		m_device3D->SetMaterial( &mtl );
+		float vx[6] = { 0, 0, 2, 0, 0, -1 };	
+		m_device3D->DrawPrimitiveUP( D3DPT_LINESTRIP, 1, &vx, 12);
+	}
+
 }
 
 void d3dDevice_dx::ClearTarget( const dword bgcolor )
@@ -606,6 +615,10 @@ void d3dDevice_dx::ResetStates( void )
 	m_rs_wireFrame		= false;
 	m_rs_fog			= false;
 
+	m_world.Identity();
+	m_view.Identity();
+	m_projection.Identity();
+
 	if ( !m_initData.resetStateBlock )
 	{
 		// create the state block for fast reinitialization in the next time
@@ -645,6 +658,10 @@ void d3dDevice_dx::ResetStates( void )
 		m_device3D->SetIndices( NULL );
 		m_device3D->SetVertexShader( NULL );
 		m_device3D->SetPixelShader( NULL );
+
+		m_device3D->SetTransform( D3DTS_WORLD,		(D3DMATRIX*)&m_world );
+		m_device3D->SetTransform( D3DTS_VIEW,		(D3DMATRIX*)&m_view );
+		m_device3D->SetTransform( D3DTS_PROJECTION, (D3DMATRIX*)&m_projection );
 
 		SetViewport( &m_defaultViewport );
 

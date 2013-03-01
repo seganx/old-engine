@@ -290,20 +290,21 @@ SEGAN_INLINE void gen_matrix_lookat( Matrix* m, const float* eye, const float* a
 
 SEGAN_INLINE void gen_matrix_direction( Matrix* m, const float* dir, const float* up )
 {
-	float fwr[3] = { - dir[0], - dir[1], - dir[2] };
+	float fwr[3] = { dir[0], dir[1], dir[2] };
 	float dirlen = sx_sqrt_fast( fwr[0] * fwr[0] + fwr[1] * fwr[1] + fwr[2] * fwr[2] );
 	fwr[0] /= dirlen;
 	fwr[1] /= dirlen;
 	fwr[2] /= dirlen;
 
-	//float side[3] = { fwr[1] * up[2] - fwr[2] * up[1], fwr[2] * up[0] - fwr[0] * up[2], fwr[0] * up[1] - fwr[1] * up[0] };
-	float side[3] = { fwr[1] * up[2] - fwr[2] * up[1], fwr[2] * up[0] - fwr[0] * up[2], fwr[0] * up[1] - fwr[1] * up[0] };
+//	float side[3] = { fwr[1] * up[2] - fwr[2] * up[1], fwr[2] * up[0] - fwr[0] * up[2], fwr[0] * up[1] - fwr[1] * up[0] };
+	float side[3] = { up[1] * fwr[2] - up[2] * fwr[1], up[2] * fwr[0] - up[0] * fwr[2], up[0] * fwr[1] - up[1] * fwr[0] };
 	float sidelen = sx_sqrt_fast( side[0] * side[0] + side[1] * side[1] + side[2] * side[2] );
 	side[0] /= sidelen;
 	side[1] /= sidelen;
 	side[2] /= sidelen;
 
-	float upd[3] = { side[1] * fwr[2] - side[2] * fwr[1], side[2] * fwr[0] - side[0] * fwr[2], side[0] * fwr[1] - side[1] * fwr[0] };
+	//float upd[3] = { side[1] * fwr[2] - side[2] * fwr[1], side[2] * fwr[0] - side[0] * fwr[2], side[0] * fwr[1] - side[1] * fwr[0] };
+	float upd[3] = { fwr[1] * side[2] - fwr[2] * side[1], fwr[2] * side[0] - fwr[0] * side[2], fwr[0] * side[1] - fwr[1] * side[0] };
 	float uplen = sx_sqrt_fast( upd[0] * upd[0] + upd[1] * upd[1] + upd[2] * upd[2] );
 	upd[0] /= uplen;
 	upd[1] /= uplen;
@@ -314,6 +315,21 @@ SEGAN_INLINE void gen_matrix_direction( Matrix* m, const float* dir, const float
 	m->m20 = fwr[0];	m->m21 = fwr[1];	m->m22 = fwr[2];	m->m23 = 0;
 	m->m30 = 0;			m->m31 = 0;			m->m32 = 0;			m->m33 = 1.0f;
 }
+
+SEGAN_INLINE void gen_matrix_transform_norm( float* dest, const float* v, const Matrix* mat )
+{
+	dest[0] = ( mat->m00 * v[0] ) + ( mat->m10 * v[1] ) + ( mat->m20 * v[2] );
+	dest[1] = ( mat->m01 * v[0] ) + ( mat->m11 * v[1] ) + ( mat->m21 * v[2] );
+	dest[2] = ( mat->m02 * v[0] ) + ( mat->m12 * v[1] ) + ( mat->m22 * v[2] );
+}
+
+SEGAN_INLINE void gen_matrix_transform_point( float* dest, const float* v, const Matrix* mat )
+{
+	dest[0] = ( mat->m00 * v[0] ) + ( mat->m10 * v[1] ) + ( mat->m20 * v[2] ) + mat->m30;
+	dest[1] = ( mat->m01 * v[0] ) + ( mat->m11 * v[1] ) + ( mat->m21 * v[2] ) + mat->m31;
+	dest[2] = ( mat->m02 * v[0] ) + ( mat->m12 * v[1] ) + ( mat->m22 * v[2] ) + mat->m32;
+}
+
 
 #endif	//	GUARD_Math_Generic_HEADER_FILE
 

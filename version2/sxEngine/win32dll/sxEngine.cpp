@@ -59,7 +59,6 @@ SEGAN_ENG_API Engine* engine_get_singleton( EngineConfig* config /*= null */ )
 	//	initialize application
 	sx_app_initialize( s_config.window_event_callback );
 
-
 	//	initialize network
 	sx_net_initialize( s_config.net_id );
 

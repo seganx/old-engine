@@ -265,6 +265,8 @@ bool d3dDevice_gl::SetSize( const uint width, const uint height, const dword SX_
 #endif		
 	}
 
+	m_viewport.x = 0;
+	m_viewport.y = 0;
 	m_viewport.width = m_creationData.width;
 	m_viewport.height = m_creationData.height;
 
@@ -448,13 +450,14 @@ bool d3dDevice_gl::BeginScene( void )
 
 void d3dDevice_gl::EndScene( void )
 {
+	float x = 0, y = 0, z = sx_random_f_limit( 1, 2 );
 	ApplyTextureBuffer();
   	glColor3f( 1.0f,1.0f,1.0f );
   	glBegin( GL_QUADS );
-  	glTexCoord2f( 0, 0 );	glVertex3f( 1.0f, 1.0f, 1.0f );
-  	glTexCoord2f( 1, 0 );	glVertex3f(-1.0f, 1.0f, 1.0f );
-  	glTexCoord2f( 1, 1 );	glVertex3f(-1.0f,-1.0f, 1.0f );
-  	glTexCoord2f( 0, 1 );	glVertex3f( 1.0f,-1.0f, 1.0f );
+  	glTexCoord2f( 0, 0 );	glVertex3f( x + 1.0f, y + 1.0f, z );
+  	glTexCoord2f( 1, 0 );	glVertex3f( x - 1.0f, y + 1.0f, z );
+  	glTexCoord2f( 1, 1 );	glVertex3f( x - 1.0f, y - 1.0f, z );
+  	glTexCoord2f( 0, 1 );	glVertex3f( x + 1.0f, y - 1.0f, z );
   	glEnd();
 }
 

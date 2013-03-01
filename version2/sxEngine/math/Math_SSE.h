@@ -393,4 +393,42 @@ SEGAN_INLINE void sse_matrix_lookat( Matrix* m, const float* eye, const float* a
 }
 #endif
 
+SEGAN_INLINE void sse_matrix_transform_norm( float* dest, const float* src, const Matrix* mat )
+{
+	__declspec(align(16)) const float vsrc[4] = { src[0], src[1], src[2], 0.0f };
+	__m128 vec = _mm_load_ps( vsrc );
+	__m128 row0 = _mm_loadu_ps( mat->m[0] );
+	__m128 row1 = _mm_loadu_ps( mat->m[1] );
+	__m128 row2 = _mm_loadu_ps( mat->m[2] );	
+	__declspec(align(16)) float vdst[4];
+	_mm_store_ps( vdst, 
+		_mm_add_ps(
+		_mm_add_ps(
+		_mm_mul_ps( row0, _mm_shuffle_ps( vec, vec, _MM_SHUFFLE( 0, 0, 0, 0 ) ) ) , 
+		_mm_mul_ps( row1, _mm_shuffle_ps( vec, vec, _MM_SHUFFLE( 1, 1, 1, 1 ) ) ) ) ,
+		_mm_mul_ps( row2, _mm_shuffle_ps( vec, vec, _MM_SHUFFLE( 2, 2, 2, 2 ) ) ) )
+		);
+	memcpy( dest, vdst, 12 );
+}
+
+SEGAN_INLINE void sse_matrix_transform_point( float* dest, const float* src, const Matrix* mat )
+{
+	__declspec(align(16)) const float vsrc[4] = { src[0], src[1], src[2], 0.0f };
+	__m128 vec = _mm_load_ps( vsrc );
+	__m128 row0 = _mm_loadu_ps( mat->m[0] );
+	__m128 row1 = _mm_loadu_ps( mat->m[1] );
+	__m128 row2 = _mm_loadu_ps( mat->m[2] );
+	__m128 row3 = _mm_loadu_ps( mat->m[3] );
+	__declspec(align(16)) float vdst[4];
+	_mm_store_ps( vdst, 
+		_mm_add_ps(
+		_mm_add_ps(
+		_mm_mul_ps( row0, _mm_shuffle_ps( vec, vec, _MM_SHUFFLE( 0, 0, 0, 0 ) ) ) ,
+		_mm_mul_ps( row1, _mm_shuffle_ps( vec, vec, _MM_SHUFFLE( 1, 1, 1, 1 ) ) ) ) ,
+		_mm_add_ps(
+		_mm_mul_ps( row2, _mm_shuffle_ps( vec, vec, _MM_SHUFFLE( 2, 2, 2, 2 ) ) ) , row3 ) )
+		);
+	memcpy( dest, vdst, 12 );
+}
+
 #endif	//	GUARD_Math_SSE_HEADER_FILE
