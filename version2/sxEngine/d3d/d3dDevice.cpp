@@ -121,12 +121,10 @@ SEGAN_ENG_API void sx_d3d_finalize( void )
 
 SEGAN_ENG_API d3dDevice* sx_d3d_create_device( dword flag )
 {
-	switch ( flag )
-	{
-	case SX_D3D_CREATE_DX:	return sx_new( d3dDevice_dx );
-	case SX_D3D_CREATE_GL:	return sx_new( d3dDevice_gl );
-	}
-	return null;
+	if ( flag & SX_D3D_CREATE_DX )
+		return sx_new( d3dDevice_dx );
+	else
+		return sx_new( d3dDevice_gl );
 }
 
 SEGAN_ENG_API void sx_d3d_destroy_device( d3dDevice* &pdevice )

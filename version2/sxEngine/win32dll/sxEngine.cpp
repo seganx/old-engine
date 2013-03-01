@@ -54,16 +54,16 @@ SEGAN_ENG_API Engine* engine_get_singleton( EngineConfig* config /*= null */ )
 	sx_thread_initilize();
 
 	//	initialize math functions
-	sx_math_initialize( s_config.math_force_use_generic );
+	sx_math_initialize( s_config.math_no_sse );
 
 	//	initialize application
-	sx_app_initialize( s_config.window_event_callback );
+	sx_app_initialize( s_config.window_callback );
 
 	//	initialize network
 	sx_net_initialize( s_config.net_id );
 
 	//	initialize device 3D system
-	//sx_d3d_initialize( s_config.d3d_flag );
+	sx_d3d_initialize( s_config.d3d_flag );
 
 	return g_engine;
 }
@@ -71,6 +71,23 @@ SEGAN_ENG_API Engine* engine_get_singleton( EngineConfig* config /*= null */ )
 
 SEGAN_ENG_API bool engine_initialize( void )
 {
+	//	create man window for engine
+	if ( !s_config.window_main )
+	{
+		g_engine->m_window = sx_app_create_window( L"SeganX v 0.2", WBT_ORDINARY_RESIZABLE, false );
+		g_engine->m_window->SetVisible( true );
+	}
+	else
+	{
+		g_engine->m_window = s_config.window_main;
+	}
+
+	//	create and initialize rendering device
+	g_engine->m_device3D = sx_d3d_create_device( s_config.d3d_flag );
+	g_engine->m_device3D->Initialize( g_engine->m_window->GetHandle() );
+	g_engine->m_device3D->SetSize( -1, -1, s_config.d3d_flag );
+
+	//	
 
 #if 0
 	static bool engine_initialized = false;

@@ -20,18 +20,20 @@
 //! structure of engine configuration
 struct EngineConfig
 {
-	LoggerConfig*			logger;
-	dword					net_id;
-	bool					math_force_use_generic;
-	WindowEventCallback		window_event_callback;
-	dword					d3d_flag;
+	LoggerConfig*			logger;						//	pointer to logger configuration. this can be null to leave it to default
+	dword					net_id;						//	net ID used to avoid net conflict
+	Window*					window_main;				//	main rendering window. this can be null to create a new window a pointer to existing window
+	WindowEventCallback		window_callback;			//	window call back to handle window events. this can be null to leave it to default
+	dword					d3d_flag;					//	rendering device flags
+	bool					math_no_sse;				//	force math to avoid using sse instruction
 
 	EngineConfig()
 		: logger(null)
-		, net_id(0x27272727)
-		, math_force_use_generic(false)
-		, window_event_callback(null)
-		, d3d_flag(0)
+		, net_id(0x2729)
+		, window_main(null)
+		, window_callback(null)
+		, d3d_flag( SX_D3D_CREATE_GL | SX_D3D_VSYNC )
+		, math_no_sse(false)
 	{
 
 	}
@@ -45,6 +47,7 @@ public:
 	class Logger*				m_logger;
 	class Network*				m_network;
  
+	class Window*				m_window;
 	class d3dDevice*			m_device3D;
 	class uiDevice*				m_deviceUI;
 	class phsDevice*			m_devicePhysics;

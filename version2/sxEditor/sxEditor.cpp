@@ -11,7 +11,6 @@
 
 //////////////////////////////////////////////////////////////////////////
 //  SOME GLOBAL VARIABLES
-Window* winMain = null;
 Client* client = null;
 
 #if 1
@@ -55,15 +54,15 @@ int WindowEventCall( Window* Sender, const WindowEvent* data )
 			curRect.width	= prc.right - prc.left - iW;
 			curRect.height	= prc.bottom - prc.top - iH;
 
-			static int counter = 0;
-			g_engine->m_logger->Log_( L"%d > Window has been resized [ %d x %d ]", counter++, curRect.width, curRect.height );
-
 #if 1
-			if ( Sender && Sender->m_name == L"main" )
+			if ( Sender && Sender == g_engine->m_window )
 			{
 				if ( g_engine->m_device3D && ( g_engine->m_device3D->m_creationData.flag & SX_D3D_FULLSCREEN ) == 0  )
 					g_engine->m_device3D->SetSize( curRect.width, curRect.height, -1 );
 			}
+#else
+			static int counter = 0;
+			g_engine->m_logger->Log_( L"%d > Window has been resized [ %d x %d ]", counter++, curRect.width, curRect.height );
 #endif
 			return 0;
 		}
@@ -123,8 +122,9 @@ void AppMainLoop( float elpsTime )
 
 		g_engine->m_device3D->SetTexture( tex_001 );
 
-		float d[3] = { 1.0f, 1.0f, 1.0f }, u[3] = { 0.0f, 1.0f, 0.0f };
+		float d[3] = { 1.0f, 0.0f, 1.0f }, u[3] = { 0.0f, 1.0f, 0.0f };
 		mat.SetDirection( d, u );
+//		mat.SetTranslation( 0, 0, 1 );
 //		mat.Identity();
 //		mat.SetRotationPitchYawRoll( 0, 0, (float)sx_os_get_timer() * 0.005f );
 //		Matrix mview = g_engine->m_device3D->GetMatrix( MM_VIEW );
@@ -137,7 +137,7 @@ void AppMainLoop( float elpsTime )
 
 		str128 str;
 		str.Format( L"fps : %d - ft : %.2f", g_engine->m_device3D->m_debugInfo.fps, g_engine->m_device3D->m_debugInfo.frameTime );
-		winMain->SetTitle( str );
+		g_engine->m_window->SetTitle( str );
 	}
 #endif
 
@@ -204,7 +204,8 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	EngineConfig config;
 	config.logger = &loggerconfig;
-	config.window_event_callback = &WindowEventCall;
+	config.window_callback = &WindowEventCall;
+	config.d3d_flag = SX_D3D_CREATE_GL | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
 
 	sx_engine_get_singleton( &config );
 
@@ -217,7 +218,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		client->Start( 2727, clientCallback );
 		client->Listen();
 		int tryToConnect = 0;
-		while ( tryToConnect < 50 )
+		while ( 0 && tryToConnect < 5 )
 		{
 			client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
 
@@ -230,16 +231,15 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			}
 
 			tryToConnect++;
-			sx_os_sleep(10);
+			sx_os_sleep(1);
 		}
 	}
 #endif
 
+	sx_engine_initialize();
+
 #if 1
 	{
-		winMain = sx_app_create_window( L"main", WBT_ORDINARY_RESIZABLE, false );
-		winMain->SetVisible( true );
-
 		Window* winChild = sx_app_create_window( L"test", WBT_WINTOOL_RESIZABLE, true );
 		winChild->SetCursor( WCT_HAND );
 		winChild->SetRect( 50, 500, 200, 150 );
@@ -249,11 +249,6 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	}
 #endif
 
-#if 1
-	g_engine->m_device3D = sx_d3d_create_device( SX_D3D_CREATE_GL );
-	g_engine->m_device3D->Initialize( winMain->GetHandle() );
-	g_engine->m_device3D->SetSize( -1, -1, 0 | SX_D3D_VSYNC /*| SX_D3D_FULLSCREEN*/ );
-#endif
 
 #if 1
 	{
