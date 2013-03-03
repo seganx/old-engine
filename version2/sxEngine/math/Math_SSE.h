@@ -51,12 +51,12 @@
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
+//#include "D:\SeganX\version2\sxEngine\math\vectormathlibrary\include\vectormath\SSE\cpp\vectormath_aos.h"
+
 #define USE_SSE2_LDDQU
 #ifdef USE_SSE2_LDDQU
 #include <intrin.h>  //used for _mm_lddqu_si128
 #endif //USE_SSE2_LDDQU
-
-//#include "vectormathlibrary/include/vectormath/SSE/cpp/vectormath_aos.h"
 
 #if !defined(vec_splat)
 
@@ -70,6 +70,7 @@
 #define _SINCOS_KC2  7.54978995489e-8f
 
 #define vec_splat(x, e)		_mm_shuffle_ps( x, x, _MM_SHUFFLE(e,e,e,e) )
+#define vec_nmsub(a,b,c)	_mm_sub_ps( c, _mm_mul_ps( a, b ) )
 #define vec_madd(a, b, c)	_mm_add_ps( c, _mm_mul_ps( a, b ) )
 #define _mm_ror_ps(vec,i)	(((i)%4) ? (_mm_shuffle_ps(vec,vec, _MM_SHUFFLE((unsigned char)(i+3)%4,(unsigned char)(i+2)%4,(unsigned char)(i+1)%4,(unsigned char)(i+0)%4))) : (vec))
 #define _mm_rol_ps(vec,i)	(((i)%4) ? (_mm_shuffle_ps(vec,vec, _MM_SHUFFLE((unsigned char)(7-i)%4,(unsigned char)(6-i)%4,(unsigned char)(5-i)%4,(unsigned char)(4-i)%4))) : (vec))
@@ -129,7 +130,7 @@ SEGAN_INLINE void sincosf4( __m128 x, __m128* s, __m128* c )
 #endif
 
 
-SEGAN_INLINE void sse_matrix_add( Matrix* res, const Matrix* mat1, const Matrix* mat2 )
+SEGAN_INLINE void sse_matrix_add( matrix* res, const matrix* mat1, const matrix* mat2 )
 {
 	_mm_storeu_ps( res->m[0], _mm_add_ps( _mm_loadu_ps( mat1->m[0] ), _mm_loadu_ps( mat2->m[0] ) ) );
 	_mm_storeu_ps( res->m[1], _mm_add_ps( _mm_loadu_ps( mat1->m[1] ), _mm_loadu_ps( mat2->m[1] ) ) );
@@ -137,7 +138,7 @@ SEGAN_INLINE void sse_matrix_add( Matrix* res, const Matrix* mat1, const Matrix*
 	_mm_storeu_ps( res->m[3], _mm_add_ps( _mm_loadu_ps( mat1->m[3] ), _mm_loadu_ps( mat2->m[3] ) ) );
 }
 
-SEGAN_INLINE void sse_matrix_sub( Matrix* res, const Matrix* mat1, const Matrix* mat2 )
+SEGAN_INLINE void sse_matrix_sub( matrix* res, const matrix* mat1, const matrix* mat2 )
 {
 	_mm_storeu_ps( res->m[0], _mm_sub_ps( _mm_loadu_ps( mat1->m[0] ), _mm_loadu_ps( mat2->m[0] ) ) );
 	_mm_storeu_ps( res->m[1], _mm_sub_ps( _mm_loadu_ps( mat1->m[1] ), _mm_loadu_ps( mat2->m[1] ) ) );
@@ -145,7 +146,7 @@ SEGAN_INLINE void sse_matrix_sub( Matrix* res, const Matrix* mat1, const Matrix*
 	_mm_storeu_ps( res->m[3], _mm_sub_ps( _mm_loadu_ps( mat1->m[3] ), _mm_loadu_ps( mat2->m[3] ) ) );
 }
 
-SEGAN_INLINE void sse_matrix_mul( Matrix* res, const Matrix* mat1, const Matrix* mat2 )
+SEGAN_INLINE void sse_matrix_mul( matrix* res, const matrix* mat1, const matrix* mat2 )
 {
 	__m128 m1r0 = _mm_loadu_ps( mat1->m[0] );
 	__m128 m1r1 = _mm_loadu_ps( mat1->m[1] );
@@ -198,7 +199,7 @@ SEGAN_INLINE void sse_matrix_mul( Matrix* res, const Matrix* mat1, const Matrix*
 		);
 }
 
-SEGAN_INLINE void sse_matrix_inv( Matrix* res, const Matrix* mat )
+SEGAN_INLINE void sse_matrix_inv( matrix* res, const matrix* mat )
 {
 	__m128 Va,Vb,Vc;
 	__m128 r1,r2,r3,tt,tt2;
@@ -294,7 +295,7 @@ SEGAN_INLINE void sse_matrix_inv( Matrix* res, const Matrix* mat )
 	_mm_storeu_ps( res->m[3], _L4 );
 }
 
-SEGAN_INLINE float sse_matrix_det( Matrix* mat )
+SEGAN_INLINE float sse_matrix_det( matrix* mat )
 {
 	__m128 Va,Vb,Vc;
 	__m128 r1,r2,r3,tt,tt2;
@@ -335,7 +336,7 @@ SEGAN_INLINE float sse_matrix_det( Matrix* mat )
 	return *( (float*)&Det );
 }
 
-SEGAN_INLINE void sse_matrix_transpose( Matrix* res, const Matrix* mat )
+SEGAN_INLINE void sse_matrix_transpose( matrix* res, const matrix* mat )
 {
 	__m128 m0 = _mm_loadu_ps( mat->m[0] );
 	__m128 m1 = _mm_loadu_ps( mat->m[1] );
@@ -351,7 +352,7 @@ SEGAN_INLINE void sse_matrix_transpose( Matrix* res, const Matrix* mat )
 	_mm_storeu_ps( res->m[3], _mm_unpackhi_ps( tmp2, tmp3 ) );
 }
 
-SEGAN_INLINE void sse_matrix_setrotate_pyr( Matrix* mat, const float pitch, const float yaw, const float roll )
+SEGAN_INLINE void sse_matrix_setrotate_pyr( matrix* mat, const float pitch, const float yaw, const float roll )
 {
 	float pyr[4] = { pitch, yaw, roll, 0.0f };
 	__m128 angles = _mm_loadu_ps( pyr );
@@ -378,7 +379,7 @@ SEGAN_INLINE void sse_matrix_setrotate_pyr( Matrix* mat, const float pitch, cons
 	_mm_storeu_ps( mat->m[3], _mm_setr_ps( 0.0f, 0.0f, 0.0f, 1.0f ) );
 }
 
-SEGAN_INLINE void sse_matrix_scale( Matrix* mat, const float x, const float y, const float z )
+SEGAN_INLINE void sse_matrix_scale( matrix* mat, const float x, const float y, const float z )
 {
 	_mm_storeu_ps( mat->m[0], _mm_set_ps( x, 0.0f, 0.0f, 0.0f ) );
 	_mm_storeu_ps( mat->m[1], _mm_set_ps( 0.0f, y, 0.0f, 0.0f ) );
@@ -393,7 +394,7 @@ SEGAN_INLINE void sse_matrix_lookat( Matrix* m, const float* eye, const float* a
 }
 #endif
 
-SEGAN_INLINE void sse_matrix_transform_norm( float* dest, const float* src, const Matrix* mat )
+SEGAN_INLINE void sse_matrix_transform_norm( float* dest, const float* src, const matrix* mat )
 {
 	__declspec(align(16)) const float vsrc[4] = { src[0], src[1], src[2], 0.0f };
 	__m128 vec = _mm_load_ps( vsrc );
@@ -411,7 +412,7 @@ SEGAN_INLINE void sse_matrix_transform_norm( float* dest, const float* src, cons
 	memcpy( dest, vdst, 12 );
 }
 
-SEGAN_INLINE void sse_matrix_transform_point( float* dest, const float* src, const Matrix* mat )
+SEGAN_INLINE void sse_matrix_transform_point( float* dest, const float* src, const matrix* mat )
 {
 	__declspec(align(16)) const float vsrc[4] = { src[0], src[1], src[2], 0.0f };
 	__m128 vec = _mm_load_ps( vsrc );
@@ -429,6 +430,28 @@ SEGAN_INLINE void sse_matrix_transform_point( float* dest, const float* src, con
 		_mm_mul_ps( row2, _mm_shuffle_ps( vec, vec, _MM_SHUFFLE( 2, 2, 2, 2 ) ) ) , row3 ) )
 		);
 	memcpy( dest, vdst, 12 );
+}
+
+SEGAN_INLINE void sse_quat_mul( quat* res, const quat* quat0, const quat* quat1 )
+{
+	__m128 ldata = _mm_loadu_ps( quat0->e );
+	__m128 rdata = _mm_loadu_ps( quat1->e );
+	__m128 tmp0 = _mm_shuffle_ps( ldata, ldata, _MM_SHUFFLE( 3, 0, 2, 1 ) );
+	__m128 tmp1 = _mm_shuffle_ps( rdata, rdata, _MM_SHUFFLE( 3, 1, 0, 2 ) );
+	__m128 tmp2 = _mm_shuffle_ps( ldata, ldata, _MM_SHUFFLE( 3, 1, 0, 2 ) );
+	__m128 tmp3 = _mm_shuffle_ps( rdata, rdata, _MM_SHUFFLE( 3, 0, 2, 1 ) );
+	__m128 qv = _mm_mul_ps( vec_splat( ldata, 3 ), rdata );
+	qv = vec_madd( vec_splat( rdata, 3 ), ldata, qv );
+	qv = vec_madd( tmp0, tmp1, qv );
+	qv = vec_nmsub( tmp2, tmp3, qv );
+	__m128 product = _mm_mul_ps( ldata, rdata );
+	__m128 l_wxyz = _mm_ror_ps( ldata, 3 );
+	__m128 r_wxyz = _mm_ror_ps( rdata, 3 );
+	__m128 qw = vec_nmsub( l_wxyz, r_wxyz, product );
+	__m128 xy = vec_madd( l_wxyz, r_wxyz, product );
+	qw = _mm_sub_ps( qw, _mm_ror_ps( xy, 2 ) );
+	__declspec(align(16)) unsigned int sw[4] = { 0, 0, 0, 0xffffffff };
+	_mm_storeu_ps( res->e, vec_sel( qv, qw, sw ) );
 }
 
 #endif	//	GUARD_Math_SSE_HEADER_FILE

@@ -22,13 +22,13 @@ SEGAN_ENG_API void sx_math_finalize( void );
 //////////////////////////////////////////////////////////////////////////
 //	standard matrix 4x4
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_ENG_API Matrix
+class SEGAN_ENG_API matrix
 {
 public:
-	Matrix() {};
-	Matrix( const float * p );
-	Matrix( const Matrix& m );
-	Matrix( 
+	matrix() {};
+	matrix( const float * p );
+	matrix( const matrix& m );
+	matrix( 
 		float f11, float f12, float f13, float f14,
 		float f21, float f22, float f23, float f24,
 		float f31, float f32, float f33, float f34,
@@ -113,7 +113,7 @@ public:
 		float	m[4][4];
 	};
 };
-typedef Matrix float4x4;
+typedef matrix float4x4;
 
 
 
@@ -222,146 +222,122 @@ public:
 	};
 };
 
-#if 0
+//////////////////////////////////////////////////////////////////////////
+//	VECTOR 4D
+//////////////////////////////////////////////////////////////////////////
+class SEGAN_ENG_API float4
+{
+public:
+	float4() {};
+	float4( const float* p );
+	float4( const float4& v );
+	float4( const float* xyz, const float w );
+	float4( const float x, const float y, const float z, const float w );
+
+	SEGAN_INLINE operator const float* ( void ) const { return e; }
+
+	//! set new value for this vector
+	void Set( const float x, const float y, const float z, const float w );
+
+	//! normalize the vector v to this. this = normalize(v)
+	void Normalize( const float* v );
+
+	//! return the length of vector
+	float Length( void ) const;
+
+	//! Length squared, or "norm"
+	float LengthSqar( void ) const;
+
+	//! dot product tow quaternions and return to this
+	float Dot( const float* v ) const;
+
+	//! return interpolated vector of v1 and v2 by weight of w to this
+	void Lerp( const float* v1, const float* v2, const float w );
+
+public:
+
+	union {
+		struct {
+			float x;
+			float y;
+			float z;
+			float w;
+		};
+
+		float e[4];	//	element vector
+	};
+};
+
 
 //////////////////////////////////////////////////////////////////////////
 //	VECTOR 4D
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_ENG_API Vector4 : public D3DXVECTOR4
+class SEGAN_ENG_API quat
 {
 public:
-	Vector4();
-	Vector4( const float* );
-	Vector4( const D3DVECTOR& xyz, float w );
-	Vector4( float x, float y, float z, float w );
+	quat() {};
+	quat( const float* p );
+	quat( const quat& v );
+	quat( const float* xyz, const float w );
+	quat( const float x, const float y, const float z, const float w );
 
-	//! set new value for this vector
-	void Set(float x, float y, float z, float w);
-
-	//! normalize the vector v to this. this = normalize(v)
-	void Normalize(const Vector4& v);
-
-	//! return the length of vector
-	float Length(void);
-
-	//! Length squared, or "norm"
-	float LengthSq(void);
-
-	//! dot product tow quaternions and return to this
-	float Dot(const Vector4 v);
-
-	//! (-x, -y, -z, w)
-	void Conjugate(const Vector4 q);
-
-	//! return interpolated vector of v1 and v2 by weight of w to this
-	void Lerp(const Vector4& v1, const Vector4& v2, const float w);
-
-	//! return spherical interpolated quaternion of q1 and q2 by weight of w to this
-	void SLerp(const Vector4& q1, const Vector4 q2, const float w);
-
-	//! build this quaternion from a rotation matrix
-	void RotationMatrix(const Matrix& mat);
-
-	//! get rotation matrix from this quaternion
-	void GetRotationMatrix(OUT Matrix& mat);
-
-	//! build this quaternion about arbitrary axis.
-	void RotationAxis(const float3 v, const float a);
-
-	//! compute a quaternin's axis and angle of rotation. Expects unit quaternions.
-	void GetAxisAngle(OUT float3& oVec, OUT float& oAng);
-
-	//! build this quaternion from Yaw around the Y axis, Pitch around the X axis, Roll around the Z axis.
-	void RotationYawPitchRoll(const float Yaw, const float Pitch, const float Roll);
-
-	//! quaternion multiplication. this will represents the rotation q2 followed by the rotation q1.  (this = q2 * q1)
-	void Multiply(const Vector4& q1, const Vector4 q2);
-
-	// conjugate and re-norm
-	void Inverse(const Vector4 q);
-
-	//! transform vector v to this by matrix m
-	void  Transform(const Vector4& vIn, const Matrix& m);
-
-	void operator =(const D3DXCOLOR colorRGBA);
-};
-typedef Vector4 *PVector4, float4, *pfloat4;
-
-//////////////////////////////////////////////////////////////////////////
-//	QUATERNION
-//////////////////////////////////////////////////////////////////////////
-class SEGAN_ENG_API Quaternion : public D3DXQUATERNION
-{
-public:
-	Quaternion();
-	Quaternion( const float* );
-	Quaternion( const D3DVECTOR& xyz, float w );
-	Quaternion( float x, float y, float z, float w );
+	SEGAN_INLINE operator const float* ( void ) const { return e; }
 
 	//! set new value for this quaternion
-	void Set(float x, float y, float z, float w);
+	void Set( const float x, const float y, const float z, const float w );
 
-	//! normalize the quaternion q to this. this = normalize(q)
-	void Normalize(const Quaternion& q);
+	//! normalize the quaternion q to this. this = normalize(v)
+	void Normalize( const float* v );
 
 	//! return the length of quaternion
-	float Length(void);
+	float Length( void ) const;
 
 	//! Length squared, or "norm"
-	float LengthSq(void);
+	float LengthSqar( void ) const;
 
 	//! dot product tow quaternions and return to this
-	float Dot(const Quaternion& q);
-
-	//! (-x, -y, -z, w)
-	void Conjugate(const Quaternion& q);
+	float Dot( const float* v ) const;
 
 	//! return interpolated quaternion of q1 and q2 by weight of w to this
-	void Lerp(const Quaternion& q1, const Quaternion& q2, const float w);
+	void Lerp( const float* v1, const float* v2, const float w );
 
 	//! return spherical interpolated quaternion of q1 and q2 by weight of w to this
-	void SLerp(const Quaternion& q1, const Quaternion q2, const float w);
+	void SLerp( const float* v1, const float* v2, const float w );
+
+	//! (-x, -y, -z, w)
+	void Conjugate( const float* q );
 
 	//! build this quaternion from a rotation matrix
-	void SetRotationMatrix(const Matrix& mat);
+	void SetRotationMatrix( const float* _matrix );
 
 	//! get rotation matrix from this quaternion
-	void GetRotationMatrix(OUT Matrix& mat) const;
+	void GetRotationMatrix( float* OUT _matrix );
 
-	//! build this quaternion about X, Y and Z angle
-	void SetRotationXYZ(const float rx, const float ry, const float rz);
+	//! build this quaternion from Yaw around the Y axis, Pitch around the X axis, Roll around the Z axis.
+	void RotationPitchYawRoll( const float yaw, const float pitch, const float roll );
 
-	//! compute X, Y and Z angles from this quaternion
-	void GetRotationXYZ(OUT float& rx, OUT float& ry, OUT float& rz) const;
-
-	//! build this quaternion about arbitrary axis
-	void SetRotationAxis(const float3& v, const float a);
-
-	//! compute a quaternin's axis and angle of rotation. Expects unit quaternions
-	void GetRotationAxis(OUT float3& oVec, OUT float& oAng) const;
-
-	//! build this quaternion from Yaw around the Y axis, Pitch around the X axis, Roll around the Z axis
-	void SetRotationPYR(const float Pitch, const float Yaw, const float Roll);
-
-	////! compute Yaw around the Y axis, Pitch around the X axis and Roll around the Z axis from this quaternion
-	//void GetRotationYPR(float& Yaw, float& Pitch, float& Roll) const;
-
-	////! build this quaternion from spherical rotation angles
-	//void RotationSpherical(const float angle, const float latitude, const float longitude);
-
-	////! compute spherical rotation angles from this quaternion
-	//void GetSpherical(OUT float& angle, OUT float& latitude, OUT float& longitude) const;
-
-	//! quaternion multiplication. this will represents the rotation q2 followed by the rotation q1  (this = q2 * q1)
-	void Multiply(const Quaternion& q1, const Quaternion& q2);
+	//! quaternion multiplication. this will represents the rotation q2 followed by the rotation q1.  (this = q2 * q1)
+	void Multiply( const float* q1, const float* q2 );
 
 	// conjugate and re-norm
-	void Inverse(const Quaternion& q);
+	void Inverse( const float* q );
 
-	//! transform quaternion q to this by matrix m
-	void  Transform(const Quaternion& q, const Matrix& m);
+public:
+
+	union {
+		struct {
+			float x;
+			float y;
+			float z;
+			float w;
+		};
+
+		float e[4];	//	element vector
+	};
 };
-typedef Quaternion *PQuaternion, floatQ, *pfloatQ;
+
+
+#if 0
 
 //////////////////////////////////////////////////////////////////////////
 //	PLANE

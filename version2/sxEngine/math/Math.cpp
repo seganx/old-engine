@@ -185,17 +185,17 @@ SEGAN_ENG_API void sx_math_finalize( void )
 //////////////////////////////////////////////////////////////////////////
 //	matrix implementation
 //////////////////////////////////////////////////////////////////////////
-SEGAN_INLINE Matrix::Matrix( const float * p )
+SEGAN_INLINE matrix::matrix( const float * p )
 {
-	memcpy( &m00, p, sizeof(Matrix) );
+	memcpy( &m00, p, sizeof(matrix) );
 }
 
-SEGAN_INLINE Matrix::Matrix( const Matrix& m )
+SEGAN_INLINE matrix::matrix( const matrix& m )
 {
-	memcpy( &m00, &m.m00, sizeof(Matrix) );
+	memcpy( &m00, &m.m00, sizeof(matrix) );
 }
 
-SEGAN_INLINE Matrix::Matrix( float f11, float f12, float f13, float f14, float f21, float f22, float f23, float f24, float f31, float f32, float f33, float f34, float f41, float f42, float f43, float f44 )
+SEGAN_INLINE matrix::matrix( float f11, float f12, float f13, float f14, float f21, float f22, float f23, float f24, float f31, float f32, float f33, float f34, float f41, float f42, float f43, float f44 )
 {
 	m00 = f11; m01 = f12; m02 = f13; m03 = f14;
 	m10 = f21; m11 = f22; m12 = f23; m13 = f24;
@@ -203,12 +203,12 @@ SEGAN_INLINE Matrix::Matrix( float f11, float f12, float f13, float f14, float f
 	m30 = f41; m31 = f42; m32 = f43; m33 = f44;
 }
 
-SEGAN_INLINE void Matrix::Empty( void )
+SEGAN_INLINE void matrix::Empty( void )
 {
-	sx_mem_set( this, 0, sizeof(Matrix) );
+	sx_mem_set( this, 0, sizeof(matrix) );
 }
 
-SEGAN_INLINE void Matrix::Identity( void )
+SEGAN_INLINE void matrix::Identity( void )
 {
 	m00=1; m01=0; m02=0; m03=0;
 	m10=0; m11=1; m12=0; m13=0;
@@ -216,9 +216,9 @@ SEGAN_INLINE void Matrix::Identity( void )
 	m30=0; m31=0; m32=0; m33=1;
 }
 
-SEGAN_INLINE bool Matrix::EqualTo( const float* p )
+SEGAN_INLINE bool matrix::EqualTo( const float* p )
 {
-	const Matrix* mat = (const Matrix*)p;
+	const matrix* mat = (const matrix*)p;
 	for ( int i=0; i<4; i++ )
 	{
 		for ( int j=0; i<4; i++ )
@@ -229,7 +229,7 @@ SEGAN_INLINE bool Matrix::EqualTo( const float* p )
 	return true;
 }
 
-SEGAN_INLINE float Matrix::Determinant( void )
+SEGAN_INLINE float matrix::Determinant( void )
 {
 #if SEGAN_MATH_SIMD
 	switch ( s_math_module )
@@ -244,9 +244,9 @@ SEGAN_INLINE float Matrix::Determinant( void )
 #endif
 }
 
-SEGAN_INLINE void Matrix::Transpose( const float* p )
+SEGAN_INLINE void matrix::Transpose( const float* p )
 {
-	const Matrix* mat = (const Matrix*)p;
+	const matrix* mat = (const matrix*)p;
 #if SEGAN_MATH_SIMD
 	switch ( s_math_module )
 	{
@@ -259,9 +259,9 @@ SEGAN_INLINE void Matrix::Transpose( const float* p )
 #endif
 }
 
-SEGAN_INLINE void Matrix::Inverse( const float* p )
+SEGAN_INLINE void matrix::Inverse( const float* p )
 {
-	const Matrix* mat = (const Matrix*)p;
+	const matrix* mat = (const matrix*)p;
 #if SEGAN_MATH_SIMD
 	switch ( s_math_module )
 	{
@@ -274,10 +274,10 @@ SEGAN_INLINE void Matrix::Inverse( const float* p )
 #endif
 }
 
-SEGAN_INLINE void Matrix::Add( const float* p1, const float* p2 )
+SEGAN_INLINE void matrix::Add( const float* p1, const float* p2 )
 {
-	const Matrix* mat1 = (const Matrix*)p1;
-	const Matrix* mat2 = (const Matrix*)p2;
+	const matrix* mat1 = (const matrix*)p1;
+	const matrix* mat2 = (const matrix*)p2;
 #if SEGAN_MATH_SIMD
 	switch ( s_math_module )
  	{
@@ -290,10 +290,10 @@ SEGAN_INLINE void Matrix::Add( const float* p1, const float* p2 )
 #endif
 }
 
-SEGAN_INLINE void Matrix::Subtract( const float* p1, const float* p2 )
+SEGAN_INLINE void matrix::Subtract( const float* p1, const float* p2 )
 {
-	const Matrix* mat1 = (const Matrix*)p1;
-	const Matrix* mat2 = (const Matrix*)p2;
+	const matrix* mat1 = (const matrix*)p1;
+	const matrix* mat2 = (const matrix*)p2;
 #if SEGAN_MATH_SIMD
 	switch ( s_math_module )
 	{
@@ -306,10 +306,10 @@ SEGAN_INLINE void Matrix::Subtract( const float* p1, const float* p2 )
 #endif
 }
 
-SEGAN_INLINE void Matrix::Multiply( const float* p1, const float* p2 )
+SEGAN_INLINE void matrix::Multiply( const float* p1, const float* p2 )
 {
-	const Matrix* mat1 = (const Matrix*)p1;
-	const Matrix* mat2 = (const Matrix*)p2;
+	const matrix* mat1 = (const matrix*)p1;
+	const matrix* mat2 = (const matrix*)p2;
 #if SEGAN_MATH_SIMD
 	switch ( s_math_module )
 	{
@@ -322,14 +322,14 @@ SEGAN_INLINE void Matrix::Multiply( const float* p1, const float* p2 )
 #endif
 }
 
-SEGAN_INLINE void Matrix::Divide( const float* m1, const float* m2 )
+SEGAN_INLINE void matrix::Divide( const float* m1, const float* m2 )
 {
-	Matrix mat2Inv;
+	matrix mat2Inv;
 	mat2Inv.Inverse( m2 );
 	Multiply( m1, m2 );
 }
 
-SEGAN_INLINE void Matrix::SetRotationPitchYawRoll( const float pitch, const float yaw, const float roll )
+SEGAN_INLINE void matrix::SetRotationPitchYawRoll( const float pitch, const float yaw, const float roll )
 {
 #if SEGAN_MATH_SIMD
 	switch ( s_math_module )
@@ -343,7 +343,7 @@ SEGAN_INLINE void Matrix::SetRotationPitchYawRoll( const float pitch, const floa
 #endif
 }
 
-SEGAN_INLINE void Matrix::GetRotationPitchYawRoll( float& OUT pitch, float& OUT yaw, float& OUT roll )
+SEGAN_INLINE void matrix::GetRotationPitchYawRoll( float& OUT pitch, float& OUT yaw, float& OUT roll )
 {
 	pitch = asinf( - m21 ); 
 
@@ -359,7 +359,7 @@ SEGAN_INLINE void Matrix::GetRotationPitchYawRoll( float& OUT pitch, float& OUT 
 	} 
 }
 
-SEGAN_INLINE void Matrix::SetDirection( const float* dir, const float* up )
+SEGAN_INLINE void matrix::SetDirection( const float* dir, const float* up )
 {
 #if 0
 	Matrix lookat;
@@ -371,7 +371,7 @@ SEGAN_INLINE void Matrix::SetDirection( const float* dir, const float* up )
 #endif
 }
 
-SEGAN_INLINE void Matrix::GetDirection( float* OUT dir, float* OUT up /*= null */ ) const
+SEGAN_INLINE void matrix::GetDirection( float* OUT dir, float* OUT up /*= null */ ) const
 {
 #if 0
 	float d[3] = { 0.0f, 0.0f, 1.0f };
@@ -394,7 +394,7 @@ SEGAN_INLINE void Matrix::GetDirection( float* OUT dir, float* OUT up /*= null *
 #endif
 }
 
-SEGAN_INLINE void Matrix::SetTranslation( const float x, const float y, const float z )
+SEGAN_INLINE void matrix::SetTranslation( const float x, const float y, const float z )
 {
 	m30 = x;
 	m31 = y;
@@ -402,7 +402,7 @@ SEGAN_INLINE void Matrix::SetTranslation( const float x, const float y, const fl
 	m33 = 1.0f;
 }
 
-SEGAN_INLINE void Matrix::TransformNormal( float* OUT dest, const float* src ) const
+SEGAN_INLINE void matrix::TransformNormal( float* OUT dest, const float* src ) const
 {
 #if SEGAN_MATH_SIMD
 	switch ( s_math_module )
@@ -416,7 +416,7 @@ SEGAN_INLINE void Matrix::TransformNormal( float* OUT dest, const float* src ) c
 #endif
 }
 
-SEGAN_INLINE void Matrix::TransformPoint( float* OUT dest, const float* src ) const
+SEGAN_INLINE void matrix::TransformPoint( float* OUT dest, const float* src ) const
 {
 #if SEGAN_MATH_SIMD
 	switch ( s_math_module )
@@ -430,7 +430,7 @@ SEGAN_INLINE void Matrix::TransformPoint( float* OUT dest, const float* src ) co
 #endif
 }
 
-SEGAN_INLINE void Matrix::Scale( const float x, const float y, const float z )
+SEGAN_INLINE void matrix::Scale( const float x, const float y, const float z )
 {
 #if SEGAN_MATH_SIMD
 	switch ( s_math_module )
@@ -444,7 +444,7 @@ SEGAN_INLINE void Matrix::Scale( const float x, const float y, const float z )
 #endif
 }
 
-SEGAN_INLINE void Matrix::LookAt( const float* eye, const float* at, const float* up )
+SEGAN_INLINE void matrix::LookAt( const float* eye, const float* at, const float* up )
 {
 #if 0
 	switch ( s_math_module )
@@ -458,7 +458,7 @@ SEGAN_INLINE void Matrix::LookAt( const float* eye, const float* at, const float
 #endif
 }
 
-SEGAN_INLINE void Matrix::PerspectiveFov( float fov, float aspect, float nearZ, float farZ )
+SEGAN_INLINE void matrix::PerspectiveFov( float fov, float aspect, float nearZ, float farZ )
 {
 	float yscale = 1 / sx_tan( fov * 0.5f );
 	float zfzn = farZ / ( farZ - nearZ );
@@ -485,7 +485,7 @@ SEGAN_INLINE void Matrix::PerspectiveFov( float fov, float aspect, float nearZ, 
 
 }
 
-SEGAN_INLINE void Matrix::Orthographic( float width, float height, float nearZ, float farZ )
+SEGAN_INLINE void matrix::Orthographic( float width, float height, float nearZ, float farZ )
 {
 	float znzf = 1 / ( nearZ - farZ );
 
@@ -516,12 +516,12 @@ SEGAN_INLINE void Matrix::Orthographic( float width, float height, float nearZ, 
 //////////////////////////////////////////////////////////////////////////
 SEGAN_INLINE float2::float2( const float* p )
 {
-	memcpy( &e, p, sizeof(float2) );
+	memcpy( e, p, sizeof(float2) );
 }
 
 SEGAN_INLINE float2::float2( const float2& v )
 {
-	memcpy( &e, &v, sizeof(float2) );
+	memcpy( e, &v, sizeof(float2) );
 }
 
 SEGAN_INLINE float2::float2( const float _x, const float _y )
@@ -575,16 +575,16 @@ SEGAN_INLINE void float2::Lerp( const float* v1, const float* v2, const float w 
 }
 
 //////////////////////////////////////////////////////////////////////////
-//	float2 implementation
+//	float3 implementation
 //////////////////////////////////////////////////////////////////////////
 SEGAN_INLINE float3::float3( const float* p )
 {
-	memcpy( &e, p, sizeof(float2) );
+	memcpy( e, p, sizeof(float3) );
 }
 
 SEGAN_INLINE float3::float3( const float3& v )
 {
-	memcpy( &e, &v, sizeof(float2) );
+	memcpy( e, &v, sizeof(float3) );
 }
 
 SEGAN_INLINE float3::float3( const float _x, const float _y, const float _z )
@@ -649,22 +649,22 @@ SEGAN_INLINE void float3::Lerp( const float* v1, const float* v2, const float w 
 	z = v1[2] + ( v2[2] - v1[2] ) * w;
 }
 
-SEGAN_INLINE void float3::TransformPoint( const float* v, const float* matrix )
+SEGAN_INLINE void float3::TransformPoint( const float* v, const float* _matrix )
 {
-	const Matrix* mat = (const Matrix*)matrix;
+	const matrix* mat = (const matrix*)_matrix;
 	mat->TransformPoint( &x, v );
 }
 
-SEGAN_INLINE void float3::TransformNorm( const float* v, const float* matrix )
+SEGAN_INLINE void float3::TransformNorm( const float* v, const float* _matrix )
 {
-	const Matrix* mat = (const Matrix*)matrix;
+	const matrix* mat = (const matrix*)_matrix;
 	mat->TransformNormal( &x, v );
 }
 
 SEGAN_INLINE void float3::ProjectToScreen( const float* v, const float* worldViewProjection, const int* viewport )
 {
 	// prepare transformation matrix
-	const Matrix* mat = (const Matrix*)worldViewProjection;
+	const matrix* mat = (const matrix*)worldViewProjection;
 
 	// transform vector
 	mat->TransformPoint( e, v );
@@ -682,3 +682,316 @@ SEGAN_INLINE void float3::ProjectToScreen( const float* v, const float* worldVie
 }
 
 
+//////////////////////////////////////////////////////////////////////////
+//	float4 implementation
+//////////////////////////////////////////////////////////////////////////
+SEGAN_INLINE float4::float4( const float* p )
+{
+	memcpy( e, p, sizeof(float4) );
+}
+
+SEGAN_INLINE float4::float4( const float4& v )
+{
+	memcpy( e, &v, sizeof(float4) );
+}
+
+SEGAN_INLINE float4::float4( const float* xyz, const float _w )
+{
+	memcpy( e, xyz, sizeof(float3) );
+	w = _w;
+}
+
+SEGAN_INLINE float4::float4( const float _x, const float _y, const float _z, const float _w )
+{
+	x = _x;
+	y = _y;
+	z = _z;
+	w = _w;
+}
+
+SEGAN_INLINE void float4::Set( const float _x, const float _y, const float _z, const float _w )
+{
+	x = _x;
+	y = _y;
+	z = _z;
+	w = _w;
+}
+
+SEGAN_INLINE void float4::Normalize( const float* v )
+{
+	const float len = sx_sqrt_fast( ( v[0] * v[0] ) + ( v[1] * v[1] ) + ( v[2] * v[2] ) + ( v[3] * v[3] ) );
+	x = v[0] / len;
+	y = v[1] / len;
+	z = v[2] / len;
+	w = v[3] / len;
+}
+
+SEGAN_INLINE float float4::Length( void ) const
+{
+	return sx_sqrt_fast( ( x * x ) + ( y * y ) + ( z * z ) + ( w * w ) );
+}
+
+SEGAN_INLINE float float4::LengthSqar( void ) const
+{
+	return ( x * x ) + ( y * y ) + ( z * z ) + ( w * w );
+}
+
+SEGAN_INLINE float float4::Dot( const float* v ) const
+{
+	return ( x * v[0] ) + ( y * v[1] ) + ( z * v[2] ) + ( w * v[3] );
+}
+
+SEGAN_INLINE void float4::Lerp( const float* v1, const float* v2, const float t )
+{
+	x = v1[0] + ( v2[0] - v1[0] ) * t;
+	y = v1[1] + ( v2[1] - v1[1] ) * t;
+	z = v1[2] + ( v2[2] - v1[2] ) * t;
+	w = v1[3] + ( v2[3] - v1[3] ) * t;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//	quaternion implementation
+//////////////////////////////////////////////////////////////////////////
+SEGAN_INLINE quat::quat( const float* p )
+{
+	memcpy( e, p, sizeof(quat) );
+}
+
+SEGAN_INLINE quat::quat( const quat& v )
+{
+	memcpy( e, &v, sizeof(quat) );
+}
+
+SEGAN_INLINE quat::quat( const float* xyz, const float _w )
+{
+	memcpy( e, xyz, sizeof(float3) );
+	w = _w;
+}
+
+SEGAN_INLINE quat::quat( const float _x, const float _y, const float _z, const float _w )
+{
+	x = _x;
+	y = _y;
+	z = _z;
+	w = _w;
+}
+
+SEGAN_INLINE void quat::Set( const float _x, const float _y, const float _z, const float _w )
+{
+	x = _x;
+	y = _y;
+	z = _z;
+	w = _w;
+}
+
+SEGAN_INLINE void quat::Normalize( const float* v )
+{
+	const float len = sx_sqrt_fast( ( v[0] * v[0] ) + ( v[1] * v[1] ) + ( v[2] * v[2] ) + ( v[3] * v[3] ) );
+	x = v[0] / len;
+	y = v[1] / len;
+	z = v[2] / len;
+	w = v[3] / len;
+}
+
+SEGAN_INLINE float quat::Length( void ) const
+{
+	return sx_sqrt_fast( ( x * x ) + ( y * y ) + ( z * z ) + ( w * w ) );
+}
+
+SEGAN_INLINE float quat::LengthSqar( void ) const
+{
+	return ( x * x ) + ( y * y ) + ( z * z ) + ( w * w );
+}
+
+SEGAN_INLINE float quat::Dot( const float* v ) const
+{
+	return ( x * v[0] ) + ( y * v[1] ) + ( z * v[2] ) + ( w * v[3] );
+}
+
+SEGAN_INLINE void quat::Conjugate( const float* q )
+{
+	x = - q[0];
+	y = - q[1];
+	z = - q[2];
+	w =   q[3];
+}
+
+SEGAN_INLINE void quat::Lerp( const float* v1, const float* v2, const float t )
+{
+	x = v1[0] + ( v2[0] - v1[0] ) * t;
+	y = v1[1] + ( v2[1] - v1[1] ) * t;
+	z = v1[2] + ( v2[2] - v1[2] ) * t;
+	w = v1[3] + ( v2[3] - v1[3] ) * t;
+}
+
+SEGAN_INLINE void quat::SLerp( const float* q1, const float* q2, const float t )
+{
+	quat start;
+	float cosAngle = ( q1[0] * q2[0] ) + ( q1[1] * q2[1] ) + ( q1[2] * q2[2] ) + ( q1[3] * q2[3] );
+	if ( cosAngle < 0.0f )
+	{
+		cosAngle = -cosAngle;
+		start.x = - q1[0];
+		start.y = - q1[1];
+		start.z = - q1[2];
+		start.w = - q1[3];
+	}
+	else
+	{
+		start.x = q1[0];
+		start.y = q1[1];
+		start.z = q1[2];
+		start.w = q1[3];
+	}
+
+	float scale0, scale1;
+	if ( cosAngle < 0.999f )
+	{
+		float angle = sx_acos( cosAngle );
+		float recipSinAngle = ( 1.0f / sx_sin( angle ) );
+		scale0 = ( sx_sin( ( ( 1.0f - t ) * angle ) ) * recipSinAngle );
+		scale1 = ( sx_sin( ( t * angle ) ) * recipSinAngle );
+	}
+	else
+	{
+		scale0 = ( 1.0f - t );
+		scale1 = t;
+	}
+
+	x = ( start.x * scale0 ) + ( q2[0] * scale1 );
+	y = ( start.y * scale0 ) + ( q2[1] * scale1 );
+	z = ( start.z * scale0 ) + ( q2[2] * scale1 );
+	w = ( start.w * scale0 ) + ( q2[3] * scale1 );
+}
+
+SEGAN_INLINE void quat::SetRotationMatrix( const float* _matrix )
+{
+	const matrix* mat = (matrix*)_matrix;
+	float xx = mat->m00;
+	float yx = mat->m01;
+	float zx = mat->m02;
+	float xy = mat->m10;
+	float yy = mat->m11;
+	float zy = mat->m12;
+	float xz = mat->m20;
+	float yz = mat->m21;
+	float zz = mat->m22;
+
+	float trace = ( ( xx + yy ) + zz );
+	sint negTrace = ( trace < 0.0f );
+	sint ZgtX = ( zz > xx );
+	sint ZgtY = ( zz > yy );
+	sint YgtX = ( yy > xx );
+
+	sint largestXorY = ( !ZgtX || !ZgtY ) && negTrace;
+	sint largestYorZ = (  YgtX ||  ZgtX ) && negTrace;
+	sint largestZorX = (  ZgtY || !YgtX ) && negTrace;
+
+	if ( largestXorY )
+	{
+		zz = -zz;
+		xy = -xy;
+	}
+	if ( largestYorZ )
+	{
+		xx = -xx;
+		yz = -yz;
+	}
+	if ( largestZorX )
+	{
+		yy = -yy;
+		zx = -zx;
+	}
+
+	float radicand = ( ( ( xx + yy ) + zz ) + 1.0f );
+	float scale = ( 0.5f * ( 1.0f / sx_sqrt_fast( radicand ) ) );
+	float tmpx = ( ( zy - yz ) * scale );
+	float tmpy = ( ( xz - zx ) * scale );
+	float tmpz = ( ( yx - xy ) * scale );
+	float tmpw = ( radicand * scale );
+
+	x = tmpx;
+	y = tmpy;
+	z = tmpz;
+	w = tmpw;
+
+	if ( largestXorY )
+	{
+		x = tmpw;
+		y = tmpz;
+		z = tmpy;
+		w = tmpx;
+	}
+
+	if ( largestYorZ )
+	{
+		tmpx = x;
+		tmpz = z;
+		x = y;
+		y = tmpx;
+		z = w;
+		w = tmpz;
+	}
+}
+
+SEGAN_INLINE void quat::GetRotationMatrix( float* OUT _matrix )
+{
+	float qx2 = ( x + x );
+	float qy2 = ( y + y );
+	float qz2 = ( z + z );
+	float qxqx2 = ( x * qx2 );
+	float qxqy2 = ( x * qy2 );
+	float qxqz2 = ( x * qz2 );
+	float qxqw2 = ( w * qx2 );
+	float qyqy2 = ( y * qy2 );
+	float qyqz2 = ( y * qz2 );
+	float qyqw2 = ( w * qy2 );
+	float qzqz2 = ( z * qz2 );
+	float qzqw2 = ( w * qz2 );
+	matrix* mat = (matrix*)_matrix;
+	mat->m00 = ( ( 1.0f - qyqy2 ) - qzqz2 );
+	mat->m01 = ( qxqy2 + qzqw2 );
+	mat->m02 = ( qxqz2 - qyqw2 );
+	mat->m10 = ( qxqy2 - qzqw2 );
+	mat->m11 = ( ( 1.0f - qxqx2 ) - qzqz2 );
+	mat->m12 = ( qyqz2 + qxqw2 );
+	mat->m20 = ( qxqz2 + qyqw2 );
+	mat->m21 = ( qyqz2 - qxqw2 );
+	mat->m22 = ( ( 1.0f - qxqx2 ) - qyqy2 );
+}
+
+SEGAN_INLINE void quat::RotationPitchYawRoll( const float yaw, const float pitch, const float roll )
+{
+	float sp, cp, sy, cy, sr, cr;
+	sx_sin_cos( pitch * 0.5f, sp, cp );
+	sx_sin_cos( yaw * 0.5f,	  sy, cy );
+	sx_sin_cos( roll * 0.5f,  sr, cr );
+
+	quat r1( cy * sp, sy * cp, - sy * sp, cy * cp );
+
+	x = cr * r1.x - sr * r1.y;
+	y = cr * r1.y + sr * r1.x;
+	z = cr * r1.z + sr * r1.w;
+	w = cr * r1.w - sr * r1.z;
+}
+
+SEGAN_INLINE void quat::Multiply( const float* q1, const float* q2 )
+{
+	const quat* quat1 = (quat*)q1;
+	const quat* quat2 = (quat*)q2;
+#if SEGAN_MATH_SIMD
+	switch ( s_math_module )
+	{
+	case MM_GENERIC:	gen_quat_mul( this, quat1, quat2 );		break;
+	case MM_SSE:		gen_quat_mul( this, quat1, quat2 );		break;
+	case MM_SSE2:		sse_quat_mul( this, quat1, quat2 );		break;
+	}
+#else
+	gen_quat_mul( this, mat1, mat2 );
+#endif
+}
+
+SEGAN_INLINE void quat::Inverse( const float* q )
+{
+	sx_assert( 0 || "not implemented" );
+}

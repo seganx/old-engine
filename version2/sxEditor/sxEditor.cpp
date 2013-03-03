@@ -82,7 +82,7 @@ void AppMainLoop( float elpsTime )
 #if 1
 	if ( g_engine->m_device3D && g_engine->m_device3D->BeginScene() )
 	{
-		Matrix mat;
+		matrix mat;
 		mat.PerspectiveFov( PI / 3.0f, (float)g_engine->m_device3D->m_viewport.height / (float)g_engine->m_device3D->m_viewport.width, 0.5f, 1000.0f );
 		g_engine->m_device3D->SetMatrix( MM_PROJECTION, mat );
 
@@ -127,7 +127,7 @@ void AppMainLoop( float elpsTime )
 //		mat.SetTranslation( 0, 0, 1 );
 //		mat.Identity();
 //		mat.SetRotationPitchYawRoll( 0, 0, (float)sx_os_get_timer() * 0.005f );
-//		Matrix mview = g_engine->m_device3D->GetMatrix( MM_VIEW );
+//		matrix mview = g_engine->m_device3D->GetMatrix( MM_VIEW );
 //		mat.Inverse( mview );
 		g_engine->m_device3D->SetMatrix( MM_WORLD, mat );
 

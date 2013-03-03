@@ -60,7 +60,7 @@ public:
 
 	virtual void SetViewport( const d3dViewport* viewport );
 
-	virtual void SetMatrix( const d3dMatrixMode mode, const float* matrix );
+	virtual void SetMatrix( const d3dMatrixMode mode, const float* _matrix );
 
 	virtual const float* GetMatrix( const d3dMatrixMode mode );
 
@@ -110,9 +110,9 @@ public:
 	bool						m_rs_wireFrame;
 	bool						m_rs_fog;
 
-	Matrix						m_world;
-	Matrix						m_view;
-	Matrix						m_projection;
+	matrix						m_world;
+	matrix						m_view;
+	matrix						m_projection;
 };
 
 

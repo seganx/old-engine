@@ -11,7 +11,9 @@
 
 #include "Math.h"
 
-SEGAN_INLINE float gen_matrix_det( Matrix* mat )
+//#include "D:\SeganX\version2\sxEngine\math\vectormathlibrary\include\vectormath\scalar\c\vectormath_aos.h"
+
+SEGAN_INLINE float gen_matrix_det( matrix* mat )
 {
 	float tmp0 = ( ( mat->m22 * mat->m03 ) - ( mat->m02 * mat->m23 ) );
 	float tmp1 = ( ( mat->m32 * mat->m13 ) - ( mat->m12 * mat->m33 ) );
@@ -26,9 +28,9 @@ SEGAN_INLINE float gen_matrix_det( Matrix* mat )
 	return ( ( ( mat->m00 * dx ) + ( mat->m10 * dy ) ) + ( mat->m20 * dz ) ) + ( mat->m30 * dw );
 }
 
-SEGAN_INLINE void gen_matrix_transpose( Matrix* res, const Matrix* mat )
+SEGAN_INLINE void gen_matrix_transpose( matrix* res, const matrix* mat )
 {
-	Matrix outMat;
+	matrix outMat;
 	
 	outMat.m01 = mat->m10;
 	outMat.m02 = mat->m20;
@@ -49,7 +51,7 @@ SEGAN_INLINE void gen_matrix_transpose( Matrix* res, const Matrix* mat )
 	*res = outMat;
 }
 
-SEGAN_INLINE void gen_matrix_inv( Matrix* res, const Matrix* mat )
+SEGAN_INLINE void gen_matrix_inv( matrix* res, const matrix* mat )
 {
 	float tmp0 = ( ( mat->m22 * mat->m03 ) - ( mat->m02 * mat->m23 ) );
 	float tmp1 = ( ( mat->m32 * mat->m13 ) - ( mat->m12 * mat->m33 ) );
@@ -127,7 +129,7 @@ SEGAN_INLINE void gen_matrix_inv( Matrix* res, const Matrix* mat )
 	res->m33 = res3[3] * detInv;
 }
 
-SEGAN_INLINE void gen_matrix_add( Matrix* res, const Matrix* mat1, const Matrix* mat2 )
+SEGAN_INLINE void gen_matrix_add( matrix* res, const matrix* mat1, const matrix* mat2 )
 {
 	res->m00 = mat1->m00 + mat2->m00;
 	res->m10 = mat1->m10 + mat2->m10;
@@ -150,7 +152,7 @@ SEGAN_INLINE void gen_matrix_add( Matrix* res, const Matrix* mat1, const Matrix*
 	res->m33 = mat1->m33 + mat2->m33;
 }
 
-SEGAN_INLINE void gen_matrix_sub( Matrix* res, const Matrix* mat1, const Matrix* mat2 )
+SEGAN_INLINE void gen_matrix_sub( matrix* res, const matrix* mat1, const matrix* mat2 )
 {
 	res->m00 = mat1->m00 - mat2->m00;
 	res->m10 = mat1->m10 - mat2->m10;
@@ -174,9 +176,9 @@ SEGAN_INLINE void gen_matrix_sub( Matrix* res, const Matrix* mat1, const Matrix*
 }
 
 
-SEGAN_INLINE void gen_matrix_mul( Matrix* res, const Matrix* mat1, const Matrix* mat2 )
+SEGAN_INLINE void gen_matrix_mul( matrix* res, const matrix* mat1, const matrix* mat2 )
 {
-	Matrix outMat;
+	matrix outMat;
 
 	outMat.m00 = mat1->m00 * mat2->m00 + mat1->m01 * mat2->m10 + mat1->m02 * mat2->m20 + mat1->m03 * mat2->m30;
 	outMat.m01 = mat1->m00 * mat2->m01 + mat1->m01 * mat2->m11 + mat1->m02 * mat2->m21 + mat1->m03 * mat2->m31;
@@ -201,7 +203,7 @@ SEGAN_INLINE void gen_matrix_mul( Matrix* res, const Matrix* mat1, const Matrix*
 	*res = outMat;
 }
 
-SEGAN_INLINE void gen_matrix_setrotate_pyr( Matrix* m, const float pitch, const float yaw, const float roll )
+SEGAN_INLINE void gen_matrix_setrotate_pyr( matrix* m, const float pitch, const float yaw, const float roll )
 {
 	float sX, cX, sY, cY, sZ, cZ;
 	sx_sin_cos( pitch, sX, cX );
@@ -227,7 +229,7 @@ SEGAN_INLINE void gen_matrix_setrotate_pyr( Matrix* m, const float pitch, const 
 	m->m33 = 1;
 }
 
-SEGAN_INLINE void gen_matrix_scale( Matrix* m, const float x, const float y, const float z )
+SEGAN_INLINE void gen_matrix_scale( matrix* m, const float x, const float y, const float z )
 {
 	m->m00 = x;
 	m->m01 = 0.0f;
@@ -247,7 +249,7 @@ SEGAN_INLINE void gen_matrix_scale( Matrix* m, const float x, const float y, con
 	m->m33 = 1.0f;
 }
 
-SEGAN_INLINE void gen_matrix_lookat( Matrix* m, const float* eye, const float* at, const float* up )
+SEGAN_INLINE void gen_matrix_lookat( matrix* m, const float* eye, const float* at, const float* up )
 {
 	float dir[3] = { at[0] - eye[0], at[1] - eye[1], at[2] - eye[2] };
 	float dirlen = sx_sqrt_fast( dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2] );
@@ -288,7 +290,7 @@ SEGAN_INLINE void gen_matrix_lookat( Matrix* m, const float* eye, const float* a
 	m->m33 = 1.0f;
 }
 
-SEGAN_INLINE void gen_matrix_direction( Matrix* m, const float* dir, const float* up )
+SEGAN_INLINE void gen_matrix_direction( matrix* m, const float* dir, const float* up )
 {
 	float fwr[3] = { dir[0], dir[1], dir[2] };
 	float dirlen = sx_sqrt_fast( fwr[0] * fwr[0] + fwr[1] * fwr[1] + fwr[2] * fwr[2] );
@@ -316,20 +318,27 @@ SEGAN_INLINE void gen_matrix_direction( Matrix* m, const float* dir, const float
 	m->m30 = 0;			m->m31 = 0;			m->m32 = 0;			m->m33 = 1.0f;
 }
 
-SEGAN_INLINE void gen_matrix_transform_norm( float* dest, const float* v, const Matrix* mat )
+SEGAN_INLINE void gen_matrix_transform_norm( float* dest, const float* v, const matrix* mat )
 {
 	dest[0] = ( mat->m00 * v[0] ) + ( mat->m10 * v[1] ) + ( mat->m20 * v[2] );
 	dest[1] = ( mat->m01 * v[0] ) + ( mat->m11 * v[1] ) + ( mat->m21 * v[2] );
 	dest[2] = ( mat->m02 * v[0] ) + ( mat->m12 * v[1] ) + ( mat->m22 * v[2] );
 }
 
-SEGAN_INLINE void gen_matrix_transform_point( float* dest, const float* v, const Matrix* mat )
+SEGAN_INLINE void gen_matrix_transform_point( float* dest, const float* v, const matrix* mat )
 {
 	dest[0] = ( mat->m00 * v[0] ) + ( mat->m10 * v[1] ) + ( mat->m20 * v[2] ) + mat->m30;
 	dest[1] = ( mat->m01 * v[0] ) + ( mat->m11 * v[1] ) + ( mat->m21 * v[2] ) + mat->m31;
 	dest[2] = ( mat->m02 * v[0] ) + ( mat->m12 * v[1] ) + ( mat->m22 * v[2] ) + mat->m32;
 }
 
+SEGAN_INLINE void gen_quat_mul( quat* res, const quat* quat0, const quat* quat1 )
+{
+	res->x = ( ( ( quat0->w * quat1->x ) + ( quat0->x * quat1->w ) ) + ( quat0->y * quat1->z ) ) - ( quat0->z * quat1->y );
+	res->y = ( ( ( quat0->w * quat1->y ) + ( quat0->y * quat1->w ) ) + ( quat0->z * quat1->x ) ) - ( quat0->x * quat1->z );
+	res->z = ( ( ( quat0->w * quat1->z ) + ( quat0->z * quat1->w ) ) + ( quat0->x * quat1->y ) ) - ( quat0->y * quat1->x );
+	res->y = ( ( ( quat0->w * quat1->w ) - ( quat0->x * quat1->x ) ) - ( quat0->y * quat1->y ) ) - ( quat0->z * quat1->z );
+}
 
 #endif	//	GUARD_Math_Generic_HEADER_FILE
 

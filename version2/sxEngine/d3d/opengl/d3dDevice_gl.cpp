@@ -369,15 +369,15 @@ SEGAN_INLINE void d3dDevice_gl::SetViewport( const d3dViewport* viewport )
 	m_viewport = *viewport;
 }
 
-SEGAN_INLINE void d3dDevice_gl::SetMatrix( const d3dMatrixMode mode, const float* matrix )
+SEGAN_INLINE void d3dDevice_gl::SetMatrix( const d3dMatrixMode mode, const float* _matrix )
 {
 	switch ( mode )
 	{
 	case MM_WORLD:
 		{
-			m_world = matrix;
+			m_world = _matrix;
 
-			Matrix modelview;
+			matrix modelview;
 			modelview.Multiply( m_world, m_view );
 			glMatrixMode( GL_MODELVIEW );
 			glLoadMatrixf( &modelview.m00 );
@@ -386,9 +386,9 @@ SEGAN_INLINE void d3dDevice_gl::SetMatrix( const d3dMatrixMode mode, const float
 
 	case MM_VIEW:
 		{
-			m_view = matrix;
+			m_view = _matrix;
 
-			Matrix modelview;
+			matrix modelview;
 			modelview.Multiply( m_world, m_view );
 			glMatrixMode( GL_MODELVIEW );
 			glLoadMatrixf( &modelview.m00 );
@@ -397,7 +397,7 @@ SEGAN_INLINE void d3dDevice_gl::SetMatrix( const d3dMatrixMode mode, const float
 
 	case MM_PROJECTION:
 		{
-			m_projection = matrix;
+			m_projection = _matrix;
 			glMatrixMode( GL_PROJECTION );
 			glLoadMatrixf( &m_projection.m00 );
 		}
@@ -460,7 +460,7 @@ void d3dDevice_gl::EndScene( void )
   	glTexCoord2f( 0, 1 );	glVertex3f( x + 1.0f, y - 1.0f, z );
   	glEnd();
 
-	Matrix mat; mat.Identity();
+	matrix mat; mat.Identity();
 	SetMatrix( MM_WORLD, mat );
 
 	float3 dest, src( 1, 1, -1 );
