@@ -155,6 +155,25 @@ namespace GM
 
 		sx_callstack();
 
+		{
+			const int availableBullets = g_game->m_player->m_energy / m_energyPerBullet;
+
+			str128 str;
+
+			if ( availableBullets )
+			{
+				m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
+				str.Format( L"%d", availableBullets );
+			}
+			else
+			{
+				m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
+				str.SetText( "0" );
+			}
+
+			m_bulletIndicator->SetText( str );
+		}
+
 		m_shootTime += elpsTime;
 
 		if ( g_game->m_mouseMode == MS_ManualTower && IsFocused() )
@@ -332,6 +351,20 @@ namespace GM
 				}
 
 				m_shootTime = 0.0f;
+
+				const int availableBullets = g_game->m_player->m_energy / m_energyPerBullet;
+				str128 str;
+				if ( availableBullets )
+				{
+					str.Format( L"%d", availableBullets );
+					m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
+				}
+				else
+				{
+					str.SetText("0");
+					m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
+				}
+				m_bulletIndicator->SetText( str );
 			}
 			//break;
 		case GMT_GAME_PAUSED:

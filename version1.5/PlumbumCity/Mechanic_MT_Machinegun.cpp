@@ -184,29 +184,31 @@ namespace GM
 		}
 
 		m_temperatureBar->SetValue( m_curTemperature );
-
-		const int availableBullets = g_game->m_player->m_energy / m_energyPerBullet;
-
-		str128 str;
-
-		if ( availableBullets )
-		{
-			m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
-			str.Format( L"%d", availableBullets );
-		}
-		else
-		{
-			m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
-			str.SetText( "0" );
-		}
-
-		m_bulletIndicator->SetText( str );
 		
 		//
 
 		if ( NotInGame() || !m_nodeWeapon || !m_nodePipe[0] ) { return; }
 
 		sx_callstack();
+
+		{
+			const int availableBullets = g_game->m_player->m_energy / m_energyPerBullet;
+
+			str128 str;
+
+			if ( availableBullets )
+			{
+				m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
+				str.Format( L"%d", availableBullets );
+			}
+			else
+			{
+				m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
+				str.SetText( "0" );
+			}
+
+			m_bulletIndicator->SetText( str );
+		}
 
 		m_shootTime += elpsTime;
 
@@ -408,6 +410,7 @@ namespace GM
 				else
 				{
 					str.SetText("0");
+					m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
 				}
 				m_bulletIndicator->SetText( str );
 			}
