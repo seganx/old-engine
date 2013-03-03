@@ -69,16 +69,15 @@ namespace GM
 		float				m_shakeMagnitude;
 		float				m_forceFeedback;
 		int					m_fire;				//  fire order for weapon
-		int					m_magazineCap;		//	capacity of each magazine
-		int					m_bullets;			//	number of bullets in weapon
-		int					m_firedCount;
-		float				m_reloadTime;		//	time of reload for weapon
-		float				m_reload;
 		bool				m_selected;			//	true of this tower has been selected
+		int					m_energyPerBullet;
+		float				m_maxTemperature;
+		float				m_curTemperature;
+		float				m_warmingRate;		//	
+		float				m_coldingRate;		//
 
-		sx::gui::ProgressBar*	m_reloadBar;
-		sx::gui::Label*		m_lblMagazine;
-		sx::gui::Label*		m_lblBullet;
+		sx::gui::ProgressBar*	m_temperatureBar;
+		sx::gui::Label*		m_bulletIndicator;
 	};
 
 

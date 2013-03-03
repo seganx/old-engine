@@ -23,14 +23,14 @@ namespace GM
 		, m_rotOffset(0,0,0)
 		, m_rotMax(0.5f, 1.0f, 0)
 		, m_fov(PI / 8.0f)
+		, m_addFOV(0.0f)
 		, m_forceFeedback(0.03f)
 		, m_cameraSpeed(0.01f)
 		, m_cameraBreath(0.001f)
 		, m_fire(0)
-		, m_bullets(0)
-		, m_firedCount(0)
 		, m_selected(false)
-		, m_lblBullet(null)
+		, m_energyPerBullet(0)
+		, m_bulletIndicator(null)
 	{
 		sx_callstack();
 	}
@@ -44,22 +44,22 @@ namespace GM
 	{
 		sx_callstack();
 
-		m_lblBullet = sx_new( sx::gui::Label );
-		m_lblBullet->SetSize( float2(70, 25) );
-		m_lblBullet->Position().Set( -450.0f, 240.0f, 0.0f );
-		m_lblBullet->GetElement(0)->Color().a = 0.0f;
-		m_lblBullet->GetElement(1)->Color().a = 0.85f;
-		m_lblBullet->SetFont( L"Font_rob_twedit_info.fnt" );
+		m_bulletIndicator = sx_new( sx::gui::Label );
+		m_bulletIndicator->SetSize( float2(70, 25) );
+		m_bulletIndicator->Position().Set( -450.0f, 240.0f, 0.0f );
+		m_bulletIndicator->GetElement(0)->Color().a = 0.0f;
+		m_bulletIndicator->GetElement(1)->Color().a = 0.85f;
+		m_bulletIndicator->SetFont( L"Font_rob_twedit_info.fnt" );
 
-		g_game->m_gui->Add_Back( m_lblBullet );
+		g_game->m_gui->Add_Back( m_bulletIndicator );
 	}
 
 	void Mechanic_MT_Sniper::Finalize( void )
 	{
 		sx_callstack();
 
-		g_game->m_gui->Remove( m_lblBullet );
-		sx_delete_and_null( m_lblBullet );
+		g_game->m_gui->Remove( m_bulletIndicator );
+		sx_delete_and_null( m_bulletIndicator );
 	}
 
 	void Mechanic_MT_Sniper::ProcessInput( bool& inputHandled, float elpsTime )
@@ -123,11 +123,14 @@ namespace GM
 			//	just check the number of bullets and player does fire
 			if ( SEGAN_KEYDOWN(0, SX_INPUT_KEY_MOUSE_LEFT) )
 			{
-				if ( (!m_fire) && (m_firedCount < m_bullets) )
+				if ( (!m_fire) && (g_game->m_player->m_energy >= m_energyPerBullet) )
 				{
 					m_fire = 1;
 				}
 			}
+
+			m_addFOV -= sx::io::Input::GetKeys(0)[SX_INPUT_KEY_MOUSE_WHEEL] * elpsTime * 0.001f;
+			m_addFOV = m_addFOV > 0.1f ? 0.1f : (m_addFOV < 0.0f ? 0.0f : m_addFOV);
 
 			m_rotOffset.x += SEGAN_MOUSE_RLY(0) * 0.002f * m_cameraSpeed;
 			m_rotOffset.y += SEGAN_MOUSE_RLX(0) * 0.002f * m_cameraSpeed;
@@ -185,7 +188,7 @@ namespace GM
 
 		//  compute max shoot time depend on fire rate
 		const float	maxShootTime = (m_attack.rate > 0.01f) ? (1000.0f / m_attack.rate) : 500.0f;
-		if ( m_fire && (m_shootTime > maxShootTime) && (m_firedCount < m_bullets) )
+		if ( m_fire && (m_shootTime > maxShootTime) && (g_game->m_player->m_energy >= m_energyPerBullet) )
 		{
 			m_shootTime = 0.0f;
 
@@ -273,7 +276,7 @@ namespace GM
 							script.GetFloat(i, L"forceFeedback", m_forceFeedback);
 							script.GetFloat(i, L"cameraSpeed", m_cameraSpeed);
 							script.GetFloat(i, L"cameraBreath", m_cameraBreath);
-							script.GetInteger(i, L"bulletsCount", m_bullets);
+							script.GetInteger(i, L"energyPerBullet", m_energyPerBullet);
 
 							if ( script.GetString(i, L"bullet", tmpStr) )
 							{
@@ -300,6 +303,7 @@ namespace GM
 
 		case GMT_GAME_RESETING:
 			m_attack.projectile = 0;
+			lastIndex = 0;
 			break;
 		case GMT_GAME_RESET:
 			MsgProc( 0, GMT_LEVEL_LOAD, 0 );
@@ -327,7 +331,6 @@ namespace GM
 					}
 				}
 
-				m_firedCount = 0;
 				m_shootTime = 0.0f;
 			}
 			//break;
@@ -380,7 +383,7 @@ namespace GM
 		m_shootCount = 0;
 		m_fire = 0;
 
-		m_lblBullet->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+		m_bulletIndicator->AddProperty( SX_GUI_PROPERTY_VISIBLE );
 	}
 
 	void Mechanic_MT_Sniper::LeaveManual( void )
@@ -396,7 +399,7 @@ namespace GM
 		m_nodeWeapon = NULL;
 		m_nodePipe = NULL;
 
-		m_lblBullet->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+		m_bulletIndicator->RemProperty( SX_GUI_PROPERTY_VISIBLE );
 	}
 
 	void Mechanic_MT_Sniper::UpdateCamera( float elpsTime )
@@ -406,7 +409,7 @@ namespace GM
 		sx::core::Camera camera;
 		camera.Far = CAMERA_FAR;
 		camera.Aspect = SEGAN_VP_WIDTH / SEGAN_VP_HEIGHT;
-		camera.FOV = m_fov;
+		camera.FOV = m_fov + m_addFOV;
 		camera.Eye = m_nodeCamera->GetPosition_world();
 
 		static float s_time = 0;
@@ -508,21 +511,24 @@ namespace GM
 
 		--m_fire;
 		m_rotOffset.x -= m_forceFeedback;
-		++m_firedCount;
+
+
+		g_game->m_player->m_energy -= m_energyPerBullet;
+		const int availableBullets = g_game->m_player->m_energy / m_energyPerBullet;
 
 		str128 str;
 
-		if ( m_firedCount != m_bullets )
+		if ( availableBullets )
 		{
-			str.Format( L"%d/%d", m_firedCount, m_bullets );
+			str.Format( L"%d", availableBullets );
 		}
 		else
 		{
-			m_lblBullet->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
-			str.Format( L"0/%d", m_bullets );
+			m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
+			str.SetText("0");
 		}
 
-		m_lblBullet->SetText(str);
+		m_bulletIndicator->SetText(str);
 	}
 
 } // namespace GM

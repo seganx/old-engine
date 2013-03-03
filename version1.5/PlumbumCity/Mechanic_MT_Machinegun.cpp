@@ -28,15 +28,14 @@ namespace GM
 		, m_shakeMagnitude(1.0f)
 		, m_forceFeedback(0.01f)
 		, m_fire(0)
-		, m_magazineCap(0)
-		, m_bullets(0)
-		, m_firedCount(0)
-		, m_reloadTime(0)
-		, m_reload(0)
 		, m_selected(false)
-		, m_reloadBar(null)
-		, m_lblMagazine(null)
-		, m_lblBullet(null)
+		, m_energyPerBullet(0)
+		, m_maxTemperature(0.0f)
+		, m_curTemperature(0.0f)
+		, m_warmingRate(0.0f)
+		, m_coldingRate(0.0f)
+		, m_temperatureBar(null)
+		, m_bulletIndicator(null)
 	{
 		sx_callstack();
 
@@ -53,45 +52,36 @@ namespace GM
 	{
 		sx_callstack();
 
-		m_reloadBar = sx_new( sx::gui::ProgressBar );
-		m_reloadBar->SetSize( float2(256, 32) );
-		m_reloadBar->AddProperty( SX_GUI_PROPERTY_PROGRESSUV );
-		m_reloadBar->AddProperty( SX_GUI_PROPERTY_BILLBOARD );
-		m_reloadBar->AddProperty( SX_GUI_PROPERTY_3DSPACE );
+		m_temperatureBar = sx_new( sx::gui::ProgressBar );
+		m_temperatureBar->SetSize( float2(256, 32) );
+		m_temperatureBar->Rotation().Set( 0.0f, 0.0f, PI / 2.0f );
+		m_temperatureBar->AddProperty( SX_GUI_PROPERTY_PROGRESSUV );
+		m_temperatureBar->AddProperty( SX_GUI_PROPERTY_BILLBOARD );
+		m_temperatureBar->AddProperty( SX_GUI_PROPERTY_3DSPACE );
 
-		m_reloadBar->GetElement(0)->SetTextureSrc( L"gui_healthBar0.txr" );
-		m_reloadBar->GetElement(1)->SetTextureSrc( L"gui_healthBar1.txr" );
+		m_temperatureBar->GetElement(0)->SetTextureSrc( L"gui_healthBar0.txr" );
+		m_temperatureBar->GetElement(1)->SetTextureSrc( L"gui_healthBar1.txr" );
 
-		m_lblMagazine = sx_new( sx::gui::Label );
-		m_lblMagazine->SetSize( float2(70, 25) );
-		m_lblMagazine->Position().Set( -450.0f, 270.0f, 0.0f );
-		m_lblMagazine->GetElement(0)->Color().a = 0.0f;
-		m_lblMagazine->GetElement(1)->Color().a = 0.85f;
-		m_lblMagazine->SetFont( L"Font_rob_twedit_info.fnt" );
+		m_bulletIndicator = sx_new( sx::gui::Label );
+		m_bulletIndicator->SetSize( float2(70, 25) );
+		m_bulletIndicator->Position().Set( -450.0f, 240.0f, 0.0f );
+		m_bulletIndicator->GetElement(0)->Color().a = 0.0f;
+		m_bulletIndicator->GetElement(1)->Color().a = 0.85f;
+		m_bulletIndicator->SetFont( L"Font_rob_twedit_info.fnt" );
 
-		m_lblBullet = sx_new( sx::gui::Label );
-		m_lblBullet->SetSize( float2(70, 25) );
-		m_lblBullet->Position().Set( -450.0f, 240.0f, 0.0f );
-		m_lblBullet->GetElement(0)->Color().a = 0.0f;
-		m_lblBullet->GetElement(1)->Color().a = 0.85f;
-		m_lblBullet->SetFont( L"Font_rob_twedit_info.fnt" );
-
-		g_game->m_gui->Add_Back( m_reloadBar );
-		g_game->m_gui->Add_Back( m_lblMagazine );
-		g_game->m_gui->Add_Back( m_lblBullet );
+		g_game->m_gui->Add_Back( m_temperatureBar );
+		g_game->m_gui->Add_Back( m_bulletIndicator );
 	}
 
 	void Mechanic_MT_Machinegun::Finalize( void )
 	{
 		sx_callstack();
 
-		g_game->m_gui->Remove( m_reloadBar );
-		g_game->m_gui->Remove( m_lblMagazine );	
-		g_game->m_gui->Remove( m_lblBullet );
+		g_game->m_gui->Remove( m_temperatureBar );
+		g_game->m_gui->Remove( m_bulletIndicator );	
 
-		sx_delete_and_null( m_reloadBar );
-		sx_delete_and_null( m_lblMagazine );
-		sx_delete_and_null( m_lblBullet );
+		sx_delete_and_null( m_temperatureBar );
+		sx_delete_and_null( m_bulletIndicator );
 	}
 
 	void Mechanic_MT_Machinegun::ProcessInput( bool& inputHandled, float elpsTime )
@@ -154,7 +144,7 @@ namespace GM
 			//	just check the number of bullets and player does fire
 			if ( SEGAN_KEYDOWN(0, SX_INPUT_KEY_MOUSE_LEFT) || SEGAN_KEYHOLD(0, SX_INPUT_KEY_MOUSE_LEFT) )
 			{
-				if ( (!m_fire) && (m_firedCount < m_bullets) && (m_reload <= 0.0f) )
+				if ( (!m_fire) && (g_game->m_player->m_energy >= m_energyPerBullet) && (m_curTemperature <= m_maxTemperature) )
 				{
 					m_fire = MANUAL_MACHINEGUN_FIRE;
 				}
@@ -179,41 +169,40 @@ namespace GM
 
 	void Mechanic_MT_Machinegun::Update( float elpsTime )
 	{
-		if ( m_reload > 0.0f )
-		{
-			m_reload -= elpsTime * 0.001f;
-			m_reloadBar->SetMax( m_reloadTime );
-			m_reloadBar->SetValue( m_reload );
+		m_curTemperature = m_fire ?
+			(m_curTemperature + (m_warmingRate * elpsTime * 0.001f)) :
+			(m_curTemperature - (m_coldingRate * elpsTime * 0.001f));
 
-			if ( m_reload <= 0.0f )
-			{
-				m_reload = 0.0f;
-				m_reloadBar->RemProperty( SX_GUI_PROPERTY_VISIBLE );
-				m_lblMagazine->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
-				str128 str;
-				m_lblBullet->SetText(str);
-				if ( m_firedCount != m_bullets )
-				{
-					str.Format( L"%dx%d", ((m_bullets - m_firedCount) / m_magazineCap) - 1, m_magazineCap );
-				}
-				else
-				{
-					m_lblMagazine->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
-					str.Format( L"0x%d", m_magazineCap );				
-				}
-				m_lblMagazine->SetText(str);
-				m_lblBullet->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
-				str.Format( L"%d/%d", m_magazineCap, m_magazineCap );
-				m_lblBullet->SetText(str);
-			}
-			else
-			{
-				str128 str;
-				const int reloaded = m_magazineCap - static_cast<const int>((m_reload / m_reloadTime) * m_magazineCap);
-				str.Format( L"%d/%d", reloaded, m_magazineCap );
-				m_lblBullet->SetText(str);
-			}
+		if ( m_curTemperature < 0.0f )
+		{
+			m_curTemperature = 0.0f;
 		}
+		else if ( m_curTemperature > m_maxTemperature )
+		{
+			m_curTemperature = m_maxTemperature;
+			m_fire = 0;
+		}
+
+		m_temperatureBar->SetValue( m_curTemperature );
+
+		const int availableBullets = g_game->m_player->m_energy / m_energyPerBullet;
+
+		str128 str;
+
+		if ( availableBullets )
+		{
+			m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
+			str.Format( L"%d", availableBullets );
+		}
+		else
+		{
+			m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
+			str.SetText( "0" );
+		}
+
+		m_bulletIndicator->SetText( str );
+		
+		//
 
 		if ( NotInGame() || !m_nodeWeapon || !m_nodePipe[0] ) { return; }
 
@@ -253,38 +242,35 @@ namespace GM
 			m_nodeWeapon->SetRotation( m_Rot.x, m_Rot.y, m_Rot.z );
 		}
 
-		if ( !m_reload )
+		//  compute max shoot time depend on fire rate
+		const float	maxShootTime = ( (m_attack.rate > 0.01f) ? (1000.0f / m_attack.rate) : 500.0f ) / MANUAL_MACHINEGUN_FIRE;
+		if ( m_fire && (m_shootTime > maxShootTime) && (g_game->m_player->m_energy >= m_energyPerBullet) && (m_curTemperature <= m_maxTemperature) )
 		{
-			//  compute max shoot time depend on fire rate
-			const float	maxShootTime = ( (m_attack.rate > 0.01f) ? (1000.0f / m_attack.rate) : 500.0f ) / MANUAL_MACHINEGUN_FIRE;
-			if ( m_fire && (m_shootTime > maxShootTime) && (m_firedCount < m_bullets) )
+			m_shootTime = 0;
+
+			//  rotate and show the pipe
+			msg_Mesh msgMesh( 0, SX_MESH_INVISIBLE );
+			m_nodePipe[ m_pipeIndex ]->MsgProc( MT_MESH, &msgMesh );
+			m_nodePipe[ m_pipeIndex ]->SetRotation( 0, 0, sx::cmn::Random(6.0f) );
+
+			//  play a sound
+			msg_SoundPlay msgSound(true, sx::cmn::Random(1000), 0, L"fire" );
+			m_node->MsgProc( MT_SOUND_PLAY, &msgSound );
+
+			//	spray bullet particle
+			str256 bulletShell = L"bullet_shell"; bulletShell << m_pipeIndex;
+			msg_Particle msgPar( SX_PARTICLE_SPRAY, 0, bulletShell );
+			m_nodeWeapon->MsgProc( MT_PARTICLE, &msgPar );
+
+			m_shootCount++;
+			if ( m_shootCount > 15 )
 			{
-				m_shootTime = 0;
-
-				//  rotate and show the pipe
-				msg_Mesh msgMesh( 0, SX_MESH_INVISIBLE );
-				m_nodePipe[ m_pipeIndex ]->MsgProc( MT_MESH, &msgMesh );
-				m_nodePipe[ m_pipeIndex ]->SetRotation( 0, 0, sx::cmn::Random(6.0f) );
-
-				//  play a sound
-				msg_SoundPlay msgSound(true, sx::cmn::Random(1000), 0, L"fire" );
-				m_node->MsgProc( MT_SOUND_PLAY, &msgSound );
-
-				//	spray bullet particle
-				str256 bulletShell = L"bullet_shell"; bulletShell << m_pipeIndex;
-				msg_Particle msgPar( SX_PARTICLE_SPRAY, 0, bulletShell );
-				m_nodeWeapon->MsgProc( MT_PARTICLE, &msgPar );
-
-				m_shootCount++;
-				if ( m_shootCount > 15 )
-				{
-					msg_Particle msgPrtcl(SX_PARTICLE_SPRAY);
-					m_nodePipe[ m_pipeIndex ]->MsgProc( MT_PARTICLE, &msgPrtcl);
-					m_shootCount = sx::cmn::Random(5);
-				}
-
-				ShootTheBullet( &m_attack, false );
+				msg_Particle msgPrtcl(SX_PARTICLE_SPRAY);
+				m_nodePipe[ m_pipeIndex ]->MsgProc( MT_PARTICLE, &msgPrtcl);
+				m_shootCount = sx::cmn::Random(5);
 			}
+
+			ShootTheBullet( &m_attack, false );
 		}
 	}
 
@@ -341,9 +327,10 @@ namespace GM
 							script.GetFloat(i, L"maxTheta", m_RotMax.x);
 							script.GetFloat(i, L"shakeMagnitude", m_shakeMagnitude);
 							script.GetFloat(i, L"forceFeedback", m_forceFeedback);
-							script.GetInteger(i, L"magazineCap", m_magazineCap);
-							script.GetInteger(i, L"bulletsCount", m_bullets);
-							script.GetFloat(i, L"reloadTime", m_reloadTime);
+							script.GetInteger(i, L"energyPerBullet", m_energyPerBullet);
+							script.GetFloat(i, L"maxTemperature", m_maxTemperature);
+							script.GetFloat(i, L"warmingRate", m_warmingRate);
+							script.GetFloat(i, L"coldingRate", m_coldingRate);
 
 							if ( script.GetString(i, L"bullet", tmpStr) )
 							{
@@ -404,20 +391,25 @@ namespace GM
 					}
 				}
 
-				m_firedCount = 0;
-				m_reload = 0;
+				m_curTemperature = 0.0f;
 
 				const float3 addPos( 0, m_node->GetBox_local().Max.y + 0.5f, 0 );
-				m_reloadBar->Position() = m_node->GetPosition_world() + addPos;
-				m_reloadBar->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+				m_temperatureBar->SetMax( m_maxTemperature );
+				m_temperatureBar->SetValue( m_curTemperature );
+				m_temperatureBar->Position() = m_node->GetPosition_world() + addPos;
 
+				const int availableBullets = g_game->m_player->m_energy / m_energyPerBullet;
 				str128 str;
-				
-				str.Format( L"%dx%d", (m_bullets / m_magazineCap) - 1, m_magazineCap );
-				m_lblMagazine->SetText(str);
-
-				str.Format( L"%d/%d", m_magazineCap, m_magazineCap );
-				m_lblBullet->SetText(str);
+				if ( availableBullets )
+				{
+					str.Format( L"%d", availableBullets );
+					m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 1.0f, 1.0f, 0.85f);
+				}
+				else
+				{
+					str.SetText("0");
+				}
+				m_bulletIndicator->SetText( str );
 			}
 			//break;
 		case GMT_GAME_PAUSED:
@@ -475,8 +467,8 @@ namespace GM
 		m_shootTime = 0.0f;
 		m_fire = 0;
 
-		m_lblMagazine->AddProperty( SX_GUI_PROPERTY_VISIBLE );
-		m_lblBullet->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+		m_temperatureBar->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+		m_bulletIndicator->AddProperty( SX_GUI_PROPERTY_VISIBLE );
 	}
 
 	void Mechanic_MT_Machinegun::LeaveManual( void )
@@ -490,8 +482,8 @@ namespace GM
 		m_nodeWeapon = null;
 		ZeroMemory( m_nodePipe, sizeof(m_nodePipe) );
 
-		m_lblMagazine->RemProperty( SX_GUI_PROPERTY_VISIBLE );
-		m_lblBullet->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+		m_temperatureBar->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+		m_bulletIndicator->RemProperty( SX_GUI_PROPERTY_VISIBLE );
 	}
 
 	void Mechanic_MT_Machinegun::UpdateCamera( float elpsTime )
@@ -612,30 +604,24 @@ namespace GM
 
 		--m_fire;
 		m_RotOffset.x -= m_forceFeedback;
-		++m_firedCount;
 
-		if ( (m_firedCount % m_magazineCap) == 0 )
+		g_game->m_player->m_energy -= m_energyPerBullet;
+		const int availableBullets = g_game->m_player->m_energy / m_energyPerBullet;
+
+		str128 str;
+
+		if ( availableBullets )
 		{
-			m_fire = 0;
-			str128 str;
-
-			if ( m_firedCount != m_bullets )
-			{
-				m_reload = m_reloadTime;
-				m_reloadBar->AddProperty( SX_GUI_PROPERTY_VISIBLE );
-			}
-
-			m_lblBullet->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
-			str.Format( L"0/%d", m_magazineCap );
-			m_lblBullet->SetText(str);
+			str.Format( L"%d", availableBullets );
 		}
 		else
 		{
-			const int remainder = (m_firedCount == m_bullets) ? 0 : m_magazineCap - (m_firedCount % m_magazineCap);
-			str128 str;
-			str.Format( L"%d/%d", remainder, m_magazineCap );
-			m_lblBullet->SetText(str);
+			m_bulletIndicator->GetElement(1)->Color() = D3DColor(1.0f, 0.0f, 0.0f, 0.85f);
+			str.SetText("0");
 		}
+
+		m_bulletIndicator->SetText(str);
+		
 	}
 
 } // namespace GM

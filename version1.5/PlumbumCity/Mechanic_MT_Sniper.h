@@ -62,23 +62,22 @@ namespace GM
 		sx::core::PNode		m_nodeCamera;		//	camera node
 		sx::core::PNode		m_nodeWeapon;		//  weapon node
 		sx::core::PNode		m_nodePipe;			//  pipe of weapon to shoot
-
 		int					m_shootCount;		//  number of shooting
 		float				m_shootTime;		//  time of shooting
 		float3				m_rot;				//  direction of weapon
 		float3				m_rotOffset;		//  offset of direction
 		float3				m_rotMax;			//	maximum rotation value
 		float				m_fov;
+		float				m_addFOV;
 		float				m_forceFeedback;
 		float				m_cameraSpeed;		//	speed of camera movement
 		float				m_cameraBreath;		//	movement caused by breathing
-
 		int					m_fire;				//  fire order for weapon
-		int					m_bullets;			//	number of bullets in weapon
-		int					m_firedCount;
 		bool				m_selected;			//	true of this tower has been selected
+		int					m_energyPerBullet;
 
-		sx::gui::Label*		m_lblBullet;
+
+		sx::gui::Label*		m_bulletIndicator;
 	};
 
 

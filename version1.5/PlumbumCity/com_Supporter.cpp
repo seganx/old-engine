@@ -30,16 +30,19 @@ void com_Supporter::Initialize( void )
 
 	m_towers.Clear();
 
-	for ( int i=0; i<nodes.Count(); i++ )
+	for ( int i = 0; i < nodes.Count(); ++i )
 	{
 		sx::core::PNode node = nodes[i];
 		Entity* entity = static_cast<Entity*>(node->GetUserData());
 
-		if ( !entity || entity->m_health.icur < 1 ) continue;
+		if ( (!entity) || (entity->m_health.icur < 1) )
+		{
+			continue;
+		}
 
 		bool notSupporter = true;
 
-		for ( int j=0; j<entity->m_components.Count(); j++ )
+		for ( int j = 0; j < entity->m_components.Count(); ++j )
 		{
 			if ( entity->m_components[j]->m_tag == m_tag )
 			{
@@ -77,8 +80,10 @@ void com_Supporter::Update( float elpsTime )
 	const float delta = elpsTime * 0.001f;
 
 	m_owner->m_experience += m_owner->test_onDamageXP * delta;
+
+	const bool not_over_active = true;
 	
-	m_energy += m_owner->m_curAttack.stunValue * delta;
+	m_energy += m_owner->m_curAttack.stunValue * delta * (not_over_active ? 1.0f : m_owner->m_curAttack.stunTime);
 	m_repair += m_owner->m_curAttack.physicalDamage * delta;
 
 	m_time += elpsTime;
@@ -108,7 +113,10 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 {
 	sx_callstack_param(com_Supporter::MsgProc(msg=%d), msg);
 
-	if ( !m_owner || m_owner->m_health.icur < 1 || !m_owner->m_node ) return;
+	if ( !m_owner || m_owner->m_health.icur < 1 || !m_owner->m_node )
+	{
+		return;
+	}
 
 	switch ( msg )
 	{
@@ -120,7 +128,7 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 			{
 				bool notSupporter = true;
 
-				for ( int j=0; j<entity->m_components.Count(); j++ )
+				for ( int j = 0; j < entity->m_components.Count(); ++j )
 				{
 					if ( entity->m_components[j]->m_tag == m_tag )
 					{
