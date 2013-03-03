@@ -70,6 +70,8 @@ namespace GM
 		float3				m_rotMax;			//	maximum rotation value
 		float				m_fov;
 		float				m_forceFeedback;
+		float				m_cameraSpeed;		//	speed of camera movement
+		float				m_cameraBreath;		//	movement caused by breathing
 
 		int					m_fire;				//  fire order for weapon
 		int					m_bullets;			//	number of bullets in weapon

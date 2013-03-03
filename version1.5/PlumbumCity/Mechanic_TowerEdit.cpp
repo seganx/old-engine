@@ -318,7 +318,7 @@ namespace GM
 	{
 		sx_callstack();
 
-		if ( !g_game->m_game_currentLevel || g_game->m_game_paused )
+		if ( !g_game->m_currentLevel || g_game->m_gamePaused )
 		{
 			m_back->State_SetIndex(0);
 			m_pnlSell->State_SetIndex(0);

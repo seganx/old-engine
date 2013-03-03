@@ -98,7 +98,7 @@ typedef byte				*pbyte;
 
 #define SEGAN_LIB_ASSERT		1		// check and log some special events on containers
 
-#define SEGAN_MATH_SIMD			0		// use SIMD instruction in some math functions
+#define SEGAN_MATH_SIMD			1		// use SIMD instruction in some math functions
 
 
 //////////////////////////////////////////////////////////////////////////

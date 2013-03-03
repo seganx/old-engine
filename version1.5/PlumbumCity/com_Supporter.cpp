@@ -69,7 +69,7 @@ void com_Supporter::Update( float elpsTime )
 {
 	sx_callstack();
 
-	if ( (!g_game->m_game_waves_comming) || (!m_owner) || (m_owner->m_health.icur < 1) || (!m_owner->m_node) )
+	if ( (!g_game->m_wavesComming) || (!m_owner) || (m_owner->m_health.icur < 1) || (!m_owner->m_node) )
 	{
 		return;
 	}

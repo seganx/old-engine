@@ -72,7 +72,7 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 		m_Mechanics[i]->ProcessInput( inputHandled, elpsTime );
 	}
 
-	if ( !g_game->m_game_paused && g_game->m_mouseMode != MS_ManualTower )
+	if ( !g_game->m_gamePaused && g_game->m_mouseMode != MS_ManualTower )
 	{
 		m_camera_Pause.m_Activate = false;
 		m_camera_MBL.ProseccInput( inputHandled, elpsTime );
@@ -99,6 +99,7 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 	{
 		inputHandled = true;
 		m_profile.level = 10;
+		m_profile.curGameMode = 2;
 		for ( int i=0; i<10; i++ )
 			m_profile.stars[i] = 3;
 	}
@@ -128,7 +129,7 @@ void Player::Update( float elpsTime )
 {
 	sx_callstack();
 
-	if ( !g_game->m_game_currentLevel || g_game->m_game_paused )
+	if ( !g_game->m_currentLevel || g_game->m_gamePaused )
 	{
 		static float gameTime = 0;
 		gameTime += elpsTime;
@@ -194,7 +195,7 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 				str << L"config_mini.txt";
 			else
 			{
-				switch ( g_game->m_game_mode )
+				switch ( g_game->m_gameMode )
 				{
 				case 0 : str << L"config_default.txt"; break;
 				case 1 : str << L"config_warrior.txt"; break;
@@ -221,7 +222,7 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 
 							script.GetInteger( i, L"energy", m_energy );
 
-							switch ( g_game->m_difficultyLevel )
+							switch ( g_game->m_difficultyMode )
 							{
 							case 0:	
 								g_game->m_difficultyValue = 0.7f;
@@ -246,8 +247,8 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 
 	case GMT_LEVEL_LOAD:		/////////////////////////////////////////////////    LOAD LEVEL
 		{						//////////////////////////////////////////////////////////////////////////
-			if ( g_game->m_game_currentLevel ) 
-				m_profile.level_selected = g_game->m_game_currentLevel;
+			if ( g_game->m_currentLevel ) 
+				m_profile.level_selected = g_game->m_currentLevel;
 
 			//  clear mechanics
 			ClearMechanincs();
@@ -258,7 +259,7 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 				str << L"config_mini.txt";
 			else
 			{
-				switch ( g_game->m_game_mode )
+				switch ( g_game->m_gameMode )
 				{
 				case 0 : str << L"config_default.txt"; break;
 				case 1 : str << L"config_warrior.txt"; break;
@@ -285,7 +286,7 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 
 							script.GetInteger( i, L"energy", m_energy );
 
-							switch ( g_game->m_difficultyLevel )
+							switch ( g_game->m_difficultyMode )
 							{
 							case 0:	
 								g_game->m_difficultyValue = 0.7f;
@@ -421,7 +422,7 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 				if ( m_people < 1 )
 				{
 					m_people = 0;
-					g_game->m_game_paused = true;
+					g_game->m_gamePaused = true;
 					g_game->m_gui->m_gameOver->Show();
 				}
 			}

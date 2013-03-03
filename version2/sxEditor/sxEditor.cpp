@@ -87,7 +87,7 @@ void AppMainLoop( float elpsTime )
 		g_engine->m_device3D->SetMatrix( MM_PROJECTION, mat );
 
 		static float timer = 0;
-		timer =  (float)( 0.0001f * sx_os_get_timer() );
+		timer =  (float)( 0.0003f * sx_os_get_timer() );
 		//float eye[3] = { 5.0f * sx_sin(timer), 5.0f, 10.0f * sx_cos(timer)	};
 		float eye[3] = { 2.0f , 5.0f, 5.0f };
 		float at[3] = { 0.0f, 0.0f, 0.0f };
@@ -203,6 +203,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	loggerconfig.mode = LM_FILE;
 
 	EngineConfig config;
+	config.net_id = 0x2727;
 	config.logger = &loggerconfig;
 	config.window_callback = &WindowEventCall;
 	config.d3d_flag = SX_D3D_CREATE_GL | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
@@ -218,7 +219,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		client->Start( 2727, clientCallback );
 		client->Listen();
 		int tryToConnect = 0;
-		while ( 0 && tryToConnect < 5 )
+		while ( tryToConnect < 500 )
 		{
 			client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
 
@@ -231,7 +232,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			}
 
 			tryToConnect++;
-			sx_os_sleep(1);
+			sx_os_sleep(2);
 		}
 	}
 #endif

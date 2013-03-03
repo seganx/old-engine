@@ -459,6 +459,20 @@ void d3dDevice_gl::EndScene( void )
   	glTexCoord2f( 1, 1 );	glVertex3f( x - 1.0f, y - 1.0f, z );
   	glTexCoord2f( 0, 1 );	glVertex3f( x + 1.0f, y - 1.0f, z );
   	glEnd();
+
+	Matrix mat; mat.Identity();
+	SetMatrix( MM_WORLD, mat );
+
+	float3 dest, src( 1, 1, -1 );
+	glColor3f( 0.5f, 0.0f, 0.0f );
+	glBegin( GL_POINTS );
+	glVertex3f( src.x, src.y, src.z );
+	glEnd();
+
+	m_world.Multiply( m_view, m_projection );
+	dest.ProjectToScreen( src, m_world, &m_viewport.x );
+	src = dest;
+
 }
 
 void d3dDevice_gl::Present( void )

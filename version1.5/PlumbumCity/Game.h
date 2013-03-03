@@ -70,12 +70,12 @@ public:
 	MouseState				m_mouseMode;				// state mode of mouse
 
 	float					m_difficultyValue;			//	difficulty value
-	int						m_difficultyLevel;			//	difficulty level
-	int						m_game_currentLevel;		//  index of current level. 0 = GUI mode
-	int						m_game_nextLevel;			//  index of current level. 0 = GUI mode
-	int						m_game_mode;				//  game mode : 0=default, 1=warrior, 2=legend
-	bool					m_game_paused;				//  game paused
-	bool					m_game_waves_comming;		//	waves are coming
+	int						m_difficultyMode;			//	difficulty level
+	int						m_currentLevel;				//  index of current level. 0 = GUI mode
+	int						m_nextLevel;				//  index of current level. 0 = GUI mode
+	int						m_gameMode;					//  game mode : 0=default, 1=warrior, 2=legend
+	bool					m_gamePaused;				//  game paused
+	bool					m_wavesComming;				//	waves are coming
 	bool					m_app_Paused;				//  application paused
 	bool					m_app_Closing;				//  application is closing
 	int						m_app_Loading;				//  application is loading resources. value is number of objects to load

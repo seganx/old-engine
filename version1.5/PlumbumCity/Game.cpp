@@ -64,12 +64,12 @@ Game::Game( void )
 ,	m_gui(0)
 ,	m_mouseMode(MS_Null)
 ,	m_difficultyValue(1.0f)
-,	m_difficultyLevel(0)
-,	m_game_currentLevel(-1)
-,	m_game_nextLevel(0)
-,	m_game_mode(0)
-,	m_game_paused(false)
-,	m_game_waves_comming(false)
+,	m_difficultyMode(0)
+,	m_currentLevel(-1)
+,	m_nextLevel(0)
+,	m_gameMode(0)
+,	m_gamePaused(false)
+,	m_wavesComming(false)
 ,	m_app_Paused(false)
 ,	m_app_Loading(0)
 ,	m_app_Closing(false)
@@ -211,7 +211,7 @@ const WCHAR* Game::GetLevelPath( void )
 
 	static str1024 mainPath;
 	mainPath = sx::sys::FileManager::Project_GetDir();
-	mainPath << L"level" << g_game->m_game_currentLevel << L"/";
+	mainPath << L"level" << g_game->m_currentLevel << L"/";
 	return mainPath;
 }
 
@@ -267,12 +267,12 @@ void Game::LoadLevel( void )
 	m_app_Loading = 0xffffff;
 
 	str1024 str = L"gui_loading_level_";
-	str << m_game_currentLevel << L".txr";
+	str << m_currentLevel << L".txr";
 	m_panel_Loading->GetElement(0)->SetTextureSrc( str );
 
 	//  load the scene
 	str = GetLevelPath();
-	switch ( m_game_mode )
+	switch ( m_gameMode )
 	{
 	case 0 : str << L"scene_default.scene"; break;
 	case 1 : str << L"scene_warrior.scene"; break;
@@ -359,7 +359,7 @@ void Game::LoadLevel( void )
 
 		
 		str = L"gui_post_level";
-		str << m_game_currentLevel << L".txr";
+		str << m_currentLevel << L".txr";
 		texture_post->Cleanup();
 		texture_post->SetSource( str );
 		texture_post->Activate();
@@ -375,7 +375,7 @@ void Game::ClearLevel( void )
 {
 	sx_callstack();
 
-	m_game_waves_comming = false;
+	m_wavesComming = false;
 	m_gui->m_gameSpeed->SetValue( 1.0f );
 	ProjectileManager::ClearProjectiles();
 	EntityManager::ClearEntities();
@@ -388,7 +388,7 @@ void Game::ClearLevel( void )
 
 void Game::Reset( void )
 {
-	g_game->m_game_waves_comming = false;
+	g_game->m_wavesComming = false;
 	PostMessage( 0, GMT_GAME_RESETING, 0 );
 	PostMessage( 0, GMT_GAME_RESET, 0 );
 	m_gui->ShowTips( L" Game Restarted !", 0xffff0000 );
@@ -401,15 +401,15 @@ void Game::Update( float elpsTime )
 
 	if ( m_app_Closing ) return;
 
-	if ( m_game_currentLevel != m_game_nextLevel )
+	if ( m_currentLevel != m_nextLevel )
 	{
-		m_game_currentLevel = m_game_nextLevel;
+		m_currentLevel = m_nextLevel;
 		LoadLevel();
 	}
 
 	if ( m_app_Loading == 1 )
 	{
-		if ( g_game->m_game_currentLevel )
+		if ( g_game->m_currentLevel )
 			g_game->PostMessage( 0, GMT_GAME_START, 0 );
 		m_app_Loading = 0;
 	}
@@ -432,7 +432,7 @@ void Game::Update( float elpsTime )
 		m_gamePlay->ProcessInput(inputHandled, elpsTime);
 		m_player->ProcessInput(inputHandled, elpsTime);
 
-		if ( !m_game_paused )
+		if ( !m_gamePaused )
 		{
 			//  update elements in the scene
 			ProjectileManager::Update( elpsTime * Config::GetData()->game_speed );
@@ -448,7 +448,7 @@ void Game::Update( float elpsTime )
 	}
 
 	//  update rendering system
-	if ( m_game_paused )
+	if ( m_gamePaused )
 	{
 		sx::core::Renderer::Update( 0 );
 	}
@@ -473,7 +473,7 @@ void Game::Update( float elpsTime )
 	sx::core::PCamera pCamera = sx::core::Renderer::GetCamera();
 	SoundListener soundListener( pCamera->Eye, pCamera->GetDirection(), pCamera->Up );
 	sx::snd::Device::SetListener( soundListener );
-	sx::snd::Device::SetVolume( m_game_paused ? 0 : Config::GetData()->musicVolume, Config::GetData()->soundVolume );
+	sx::snd::Device::SetVolume( m_gamePaused ? 0 : Config::GetData()->musicVolume, Config::GetData()->soundVolume );
 	sx::snd::Device::Pause( m_app_Paused );
 }
 
@@ -481,7 +481,7 @@ void Game::Render( DWORD flag )
 {
 	sx_callstack();
 
-	if ( m_app_Closing || m_game_currentLevel != m_game_nextLevel ) return;
+	if ( m_app_Closing || m_currentLevel != m_nextLevel ) return;
 	if ( !sx::core::Renderer::CanRender() ) return;
 
 	sx::core::Renderer::Begin();
@@ -494,7 +494,7 @@ void Game::Render( DWORD flag )
 
 	FogDesc fog;
 	sx::d3d::Device3D::GetFogDesc(fog);
-	sx::d3d::Device3D::Clear_Screen( (m_game_currentLevel==0 || flag) ? 0xff000000 : fog.Color );
+	sx::d3d::Device3D::Clear_Screen( (m_currentLevel==0 || flag) ? 0xff000000 : fog.Color );
 
 	//  render the meshes in the scene
 	if ( !m_app_Loading )
@@ -527,7 +527,7 @@ void Game::Render( DWORD flag )
 	sx::d3d::UI3D::ReadyToDebug( D3DColor(0,0,0,0) );
 	sx::d3d::Device3D::RS_Alpha(0);
 
-	if ( !m_app_Loading && !m_game_paused )
+	if ( !m_app_Loading && !m_gamePaused )
 		m_gui->Draw( SX_GUI_DRAW_JUST3D );
 
 	if ( m_app_Loading )
@@ -708,9 +708,6 @@ void Achievement::AddValue( int val /*= 1 */ )
 	if ( value > range ) value = range;
 
 	if ( value != range ) return;
-	//str1024 str;
-	//str.Format( L" Achievement unlocked : \n %s ", name );
-	//g_game->m_gui->ShowTips( tips, 0xffffa352, icon );
 	g_game->m_gui->ShowTips( tips, 0xffff0319, icon );
 
 	msg_SoundPlay msg( true, 0, 0, L"achievement" );

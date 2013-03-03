@@ -110,7 +110,7 @@ namespace GM
 
 	void Mechanic_EnemyWaves::Update( float elpsTime )
 	{
-		if ( m_wavesSrc.IsEmpty() || g_game->m_game_paused || !g_game->m_game_currentLevel || m_waveIndex >= m_wavesSrc.Count()+1 )
+		if ( m_wavesSrc.IsEmpty() || g_game->m_gamePaused || !g_game->m_currentLevel || m_waveIndex >= m_wavesSrc.Count()+1 )
 		{
 			m_back->State_SetIndex(0);
 			return;
@@ -138,7 +138,7 @@ namespace GM
 			m_nextWave->State_SetIndex(0);
 			m_waveIndex++;
 			g_game->PostMessage( 0, GMT_WAVE_FINISHED, NULL );
-			g_game->m_game_paused = true;
+			g_game->m_gamePaused = true;
 			g_game->m_gui->m_victory->Show();
 			return;
 		}
@@ -198,7 +198,7 @@ namespace GM
 			if ( !entity )
 			{
 				sxLog::Log( L" ERROR : can't clone entity : level %d, wave %d , subwave %d , type %s !", 
-					g_game->m_game_currentLevel, m_waveIndex+1, i+1, pSubWave->type->m_typeName.Text() );
+					g_game->m_currentLevel, m_waveIndex+1, i+1, pSubWave->type->m_typeName.Text() );
 			}
 
 			entity->SetLevel(0);
@@ -215,13 +215,13 @@ namespace GM
 			if ( Config::GetData()->display_Debug == 3 )
 			{
 				if ( entity->m_cost[0] < 1 )
-					sxLog::Log( L"WARNING : level %d, wave %d , subwave %d , entity %s has %d gold !", g_game->m_game_currentLevel, m_waveIndex+1, i+1, entity->m_typeName.Text(), entity->m_cost[0] );
+					sxLog::Log( L"WARNING : level %d, wave %d , subwave %d , entity %s has %d gold !", g_game->m_currentLevel, m_waveIndex+1, i+1, entity->m_typeName.Text(), entity->m_cost[0] );
 
 				if ( entity->m_health.icur < 1 )
-					sxLog::Log( L"WARNING : level %d, wave %d , subwave %d , entity %s has %d health !", g_game->m_game_currentLevel, m_waveIndex+1, i+1, entity->m_typeName.Text(), entity->m_health.icur );
+					sxLog::Log( L"WARNING : level %d, wave %d , subwave %d , entity %s has %d health !", g_game->m_currentLevel, m_waveIndex+1, i+1, entity->m_typeName.Text(), entity->m_health.icur );
 
 				if ( entity->m_move.animSpeed < 1.0f )
-					sxLog::Log( L"WARNING : level %d, wave %d , subwave %d , entity %s has %.2f animSpeed !", g_game->m_game_currentLevel, m_waveIndex+1, i+1, entity->m_typeName.Text(), entity->m_move.animSpeed );
+					sxLog::Log( L"WARNING : level %d, wave %d , subwave %d , entity %s has %.2f animSpeed !", g_game->m_currentLevel, m_waveIndex+1, i+1, entity->m_typeName.Text(), entity->m_move.animSpeed );
 			}
 
 			entity->m_attackLevel[0].rate				+= pWave->addFireRate			+ pSubWave->addFireRate;
@@ -274,7 +274,7 @@ namespace GM
 			pWave->enemyCounts--;
 
 			//	add info to gui
-			if ( g_game->m_player->m_profile.level_played < g_game->m_game_currentLevel )
+			if ( g_game->m_player->m_profile.level_played < g_game->m_currentLevel )
 				g_game->m_gui->m_info->AddTutorial( pSubWave->infoTitle, pSubWave->infoDesc, pSubWave->infoImage, pSubWave->infoShowNow > 0 );
 			else
 				g_game->m_gui->m_info->AddTutorial( pSubWave->infoTitle, pSubWave->infoDesc, pSubWave->infoImage, false );
@@ -365,7 +365,7 @@ namespace GM
 		{
 			if (m_waveIndex == 0)
 			{
-				g_game->m_game_waves_comming = true;
+				g_game->m_wavesComming = true;
 				EntityManager::MsgProc(0, GMT_WAVE_STARTED, NULL);
 			}
 
@@ -445,7 +445,7 @@ namespace GM
 			str << L"waves_mini.txt";
 		else
 		{
-			switch ( g_game->m_game_mode )
+			switch ( g_game->m_gameMode )
 			{
 			case 0 : str << L"waves_default.txt"; break;
 			case 1 : str << L"waves_warrior.txt"; break;
@@ -530,7 +530,7 @@ namespace GM
 						{
 							ew->subWave[j].type = (Entity*)EntityManager::GetTypeByName(entityType);
 							if ( !ew->subWave[j].type )
-								sxLog::Log( L"WARNING : level %d, wave %d , subwave %d entity type %s not found !", g_game->m_game_currentLevel, ( m_wavesSrc.Count()-1), j, entityType.Text() );
+								sxLog::Log( L"WARNING : level %d, wave %d , subwave %d entity type %s not found !", g_game->m_currentLevel, ( m_wavesSrc.Count()-1), j, entityType.Text() );
 						}
 
 						tmpStr.Format(L"%d_startNode", j);

@@ -112,7 +112,7 @@ GoldAndPeople::~GoldAndPeople( void )
 
 void GoldAndPeople::ProcessInput( bool& inputHandled, float elpsTime )
 {
-	if ( !g_game->m_game_currentLevel || g_game->m_game_paused || g_game->m_app_Loading || g_game->m_mouseMode != MS_Null ) return;
+	if ( !g_game->m_currentLevel || g_game->m_gamePaused || g_game->m_app_Loading || g_game->m_mouseMode != MS_Null ) return;
 	sx_callstack();
 
 	if ( !inputHandled && SEGAN_KEYUP( 0, SX_INPUT_KEY_I ) )
@@ -414,6 +414,7 @@ GameGUI::GameGUI( void ): Form()
 , m_status(0)
 , m_main(0)
 , m_map(0)
+, m_playLevel(0)
 , m_profile(0)
 , m_achivements(0)
 , m_settings(0)
@@ -489,6 +490,7 @@ void GameGUI::Initialize( void )
 	m_status = sx_new ( MenuStatus );
 	m_main = sx_new ( MenuMain );
 	m_map = sx_new ( MenuMap );
+	m_playLevel = sx_new ( MenuPlayLevel );
 	m_profile = sx_new( MenuProfile );
 	m_achivements = sx_new( MenuAchievements );
 	m_settings = sx_new( MenuSettings );
@@ -503,6 +505,7 @@ void GameGUI::Initialize( void )
 	m_status->Initialize();
 	m_main->Initialize();
 	m_map->Initialize();
+	m_playLevel->Initialize();
 	m_profile->Initialize();
 	m_achivements->Initialize();
 	m_settings->Initialize();
@@ -534,6 +537,7 @@ void GameGUI::Finalize( void )
 	m_achivements->Finalize();
 	m_settings->Finalize();
 	m_profile->Finalize();
+	m_playLevel->Finalize();
 	m_map->Finalize();
 	m_main->Finalize();
 	m_status->Finalize();
@@ -556,6 +560,7 @@ void GameGUI::Finalize( void )
 	sx_delete_and_null( m_settings );
 	sx_delete_and_null( m_profile );
 	sx_delete_and_null( m_map );
+	sx_delete_and_null( m_playLevel );
 	sx_delete_and_null( m_main );
 	sx_delete_and_null( m_status );
 	sx_delete_and_null( m_powerAttaks );
@@ -577,10 +582,11 @@ void GameGUI::ProcessInput( bool& inputHandled, float elpsTime )
 	m_pause->ProcessInput( inputHandled, elpsTime );
 	m_achivements->ProcessInput( inputHandled, elpsTime );
 	m_profile->ProcessInput( inputHandled, elpsTime );
+	m_playLevel->ProcessInput( inputHandled, elpsTime );
 	m_map->ProcessInput( inputHandled, elpsTime );
 	m_main->ProcessInput( inputHandled, elpsTime );
 
-	if ( !g_game->m_game_paused )
+	if ( !g_game->m_gamePaused )
 	{
 		m_gameSpeed->ProcessInput( inputHandled );
 	}
@@ -617,13 +623,14 @@ void GameGUI::Update( float elpsTime )
 	m_confirmExit->Update( elpsTime );
 	m_achivements->Update( elpsTime );
 	m_settings->Update( elpsTime );
+	m_playLevel->Update( elpsTime );
 	m_map->Update( elpsTime );
 	m_pause->Update( elpsTime );
 	m_powerAttaks->Update( elpsTime );
 
 	Config::GetData()->game_speed = m_gameSpeed->GetBlendingValue();
 	
-	if ( !g_game->m_game_currentLevel || g_game->m_game_paused )
+	if ( !g_game->m_currentLevel || g_game->m_gamePaused )
 	{
 		m_powerAttaks->State_SetIndex(0);
 		m_goldPeople->m_back->State_SetIndex(0);
@@ -668,6 +675,7 @@ void GameGUI::Draw( DWORD flag )
 	m_victory->Draw( flag );
 	m_main->Draw( flag );
 	m_map->Draw( flag );
+	m_playLevel->Draw( flag );
 	m_profile->Draw( flag );
 	m_achivements->Draw( flag );
 	m_settings->Draw( flag );
@@ -703,7 +711,7 @@ void GameGUI::MsgProc( UINT recieverID, UINT msg, void* data )
 	case GMT_GAME_RESET:
 	case GMT_LEVEL_LOAD:
 		{
-			if ( g_game->m_game_currentLevel == 0 )
+			if ( g_game->m_currentLevel == 0 )
 				m_main->Show();
 
 			m_gameSpeed->SetValue(1.0f);
@@ -746,6 +754,7 @@ void GameGUI::MsgProc( UINT recieverID, UINT msg, void* data )
 	m_pause->MsgProc( recieverID, msg, data );
 	m_main->MsgProc( recieverID, msg, data );
 	m_map->MsgProc( recieverID, msg, data );
+	m_playLevel->MsgProc( recieverID, msg, data );
 	m_achivements->MsgProc( recieverID, msg, data );
 	m_settings->MsgProc( recieverID, msg, data );
 	m_profile->MsgProc( recieverID, msg, data );

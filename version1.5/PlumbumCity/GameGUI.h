@@ -82,6 +82,7 @@ public:
 	MenuStatus*					m_status;
 	MenuMain*					m_main;
 	MenuMap*					m_map;
+	MenuPlayLevel*				m_playLevel;
 	MenuProfile*				m_profile;
 	MenuAchievements*			m_achivements;
 	MenuSettings*				m_settings;

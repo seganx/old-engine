@@ -24,6 +24,8 @@ namespace GM
 		, m_rotMax(0.5f, 1.0f, 0)
 		, m_fov(PI / 8.0f)
 		, m_forceFeedback(0.03f)
+		, m_cameraSpeed(0.01f)
+		, m_cameraBreath(0.001f)
 		, m_fire(0)
 		, m_bullets(0)
 		, m_firedCount(0)
@@ -127,8 +129,8 @@ namespace GM
 				}
 			}
 
-			m_rotOffset.x += SEGAN_MOUSE_RLY(0) * 0.002f;
-			m_rotOffset.y += SEGAN_MOUSE_RLX(0) * 0.002f;
+			m_rotOffset.x += SEGAN_MOUSE_RLY(0) * 0.002f * m_cameraSpeed;
+			m_rotOffset.y += SEGAN_MOUSE_RLX(0) * 0.002f * m_cameraSpeed;
 			if ( m_rotOffset.x > m_rotMax.x )  { m_rotOffset.x =  m_rotMax.x; }
 			if ( m_rotOffset.y > m_rotMax.y )  { m_rotOffset.y =  m_rotMax.y; }
 			if ( m_rotOffset.x < -m_rotMax.x ) { m_rotOffset.x = -m_rotMax.x; }
@@ -230,7 +232,7 @@ namespace GM
 				}
 				else
 				{
-					switch ( g_game->m_game_mode )
+					switch ( g_game->m_gameMode )
 					{
 					case 0 : str << L"config_default.txt"; break;
 					case 1 : str << L"config_warrior.txt"; break;
@@ -269,6 +271,8 @@ namespace GM
 							script.GetFloat(i, L"maxTheta", m_rotMax.x);
 							script.GetFloat(i, L"fov", m_fov);
 							script.GetFloat(i, L"forceFeedback", m_forceFeedback);
+							script.GetFloat(i, L"cameraSpeed", m_cameraSpeed);
+							script.GetFloat(i, L"cameraBreath", m_cameraBreath);
 							script.GetInteger(i, L"bulletsCount", m_bullets);
 
 							if ( script.GetString(i, L"bullet", tmpStr) )
@@ -405,7 +409,12 @@ namespace GM
 		camera.FOV = m_fov;
 		camera.Eye = m_nodeCamera->GetPosition_world();
 
-		float3 dir(0, 0, 0.1f);
+		static float s_time = 0;
+		s_time += elpsTime * m_cameraBreath * 0.3f;
+		float3 dir( 
+			0.4f * m_cameraBreath * sx_sin( s_time ),
+			0.4f * m_cameraBreath * sx_cos( s_time * 3.0f ) * sx_sin( s_time * 2.0f ), 
+			0.1f );
 		dir.Transform_Norm( dir, m_nodeCamera->GetMatrix_world() );
 		camera.Eye += dir;
 		camera.At = camera.Eye + dir * 10.0f;

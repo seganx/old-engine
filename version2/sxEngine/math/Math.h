@@ -44,28 +44,28 @@ public:
 	void Identity( void );
 
 	//! compare the matrix and return true if all elements are the same
-	bool EqualTo( const Matrix& m );
+	bool EqualTo( const float* m );
 
  	//! calculate the determinant of matrix
  	float Determinant( void );
  
  	//! calculate the transpose of matrix m into this. this = transpose(m)
- 	void Transpose( const Matrix& m );
+ 	void Transpose( const float* m );
  
  	//! calculate the inverse of matrix m to this. this = inverse(m)
- 	void Inverse( const Matrix& m );
+ 	void Inverse( const float* m );
 
 	//! add two matrix and put the result to this. this = m1 + m2
-	void Add( const Matrix& m1, const Matrix& m2 );
+	void Add( const float* m1, const float* m2 );
 
 	//! subtract two matrix and put the result to this. this = m1 - m2
-	void Subtract( const Matrix& m1, const Matrix& m2 );
+	void Subtract( const float* m1, const float* m2 );
 
 	//! multiply two matrix and put the result to this. this = m1 * m2
-	void Multiply( const Matrix& m1, const Matrix& m2 );
+	void Multiply( const float* m1, const float* m2 );
 
 	//! divide two matrix and put the result to this. this = m1 / m2
-	void Divide( const Matrix& m1, const Matrix& m2 );
+	void Divide( const float* m1, const float* m2 );
  
 	//! make this as a rotation matrix in pitch/yaw/roll system
 	void SetRotationPitchYawRoll( const float pitch, const float yaw, const float roll );
@@ -77,16 +77,16 @@ public:
 	void SetDirection( const float* dir, const float* up );
 
 	//! get direction of this matrix. dir and/or up vector can be null
-	void GetDirection( float* OUT dir, float* OUT up = null ); 
+	void GetDirection( float* OUT dir, float* OUT up = null ) const; 
 
  	//! set translation of this matrix without change of rotation
  	void SetTranslation( const float x, const float y, const float z );
 
 	//! transform src vector by this matrix to the dest vector
-	void TransformNormal( float* OUT dest, const float* src );
+	void TransformNormal( float* OUT dest, const float* src ) const;
 
 	//! transform src point by this matrix to the dest point
-	void TransformPoint( float* OUT dest, const float* src );
+	void TransformPoint( float* OUT dest, const float* src ) const;
  
  	//! make this to an scaling matrix. Use this with care. some objects in 3d space have no absolute scale. like rigid bodies, triggers, etc
  	void Scale( const float x, const float y, const float z );
@@ -116,88 +116,113 @@ public:
 typedef Matrix float4x4;
 
 
-#if 0
 
 //////////////////////////////////////////////////////////////////////////
 //	VECTOR 2D
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_ENG_API Vector2 : public D3DXVECTOR2
+class SEGAN_ENG_API float2
 {
 public:
-	Vector2( void );
-	Vector2( const float * );
-	Vector2( const Vector2& v );
-	Vector2( float x, float y );
+	float2() {};
+	float2( const float* p );
+	float2( const float2& v );
+	float2( const float x, const float y );
+
+	SEGAN_INLINE operator const float* ( void ) const { return e; }
 
 	//! set new value for this vector
-	void  Set(float x, float y);
+	void  Set( const float x, const float y );
 
 	//! normalize the vector v to this. this = normalize(v)
-	void  Normalize(Vector2& v);
+	void  Normalize( const float* v );
 
 	//! return the length of vector
-	float Length(void);
+	float Length( void ) const;
 
 	//! return distance between this and v
-	float Distance(Vector2& v);
+	float Distance( const float* v ) const;
 
 	//! return the value of dot product of this and v. (this.v)
-	float Dot(Vector2& v);
+	float Dot( const float* v ) const;
 
 	//! return the angle between this and v
-	float Angle(Vector2& v);
+	float Angle( const float* v ) const;
 
 	//! return interpolated vector of v1 and v2 by weight of w to this
-	void  Lerp(Vector2& v1, Vector2& v2, float w);
+	void  Lerp( const float* v1, const float* v2, const float w );
 
+public:
+
+	union {
+		struct {
+			float x;
+			float y;
+		};
+
+		float e[2];	//	element vector
+	};
 };
-typedef Vector2	*PVector2, float2, *pfloat2;
 
 //////////////////////////////////////////////////////////////////////////
 //	VECTOR 3D
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_ENG_API Vector3 : public D3DXVECTOR3
+class SEGAN_ENG_API float3
 {
 public:
-	Vector3( void );
-	Vector3( const float * );
-	Vector3( const D3DVECTOR& v );
-	Vector3( float x, float y, float z );
+	float3() {};
+	float3( const float* p );
+	float3( const float3& v );
+	float3( const float x, const float y, const float z );
+
+	SEGAN_INLINE operator const float* ( void ) const { return e; }
 
 	//! set new value for this vector
-	void Set(float x, float y, float z);
+	void Set( const float x, const float y, const float z );
 
 	//! normalize the vector v to this. this = normalize(v)
-	void  Normalize(const Vector3& v);
+	void Normalize( const float* v );
 
 	//! return the length of vector
-	float Length(void);
+	float Length( void ) const;
 
 	//! return distance between this and v
-	float Distance(const Vector3& v) const;
+	float Distance( const float* v ) const;
 
 	//! return square of distance between this and v
-	float Distance_sqr(const Vector3& v) const;
+	float DistanceSqr( const float* v ) const;
 
 	//! return the value of dot product of this and v. (this.v)
-	float Dot(const Vector3& v);
+	float Dot( const float* v ) const;
 
 	//! return the vector of cross product of v1 and v2 to this. this = (v2 x v2)
-	void Cross(const Vector3& v1, const Vector3& v2);
+	void Cross( const float* v1, const float* v2 );
 
 	//! return interpolated vector of v1 and v2 by weight of w to this
-	void  Lerp(Vector3& v1, Vector3& v2, float w);
+	void Lerp( const float* v1, const float* v2, const float w );
 
 	//! transform vector v to this by matrix m WITH interference of translation
-	void  Transform(const Vector3& v, const Matrix& m);
+	void TransformPoint( const float* v, const float* matrix );
 
 	//! transform vector v to this by matrix m WITHOUT interference of translation
-	void  Transform_Norm(const Vector3& vIn, const Matrix& m);
+	void TransformNorm( const float* v, const float* matrix );
 
-	//! project vector to the screen space
-	void  ProjectToScreen(const Vector3& vIn, const Matrix& matWorld, const Matrix& matView, const Matrix& matProj, const D3DVIEWPORT9& vp);
+	//! project vector to the screen space. view port must contain x, y, width, height
+	void ProjectToScreen( const float* v, const float* worldViewProjection, const int* viewport );
+
+public:
+
+	union {
+		struct {
+			float x;
+			float y;
+			float z;
+		};
+
+		float e[3];	//	element vector
+	};
 };
-typedef Vector3 *PVector3, Vector, *PVector, float3, *pfloat3;
+
+#if 0
 
 //////////////////////////////////////////////////////////////////////////
 //	VECTOR 4D

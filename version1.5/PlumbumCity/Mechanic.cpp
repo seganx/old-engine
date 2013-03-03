@@ -93,6 +93,6 @@ FORCEINLINE GM::Mechanic* GM::Mechanic::GetFocused( void )
 
 bool GM::Mechanic::NotInGame( void )
 {
-	return !g_game->m_game_currentLevel || g_game->m_game_paused;
+	return !g_game->m_currentLevel || g_game->m_gamePaused;
 }
 

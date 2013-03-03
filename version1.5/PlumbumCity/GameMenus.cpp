@@ -217,7 +217,7 @@ void MenuMain::ProcessInput( bool& inputHandled, float elpsTime )
 	if ( inputHandled ) return;
 	sx_callstack();
 
-	if ( g_game->m_game_currentLevel == 0 && m_slantBack->State_GetIndex() )
+	if ( g_game->m_currentLevel == 0 && m_slantBack->State_GetIndex() )
 	{
 		if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_ESCAPE ) )
 		{
@@ -238,7 +238,7 @@ void MenuMain::Update( float elpsTime )
 	static int firstTime = 1;
 	if ( elpsTime > 100 ) return;
 
-	if ( g_game->m_game_currentLevel == 0 && !g_game->m_app_Loading )
+	if ( g_game->m_currentLevel == 0 && !g_game->m_app_Loading )
 	{
 		m_time += elpsTime;
 
@@ -509,50 +509,6 @@ void MenuMap::Initialize( void )
 	m_chooser->State_GetByIndex(0).Color.Set(0,0,0,0);
 
 
-	//	create buttons
-	m_playGame = sx_new( sx::gui::PanelEx );
-	m_playGame->SetUserTag( 10 );
-	m_playGame->SetParent( m_back );
-	m_playGame->SetSize( float2(128, 128) );
-	m_playGame->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
-	m_playGame->GetElement(0)->SetTextureSrc( L"gui_menu_map_play.txr" );
-	m_playGame->State_GetByIndex(0).Position.Set( -340.0f, 192.0f, 0.0f );
-	m_playGame->State_Add();
-	m_playGame->State_GetByIndex(1).Scale.Set( 1.15f, 1.15f, 1.0f );
-	m_playGame->State_GetByIndex(1).Blender.Set( 0.1f, 0.7f );
-	SEGAN_GUI_SET_ONENTER( m_playGame, Menu::OnEnter );
-	SEGAN_GUI_SET_ONEXIT( m_playGame, Menu::OnExit );
-	SEGAN_GUI_SET_ONCLICK( m_playGame, MenuMap::OnClick );
-
-
-	m_miniGame = sx_new( sx::gui::PanelEx );
-	m_miniGame->SetUserTag( 11 );
-	m_miniGame->SetParent( m_back );
-	m_miniGame->SetSize( float2(64, 64) );
-	m_miniGame->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
-	m_miniGame->GetElement(0)->SetTextureSrc( L"gui_menu_map_mini.txr" );
-	m_miniGame->State_GetByIndex(0).Position.Set( -340.0f, 112.0f, 0.0f );
-	m_miniGame->State_Add();
-	m_miniGame->State_GetByIndex(1).Scale.Set( 1.15f, 1.15f, 1.0f );
-	m_miniGame->State_GetByIndex(1).Blender.Set( 0.1f, 0.7f );
-	SEGAN_GUI_SET_ONENTER( m_miniGame, Menu::OnEnter );
-	SEGAN_GUI_SET_ONEXIT( m_miniGame, Menu::OnExit );
-	SEGAN_GUI_SET_ONCLICK( m_miniGame, MenuMap::OnClick );
-
-	m_upgrade = sx_new( sx::gui::PanelEx );
-	m_upgrade->SetUserTag( 12 );
-	m_upgrade->SetParent( m_back );
-	m_upgrade->SetSize( float2(64, 64) );
-	m_upgrade->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
-	m_upgrade->GetElement(0)->SetTextureSrc( L"gui_menu_map_upgrade.txr" );
-	m_upgrade->State_GetByIndex(0).Position.Set( -324.0f, 52.0f, 0.0f );
-	m_upgrade->State_Add();
-	m_upgrade->State_GetByIndex(1).Scale.Set( 1.15f, 1.15f, 1.0f );
-	m_upgrade->State_GetByIndex(1).Blender.Set( 0.1f, 0.7f );
-	SEGAN_GUI_SET_ONENTER( m_upgrade, Menu::OnEnter );
-	SEGAN_GUI_SET_ONEXIT( m_upgrade, Menu::OnExit );
-	SEGAN_GUI_SET_ONCLICK( m_upgrade, MenuMap::OnClick );
-
 	//	create back button
 	m_goback = sx_new( sx::gui::Button );
 	m_goback->SetUserTag( 13 );
@@ -568,91 +524,7 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuMap::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
 
-	//	create game mode
-	m_mode_scroll = sx_new( sx::gui::TrackBar );
-	m_mode_scroll->SetMax(2);
-	m_mode_scroll->SetUserTag( 1 );
-	m_mode_scroll->SetParent( m_back );
-	m_mode_scroll->SetSize( float2(130, 32) );
-	m_mode_scroll->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
-	m_mode_scroll->GetElement(0)->Color().a = 0.0f;
-	m_mode_scroll->GetElement(1)->Color().a = 0.01f;
-	m_mode_scroll->Position().Set( -317.0f, 295.0f, 0.0f );
-	SEGAN_GUI_SET_ONSCROLL( m_mode_scroll, MenuMap::OnScroll );
-
-	sx::gui::Panel* panel = sx_new( sx::gui::Panel );
-	panel->SetParent( m_mode_scroll );
-	panel->SetSize( float2( 80, 32 ) );
-	panel->GetElement(0)->SetTextureSrc( L"gui_menu_map_diff.txr" );
-
-	//	create difficulty
-	m_diff_scroll = sx_new( sx::gui::TrackBar );
-	m_diff_scroll->SetMax(2);
-	m_diff_scroll->SetUserTag( 1 );
-	m_diff_scroll->SetParent( m_back );
-	m_diff_scroll->SetSize( float2(130, 32) );
-	m_diff_scroll->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
-	m_diff_scroll->GetElement(0)->Color().a = 0.0f;
-	m_diff_scroll->GetElement(1)->Color().a = 0.01f;
-	m_diff_scroll->Position().Set( -317.0f, 265.0f, 0.0f );
-	SEGAN_GUI_SET_ONSCROLL( m_diff_scroll, MenuMap::OnScroll );
-
-	panel = sx_new( sx::gui::Panel );
-	panel->SetParent( m_diff_scroll );
-	panel->SetSize( float2( 80, 32 ) );
-	panel->GetElement(0)->SetTextureSrc( L"gui_menu_map_diff.txr" );
-
-	//	create label to show people
-	m_diff_label = sx_new( sx::gui::Label );
-	m_diff_label->SetParent( panel );
-	m_diff_label->SetSize( float2(80, 20) );
-	m_diff_label->SetAlign( GTA_CENTER );
-	m_diff_label->GetElement(0)->Color().a = 0.0f;
-	m_diff_label->GetElement(1)->Color() = 0xaaffffff;
-	m_diff_label->SetFont( L"Font_map_diff.fnt" );
-	m_diff_label->AddProperty( SX_GUI_PROPERTY_MULTILINE );
-	m_diff_label->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
-
-	panel = sx_new( sx::gui::Panel );
-	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
-	panel->SetParent( m_diff_scroll );
-	panel->SetSize( float2( 32, 32 ) );
-	panel->GetElement(0)->Color().a = 0.01f;
-	panel->SetUserTag( 2 );
-	panel->Position().x = m_diff_scroll->GetSize().x * 0.5f + 16;
-	SEGAN_GUI_SET_ONCLICK( panel, MenuMap::OnScroll );
-
-	panel = sx_new( sx::gui::Panel );
-	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
-	panel->SetParent( m_diff_scroll );
-	panel->SetSize( float2( 32, 32 ) );
-	panel->GetElement(0)->Color().a = 0.01f;
-	panel->SetUserTag( 3 );
-	panel->Position().x = - m_diff_scroll->GetSize().x * 0.5f - 16;
-	SEGAN_GUI_SET_ONCLICK( panel, MenuMap::OnScroll );
-
-	//	load some default value
-	String str = sx::sys::FileManager::Project_GetDir();
-	str << L"strings.txt";
-	Scripter script;
-	script.Load( str );
-	for (int i=0; i<script.GetObjectCount(); i++)
-	{
-		str512 tmpStr;
-		if ( script.GetString(i, L"Type", tmpStr) && tmpStr == L"Strings" )
-		{
-			if ( !script.GetString(i, L"Name", tmpStr) )
-				continue;
-
-			if ( tmpStr == L"DifficultyButton" )
-			{
-				script.GetString( i, L"norm",	m_diff_norm_text	);
-				script.GetString( i, L"hard",	m_diff_hard_text	);
-				script.GetString( i, L"insane", m_diff_insane_text	);
-				break;
-			}
-		}
-	}
+	
 }
 
 void MenuMap::Finalize( void )
@@ -674,7 +546,7 @@ void MenuMap::ProcessInput( bool& inputHandled, float elpsTime )
 	}
 	else if ( !inputHandled && SEGAN_KEYUP( 0, SX_INPUT_KEY_RETURN ) )
 	{
-		OnClick( m_playGame );
+//		OnClick( m_playGame );
 		inputHandled = true;
 		return;
 	}
@@ -684,7 +556,7 @@ void MenuMap::ProcessInput( bool& inputHandled, float elpsTime )
 
 void MenuMap::Update( float elpsTime )
 {
-	if ( g_game->m_game_currentLevel == 0 )
+	if ( g_game->m_currentLevel == 0 )
 	{
 		static float rotatez = 0;
 		rotatez += elpsTime * 0.002f;
@@ -744,18 +616,8 @@ void MenuMap::Update( float elpsTime )
 
 	}
 
-	{
-		float x, y, z;
-		m_diff_scroll->GetElement(1)->Matrix().GetTranslation(x, y, z);
-		sx::gui::Panel* panel = (sx::gui::PPanel)m_diff_scroll->GetChild(0);
-		panel->Position().Set( x, y, z );
-
-		m_mode_scroll->GetElement(1)->Matrix().GetTranslation(x, y, z);
-		panel = (sx::gui::PPanel)m_mode_scroll->GetChild(0);
-		panel->Position().Set( x, y, z );
-	}
-
 	Menu::Update(elpsTime);
+
 }
 
 void MenuMap::Draw( DWORD flag )
@@ -781,10 +643,6 @@ void MenuMap::Show( void )
 	m_selectedLevel = g_game->m_player->m_profile.level_selected;
 	SEGAN_CLAMP( m_selectedLevel, 1, 10 );
 	m_chooser->State_SetIndex( m_selectedLevel );
-
-	//	load from player profile
-	m_mode_scroll->SetValue( (float)g_game->m_player->m_profile.curGameMode );
-	m_diff_scroll->SetValue( (float)g_game->m_player->m_profile.curDifficulty );
 
 	Menu::Show();
 	m_frame = 0;
@@ -835,58 +693,8 @@ void MenuMap::OnClick( sx::gui::PControl sender )
 
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
-		}
-		break;
 
-	case 10:	//	play
-		{
-			g_game->m_miniGame = false;
-			g_game->m_game_nextLevel = m_selectedLevel;
-
-			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
-			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
-
-			Hide();
-			g_game->m_gui->m_main->Hide();
-		}
-		break;
-
-	case 11:	// play mini game
-		{
-			if ( g_game->m_player->m_profile.level > m_selectedLevel )
-			{
-				g_game->m_miniGame = true;
-				g_game->m_game_nextLevel = m_selectedLevel;
-
-				msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
-				m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
-
-				Hide();
-				g_game->m_gui->m_main->Hide();
-			}
-			else
-			{
-				msg_SoundPlay msg( true, 0, 0, L"menu_minigame" );
-				m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
-			}
-		}
-		break;
-
-	case 12:	// upgrade
-		{
-// 			Hide();
-// 			g_game->m_gui->m_main->Show();
-// 			g_game->m_gui->m_main->m_mainBack->State_SetIndex(1);
-			
-			g_game->m_gui->m_upgradePanel->SetData (
-				g_game->m_player->m_profile.level, 
-				g_game->m_player->m_profile.GetNumStars(), 
-				g_game->m_player->m_profile.upgrades 
-				);
-			g_game->m_gui->m_upgradePanel->Show();
-
-			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
-			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+			g_game->m_gui->m_playLevel->Show( m_selectedLevel, false );
 		}
 		break;
 
@@ -904,7 +712,355 @@ void MenuMap::OnClick( sx::gui::PControl sender )
 	}
 }
 
-void MenuMap::OnScroll( sx::gui::PControl sender )
+//////////////////////////////////////////////////////////////////////////
+//	level menu
+//////////////////////////////////////////////////////////////////////////
+void MenuPlayLevel::Initialize( void )
+{
+	Menu::Initialize();
+	m_level = 0;
+
+	m_back->SetSize( float2( 1, 1 ) );
+	m_back->State_GetByIndex(0).Blender.Set( 0.3f, 0.3f );
+	m_back->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
+	m_back->State_GetByIndex(1).Blender.Set( 0.07f, 0.6f );
+	m_back->State_GetByIndex(1).Color.Set( 0, 0, 0, 1.0f );
+
+	sx::gui::Panel* panel = sx_new( sx::gui::Panel );
+	panel->SetParent( m_back );
+	panel->SetSize( float2( 4096, 4096 ) );
+	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	panel->GetElement(0)->Color() = D3DColor( 0.0f, 0.0f, 0.0f, 0.5f );
+	
+	panel = sx_new( sx::gui::Panel );
+	panel->SetParent( m_back );
+	panel->SetSize( float2( 512, 512 ) );
+	panel->GetElement(0)->SetTextureSrc( L"gui_menu_play_level.txr" );
+
+	//	create buttons
+	m_playGame = sx_new( sx::gui::PanelEx );
+	m_playGame->SetUserTag( 10 );
+	m_playGame->SetParent( m_back );
+	m_playGame->SetSize( float2(128, 128) );
+	m_playGame->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_playGame->GetElement(0)->SetTextureSrc( L"gui_menu_map_play.txr" );
+	m_playGame->State_GetByIndex(0).Position.Set( 200.0f, 100.0f, 0.0f );
+	m_playGame->State_Add();
+	m_playGame->State_GetByIndex(1).Scale.Set( 1.15f, 1.15f, 1.0f );
+	m_playGame->State_GetByIndex(1).Blender.Set( 0.1f, 0.7f );
+	SEGAN_GUI_SET_ONENTER( m_playGame, Menu::OnEnter );
+	SEGAN_GUI_SET_ONEXIT( m_playGame, Menu::OnExit );
+	SEGAN_GUI_SET_ONCLICK( m_playGame, MenuPlayLevel::OnClick );
+
+
+	m_miniGame = sx_new( sx::gui::PanelEx );
+	m_miniGame->SetUserTag( 11 );
+	m_miniGame->SetParent( m_back );
+	m_miniGame->SetSize( float2(64, 64) );
+	m_miniGame->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_miniGame->GetElement(0)->SetTextureSrc( L"gui_menu_map_mini.txr" );
+	m_miniGame->State_GetByIndex(0).Position.Set( 100.0f, 100.0f, 0.0f );
+	m_miniGame->State_Add();
+	m_miniGame->State_GetByIndex(1).Scale.Set( 1.15f, 1.15f, 1.0f );
+	m_miniGame->State_GetByIndex(1).Blender.Set( 0.1f, 0.7f );
+	SEGAN_GUI_SET_ONENTER( m_miniGame, Menu::OnEnter );
+	SEGAN_GUI_SET_ONEXIT( m_miniGame, Menu::OnExit );
+	SEGAN_GUI_SET_ONCLICK( m_miniGame, MenuPlayLevel::OnClick );
+
+	m_upgrade = sx_new( sx::gui::PanelEx );
+	m_upgrade->SetUserTag( 12 );
+	m_upgrade->SetParent( m_back );
+	m_upgrade->SetSize( float2(64, 64) );
+	m_upgrade->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_upgrade->GetElement(0)->SetTextureSrc( L"gui_menu_map_upgrade.txr" );
+	m_upgrade->State_GetByIndex(0).Position.Set( 0.0f, 100.0f, 0.0f );
+	m_upgrade->State_Add();
+	m_upgrade->State_GetByIndex(1).Scale.Set( 1.15f, 1.15f, 1.0f );
+	m_upgrade->State_GetByIndex(1).Blender.Set( 0.1f, 0.7f );
+	SEGAN_GUI_SET_ONENTER( m_upgrade, Menu::OnEnter );
+	SEGAN_GUI_SET_ONEXIT( m_upgrade, Menu::OnExit );
+	SEGAN_GUI_SET_ONCLICK( m_upgrade, MenuPlayLevel::OnClick );
+
+	//	create game mode
+	for ( int i=0; i<3; ++i )
+	{
+		sx::gui::CheckBox* ch = sx_new( sx::gui::CheckBox );
+		ch->SetUserTag( i );
+		ch->SetParent( m_back );
+		ch->SetSize( float2( 64, 64 ) );
+		ch->GetElement(1)->SetTextureSrc( L"gui_menu_play_mode.txr" );
+		ch->Position().Set( ( i * 70.0f ) - 200.0f, - 200.0f, 0.0f );
+		SEGAN_GUI_SET_ONCLICK( ch, MenuPlayLevel::OnClick );
+		switch ( i ) {
+		case 0:	ch->GetElement(0)->SetTextureSrc( L"gui_menu_play_mode_0.txr" ); break;
+		case 1:	ch->GetElement(0)->SetTextureSrc( L"gui_menu_play_mode_1.txr" ); break;
+		case 2:	ch->GetElement(0)->SetTextureSrc( L"gui_menu_play_mode_2.txr" ); break;
+		}
+
+		m_mode[i] = ch;
+	}
+
+	//	create difficulty
+	m_diff_scroll = sx_new( sx::gui::TrackBar );
+	m_diff_scroll->SetMax(2);
+	m_diff_scroll->SetUserTag( 1 );
+	m_diff_scroll->SetParent( m_back );
+	m_diff_scroll->SetSize( float2(130, 32) );
+	m_diff_scroll->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
+	m_diff_scroll->GetElement(0)->Color().a = 0.0f;
+	m_diff_scroll->GetElement(1)->Color().a = 0.01f;
+	m_diff_scroll->Position().Set( -100.0f, -100.0f, 0.0f );
+	SEGAN_GUI_SET_ONSCROLL( m_diff_scroll, MenuPlayLevel::OnScroll );
+
+	panel = sx_new( sx::gui::Panel );
+	panel->SetParent( m_diff_scroll );
+	panel->SetSize( float2( 80, 32 ) );
+	panel->GetElement(0)->SetTextureSrc( L"gui_menu_map_diff.txr" );
+
+	//	create label to show people
+	m_diff_label = sx_new( sx::gui::Label );
+	m_diff_label->SetParent( panel );
+	m_diff_label->SetSize( float2(80, 20) );
+	m_diff_label->SetAlign( GTA_CENTER );
+	m_diff_label->GetElement(0)->Color().a = 0.0f;
+	m_diff_label->GetElement(1)->Color() = 0xaaffffff;
+	m_diff_label->SetFont( L"Font_map_diff.fnt" );
+	m_diff_label->AddProperty( SX_GUI_PROPERTY_MULTILINE );
+	m_diff_label->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
+
+	panel = sx_new( sx::gui::Panel );
+	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	panel->SetParent( m_diff_scroll );
+	panel->SetSize( float2( 32, 32 ) );
+	panel->GetElement(0)->Color().a = 0.01f;
+	panel->SetUserTag( 2 );
+	panel->Position().x = m_diff_scroll->GetSize().x * 0.5f + 16;
+	SEGAN_GUI_SET_ONCLICK( panel, MenuPlayLevel::OnScroll );
+
+	panel = sx_new( sx::gui::Panel );
+	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	panel->SetParent( m_diff_scroll );
+	panel->SetSize( float2( 32, 32 ) );
+	panel->GetElement(0)->Color().a = 0.01f;
+	panel->SetUserTag( 3 );
+	panel->Position().x = - m_diff_scroll->GetSize().x * 0.5f - 16;
+	SEGAN_GUI_SET_ONCLICK( panel, MenuPlayLevel::OnScroll );
+
+	//	load some default value
+	String str = sx::sys::FileManager::Project_GetDir();
+	str << L"strings.txt";
+	Scripter script;
+	script.Load( str );
+	for (int i=0; i<script.GetObjectCount(); i++)
+	{
+		str512 tmpStr;
+		if ( script.GetString(i, L"Type", tmpStr) && tmpStr == L"Strings" )
+		{
+			if ( !script.GetString(i, L"Name", tmpStr) )
+				continue;
+
+			if ( tmpStr == L"DifficultyButton" )
+			{
+				script.GetString( i, L"norm",	m_diff_text[0]	);
+				script.GetString( i, L"hard",	m_diff_text[1]	);
+				script.GetString( i, L"insane", m_diff_text[2]	);
+				break;
+			}
+		}
+	}
+
+	//	create back button
+	m_goback = sx_new( sx::gui::Button );
+	m_goback->SetUserTag( 13 );
+	m_goback->SetParent( m_back );
+	m_goback->SetSize( float2( 128, 32 ) );
+	m_goback->Position().Set( -200.0f, 0.0f, 0.0f );
+	m_goback->GetElement(0)->SetTextureSrc( L"gui_menu_back.txr" );
+	m_goback->GetElement(0)->Color().a = 0.5f;
+	m_goback->GetElement(1)->SetTextureSrc( L"gui_menu_back.txr" );
+	m_goback->GetElement(1)->Color().a = 1.0f;
+	m_goback->GetElement(2)->SetTextureSrc( L"gui_menu_back.txr" );
+	m_goback->GetElement(2)->Color().a = 0.5f;
+	SEGAN_GUI_SET_ONCLICK( m_goback, MenuPlayLevel::OnClick );
+	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
+}
+
+void MenuPlayLevel::Finalize( void )
+{
+	Menu::Finalize();
+}
+
+void MenuPlayLevel::ProcessInput( bool& inputHandled, float elpsTime )
+{
+	if ( !m_back->State_GetIndex() ) return;
+	sx_callstack();
+
+	if ( !inputHandled && SEGAN_KEYUP( 0, SX_INPUT_KEY_ESCAPE ) )
+	{
+		Hide();
+		inputHandled = true;
+		return;
+	}
+	else if ( !inputHandled && SEGAN_KEYUP( 0, SX_INPUT_KEY_RETURN ) )
+	{
+		OnClick( m_playGame );
+		inputHandled = true;
+		return;
+	}
+
+	Menu::ProcessInput( inputHandled, elpsTime );
+}
+
+void MenuPlayLevel::Update( float elpsTime )
+{
+	{
+		float x, y, z;
+		m_diff_scroll->GetElement(1)->Matrix().GetTranslation(x, y, z);
+		sx::gui::Panel* panel = (sx::gui::PPanel)m_diff_scroll->GetChild(0);
+		panel->Position().Set( x, y, z );
+	}
+
+	Menu::Update(elpsTime);
+}
+
+void MenuPlayLevel::Draw( DWORD flag )
+{
+	sx_callstack();
+	Menu::Draw(flag);
+}
+
+void MenuPlayLevel::Show( const int level, const bool inGame )
+{
+	m_level = level;
+	m_InGame = inGame;
+
+	//	prepare GUI of game mode
+	m_mode[0]->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+	m_mode[1]->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+	m_mode[2]->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+	m_mode[0]->Checked() = m_mode[1]->Checked() = m_mode[2]->Checked() = false;
+
+	int playerGameMode = g_game->m_player->m_profile.curGameMode;
+	switch ( playerGameMode ) {
+	case 2:	m_mode[2]->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+	case 1:	m_mode[1]->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+	case 0:	m_mode[0]->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+	}
+
+	//	verify game modes in profile
+	int levelGameMode = g_game->m_player->m_profile.gameMode[ m_level ];
+	if ( levelGameMode > playerGameMode )
+		g_game->m_player->m_profile.gameMode[ m_level ] = levelGameMode = playerGameMode;
+
+	// apply game mode to the gui and game structure
+	g_game->m_gameMode = levelGameMode;
+	m_mode[ g_game->m_gameMode ]->Checked() = true;
+
+	//	apply defficulty values
+	m_diff_scroll->SetValue( (float)g_game->m_player->m_profile.curDifficulty );
+
+	if ( m_InGame )
+	{
+		m_goback->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+		m_miniGame->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+	}
+	else
+	{
+		m_goback->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+		m_miniGame->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+	}
+
+
+	Menu::Show();
+}
+
+void MenuPlayLevel::Hide( void )
+{
+	Menu::Hide();
+
+	if ( m_InGame )
+	{
+		g_game->m_gui->m_victory->Hide();
+	}
+}
+
+void MenuPlayLevel::OnClick( sx::gui::PControl sender )
+{
+	if ( !sender ) return;
+
+	switch ( sender->GetUserTag() )
+	{
+	case 0: case 1: case 2:	// game mode
+		g_game->m_player->m_profile.gameMode[ m_level ] = g_game->m_gameMode = sender->GetUserTag();
+		m_mode[0]->Checked() = m_mode[1]->Checked() = m_mode[2]->Checked() = false;
+		m_mode[ g_game->m_gameMode ]->Checked() = true;
+		break;
+
+	case 10:	//	play
+		{
+			g_game->m_miniGame = false;
+			g_game->m_nextLevel = m_level;
+
+			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
+			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+
+			Hide();
+			if ( !m_InGame )
+			{
+				g_game->m_gui->m_map->Hide();
+				g_game->m_gui->m_main->Hide();
+			}
+		}
+		break;
+
+	case 11:	// play mini game
+		{
+			if ( g_game->m_player->m_profile.level > m_level )
+			{
+				g_game->m_miniGame = true;
+				g_game->m_nextLevel = m_level;
+
+				msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
+				m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+
+				Hide();
+				g_game->m_gui->m_map->Hide();
+				g_game->m_gui->m_main->Hide();
+			}
+			else
+			{
+				msg_SoundPlay msg( true, 0, 0, L"menu_minigame" );
+				m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+			}
+		}
+		break;
+
+	case 12:	// upgrade
+		{
+			g_game->m_gui->m_upgradePanel->SetData (
+				g_game->m_player->m_profile.level, 
+				g_game->m_player->m_profile.GetNumStars(), 
+				g_game->m_player->m_profile.upgrades 
+				);
+			g_game->m_gui->m_upgradePanel->Show();
+
+			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
+			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+		}
+		break;
+
+	case 13:	// back
+		{
+			Hide();
+			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
+			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+		}
+		break;
+
+	}
+}
+
+void MenuPlayLevel::OnScroll( sx::gui::PControl sender )
 {
 	if ( !sender ) return;
 
@@ -919,24 +1075,9 @@ void MenuMap::OnScroll( sx::gui::PControl sender )
 		break;
 	}
 
-	g_game->m_player->m_profile.curGameMode = int( m_mode_scroll->GetValue() + 0.5f );
 	g_game->m_player->m_profile.curDifficulty = int( m_diff_scroll->GetValue() + 0.5f );
-
-	switch ( g_game->m_player->m_profile.curDifficulty )
-	{
-	case 0:
-		m_diff_label->SetText( m_diff_norm_text );
-		g_game->m_difficultyLevel = 0;
-		break;
-	case 1:
-		m_diff_label->SetText( m_diff_hard_text );
-		g_game->m_difficultyLevel = 1;
-		break;
-	case 2:
-		m_diff_label->SetText( m_diff_insane_text );
-		g_game->m_difficultyLevel = 2;
-		break;
-	}
+	g_game->m_difficultyMode = g_game->m_player->m_profile.curDifficulty;
+	m_diff_label->SetText( m_diff_text[g_game->m_difficultyMode] );
 }
 
 
@@ -1210,7 +1351,7 @@ void MenuProfile::ProcessInput( bool& inputHandled, float elpsTime )
 void MenuProfile::Update( float elpsTime )
 {
 	Menu::Update( elpsTime );
-	if ( g_game->m_game_currentLevel ) return;
+	if ( g_game->m_currentLevel ) return;
 
 	str512 name = m_profiles[m_profIndex].name;
 	if ( name == m_profileName->GetText() )
@@ -1667,7 +1808,7 @@ void MenuSettings::ProcessInput( bool& inputHandled, float elpsTime )
 	if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_ESCAPE ) )
 	{
 		Hide();
-		if ( g_game->m_game_currentLevel )
+		if ( g_game->m_currentLevel )
 			g_game->m_gui->m_pause->Show();
 		else
 			g_game->m_gui->m_main->Show();
@@ -1688,7 +1829,7 @@ void MenuSettings::Show( void )
 	m_mouse->SetValue( Config::GetData()->mouseSpeed );
 	m_applyChange = true;
 
-	if ( g_game->m_game_currentLevel )
+	if ( g_game->m_currentLevel )
 		m_back->State_SetIndex(2);
 	else
 		m_back->State_SetIndex(1);
@@ -1707,7 +1848,7 @@ void MenuSettings::OnClick( sx::gui::PControl sender )
 
 		Config::SaveConfig();
 		Hide();
-		if ( g_game->m_game_currentLevel )
+		if ( g_game->m_currentLevel )
 			g_game->m_gui->m_pause->Show();
 		else
 			g_game->m_gui->m_main->Show();
@@ -1874,8 +2015,8 @@ void MenuConfirmExit::Hide( void )
 	m_form->State_SetIndex(0);
 	Menu::Hide();
 
-	if ( g_game->m_game_currentLevel && m_cancelPause )
-		g_game->m_game_paused = false;
+	if ( g_game->m_currentLevel && m_cancelPause )
+		g_game->m_gamePaused = false;
 }
 
 void MenuConfirmExit::OnClick( sx::gui::PControl sender )
@@ -1886,7 +2027,7 @@ void MenuConfirmExit::OnClick( sx::gui::PControl sender )
 	}
 	else
 	{
-		if ( g_game->m_game_currentLevel == 0 )
+		if ( g_game->m_currentLevel == 0 )
 		{
 			g_game->m_gui->m_profile->SaveProfile();
 		}
@@ -1895,7 +2036,7 @@ void MenuConfirmExit::OnClick( sx::gui::PControl sender )
 		{
 			g_game->PostMessage( 0, GMT_GAME_END, NULL );
 			g_game->m_gui->m_victory->ApplyChangesToProfile();
-			g_game->m_game_waves_comming = false;
+			g_game->m_wavesComming = false;
 		}
 
 		else if ( g_game->m_gui->m_gameOver->IsVisible() )
@@ -1983,7 +2124,7 @@ void MenuStatus::Initialize( void )
 void MenuStatus::Update( float elpsTime )
 {
 	Menu::Update( elpsTime );
-	if ( g_game->m_game_currentLevel || !m_back->State_GetIndex() ) return;
+	if ( g_game->m_currentLevel || !m_back->State_GetIndex() ) return;
 
 	m_playerName->SetText( g_game->m_player->m_name );
 
@@ -2070,7 +2211,7 @@ void MenuPause::ProcessInput( bool& inputHandled, float elpsTime )
 	if ( inputHandled ) return;
 	sx_callstack();
 
-	if ( g_game->m_mouseMode == MS_Null && g_game->m_game_currentLevel && SEGAN_KEYDOWN(0, SX_INPUT_KEY_ESCAPE) )
+	if ( g_game->m_mouseMode == MS_Null && g_game->m_currentLevel && SEGAN_KEYDOWN(0, SX_INPUT_KEY_ESCAPE) )
 	{
 		switch ( m_back->State_GetIndex() )
 		{
@@ -2093,7 +2234,7 @@ void MenuPause::ProcessInput( bool& inputHandled, float elpsTime )
 
 void MenuPause::Update( float elpsTime )
 {
-// 	if ( g_game->m_game_paused )
+// 	if ( g_game->m_gamePaused )
 // 	{
 // 		static float gameTime = 0;
 // 		gameTime += elpsTime;
@@ -2128,10 +2269,10 @@ void MenuPause::Show( void )
 	if ( g_game->m_gui->m_gameOver->m_back->State_GetIndex() ) return;
 	if ( g_game->m_gui->m_settings->m_back->State_GetIndex() ) return;
 
-	g_game->m_game_paused = true;
+	g_game->m_gamePaused = true;
 	g_game->m_mouseMode = MS_Null;
 
-// 	if ( !g_game->m_game_paused )
+// 	if ( !g_game->m_gamePaused )
 // 	{
 // 		g_game->PostMessage( 0, GMT_GAME_PAUSED, NULL );
 // 	}
@@ -2145,7 +2286,7 @@ void MenuPause::Show( void )
 
 void MenuPause::Hide( void )
 {
-	g_game->m_game_paused = false;
+	g_game->m_gamePaused = false;
 	Menu::Hide();
 }
 
@@ -2177,7 +2318,7 @@ void MenuPause::OnClick( sx::gui::PControl sender )
 	case 2: //	setting
 		{
 			Hide();
-			g_game->m_game_paused = true;
+			g_game->m_gamePaused = true;
 			g_game->m_gui->m_settings->Show();
 
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
@@ -2188,7 +2329,7 @@ void MenuPause::OnClick( sx::gui::PControl sender )
 	case 3:	//	exit to menu
 		{
 			Hide();
-			g_game->m_game_nextLevel = 0;
+			g_game->m_nextLevel = 0;
 
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
@@ -2477,7 +2618,8 @@ void MenuVictory::Show( void )
 	}
 	else
 	{
-		m_nextLevel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+		if ( g_game->m_currentLevel < 6 )
+			m_nextLevel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 
 		int deadPeople = g_game->m_player->m_profile.people - g_game->m_player->m_people;
 		if ( deadPeople < 3 )
@@ -2492,7 +2634,7 @@ void MenuVictory::Show( void )
 
 		if ( m_starAdd )
 		{
-			switch ( g_game->m_difficultyLevel )
+			switch ( g_game->m_difficultyMode )
 			{
 			case 0: if ( m_starAdd > 1 ) m_starAdd = 1; break;
 			case 1: if ( m_starAdd > 2 ) m_starAdd = 2; break;
@@ -2531,7 +2673,7 @@ void MenuVictory::Hide( void )
 
 void MenuVictory::ApplyChangesToProfile( void )
 {
-	int curtLevel = g_game->m_game_currentLevel - 1;
+	int curtLevel = g_game->m_currentLevel - 1;
 	int nextLevel = curtLevel + 2;
 
 	//	add people
@@ -2539,8 +2681,8 @@ void MenuVictory::ApplyChangesToProfile( void )
 	g_game->m_player->m_profile.people = g_game->m_player->m_people;
 
 	//	save difficulty level
-	if ( !g_game->m_miniGame && g_game->m_difficultyLevel > g_game->m_player->m_profile.difficulty[ curtLevel ] )
-		g_game->m_player->m_profile.difficulty[ curtLevel ] = g_game->m_difficultyLevel;
+	if ( !g_game->m_miniGame && g_game->m_difficultyMode > g_game->m_player->m_profile.difficulty[ curtLevel ] )
+		g_game->m_player->m_profile.difficulty[ curtLevel ] = g_game->m_difficultyMode;
 
 	//	add stars
 	if ( m_starCount > g_game->m_player->m_profile.stars[ curtLevel ] )
@@ -2575,17 +2717,24 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 
 			//	notify that game has been end
 			g_game->PostMessage( 0, GMT_GAME_END, NULL );
-			g_game->m_game_waves_comming = false;
+			g_game->m_wavesComming = false;
 
 			//	apply changes
 			ApplyChangesToProfile();
 
 			//	go ahead
-			g_game->m_game_nextLevel = usertag ? 0 : g_game->m_game_currentLevel + 1;
+			if ( usertag )
+			{
+				g_game->m_nextLevel = 0;
+				Hide();
+			}
+			else
+			{
+				g_game->m_gui->m_playLevel->Show( g_game->m_currentLevel + 1, true );
+			}
 
-			Hide();
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
-			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg ); 
 		}
 		break;
 
@@ -2600,11 +2749,12 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 		break;
 
 	case 2:		//	upgrades
+		if ( false )
 		{
 			int stars = 0;
 			for ( int i=0; i<10; i++ )
 			{
-				if ( i == g_game->m_game_currentLevel-1 && g_game->m_player->m_profile.stars[i] < m_starCount )
+				if ( i == g_game->m_currentLevel-1 && g_game->m_player->m_profile.stars[i] < m_starCount )
 					stars += m_starCount;
 				else
 					stars += g_game->m_player->m_profile.stars[i];
@@ -2612,7 +2762,7 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 
 			if ( m_setDataToUpgrade )
 			{
-				g_game->m_gui->m_upgradePanel->SetData( g_game->m_game_currentLevel+1, stars, g_game->m_player->m_profile.upgrades );
+				g_game->m_gui->m_upgradePanel->SetData( g_game->m_currentLevel+1, stars, g_game->m_player->m_profile.upgrades );
 				m_setDataToUpgrade = false;
 			}
 			g_game->m_gui->m_upgradePanel->Show();
@@ -2635,7 +2785,7 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 		break;
 	}
 
-	g_game->m_game_paused = false;
+	g_game->m_gamePaused = false;
 }
 
 
@@ -2726,7 +2876,7 @@ void MenuGameOver::OnClick( sx::gui::PControl sender )
 	case 1:		//	main menu
 		{
 			g_game->m_player->SyncPlayerAndGame( true );
-			g_game->m_game_nextLevel = 0;
+			g_game->m_nextLevel = 0;
 
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
@@ -2747,7 +2897,7 @@ void MenuGameOver::OnClick( sx::gui::PControl sender )
 		break;
 	}
 
-	g_game->m_game_paused = false;
+	g_game->m_gamePaused = false;
 }
 
 
@@ -2775,7 +2925,7 @@ void MenuCinematic::Initialize( void )
 
 void MenuCinematic::Update( float elpsTime )
 {
-	if ( g_game->m_game_paused )
+	if ( g_game->m_gamePaused )
 		m_back->State_SetIndex( 1 );
 	else
 		m_back->State_SetIndex( 0 );
@@ -2886,8 +3036,8 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 	switch ( msg )
 	{
 	case GMT_GAME_END:
-		if ( g_game->m_player->m_profile.level_played < g_game->m_game_currentLevel )
-			g_game->m_player->m_profile.level_played = g_game->m_game_currentLevel;
+		if ( g_game->m_player->m_profile.level_played < g_game->m_currentLevel )
+			g_game->m_player->m_profile.level_played = g_game->m_currentLevel;
 
 	case GMT_GAME_RESETING:
 	case GMT_LEVEL_CLEAR:
@@ -2907,7 +3057,7 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 				str << L"config_mini.txt";
 			else
 			{
-				switch ( g_game->m_game_mode )
+				switch ( g_game->m_gameMode )
 				{
 				case 0 : str << L"config_default.txt"; break;
 				case 1 : str << L"config_warrior.txt"; break;
@@ -2936,7 +3086,7 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 						if ( !script.GetString( i, L"image", image	) )
 							continue;
 
-						if ( g_game->m_player->m_profile.level_played < g_game->m_game_currentLevel )
+						if ( g_game->m_player->m_profile.level_played < g_game->m_currentLevel )
 						{
 							AddTutorial( title, desc, image, true, false );
 						}
@@ -2995,7 +3145,7 @@ void MenuInfo::Show( void )
 	if ( g_game->m_mouseMode == MS_Null )
 	{
 		Menu::Show();
-		g_game->m_game_paused = true;
+		g_game->m_gamePaused = true;
 		m_time = 0;
 	}
 }
@@ -3003,7 +3153,7 @@ void MenuInfo::Show( void )
 void MenuInfo::Hide( void )
 {
 	Menu::Hide();
-	g_game->m_game_paused = false;
+	g_game->m_gamePaused = false;
 }
 
 void MenuInfo::OnClick( sx::gui::PControl sender )
@@ -3335,7 +3485,7 @@ void MenuUpgrade::Show( void )
 void MenuUpgrade::Hide( void )
 {
 	//	if upgrade shown in main menu save upgrades
-	if ( g_game->m_game_currentLevel == 0 )
+	if ( g_game->m_currentLevel == 0 )
 	{
 		GetData( g_game->m_player->m_profile.upgrades );
 		g_game->m_gui->m_profile->SaveProfile();

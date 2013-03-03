@@ -268,6 +268,7 @@ struct PlayerProfile
 
 	// version 4
 	int				curGameMode;
+	int				gameMode[10];
 
 	PlayerProfile( void ){
 		Reset();

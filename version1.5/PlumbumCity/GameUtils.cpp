@@ -55,7 +55,7 @@ namespace GU
 
 	void Camera_RTS::ProseccInput( bool& inputHandled, float elpsTime )
 	{
-		if ( g_game->m_game_paused || !m_Activate ) return;
+		if ( g_game->m_gamePaused || !m_Activate ) return;
 		
 		sx_callstack();
 

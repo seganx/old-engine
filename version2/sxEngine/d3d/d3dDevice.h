@@ -147,10 +147,10 @@ struct d3dDebugInfo
 //! view port structure
 struct d3dViewport
 {
-	uint		x;
-	uint		y;
-	uint		width;
-	uint		height;
+	sint		x;
+	sint		y;
+	sint		width;
+	sint		height;
 };
 
 //! vertex buffer description

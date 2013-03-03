@@ -92,7 +92,6 @@ public:
 	void Show(void);
 	void Hide(void);
 	void OnClick(sx::gui::PControl sender);
-	void OnScroll(sx::gui::PControl sender);
 
 public:
 
@@ -104,19 +103,37 @@ public:
 		sx::gui::PanelEx*	m_star[3];
 	};
 	Level_GUI			m_levels[10];
+	sx::gui::Button*	m_goback;
+	sx::gui::PanelEx*	m_chooser;
+	int					m_frame;
+	int					m_selectedLevel;
+};
+
+class MenuPlayLevel: public Menu
+{
+public:
+	void Initialize(void);
+	void Finalize(void);
+	void ProcessInput(bool& inputHandled, float elpsTime);
+	void Update(float elpsTime);
+	void Draw(DWORD flag);
+	void Show(const int level, const bool inGame);
+	void Hide(void);
+	void OnClick(sx::gui::PControl sender);
+	void OnScroll(sx::gui::PControl sender);
+
+public:
 	sx::gui::PanelEx*	m_playGame;
 	sx::gui::PanelEx*	m_miniGame;
 	sx::gui::PanelEx*	m_upgrade;
 	sx::gui::Button*	m_goback;
-	sx::gui::PanelEx*	m_chooser;
 	sx::gui::TrackBar*	m_diff_scroll;
-	sx::gui::TrackBar*	m_mode_scroll;
 	sx::gui::Label*		m_diff_label;
-	str512				m_diff_norm_text;
-	str512				m_diff_hard_text;
-	str512				m_diff_insane_text;
-	int					m_frame;
-	int					m_selectedLevel;
+	str512				m_diff_text[3];
+	sx::gui::CheckBox*	m_mode[3];
+	str512				m_mode_text[3];
+	int					m_level;
+	bool				m_InGame;
 };
 
 class MenuProfile: public Menu

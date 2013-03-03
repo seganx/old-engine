@@ -164,7 +164,7 @@ void MainLoop(float elpsTime)
 	if ( g_game->m_app_Paused )
 	{
 		Sleep(50);
-		if ( g_game->m_game_currentLevel && !g_game->m_game_paused )
+		if ( g_game->m_currentLevel && !g_game->m_gamePaused )
 			g_game->PostMessage( 0, GMT_GAME_PAUSED, NULL );
 		sx::snd::Device::Pause( true );
 		return;
@@ -290,7 +290,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	Game::Initialize( &s_window );
 
 	//  TEST 
-	g_game->m_game_nextLevel = 0;	//  set level to first test
+	g_game->m_nextLevel = 0;	//  set level to first test
 	//g_game->m_upgrades.trap_cooltime = 8.0f;
 	//g_game->m_upgrades.trap_count = 5;
 

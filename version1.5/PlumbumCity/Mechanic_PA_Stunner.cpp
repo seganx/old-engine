@@ -97,7 +97,7 @@ namespace GM
 
 	void Mechanic_PA_Stunner::Update( float elpsTime )
 	{
-		if ( !g_game->m_game_currentLevel || g_game->m_game_paused )
+		if ( !g_game->m_currentLevel || g_game->m_gamePaused )
 			return;
 		sx_callstack();
 
@@ -145,7 +145,7 @@ namespace GM
 					str << L"config_mini.txt";
 				else
 				{
-					switch ( g_game->m_game_mode )
+					switch ( g_game->m_gameMode )
 					{
 					case 0 : str << L"config_default.txt"; break;
 					case 1 : str << L"config_warrior.txt"; break;
