@@ -67,8 +67,9 @@ namespace GM
 		float3				m_rot;				//  direction of weapon
 		float3				m_rotOffset;		//  offset of direction
 		float3				m_rotMax;			//	maximum rotation value
+		float				m_fov_min;
+		float				m_fov_max;
 		float				m_fov;
-		float				m_addFOV;
 		float				m_forceFeedback;
 		float				m_cameraSpeed;		//	speed of camera movement
 		float				m_cameraBreath;		//	movement caused by breathing

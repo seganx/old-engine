@@ -22,8 +22,9 @@ namespace GM
 		, m_rot(0,0,0)
 		, m_rotOffset(0,0,0)
 		, m_rotMax(0.5f, 1.0f, 0)
-		, m_fov(PI / 8.0f)
-		, m_addFOV(0.0f)
+		, m_fov_min(PI / 32.0f)
+		, m_fov_max(PI / 8.0f)
+		, m_fov((m_fov_min + m_fov_max) * 0.5f)
 		, m_forceFeedback(0.03f)
 		, m_cameraSpeed(0.01f)
 		, m_cameraBreath(0.001f)
@@ -129,8 +130,8 @@ namespace GM
 				}
 			}
 
-			m_addFOV -= sx::io::Input::GetKeys(0)[SX_INPUT_KEY_MOUSE_WHEEL] * elpsTime * 0.001f;
-			m_addFOV = m_addFOV > 0.1f ? 0.1f : (m_addFOV < 0.0f ? 0.0f : m_addFOV);
+			m_fov -= sx::io::Input::GetKeys(0)[SX_INPUT_KEY_MOUSE_WHEEL] * elpsTime * (m_fov_max - m_fov_min) * 0.01f;
+			m_fov = m_fov > m_fov_max ? m_fov_max : (m_fov < m_fov_min ? m_fov_min : m_fov);
 
 			m_rotOffset.x += SEGAN_MOUSE_RLY(0) * 0.002f * m_cameraSpeed;
 			m_rotOffset.y += SEGAN_MOUSE_RLX(0) * 0.002f * m_cameraSpeed;
@@ -291,7 +292,8 @@ namespace GM
 							script.GetFloat(i, L"fireRate", m_attack.rate);
 							script.GetFloat(i, L"maxPhi", m_rotMax.y);
 							script.GetFloat(i, L"maxTheta", m_rotMax.x);
-							script.GetFloat(i, L"fov", m_fov);
+							script.GetFloat(i, L"fovMin", m_fov_min);
+							script.GetFloat(i, L"fovMax", m_fov_max);
 							script.GetFloat(i, L"forceFeedback", m_forceFeedback);
 							script.GetFloat(i, L"cameraSpeed", m_cameraSpeed);
 							script.GetFloat(i, L"cameraBreath", m_cameraBreath);
@@ -351,6 +353,8 @@ namespace GM
 				}
 
 				m_shootTime = 0.0f;
+
+				m_fov = (m_fov_min + m_fov_max) * 0.5f;
 
 				const int availableBullets = g_game->m_player->m_energy / m_energyPerBullet;
 				str128 str;
@@ -442,7 +446,7 @@ namespace GM
 		sx::core::Camera camera;
 		camera.Far = CAMERA_FAR;
 		camera.Aspect = SEGAN_VP_WIDTH / SEGAN_VP_HEIGHT;
-		camera.FOV = m_fov + m_addFOV;
+		camera.FOV = m_fov;
 		camera.Eye = m_nodeCamera->GetPosition_world();
 
 		static float s_time = 0;
