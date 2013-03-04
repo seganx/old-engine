@@ -23,7 +23,7 @@
 #include "Mechanic_MT_Sniper.h"
 
 
-Player::Player( void ):	m_gold(500), m_people(100), m_energy(100)
+Player::Player( void ):	m_gold(500), m_people(100), m_energy(100), m_fastCoolDown(1.0f)
 {
 	sx_callstack();
 
@@ -141,7 +141,7 @@ void Player::Update( float elpsTime )
 		float mousex = Config::GetData()->display_Size.x * 0.5f - SEGAN_MOUSE_ABSX(0);
 		float mousey = Config::GetData()->display_Size.y * 0.5f - SEGAN_MOUSE_ABSY(0);
 		m_camera_Pause.m_Phi = g_game->m_player->m_camera_RTS.m_Phi + mousex * 0.0001f + sin( 6.0f * cos ( gameTime * 0.0001f ) ) * 0.1f;
-		m_camera_Pause.m_Tht = 0.8f + mousey * 0.0001f + + sin( 3.0f * cos ( gameTime * 0.0001f ) ) * 0.1f;
+		m_camera_Pause.m_Tht = 0.8f + mousey * 0.0001f + sin( 3.0f * cos ( gameTime * 0.0001f ) ) * 0.1f;
 
 		m_camera_Pause.Update( elpsTime );
 
@@ -184,6 +184,7 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 	case GMT_GAME_RESETING:
 		{
 			m_camera_MBL.Attach(NULL);
+			m_fastCoolDown = 1.0f;
 		}
 		break;
 
@@ -241,7 +242,7 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 					}
 				}
 			}
-
+			m_fastCoolDown = 1.0f;
 		}
 		break;
 
@@ -359,6 +360,8 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 
 			for ( int i=0; i<m_Mechanics.Count(); i++ )
 				m_Mechanics[i]->Initialize();
+
+			m_fastCoolDown = 1.0f;
 		}
 		break;	//	GMT_LEVEL_LOAD
 
@@ -370,6 +373,7 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 
 			//  clear mechanics
 			ClearMechanincs();
+			m_fastCoolDown = 1.0f;
 		}
 		break;	//	GMT_LEVEL_CLEAR
 
@@ -382,6 +386,7 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 	case GMT_GAME_END:			/////////////////////////////////////////////////    END GAME
 		{						//////////////////////////////////////////////////////////////////////////
 			ClearMechanincs();
+			m_fastCoolDown = 1.0f;
 		}
 		break;	//	GMT_GAME_END
 

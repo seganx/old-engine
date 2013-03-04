@@ -155,7 +155,7 @@ namespace GM
 
 		if ( m_Time < m_coolTime )
 		{
-			m_Time += elpsTime * 0.001f;
+			m_Time += elpsTime * 0.001f * g_game->m_player->m_fastCoolDown;
 			m_progBar->SetValue( m_Time/m_coolTime );
 		}
 		else m_progBar->SetValue( 1 );

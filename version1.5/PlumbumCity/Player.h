@@ -48,6 +48,7 @@ public:
 	int							m_gold;				//  gold
 	int							m_people;			//	current people
 	int							m_energy;			//  
+	float						m_fastCoolDown;		//
 
 	PlayerProfile				m_profile;
 };

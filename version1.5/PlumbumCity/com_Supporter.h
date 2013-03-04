@@ -37,14 +37,28 @@ public:
 	//! clone this component and return new one
 	virtual Component* Clone( void );
 
-public:
+private:
 	
 	sx::core::PNode		m_node;
 	float				m_time;
 	float				m_energy;
 	float				m_repair;
+	float				m_overActiveTime;
+	float				m_time_exp;
 
-	Array<Entity*>		m_towers;
+	struct EntityExp
+	{
+		Entity* entity;
+		float	experience;
+
+		EntityExp();
+
+		EntityExp(Entity* entity, float	experience);
+
+		bool operator==(const EntityExp& other) const;
+	};
+
+	Array<EntityExp>	m_towers;
 
 };
 

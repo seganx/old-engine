@@ -3,12 +3,15 @@
 #include "Game.h"
 #include "Player.h"
 
+
 com_Supporter::com_Supporter( void ): Component()
-	,	m_node(0)
-	,	m_time(0)
-	,	m_energy(0)
-	,	m_repair(0)
-	,	m_towers(512)
+	,	m_node(null)
+	,	m_time(0.0f)
+	,	m_energy(0.0f)
+	,	m_repair(0.0f)
+	,	m_overActiveTime(0.0f)
+	,	m_time_exp(0.0f)
+	,	m_towers(64)
 {
 	sx_callstack();
 
@@ -53,13 +56,15 @@ void com_Supporter::Initialize( void )
 		
 		if (notSupporter)
 		{
-			m_towers.PushBack(entity);
+			m_towers.PushBack(EntityExp(entity, entity->m_experience));
 		}
 	}
 
-	m_time		= 0.0f;
-	m_energy	= 0.0f;
-	m_repair	= 0.0f;
+	m_time = 0.0f;
+	m_energy = 0.0f;
+	m_repair = 0.0f;
+	m_overActiveTime = 0.0f;
+	m_time_exp = 0.0f;
 	m_owner->m_experience = 0.0f;	
 }
 
@@ -79,11 +84,31 @@ void com_Supporter::Update( float elpsTime )
 
 	const float delta = elpsTime * 0.001f;
 
-	m_owner->m_experience += m_owner->test_onDamageXP * delta;
+	if ( m_owner->m_level > MAX_LEVEL )
+	{
+		if ( m_overActiveTime <= 0.0f )
+		{
+			const float chance = sx::cmn::Random( 1.0f );
 
-	const bool not_over_active = true;
+			if ( chance <= m_owner->m_curAbility.chance )
+			{
+				m_overActiveTime = m_owner->m_curAbility.actionTime;
+				g_game->m_player->m_fastCoolDown += m_owner->m_curAbility.minRange;
+			}
+		}
+		else
+		{
+			m_overActiveTime -= delta;
+
+			if ( m_overActiveTime <= 0.0f )
+			{
+				m_overActiveTime = 0.0f;
+				g_game->m_player->m_fastCoolDown -= m_owner->m_curAbility.minRange;
+			}
+		}
+	}
 	
-	m_energy += m_owner->m_curAttack.stunValue * delta * (not_over_active ? 1.0f : m_owner->m_curAttack.stunTime);
+	m_energy += m_owner->m_curAttack.stunValue * delta * ((m_overActiveTime > 0.0f) ? m_owner->m_curAbility.stunTime : 1.0f);
 	m_repair += m_owner->m_curAttack.physicalDamage * delta;
 
 	m_time += elpsTime;
@@ -98,12 +123,31 @@ void com_Supporter::Update( float elpsTime )
 
 		for ( int i = 0; i < m_towers.Count(); ++i )
 		{
-			if ( m_towers[i] && m_towers[i]->m_health.icur > 0 )
+			if ( m_towers[i].entity && m_towers[i].entity->m_health.icur > 0 )
 			{
 				const int addHealth = static_cast<int>(m_repair);
 				m_repair -= addHealth;
-				m_towers[i]->m_health.icur +=
-					m_towers[i]->m_health.icur + addHealth > m_towers[i]->m_health.imax ? 0 : addHealth;
+				m_towers[i].entity->m_health.icur +=
+					m_towers[i].entity->m_health.icur + addHealth > m_towers[i].entity->m_health.imax ? 0 : addHealth;
+			}
+		}
+	}
+
+	m_owner->m_experience += m_owner->test_onDamageXP * delta;
+	m_time_exp += elpsTime;
+
+	if ( m_time_exp > 1000.0f )
+	{
+		m_time_exp = 0.0f;
+
+		for ( int i = 0; i < m_towers.Count(); ++i )
+		{
+			if ( m_towers[i].entity && m_towers[i].entity->m_health.icur > 0 )
+			{
+				const float expDif = m_towers[i].entity->m_experience - m_towers[i].experience;
+				m_towers[i].experience = m_towers[i].entity->m_experience;
+
+				m_owner->m_experience += expDif;
 			}
 		}
 	}
@@ -142,18 +186,19 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 					const float distance = m_owner->GetDistance_edge( entity );
 					if ( distance <= m_owner->m_curAttack.maxRange )
 					{
-						m_towers.PushBack(entity);
+						m_towers.PushBack(EntityExp(entity, entity->m_experience));
 					}				
 				}
 			}
 		}
+		break;
 	case GMT_I_FINALIZED:
 		if ( data )
 		{
 			Entity* entity = static_cast<Entity*>(data);
 			if ( entity->m_partyCurrent == PARTY_TOWER )
 			{
-				m_towers.Remove(entity);
+				m_towers.Remove(EntityExp(entity, entity->m_experience));
 			}
 		}
 		break;
@@ -171,3 +216,22 @@ Component* com_Supporter::Clone( void )
 
 	return me;
 }
+
+
+com_Supporter::EntityExp::EntityExp()
+	: entity(null), experience(0.0f)
+{
+
+}
+
+com_Supporter::EntityExp::EntityExp(Entity* entity, float experience)
+	: entity(entity), experience(experience)
+{
+
+}
+
+bool com_Supporter::EntityExp::operator==(const EntityExp& other) const
+{
+	return this->entity == other.entity;
+}
+
