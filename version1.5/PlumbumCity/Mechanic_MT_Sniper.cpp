@@ -29,7 +29,7 @@ namespace GM
 		, m_cameraBreath(0.001f)
 		, m_fire(0)
 		, m_selected(false)
-		, m_energyPerBullet(0)
+		, m_energyPerBullet(1)
 		, m_bulletIndicator(null)
 	{
 		sx_callstack();

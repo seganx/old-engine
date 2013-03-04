@@ -29,7 +29,7 @@ namespace GM
 		, m_forceFeedback(0.01f)
 		, m_fire(0)
 		, m_selected(false)
-		, m_energyPerBullet(0)
+		, m_energyPerBullet(1)
 		, m_maxTemperature(0.0f)
 		, m_curTemperature(0.0f)
 		, m_warmingRate(0.0f)
