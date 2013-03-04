@@ -43,6 +43,12 @@ void com_Supporter::Initialize( void )
 			continue;
 		}
 
+		const float distance_squared = m_owner->GetPosition().Distance_sqr( entity->GetPosition() );
+		if ( distance_squared > m_owner->m_curAttack.maxRange * m_owner->m_curAttack.maxRange )
+		{
+			continue;
+		}
+
 		bool notSupporter = true;
 
 		for ( int j = 0; j < entity->m_components.Count(); ++j )
@@ -183,8 +189,8 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 
 				if (notSupporter)
 				{
-					const float distance = m_owner->GetDistance_edge( entity );
-					if ( distance <= m_owner->m_curAttack.maxRange )
+					const float distance_squared = m_owner->GetPosition().Distance_sqr( entity->GetPosition() );
+					if ( distance_squared <= m_owner->m_curAttack.maxRange * m_owner->m_curAttack.maxRange )
 					{
 						m_towers.PushBack(EntityExp(entity, entity->m_experience));
 					}				
