@@ -100,6 +100,7 @@ void DestroyPatchBuffers(void)
 namespace sx { namespace core {
 
 	Mesh::Mesh() : NodeMember()
+		, m_scale(1,1,1)
 		, m_Geometry(NULL)
 		, reserved(0)
 	{
@@ -143,6 +144,7 @@ namespace sx { namespace core {
 
 		d3d::Geometry::Manager::Release(m_Geometry);
 
+		m_scale.Set( 1, 1, 1 );
 		m_Box.Zero();
 		m_Sphere.Zero();
 		
@@ -198,7 +200,10 @@ namespace sx { namespace core {
 				if ( !(m_Option & SX_MESH_RECIEVESHADOW) )
 					SEGAN_SET_REM( flag, SX_SHADER_SHADOW );
 
-				d3d::Device3D::Matrix_World_Set( m_Owner->GetMatrix_world() );
+				Matrix matScale;
+				matScale.Scale( m_scale.x, m_scale.y, m_scale.z );
+				matScale.Multiply( matScale, m_Owner->GetMatrix_world() );
+				d3d::Device3D::Matrix_World_Set( matScale );
 				m_Material.SetToDevice(flag);
 				d3d::Device3D::DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_Geometry->GetVertexCount(lod), 0, m_Geometry->GetFaceCount(lod));
 			}
@@ -229,12 +234,18 @@ namespace sx { namespace core {
 					matView.Inverse( matView );
 					Sphere worldSphere;
 					worldSphere.Transform( m_Sphere, m_Owner->GetMatrix_world() );
+					Matrix matScale;
+					matScale.Scale( m_scale.x, m_scale.y, m_scale.z );
+					matView.Multiply( matScale, matView );
 					matView.SetTranslation(worldSphere.x, worldSphere.y, worldSphere.z );
 					d3d::UI3D::DrawCircle( matView, m_Sphere.r, 0x00203f3f * ((flag & SX_DRAW_SELECTED) != 0) + 0xffafbfbf );
 				}
 				else
 				{
-					d3d::Device3D::Matrix_World_Set(m_Owner->GetMatrix_world());
+					Matrix matScale;
+					matScale.Scale( m_scale.x, m_scale.y, m_scale.z );
+					matScale.Multiply( matScale, m_Owner->GetMatrix_world() );
+					d3d::Device3D::Matrix_World_Set( matScale );
 					d3d::UI3D::DrawSphere( m_Sphere, 0x00203f3f * ((flag & SX_DRAW_SELECTED) != 0) + 0xffafbfbf );
 				}
 			}
@@ -259,7 +270,10 @@ namespace sx { namespace core {
 				if ( !(m_Option & SX_MESH_RECIEVESHADOW) )
 					SEGAN_SET_REM( flag, SX_SHADER_SHADOW );
 
-				d3d::Device3D::Matrix_World_Set( m_Owner->GetMatrix_world() );
+				Matrix matScale;
+				matScale.Scale( m_scale.x, m_scale.y, m_scale.z );
+				matScale.Multiply( matScale, m_Owner->GetMatrix_world() );
+				d3d::Device3D::Matrix_World_Set( matScale );
 				m_Material.SetToDevice(flag);
 				d3d::Device3D::DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_Geometry->GetVertexCount(lod), 0, m_Geometry->GetFaceCount(lod));
 			}
@@ -327,7 +341,10 @@ namespace sx { namespace core {
 		}
 		else 	//  draw this mesh normally
 		{
-			d3d::Device3D::Matrix_World_Set( m_Owner->GetMatrix_world() );
+			Matrix matScale;
+			matScale.Scale( m_scale.x, m_scale.y, m_scale.z );
+			matScale.Multiply( matScale, m_Owner->GetMatrix_world() );
+			d3d::Device3D::Matrix_World_Set( matScale );
 
 			//  check mesh options
 			if ( !(m_Option & SX_MESH_RECIEVESHADOW) )
@@ -448,7 +465,9 @@ namespace sx { namespace core {
 					{
 						float3 v0, v1, v2;
 						int cFace = gm->GetFaceCount();
-						const Matrix& mat = m_Owner->GetMatrix_world();
+						Matrix mat;
+						mat.Scale( m_scale.x, m_scale.y, m_scale.z );
+						mat.Multiply( mat, m_Owner->GetMatrix_world() );
 
 						for (int i=0; i<cFace; i++)
 						{
@@ -518,7 +537,7 @@ namespace sx { namespace core {
 		SEGAN_STREAM_WRITE(stream, meshFileID);
 
 		// write version
-		int version = 2;
+		int version = 3;
 		SEGAN_STREAM_WRITE(stream, version);
 
 		//  save default things
@@ -535,6 +554,9 @@ namespace sx { namespace core {
 		
 		// write materials and their contents
 		m_Material.Save(stream);
+
+		// version 3
+		SEGAN_STREAM_WRITE(stream, m_scale);
 		
 	}
 
@@ -598,6 +620,27 @@ namespace sx { namespace core {
 			// read materials and their contents
 			m_Material.Load(stream);
 			
+		}
+
+		if (version == 3)
+		{
+			//  load default things
+			NodeMember::Load( stream );
+
+			// read bounding box and sphere
+			SEGAN_STREAM_READ(stream, m_Box);
+			SEGAN_STREAM_READ(stream, m_Sphere);
+
+			// read geometry resource
+			String str;
+			cmn::String_Load(str, &stream);
+			SetGeometry(str);		
+
+			// read materials and their contents
+			m_Material.Load(stream);
+
+			SEGAN_STREAM_READ(stream, m_scale);
+			SetScale( m_scale.x, m_scale.y, m_scale.z );
 		}
 	}
 
@@ -702,6 +745,32 @@ namespace sx { namespace core {
 		float lodStep = s_lodRange * m_Geometry->GetBoundingSphere().r / 3;
 
 		return ( viewParam < lodStep ? 0 : ( viewParam < lodStep*3 ? 1 : 2 ) );
+	}
+
+	void Mesh::SetScale( const float x, const float y, const float z )
+	{
+		m_scale.Set( x, y, z );
+
+		if ( m_Geometry )
+		{
+			m_Box = m_Geometry->GetBoundingBox();
+			m_Sphere =	m_Geometry->GetBoundingSphere();
+		}
+		else
+		{
+			m_Box.Zero();
+			m_Sphere.Zero();
+		}
+
+		m_Box.Max.x *= x;
+		m_Box.Max.y *= y;
+		m_Box.Max.z *= z;
+		m_Box.Min.x *= x;
+		m_Box.Min.y *= y;
+		m_Box.Min.z *= z;
+		m_Sphere.radius *= sx_max_3f( x, y, z );
+
+		m_Owner->UpdateBoundingVolumes();
 	}
 
 

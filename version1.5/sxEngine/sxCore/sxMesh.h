@@ -100,7 +100,11 @@ namespace sx { namespace core {
 		/*! return level of detail value depend on view parameter. 	*/
 		int ComputeLodValue(float viewParam);
 
+		//! set new scale for the mesh
+		void SetScale( const float x, const float y, const float z );
+
 	public:
+		float3			m_scale;			//	scale of the mesh
 		math::AABox		m_Box;				//  bounding box of the mesh
 		math::Sphere	m_Sphere;			//  bounding sphere of the mesh
 		d3d::PGeometry	m_Geometry;			//  geometry of this mesh

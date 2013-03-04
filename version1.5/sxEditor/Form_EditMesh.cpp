@@ -51,6 +51,8 @@ Form_EditMesh::Form_EditMesh( void ): BaseForm(), m_heightPlus(0)
 		Recompute Normal and Tangent vectors.\n\
 		Regenerate 2 sub LOD. ");
 
+	m_scale = EditorUI::CreateLabeldEditBox( m_pBack, 200, 50.0f, 50.0f, L"Scale :" );
+
 	m_EditMaterial.SetParent(m_pBack);
 	m_EditMaterial.SetOnSizeChanged(this, (GUICallbackEvent)&Form_EditMesh::OnMaterialResized);
 
@@ -76,7 +78,8 @@ void Form_EditMesh::SetSize( float width, float height )
 	m_pTitle->Position().y = top;
 	top -= 35.0f;
 
-	m_EditGeometry->Position().Set( -left-32.0f, top, 0.0f );
+	m_EditGeometry->Position().Set( - left - 32.0f, top, 0.0f );
+	m_scale->Position().Set( - left - 40.0f, top - 70.0f, 0.0f );
 
 	top = height*0.5f - 40.0f;
 	m_lblInfo->Position().y = top;			top -= 20.0f;
@@ -168,6 +171,10 @@ void Form_EditMesh::SetMeshToEdit( sx::core::PNodeMember mesh )
 
 	//  update material list
 	m_EditMaterial.SetMaterialToEdit( &m_mesh->Material() );
+
+	m_scale->SetOnTextChange( NULL, NULL );
+	m_scale->SetText( FloatToStr( m_mesh->m_scale.x, 2 ) );
+	SEGAN_GUI_SET_ONTEXT( m_scale, Form_EditMesh::OnParamChange );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -240,6 +247,13 @@ void Form_EditMesh::OnParamChange( sx::gui::PControl Sender )
 		}
 
 		ShowMeshInfo();
+	}
+
+	if ( Sender == m_scale )
+	{
+		str64 tmp = m_scale->GetText();
+		float v = tmp.ToFloat();
+		m_mesh->SetScale( v, v, v );
 	}
 
 }
