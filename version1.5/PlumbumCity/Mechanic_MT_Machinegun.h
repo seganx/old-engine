@@ -61,7 +61,6 @@ namespace GM
 		sx::core::PNode		m_nodeWeapon;		//  weapon node
 		sx::core::PNode		m_nodePipe[4];		//  pipes of weapon to shoot
 		int					m_pipeIndex;		//  index of weapon pipeline
-		int					m_shootCount;		//  number of shooting
 		float				m_shootTime;		//  time of shooting
 		float3				m_Rot;				//  direction of weapon
 		float3				m_RotOffset;		//  offset of direction

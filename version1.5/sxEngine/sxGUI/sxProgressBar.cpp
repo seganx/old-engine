@@ -7,7 +7,7 @@ namespace sx { namespace gui {
 	ProgressBar::ProgressBar( void ): Control(),
 		m_Max(1.0f), 
 		m_Value(0.0f), 
-		m_ValueScroll(0.0f), 
+		m_ValueScroll(1.0f), 
 		m_VB0(NULL),
 		m_VB1(NULL)
 	{
@@ -99,6 +99,28 @@ namespace sx { namespace gui {
 
 		m_ValueScroll += (m_Value - m_ValueScroll) * (elpsTime * 0.06f) * 0.15f;
 		SEGAN_CLAMP(m_ValueScroll, 0, m_Max);
+
+		if ( !(m_Option & SX_GUI_PROPERTY_PROGRESSCIRCLE) && abs( m_ValueScroll - m_Value) > EPSILON )
+		{
+			float val;
+			if (m_Max)
+				val = (float)(m_ValueScroll / m_Max);
+			else
+				val = SX_GUI_MINIMUM_SCALE;
+			if (val < SX_GUI_MINIMUM_SCALE) val = SX_GUI_MINIMUM_SCALE;
+
+			if ( m_Option & SX_GUI_PROPERTY_PROGRESSUV )
+			{
+				RectF rc = m_Elements[1]->GetRect();
+				rc.x2 = rc.x1 + m_Size.x * val;
+				m_Elements[1]->SetRect( rc, float2(0, 0), float2(val, 0), float2(0, 1), float2(val, 1) );
+			}
+			else
+			{
+				m_Elements[1]->Matrix().Scale( val, 1.0f, 1.0f );
+				m_Elements[1]->Matrix()._41 = (val - 1) * m_Size.x * 0.5f;
+			}
+		}
 	}
 
 	void ProgressBar::Draw( DWORD option )
@@ -228,28 +250,6 @@ namespace sx { namespace gui {
 			if ( m_VB0 || m_VB1 )
 			{
 				CLEANUP_BUFFER();
-			}
-
-			if ( abs( m_ValueScroll - m_Value) > EPSILON )
-			{
-				float val;
-				if (m_Max)
-					val = (float)(m_ValueScroll / m_Max);
-				else
-					val = SX_GUI_MINIMUM_SCALE;
-				if (val < SX_GUI_MINIMUM_SCALE) val = SX_GUI_MINIMUM_SCALE;
-
-				if ( m_Option & SX_GUI_PROPERTY_PROGRESSUV )
-				{
-					RectF rc = m_Elements[1]->GetRect();
-					rc.x2 = rc.x1 + m_Size.x * val;
-					m_Elements[1]->SetRect( rc, float2(0, 0), float2(val, 0), float2(0, 1), float2(val, 1) );
-				}
-				else
-				{
-					m_Elements[1]->Matrix().Scale( val, 1.0f, 1.0f );
-					m_Elements[1]->Matrix()._41 = (val - 1) * m_Size.x * 0.5f;
-				}
 			}
 
 			for (int i=0; i<m_Elements.Count(); i++) m_Elements[i]->Draw(option);

@@ -20,7 +20,6 @@ namespace GM
 		, m_nodeCamera(null)
 		, m_nodeWeapon(null)
 		, m_pipeIndex(0)
-		, m_shootCount(0)
 		, m_shootTime(0)
 		, m_Rot(0,0,0)
 		, m_RotOffset(0,0,0)
@@ -53,7 +52,7 @@ namespace GM
 		sx_callstack();
 
 		m_temperatureBar = sx_new( sx::gui::ProgressBar );
-		m_temperatureBar->SetSize( float2(256, 32) );
+		m_temperatureBar->SetSize( float2(128, 16) );
 		m_temperatureBar->Rotation().Set( 0.0f, 0.0f, PI / 2.0f );
 		m_temperatureBar->AddProperty( SX_GUI_PROPERTY_PROGRESSUV );
 		m_temperatureBar->AddProperty( SX_GUI_PROPERTY_BILLBOARD );
@@ -181,6 +180,9 @@ namespace GM
 		{
 			m_curTemperature = m_maxTemperature;
 			m_fire = 0;
+
+			msg_Particle msgPrtcl(SX_PARTICLE_SPRAY);
+			m_nodePipe[ m_pipeIndex ]->MsgProc( MT_PARTICLE, &msgPrtcl);
 		}
 
 		m_temperatureBar->SetValue( m_curTemperature );
@@ -263,14 +265,6 @@ namespace GM
 			str256 bulletShell = L"bullet_shell"; bulletShell << m_pipeIndex;
 			msg_Particle msgPar( SX_PARTICLE_SPRAY, 0, bulletShell );
 			m_nodeWeapon->MsgProc( MT_PARTICLE, &msgPar );
-
-			m_shootCount++;
-			if ( m_shootCount > 15 )
-			{
-				msg_Particle msgPrtcl(SX_PARTICLE_SPRAY);
-				m_nodePipe[ m_pipeIndex ]->MsgProc( MT_PARTICLE, &msgPrtcl);
-				m_shootCount = sx::cmn::Random(5);
-			}
 
 			ShootTheBullet( &m_attack, false );
 		}
@@ -466,7 +460,6 @@ namespace GM
 			g_game->m_mouseMode = MS_Null;
 		}
 
-		m_shootCount = 0;
 		m_shootTime = 0.0f;
 		m_fire = 0;
 
