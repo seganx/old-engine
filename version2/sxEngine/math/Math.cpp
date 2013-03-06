@@ -538,9 +538,10 @@ SEGAN_INLINE void float2::Set( const float _x, const float _y )
 
 SEGAN_INLINE void float2::Normalize( const float* v )
 {
-	const float len = sx_sqrt_fast( v[0] * v[0] + v[1] * v[1] );
-	x = v[0] / len;
-	y = v[1] / len;
+	float len = sx_sqrt_fast( v[0] * v[0] + v[1] * v[1] );
+	if ( len )	len = 1.0f / len;
+	x = v[0] * len;
+	y = v[1] * len;
 }
 
 SEGAN_INLINE float float2::Length( void ) const
@@ -603,10 +604,11 @@ SEGAN_INLINE void float3::Set( const float _x, const float _y, const float _z )
 
 SEGAN_INLINE void float3::Normalize( const float* v )
 {
-	const float len = sx_sqrt_fast( ( v[0] * v[0] ) + ( v[1] * v[1] ) + ( v[2] * v[2] ) );
-	x = v[0] / len;
-	y = v[1] / len;
-	z = v[2] / len;
+	float len = sx_sqrt_fast( ( v[0] * v[0] ) + ( v[1] * v[1] ) + ( v[2] * v[2] ) );
+	if ( len )	len = 1.0f / len;
+	x = v[0] * len;
+	y = v[1] * len;
+	z = v[2] * len;
 }
 
 SEGAN_INLINE float float3::Length( void ) const
@@ -719,11 +721,12 @@ SEGAN_INLINE void float4::Set( const float _x, const float _y, const float _z, c
 
 SEGAN_INLINE void float4::Normalize( const float* v )
 {
-	const float len = sx_sqrt_fast( ( v[0] * v[0] ) + ( v[1] * v[1] ) + ( v[2] * v[2] ) + ( v[3] * v[3] ) );
-	x = v[0] / len;
-	y = v[1] / len;
-	z = v[2] / len;
-	w = v[3] / len;
+	float len = sx_sqrt_fast( ( v[0] * v[0] ) + ( v[1] * v[1] ) + ( v[2] * v[2] ) + ( v[3] * v[3] ) );
+	if ( len )	len = 1.0f / len;
+	x = v[0] * len;
+	y = v[1] * len;
+	z = v[2] * len;
+	w = v[3] * len;
 }
 
 SEGAN_INLINE float float4::Length( void ) const
@@ -786,11 +789,12 @@ SEGAN_INLINE void quat::Set( const float _x, const float _y, const float _z, con
 
 SEGAN_INLINE void quat::Normalize( const float* v )
 {
-	const float len = sx_sqrt_fast( ( v[0] * v[0] ) + ( v[1] * v[1] ) + ( v[2] * v[2] ) + ( v[3] * v[3] ) );
-	x = v[0] / len;
-	y = v[1] / len;
-	z = v[2] / len;
-	w = v[3] / len;
+	float len = sx_sqrt_fast( ( v[0] * v[0] ) + ( v[1] * v[1] ) + ( v[2] * v[2] ) + ( v[3] * v[3] ) );
+	if ( len )	len = 1.0f / len;
+	x = v[0] * len;
+	y = v[1] * len;
+	z = v[2] * len;
+	w = v[3] * len;
 }
 
 SEGAN_INLINE float quat::Length( void ) const
@@ -975,6 +979,15 @@ SEGAN_INLINE void quat::RotationPitchYawRoll( const float yaw, const float pitch
 	w = cr * r1.w - sr * r1.z;
 }
 
+
+SEGAN_INLINE void quat::Add( const float* q1, const float* q2 )
+{
+	x = q1[0] + q2[0];
+	y = q1[1] + q2[1];
+	z = q1[2] + q2[2];
+	w = q1[3] + q2[3];
+}
+
 SEGAN_INLINE void quat::Multiply( const float* q1, const float* q2 )
 {
 	const quat* quat1 = (quat*)q1;
@@ -994,4 +1007,296 @@ SEGAN_INLINE void quat::Multiply( const float* q1, const float* q2 )
 SEGAN_INLINE void quat::Inverse( const float* q )
 {
 	sx_assert( 0 || "not implemented" );
+}
+
+//////////////////////////////////////////////////////////////////////////
+//	plane implementation
+//////////////////////////////////////////////////////////////////////////
+SEGAN_INLINE Plane::Plane( const float* p )
+{
+	memcpy( e, p, sizeof(Plane) );
+}
+
+SEGAN_INLINE Plane::Plane( const Plane& p )
+{
+	memcpy( e, p.e, sizeof(Plane) );
+}
+
+SEGAN_INLINE Plane::Plane( const float _a, const float _b, const float _c, const float _d )
+{
+	a = _a;
+	b = _b;
+	c = _c;
+	d = _d;
+}
+
+SEGAN_INLINE void Plane::Set( const float _a, const float _b, const float _c, const float _d )
+{
+	a = _a;
+	b = _b;
+	c = _c;
+	d = _d;
+}
+
+SEGAN_INLINE void Plane::MakeFromPoints( const float* p1, const float* p2, const float* p3 )
+{
+	float3 v1( p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2] );
+	float3 v2( p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2] );
+	float3 n; n.Cross( v1, v2 );
+	MakeFromNormal( p1, &n.x );
+}
+
+SEGAN_INLINE void Plane::MakeFromNormal( const float* p, const float* n )
+{
+	a = n[0];
+	b = n[1];
+	c = n[2];
+	d = - ( p[0] * n[0] ) - ( p[1] * n[1] ) - ( p[2] * n[2] );
+}
+
+SEGAN_INLINE float Plane::Distance( const float* p ) const
+{
+	return ( a * p[0] + b * p[1] + c * p[2] + d );
+}
+
+SEGAN_INLINE void Plane::Normalize( const float* p )
+{
+	float len = sx_sqrt_fast( ( p[0] * p[0] ) + ( p[1] * p[1] ) + ( p[2] * p[2] ) );
+	if ( len )	len = 1.0f / len;
+	a *= len;
+	b *= len;
+	c *= len;
+	d *= len;
+}
+
+void Plane::Transform( const float* p, const float* m )
+{
+	sx_assert( 0 || "Plane::transformation is not implemented yet" );
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+//	frustum implementation
+//////////////////////////////////////////////////////////////////////////
+SEGAN_INLINE Frustum::Frustum( const float* f )
+{
+	memcpy( p, f, sizeof(Frustum) );
+}
+
+SEGAN_INLINE Frustum::Frustum( const Frustum& f )
+{
+	memcpy( p, f.p, sizeof(Frustum) );
+
+}
+
+SEGAN_INLINE Frustum::Frustum( const float* _p0, const float* _p1, const float* _p2, const float* _p3, const float* _p4, const float* _p5 )
+{
+	memcpy( &p0, _p0, sizeof(Plane) );
+	memcpy( &p1, _p1, sizeof(Plane) );
+	memcpy( &p2, _p2, sizeof(Plane) );
+	memcpy( &p3, _p3, sizeof(Plane) );
+	memcpy( &p4, _p4, sizeof(Plane) );
+	memcpy( &p5, _p5, sizeof(Plane) );
+}
+
+SEGAN_INLINE void Frustum::Normalize( const float* _frustum )
+{
+	const Frustum* fr = (Frustum*)_frustum;
+
+	p0.Normalize( fr->p0.e );
+	p1.Normalize( fr->p1.e );
+	p2.Normalize( fr->p2.e );
+	p3.Normalize( fr->p3.e );
+	p4.Normalize( fr->p4.e );
+	p5.Normalize( fr->p5.e );
+}
+
+SEGAN_INLINE void Frustum::ComputeByMatrix( const float* _matrix )
+{
+	const matrix* mat = (matrix*)_matrix;
+
+	// Near clipping plane
+	p0.a = mat->m02;
+	p0.b = mat->m12;
+	p0.c = mat->m22;
+	p0.d = mat->m32;
+
+	// Left clipping plane
+	p1.a = mat->m03 + mat->m00;
+	p1.b = mat->m13 + mat->m10;
+	p1.c = mat->m23 + mat->m20;
+	p1.d = mat->m33 + mat->m30;
+
+	// Right clipping plane
+	p2.a = mat->m03 - mat->m00;
+	p2.b = mat->m13 - mat->m10;
+	p2.c = mat->m23 - mat->m20;
+	p2.d = mat->m33 - mat->m30;
+
+	// Top clipping plane
+	p3.a = mat->m03 - mat->m01;
+	p3.b = mat->m13 - mat->m11;
+	p3.c = mat->m23 - mat->m21;
+	p3.d = mat->m33 - mat->m31;
+
+	// Bottom clipping plane
+	p4.a = mat->m03 + mat->m01;
+	p4.b = mat->m13 + mat->m11;
+	p4.c = mat->m23 + mat->m21;
+	p4.d = mat->m33 + mat->m31;
+
+	// Far clipping plane
+	p5.a = mat->m03 - mat->m02;
+	p5.b = mat->m13 - mat->m12;
+	p5.c = mat->m23 - mat->m22;
+	p5.d = mat->m33 - mat->m32;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//	sphere implementation
+//////////////////////////////////////////////////////////////////////////
+SEGAN_INLINE Sphere::Sphere( const float* s )
+{
+	memcpy( this, s, sizeof(Sphere) );
+}
+
+SEGAN_INLINE Sphere::Sphere( const Sphere& s )
+{
+	memcpy( this, &s, sizeof(Sphere) );
+
+}
+
+SEGAN_INLINE Sphere::Sphere( const float* cen, const float rad )
+{
+	memcpy( &center, cen, sizeof(float3) );
+	radius = rad;
+}
+
+SEGAN_INLINE Sphere::Sphere( const float _x, const float _y, const float _z, const float _r )
+{
+	x = _x;
+	y = _y;
+	z = _z;
+	r = _r;
+}
+
+SEGAN_INLINE void Sphere::Zero( void )
+{
+	x = 0;
+	y = 0;
+	z = 0;
+	r = 0;
+}
+
+SEGAN_INLINE void Sphere::Set( const float* cen, const float rad )
+{
+	memcpy( &center, cen, sizeof(float3) );
+	radius = rad;
+}
+
+SEGAN_INLINE void Sphere::ComputeByAABox( const float* box )
+{
+	sx_assert( 0 || "Sphere::ComputeByAABox no implemented yet" );
+// 	center = box.Min + box.Max;
+// 	center *= 0.5f;
+// 	float3 a = box.Max - box.Min;
+// 	radius = a.Length() / 2;
+}
+
+SEGAN_INLINE void Sphere::Cover( const float* s )
+{
+	float3 cen ( x - s[0], y - s[1], z - s[2] );
+	const float rad = cen.Length() + s[3];
+	if ( r < rad ) r = rad;
+}
+
+SEGAN_INLINE bool Sphere::Intersect( const float* s, float* OUT distance ) const
+{
+	float3 d( s[0] - x, s[1] - y, s[2] - z );
+	if (distance)
+	{
+		*distance = sx_sqrt_fast( d.x * d.x + d.y * d.y + d.z * d.z );
+		return ( *distance < ( s[3] + r ) );
+	}
+	else
+	{
+		float dis = ( d.x * d.x ) + ( d.y * d.y ) + ( d.z * d.z );
+		float rad = s[3] + r;
+		return ( dis < ( rad * rad ) );
+	}
+}
+
+SEGAN_INLINE void Sphere::Transform( const float* s, const float* mat )
+{
+	radius = s[3];
+	center.TransformPoint( s, mat );
+}
+
+//////////////////////////////////////////////////////////////////////////
+//	axis aligned box implementation
+//////////////////////////////////////////////////////////////////////////
+SEGAN_INLINE AABox::AABox( const float* a )
+{
+	memcpy( this, a, sizeof(AABox) );
+}
+
+SEGAN_INLINE AABox::AABox( const AABox& a )
+{
+	memcpy( this, &a, sizeof(AABox) );
+}
+
+SEGAN_INLINE AABox::AABox( const float* _min, const float* _max )
+{
+	memcpy( &min, _min, sizeof(float3) );
+	memcpy( &max, _max, sizeof(float3) );
+}
+
+SEGAN_INLINE AABox::AABox( const float _x1, const float _y1, const float _z1, const float _x2, const float _y2, const float _z2 )
+{
+	x1 = _x1;
+	y1 = _y1;
+	z1 = _z1;
+	x2 = _x2;
+	y2 = _y2;
+	z2 = _z2;
+}
+
+SEGAN_INLINE void AABox::Zero( void )
+{
+	min.Set( 0, 0, 0 );
+	max.Set( 0, 0, 0 );
+}
+
+SEGAN_INLINE void AABox::CoverAA( const float* aabox )
+{	   
+	if ( x1 > aabox[0] ) x1 = aabox[0];
+	if ( y1 > aabox[1] ) y1 = aabox[1];
+	if ( z1 > aabox[2] ) z1 = aabox[2];
+
+	if ( x2 < aabox[3] ) x2 = aabox[3];
+	if ( y2 < aabox[4] ) y2 = aabox[4];
+	if ( z2 < aabox[5] ) z2 = aabox[5];
+
+}
+
+SEGAN_INLINE void AABox::CoverOB( const float* obbox )
+{
+	sx_assert( 0 || "AABox::CoverOB no implemented yet" );
+#if 0
+	for ( int i = 0; i < 8; ++i )
+	{
+		if ( x1 > box.v[i].x ) x1 = box.v[i].x;
+		if ( y1 > box.v[i].y ) y1 = box.v[i].y;
+		if ( z1 > box.v[i].z ) z1 = box.v[i].z;
+
+		if ( x2 < box.v[i].x ) x2 = box.v[i].x;
+		if ( y2 < box.v[i].y ) y2 = box.v[i].y;
+		if ( z2 < box.v[i].z ) z2 = box.v[i].z;
+	}
+#endif
+}
+
+SEGAN_INLINE float AABox::GetVolume( void ) const
+{
+	return ( x2 - x1 ) * ( y2 - y1 ) * ( z2 - z1 );
 }

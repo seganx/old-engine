@@ -35,8 +35,6 @@ public:
 		float f41, float f42, float f43, float f44
 		);
 
-	SEGAN_INLINE operator const float* ( void ) const { return &m00; }
-
 	//! zero all elements of this matrix
 	void Empty( void );
 
@@ -100,6 +98,9 @@ public:
  	//! Build an orthographic projection matrix
  	void Orthographic( float width, float height, float nearZ, float farZ );
 
+	//! conventional operators
+	SEGAN_INLINE operator const float* ( void ) const { return &m00; }
+
 public:
 
 	union {
@@ -128,8 +129,6 @@ public:
 	float2( const float2& v );
 	float2( const float x, const float y );
 
-	SEGAN_INLINE operator const float* ( void ) const { return e; }
-
 	//! set new value for this vector
 	void  Set( const float x, const float y );
 
@@ -151,6 +150,26 @@ public:
 	//! return interpolated vector of v1 and v2 by weight of w to this
 	void  Lerp( const float* v1, const float* v2, const float w );
 
+	//! conventional operators
+	SEGAN_INLINE operator const float* ( void ) const { return e; }
+
+	// assignment operators
+	SEGAN_INLINE float2& operator += ( const float2& v ) { x += v.x; y += v.y; return *this; }
+	SEGAN_INLINE float2& operator -= ( const float2& v ) { x -= v.x; y -= v.y; return *this; }
+	SEGAN_INLINE float2& operator *= ( const float f )	 { x *= f; y *= f; return *this; }
+	SEGAN_INLINE float2& operator /= ( const float f )	 { x /= f; y /= f; return *this; }
+
+	// unary operators
+	SEGAN_INLINE float2 operator - () const	{ return float2( -x, -y ); }
+
+	// binary operators
+	SEGAN_INLINE float2 operator + ( const float2& v ) const	{ return float2( x + v.x, y + v.y ); }
+	SEGAN_INLINE float2 operator - ( const float2& v ) const	{ return float2( x - v.x, y - v.y ); }
+	SEGAN_INLINE float2 operator * ( const float f ) const		{ return float2( x * f, y * f ); }
+	SEGAN_INLINE float2 operator / ( const float f ) const		{ return float2( x / f, y / f ); }
+	SEGAN_INLINE bool operator == ( const float2& v ) const		{ return ( x == v.x ) && ( y == v.y ); }
+	SEGAN_INLINE bool operator != ( const float2& v ) const		{ return ( x != v.x ) || ( y != v.y ); }
+
 public:
 
 	union {
@@ -163,6 +182,7 @@ public:
 	};
 };
 
+
 //////////////////////////////////////////////////////////////////////////
 //	VECTOR 3D
 //////////////////////////////////////////////////////////////////////////
@@ -173,8 +193,6 @@ public:
 	float3( const float* p );
 	float3( const float3& v );
 	float3( const float x, const float y, const float z );
-
-	SEGAN_INLINE operator const float* ( void ) const { return e; }
 
 	//! set new value for this vector
 	void Set( const float x, const float y, const float z );
@@ -209,6 +227,26 @@ public:
 	//! project vector to the screen space. view port must contain x, y, width, height
 	void ProjectToScreen( const float* v, const float* worldViewProjection, const int* viewport );
 
+	//! conventional operators
+	SEGAN_INLINE operator const float* ( void ) const { return e; }
+
+	// assignment operators
+	SEGAN_INLINE float3& operator += ( const float3& v ) { x += v.x; y += v.y; z += v.z; return *this; }
+	SEGAN_INLINE float3& operator -= ( const float3& v ) { x -= v.x; y -= v.y; z -= v.z; return *this; }
+	SEGAN_INLINE float3& operator *= ( const float f )	 { x *= f; y *= f; z *= f; return *this; }
+	SEGAN_INLINE float3& operator /= ( const float f )	 { x /= f; y /= f; z /= f; return *this; }
+
+	// unary operators
+	SEGAN_INLINE float3 operator - () const	{ return float3( -x, -y, -z ); }
+
+	// binary operators
+	SEGAN_INLINE float3 operator + ( const float3& v ) const	{ return float3( x + v.x, y + v.y, z + v.z ); }
+	SEGAN_INLINE float3 operator - ( const float3& v ) const	{ return float3( x - v.x, y - v.y, z + v.z ); }
+	SEGAN_INLINE float3 operator * ( const float f ) const		{ return float3( x * f, y * f, z * f ); }
+	SEGAN_INLINE float3 operator / ( const float f ) const		{ return float3( x / f, y / f, z / f ); }
+	SEGAN_INLINE bool operator == ( const float3& v ) const		{ return ( x == v.x ) && ( y == v.y ) && ( z == v.z ); }
+	SEGAN_INLINE bool operator != ( const float3& v ) const		{ return ( x != v.x ) || ( y != v.y ) || ( z != v.z ); }
+
 public:
 
 	union {
@@ -234,8 +272,6 @@ public:
 	float4( const float* xyz, const float w );
 	float4( const float x, const float y, const float z, const float w );
 
-	SEGAN_INLINE operator const float* ( void ) const { return e; }
-
 	//! set new value for this vector
 	void Set( const float x, const float y, const float z, const float w );
 
@@ -253,6 +289,26 @@ public:
 
 	//! return interpolated vector of v1 and v2 by weight of w to this
 	void Lerp( const float* v1, const float* v2, const float w );
+
+	//! conventional operators
+	SEGAN_INLINE operator const float* ( void ) const { return e; }
+
+	// assignment operators
+	SEGAN_INLINE float4& operator += ( const float4& v ) { x += v.x; y += v.y; z += v.z; w += v.w; return *this; }
+	SEGAN_INLINE float4& operator -= ( const float4& v ) { x -= v.x; y -= v.y; z -= v.z; w -= v.w; return *this; }
+	SEGAN_INLINE float4& operator *= ( const float f )	 { x *= f; y *= f; z *= f; w *= f; return *this; }
+	SEGAN_INLINE float4& operator /= ( const float f )	 { x /= f; y /= f; z /= f; w /= f; return *this; }
+
+	// unary operators
+	SEGAN_INLINE float4 operator - () const	{ return float4( -x, -y, -z, -w ); }
+
+	// binary operators
+	SEGAN_INLINE float4 operator + ( const float4& v ) const	{ return float4( x + v.x, y + v.y, z + v.z, w + v.w ); }
+	SEGAN_INLINE float4 operator - ( const float4& v ) const	{ return float4( x - v.x, y - v.y, z + v.z, w - v.w ); }
+	SEGAN_INLINE float4 operator * ( const float f ) const		{ return float4( x * f, y * f, z * f, w * f ); }
+	SEGAN_INLINE float4 operator / ( const float f ) const		{ return float4( x / f, y / f, z / f, w / f ); }
+	SEGAN_INLINE bool operator == ( const float4& v ) const		{ return ( x == v.x ) && ( y == v.y ) && ( z == v.z ) && ( w == v.w ); }
+	SEGAN_INLINE bool operator != ( const float4& v ) const		{ return ( x != v.x ) || ( y != v.y ) || ( z != v.z ) || ( w == v.w ); }
 
 public:
 
@@ -319,6 +375,9 @@ public:
 	//! quaternion multiplication. this will represents the rotation q2 followed by the rotation q1.  (this = q2 * q1)
 	void Multiply( const float* q1, const float* q2 );
 
+	//! add two quaternion and put the result to this. this = q1 + q2
+	void Add( const float* q1, const float* q2 );
+
 	// conjugate and re-norm
 	void Inverse( const float* q );
 
@@ -336,40 +395,82 @@ public:
 	};
 };
 
-
-#if 0
-
+//#define _XM_NO_INTRINSICS_
+//#include "D:\sajad\Engines\API\_DirectX\Include\xnamath.h"
 //////////////////////////////////////////////////////////////////////////
 //	PLANE
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_ENG_API Plane : public D3DXPLANE
+class SEGAN_ENG_API Plane
 {
 public:
-	//! setup a plane from 3 vectors in space
-	void Set(const Vector3& a, const Vector3& b, const Vector3 c);
+	Plane() {};
+	Plane( const float* p );
+	Plane( const Plane& p );
+	Plane( const float a, const float b, const float c, const float d );
 
-	//! Construct a plane from a point and a normal
-	void Make(const Vector3& v, const Vector3& n);
+	//! set new value for this plane
+	void Set( const float a, const float b, const float c, const float d );
 
-	//! return distance of a vector v from this plane
-	float Distance(const Vector3& v) const;
+	//! construct a plane from 3 points in space
+	void MakeFromPoints( const float* p1, const float* p2, const float* p3 );
+
+	//! construct a plane from a point and a normal
+	void MakeFromNormal( const float* p, const float* n );
+
+	//! return distance of a point from this plane
+	float Distance( const float* p ) const;
 
 	//! normalize plane p to this
-	void Normalize(const Plane& p);
+	void Normalize( const float* p );
+
+	//! make this plane by transform plane p by matrix m
+	void Transform( const float* p, const float* m );
+
+	//! conventional operators
+	SEGAN_INLINE operator const float* ( void ) const { return e; }
+
+public:
+
+	union {
+		struct {
+			float a;
+			float b;
+			float c;
+			float d;
+		};
+
+		float e[4];	//	elements of plane
+	};
 };
-typedef Plane *PPlane;
+
 
 //////////////////////////////////////////////////////////////////////////
 //	FRUSTUM
 //////////////////////////////////////////////////////////////////////////
-struct SEGAN_ENG_API Frustum
+class SEGAN_ENG_API Frustum
 {
-	union{
-		struct{
-			Plane p[6];
-		};
+public:
+	Frustum() {};
+	Frustum( const float* p );
+	Frustum( const Frustum& p );
+	Frustum(
+		const float* p0, const float* p1, const float* p2,
+		const float* p3, const float* p4, const float* p5
+		);
 
-		struct{
+	//! normalize frustum f to this
+	void Normalize( const float* _frustum );
+
+	//! compute this frustum from given matrix
+	void ComputeByMatrix( const float* _matrix );
+
+	//! conventional operators
+	SEGAN_INLINE operator const float* ( void ) const { return p0.e; }
+
+public:
+
+	union {
+		struct {
 			Plane p0;
 			Plane p1;
 			Plane p2;
@@ -377,16 +478,111 @@ struct SEGAN_ENG_API Frustum
 			Plane p4;
 			Plane p5;
 		};
+
+		struct {
+			Plane p[6];	//	planes of the frustum
+		};
 	};
 
-	//! normalize frustum f to this
-	void Normalize( const Frustum& f );
-
-	//! compute this frustum from given matrix
-	void ComputeByMatrix(Matrix& mat);
 };
-typedef Frustum *PFrustum;
 
+//////////////////////////////////////////////////////////////////////////
+//	SPHERE
+//////////////////////////////////////////////////////////////////////////
+class SEGAN_ENG_API Sphere
+{
+public:
+	Sphere() {};
+	Sphere( const float* s );
+	Sphere( const Sphere& s );
+	Sphere( const float* cen, const float rad );
+	Sphere( const float x, const float y, const float z, const float r );
+
+	//! resize the sphere to the zero
+	void Zero( void );
+
+	//! set new properties
+	void Set( const float* cen, const float rad );
+
+	//! compute center and radius depend of the box
+	void ComputeByAABox( const float* box );
+
+	//! resize the current sphere to cover the entry sphere
+	void Cover( const float* sphere );
+
+	//! return true if the sphere intersect to this and also fill the distance parameter 
+	bool Intersect( const float* sphere, float* OUT distance ) const;
+
+	//! transform sphere to this by matrix m
+	void Transform( const float* sphere, const float* mat );
+
+	//! conventional operators
+	SEGAN_INLINE operator const float* ( void ) const { return &x; }
+
+public:
+
+	union{
+		struct
+		{
+			float3	center;
+			float	radius;
+		};
+
+		struct
+		{
+			float x;
+			float y;
+			float z;
+			float r;
+		};
+	};
+
+};
+
+//////////////////////////////////////////////////////////////////////////
+//	AXIS ALIGNED BOX
+//////////////////////////////////////////////////////////////////////////
+class SEGAN_ENG_API AABox
+{
+public:
+	AABox() {};
+	AABox( const float* a );
+	AABox( const AABox& a );
+	AABox( const float* min, const float* max );
+	AABox( const float x1, const float y1, const float z1, const float x2, const float y2, const float z2 );
+
+	//! resize the box to the zero
+	void Zero( void );
+
+	//! resize the current box to cover the entry box
+	void CoverAA( const float* aabox );
+
+	//! resize the current box to cover the entry box
+	void CoverOB( const float* obbox );
+
+	//! return volume of the box
+	float GetVolume( void ) const;
+
+public:
+
+	union{
+		struct {
+			float x1;
+			float y1;
+			float z1;
+			float x2;
+			float y2;
+			float z2;
+		};
+
+		struct {
+			float3 min;
+			float3 max;
+		};
+	};
+};
+
+#if 0
 
 //////////////////////////////////////////////////////////////////////////
 //	3D RECTANGLE
@@ -418,35 +614,6 @@ struct SEGAN_ENG_API Rect3D
 };
 
 //////////////////////////////////////////////////////////////////////////
-//	AXIS ALIGNED BOX
-//////////////////////////////////////////////////////////////////////////
-struct OBBox;
-struct SEGAN_ENG_API AABox
-{
-	Vector Min;
-	Vector Max;
-
-	AABox(void);
-	AABox(const float3& _min, const float3& _max);
-
-	//! resize the box to the zero
-	void Zero(void);
-
-	//! resize the current box to cover the entry box
-	void CoverAA(const AABox& box);
-
-	//! resize the current box to cover the entry box
-	void CoverOB(const OBBox& box);
-
-	//! return volume of the box
-	float GetVolume(void) const;
-
-	//!  operator ==
-	bool operator == (const AABox& box) const;
-};
-typedef AABox *PAABox;
-
-//////////////////////////////////////////////////////////////////////////
 //	ORIENTED BOX
 //////////////////////////////////////////////////////////////////////////
 struct SEGAN_ENG_API OBBox
@@ -466,52 +633,6 @@ struct SEGAN_ENG_API OBBox
 };
 typedef OBBox *POBBox;
 
-//////////////////////////////////////////////////////////////////////////
-//	SPHERE
-//////////////////////////////////////////////////////////////////////////
-struct SEGAN_ENG_API Sphere
-{
-	union{
-		struct
-		{
-			Vector center;
-			float radius;
-		};
-
-		struct
-		{
-			float x;
-			float y;
-			float z;
-			float r;
-		};
-	};
-
-	Sphere(void);
-	Sphere(const float3& cen, const float rad);
-
-	//! set new properties
-	void Set(const float3& cen, const float rad);
-
-	//! compute center and radius depend of the box
-	void ComputeByAABox(const AABox& box);
-
-	//! resize the sphere to the zero
-	void Zero(void);
-
-	//! resize the current sphere to cover the entry sphere
-	void Cover(const Sphere& sphere);
-
-	//! return true if the sphere intersect to this and also fill the distance parameter 
-	bool Intersect(const Sphere& sphere, float* distance) const;
-
-	//! transform Sphere to this by matrix m
-	void Transform(const Sphere& sphere, const Matrix& m);
-
-	//!  operator ==
-	bool operator == (const Sphere& sphere) const;
-};
-typedef Sphere *PSphere;
 
 //////////////////////////////////////////////////////////////////////////
 //	RAY
@@ -572,7 +693,7 @@ struct SEGAN_ENG_API Ray
 typedef Ray *PRay;
 
 //////////////////////////////////////////////////////////////////////////
-//	FLOAT RECTANGLE
+//	float RECTANGLE
 //////////////////////////////////////////////////////////////////////////
 typedef struct RectF
 {
