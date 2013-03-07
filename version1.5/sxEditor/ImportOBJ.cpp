@@ -543,13 +543,13 @@ void ImportOBJFile( const WCHAR* FileName, OUT sx::core::ArrayPNode& nodeList, I
 				ZeroMemory(&F, sizeof(objFace));
 				for (int i=0; i<4; i++)
 				{
-					F.v[i] = abs( toker.Next().ToInt() - 1 );
+					F.v[i] = sx_abs_i( toker.Next().ToInt() ) - 1;
 					tmp = toker.LookatNext();	if ( tmp != '/' ) continue;
 					tmp = toker.Next();
-					F.t[i] = abs( toker.Next().ToInt() - 1 );
+					F.t[i] = sx_abs_i( toker.Next().ToInt() ) - 1;
 					tmp = toker.LookatNext();	if ( tmp != '/' ) continue;
 					tmp = toker.Next();
-					F.n[i] = abs( toker.Next().ToInt() - 1 );
+					F.n[i] = sx_abs_i( toker.Next().ToInt() ) - 1;
 				}
 
 				//  prepare face as triangle

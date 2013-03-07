@@ -11,8 +11,6 @@
 
 #include "Math.h"
 
-//#include "D:\SeganX\version2\sxEngine\math\vectormathlibrary\include\vectormath\scalar\c\vectormath_aos.h"
-
 SEGAN_INLINE float gen_matrix_det( matrix* mat )
 {
 	float tmp0 = ( ( mat->m22 * mat->m03 ) - ( mat->m02 * mat->m23 ) );

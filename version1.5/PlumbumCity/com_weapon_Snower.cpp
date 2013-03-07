@@ -297,43 +297,34 @@ void com_weapon_Snower::ShootTheBullet( const prpAttack* pAttack, Sphere& target
 {
 	sx_callstack_param(com_weapon_Snower::ShootTheBullet(special=%d), byte(special));
 
-	//  shoot the bullet
-	Projectile* proj			= pAttack->projectile->Clone();
-	proj->m_killParty			= m_owner->m_partyEnemies;
-	proj->m_target				= m_target;
-	proj->m_sender				= m_owner;
-
 	//  prepare the special attack
 	if ( special )
 	{
-		if ( m_target->m_move.type == GMT_AIR )
-		{
-			m_special.m_modifyTime = m_owner->m_curAbility.stunTime;
-			proj->m_component = &m_special;
-		}		
-		else if ( m_target->m_move.type == GMT_GROUND )
-		{
-			proj->m_attack = m_owner->m_curAbility;
-			proj->m_attack.stunValue = -1;
-		}
+		msgDamage stune(0,0,0,0, m_owner->m_curAbility.stunValue, m_owner->m_curAbility.stunTime, 0);
+		m_target->MsgProc( GMT_DAMAGE, &stune );
 	}
 	else
 	{
-		proj->m_attack = *pAttack;
-	}
+		//  shoot the bullet
+		Projectile* proj			= pAttack->projectile->Clone();
+		proj->m_killParty			= m_owner->m_partyEnemies;
+		proj->m_target				= m_target;
+		proj->m_sender				= m_owner;
+		proj->m_attack				= *pAttack;
 
-	proj->m_dir.Normalize( targetSphere.center - m_nodePipe[m_pipeIndex]->GetPosition_world() );
-	proj->m_pos	= m_nodePipe[ m_pipeIndex ]->GetPosition_world();
-	proj->m_pos	+= m_Dir * proj->m_node->GetSphere_local().r;
+		proj->m_dir.Normalize( targetSphere.center - m_nodePipe[m_pipeIndex]->GetPosition_world() );
+		proj->m_pos	= m_nodePipe[ m_pipeIndex ]->GetPosition_world();
+		proj->m_pos	+= m_Dir * proj->m_node->GetSphere_local().r;
 
-	ProjectileManager::AddProjectile(proj);
+		ProjectileManager::AddProjectile(proj);
 
-	//  change pipe index
-	switch (m_pipeIndex)
-	{
-	case 0:	m_pipeIndex = m_nodePipe[1] ? 1 : 0;	break;
-	case 1:	m_pipeIndex = m_nodePipe[2] ? 2 : 0;	break;
-	case 2:	m_pipeIndex = m_nodePipe[3] ? 3 : 0;	break;
-	case 3:	m_pipeIndex = 0; break;
+		//  change pipe index
+		switch (m_pipeIndex)
+		{
+		case 0:	m_pipeIndex = m_nodePipe[1] ? 1 : 0;	break;
+		case 1:	m_pipeIndex = m_nodePipe[2] ? 2 : 0;	break;
+		case 2:	m_pipeIndex = m_nodePipe[3] ? 3 : 0;	break;
+		case 3:	m_pipeIndex = 0; break;
+		}
 	}
 }

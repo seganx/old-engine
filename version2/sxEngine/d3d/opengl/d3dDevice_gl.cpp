@@ -376,11 +376,8 @@ SEGAN_INLINE void d3dDevice_gl::SetMatrix( const d3dMatrixMode mode, const float
 	case MM_WORLD:
 		{
 			m_world = _matrix;
-
-			matrix modelview;
-			modelview.Multiply( m_world, m_view );
 			glMatrixMode( GL_MODELVIEW );
-			glLoadMatrixf( &modelview.m00 );
+			glLoadMatrixf( sx_mul( m_world, m_view ) );
 		}
 		break;
 
@@ -388,10 +385,8 @@ SEGAN_INLINE void d3dDevice_gl::SetMatrix( const d3dMatrixMode mode, const float
 		{
 			m_view = _matrix;
 
-			matrix modelview;
-			modelview.Multiply( m_world, m_view );
 			glMatrixMode( GL_MODELVIEW );
-			glLoadMatrixf( &modelview.m00 );
+			glLoadMatrixf( sx_mul( m_world, m_view ) );
 		}
 		break;
 
@@ -469,8 +464,7 @@ void d3dDevice_gl::EndScene( void )
 	glVertex3f( src.x, src.y, src.z );
 	glEnd();
 
-	m_world.Multiply( m_view, m_projection );
-	dest.ProjectToScreen( src, m_world, &m_viewport.x );
+	dest = sx_project_to_screen( src, sx_mul( m_view, m_projection ), m_viewport.x, m_viewport.y, m_viewport.width, m_viewport.height );
 	src = dest;
 
 }

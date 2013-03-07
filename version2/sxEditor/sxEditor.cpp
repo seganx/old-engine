@@ -82,8 +82,7 @@ void AppMainLoop( float elpsTime )
 #if 1
 	if ( g_engine->m_device3D && g_engine->m_device3D->BeginScene() )
 	{
-		matrix mat;
-		mat.PerspectiveFov( PI / 3.0f, (float)g_engine->m_device3D->m_viewport.height / (float)g_engine->m_device3D->m_viewport.width, 0.5f, 1000.0f );
+		matrix mat = sx_perspective_fov( PI / 3.0f, (float)g_engine->m_device3D->m_viewport.height / (float)g_engine->m_device3D->m_viewport.width, 0.5f, 1000.0f );
 		g_engine->m_device3D->SetMatrix( MM_PROJECTION, mat );
 
 		static float timer = 0;
@@ -92,7 +91,7 @@ void AppMainLoop( float elpsTime )
 		float eye[3] = { 2.0f , 5.0f, 5.0f };
 		float at[3] = { 0.0f, 0.0f, 0.0f };
 		float up[3] = { 0.0f, 1.0f, 0.0f };
-		mat.LookAt( eye, at, up );
+		mat = sx_lookat( eye, at, up );
 		g_engine->m_device3D->SetMatrix( MM_VIEW, mat );
 
 		g_engine->m_device3D->SetTexture( null );
@@ -123,7 +122,7 @@ void AppMainLoop( float elpsTime )
 		g_engine->m_device3D->SetTexture( tex_001 );
 
 		float d[3] = { 1.0f, 0.0f, 1.0f }, u[3] = { 0.0f, 1.0f, 0.0f };
-		mat.SetDirection( d, u );
+		sx_set_direction( mat, d, u );
 //		mat.SetTranslation( 0, 0, 1 );
 //		mat.Identity();
 //		mat.SetRotationPitchYawRoll( 0, 0, (float)sx_os_get_timer() * 0.005f );

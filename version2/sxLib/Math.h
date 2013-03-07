@@ -177,6 +177,31 @@ SEGAN_LIB_INLINE float sx_sqrt_fast( const float x )
 	return u.x;
 }
 
+//! return the closest power of two number to the given number
+SEGAN_LIB_INLINE uint sx_pow2_clossest( const uint x )
+{
+	uint i = 1;
+	while ( i < x ) i += i;
+	if ( 4 * x < 3 * i ) i >>= 1;
+	return i;
+}
+
+//! return the upper power of two number from the given number
+SEGAN_LIB_INLINE uint sx_pow2_upper( const uint x )
+{
+	uint i = 1;
+	while ( i < x ) i += i;
+	return i;
+}
+
+//! return the lower power of two number from the given number
+SEGAN_LIB_INLINE uint sx_pow2_lower( const uint x )
+{
+	uint i = 1;
+	while ( i <= x ) i += i;
+	return i >> 1;
+}
+
 //! clamp value between min and max
 SEGAN_LIB_INLINE sint sx_clamp_i( const sint value, const sint imin, const sint imax )
 {
@@ -229,7 +254,6 @@ SEGAN_LIB_INLINE float sx_angle_normalize_180( const float angle )
 SEGAN_LIB_INLINE void sx_sin_cos( const float IN x, float& OUT s, float& OUT c)
 {
 #if defined(_WIN32)
-//#if 0
 	_asm {
 		fld		x
 		fsincos
@@ -294,6 +318,7 @@ SEGAN_LIB_INLINE sint sx_random_i_limit( const sint minRange, const sint maxRang
 	sint len = maxRange - minRange + 1;
 	return sx_random_i( len ) + minRange;
 }
+
 
 #endif	//	GUARD_Math_HEADER_FILE
 

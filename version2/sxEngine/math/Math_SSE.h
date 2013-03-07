@@ -51,7 +51,6 @@
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
-//#include "D:\SeganX\version2\sxEngine\math\vectormathlibrary\include\vectormath\SSE\cpp\vectormath_aos.h"
 
 #define USE_SSE2_LDDQU
 #ifdef USE_SSE2_LDDQU
@@ -295,7 +294,7 @@ SEGAN_INLINE void sse_matrix_inv( matrix* res, const matrix* mat )
 	_mm_storeu_ps( res->m[3], _L4 );
 }
 
-SEGAN_INLINE float sse_matrix_det( matrix* mat )
+SEGAN_INLINE float sse_matrix_det( const matrix* mat )
 {
 	__m128 Va,Vb,Vc;
 	__m128 r1,r2,r3,tt,tt2;

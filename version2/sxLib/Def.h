@@ -92,6 +92,8 @@ typedef byte				*pbyte;
 
 #define SEGAN_INLINE			inline
 
+#define SEGAN_ALIGN_16			__declspec(align(16))
+
 #define SEGAN_MEMLEAK			1		// use first version of memory leak detector
 
 #define SEGAN_CALLSTACK			1		// enable call stack system to log stack of function
