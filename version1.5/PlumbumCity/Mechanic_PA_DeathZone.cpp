@@ -1,4 +1,4 @@
-#include "Mechanic_PA_Trap.h"
+#include "Mechanic_PA_DeathZone.h"
 #include "Game.h"
 #include "Player.h"
 #include "Scripter.h"
@@ -33,7 +33,7 @@ namespace GM
 		}
 	};
 
-	Mechanic_PA_Trap::Mechanic_PA_Trap( void ) 
+	Mechanic_PA_DeathZone::Mechanic_PA_DeathZone( void ) 
 		: Mechanic()
 		, m_Cost(100)
 		, m_Time(0)
@@ -48,14 +48,14 @@ namespace GM
 		m_attack.actionCount = 1;
 	}
 
-	Mechanic_PA_Trap::~Mechanic_PA_Trap( void )
+	Mechanic_PA_DeathZone::~Mechanic_PA_DeathZone( void )
 	{
 		sx_callstack();
 
 		powerAttack_count--;
 	}
 
-	void Mechanic_PA_Trap::Initialize( void )
+	void Mechanic_PA_DeathZone::Initialize( void )
 	{
 		sx_callstack();
 
@@ -68,7 +68,7 @@ namespace GM
 		m_panelEx->GetElement(0)->SetTextureSrc( L"gui_pa_trap.txr" );
 
 		m_panelEx->AddProperty(SX_GUI_PROPERTY_ACTIVATE);
-		SEGAN_GUI_SET_ONCLICK( m_panelEx, Mechanic_PA_Trap::OnGUIClick );
+		SEGAN_GUI_SET_ONCLICK( m_panelEx, Mechanic_PA_DeathZone::OnGUIClick );
 
 		m_progBar = sx_new( sx::gui::ProgressBar );
 		m_progBar->SetSize( float2(64,64) );
@@ -79,7 +79,7 @@ namespace GM
 		m_progBar->GetElement(1)->SetTextureSrc( L"gui_pa_ring.txr" );
 	}
 
-	void Mechanic_PA_Trap::Finalize( void )
+	void Mechanic_PA_DeathZone::Finalize( void )
 	{
 		sx_callstack();
 
@@ -92,7 +92,7 @@ namespace GM
 		sx_delete_and_null( m_node );
 	}
 
-	void Mechanic_PA_Trap::ProcessInput( bool& inputHandled, float elpsTime )
+	void Mechanic_PA_DeathZone::ProcessInput( bool& inputHandled, float elpsTime )
 	{
 		if ( NotInGame() || g_game->m_mouseMode == MS_CreateTower || g_game->m_mouseMode == MS_ManualTower )
 			return;
@@ -112,7 +112,7 @@ namespace GM
 
 
 		//  check create mode
-		if ( g_game->m_mouseMode == MS_CreateLandMine )
+		if ( g_game->m_mouseMode == MS_CreateDeathZone )
 		{
 			Entity::SetSelected(NULL);
 
@@ -148,7 +148,7 @@ namespace GM
 
 	}
 
-	void Mechanic_PA_Trap::Update( float elpsTime )
+	void Mechanic_PA_DeathZone::Update( float elpsTime )
 	{
 		if ( NotInGame() )	return;
 
@@ -206,33 +206,16 @@ namespace GM
 
 			//  find enemies near the trap
 			static sx::core::ArrayPNode enemies(128);	enemies.Clear();
+			
+			trap->time += elpsTime * 0.001f;
 
-			const float radius2 = m_radius * m_radius;
-			const float splashRadius2 = m_attack.splashRadius * m_attack.splashRadius;
-			sx::core::Scene::GetNodesByArea( trap->pos, m_attack.splashRadius, enemies, NMT_ALL, PARTY_ENEMY );
-
-			for (int j=0; j<enemies.Count(); j++)
+			if ( trap->time > 0.1f )
 			{
-				sx::core::PNode enNode = enemies[j];
-				if ( enNode->GetUserData() )
-				{
-					Entity* en = static_cast<Entity*>( enNode->GetUserData() );
-					if ( en->m_health.icur > 0 && en->m_move.type == GMT_GROUND )
-					{
-						const float dist2 = trap->pos.Distance_sqr( en->m_pos );
+				trap->time = 0.0f;
+				trap->count--;
 
-						if ( dist2 <= radius2 )
-						{
-							trap->count = 0;
-							worked = true;
-							break;
-						}
-					}
-				}
-			}
+				sx::core::Scene::GetNodesByArea( trap->pos, m_radius, enemies, NMT_ALL, PARTY_ENEMY );
 
-			if ( worked )
-			{
 				for (int j=0; j<enemies.Count(); j++)
 				{
 					sx::core::PNode enNode = enemies[j];
@@ -241,14 +224,10 @@ namespace GM
 						Entity* en = static_cast<Entity*>( enNode->GetUserData() );
 						if ( en->m_health.icur > 0 && en->m_move.type == GMT_GROUND )
 						{
-							const float dist2 = trap->pos.Distance_sqr( en->m_pos );
-							const float diff = (splashRadius2 - dist2) > 0.01f ? (splashRadius2 - dist2) : 0.01f;
-							const float ratio = diff / splashRadius2; // sinf(PI * 0.5f * (diff / splashRadius2));
-
 							msgDamage damage( 
-								m_attack.physicalDamage * ratio, 
+								m_attack.physicalDamage, 
 								m_attack.physicalArmor, 
-								m_attack.electricalDamage * ratio, 
+								m_attack.electricalDamage, 
 								m_attack.electricalArmor, 
 								m_attack.stunValue, 
 								m_attack.stunTime, 
@@ -262,7 +241,10 @@ namespace GM
 						}
 					}
 				}
-
+			}
+			
+			if ( worked )
+			{
 				msg_Animator msgAnim( SX_ANIMATOR_PLAY, SX_ANIMATOR_LOOP, 0, -1, -1, -1, 0 );
 				trap->node->MsgProc( MT_ANIMATOR, &msgAnim );
 
@@ -275,12 +257,11 @@ namespace GM
 					msg_SoundPlay msgSnd( false );
 					fireNode->MsgProc( MT_SOUND_PLAY, &msgSnd );
 				}
-			} // worked
+			}
 		}
-
 	}
 
-	void Mechanic_PA_Trap::MsgProc( UINT recieverID, UINT msg, void* data )
+	void Mechanic_PA_DeathZone::MsgProc( UINT recieverID, UINT msg, void* data )
 	{
 		sx_callstack_param(Mechanic_PA_Trap::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
@@ -315,7 +296,7 @@ namespace GM
 						if ( !script.GetString(i, L"Name", tmpStr) )
 							continue;
 
-						if ( tmpStr == L"LandMine" )
+						if ( tmpStr == L"DeathZone" )
 						{
 							script.GetInteger(i, L"cost", m_Cost);
 							script.GetFloat(i, L"coolTime", m_coolTime);
@@ -346,7 +327,7 @@ namespace GM
 							script.GetFloat(i, L"electricalDamage", m_attack.electricalDamage );
 							script.GetFloat(i, L"stunTime",			m_attack.stunTime );
 							script.GetFloat(i, L"stunValue",		m_attack.stunValue );
-							script.GetFloat(i, L"splashRadius",		m_attack.splashRadius );
+							script.GetFloat(i, L"actionTime",		m_attack.actionTime );
 							script.GetFloat(i, L"radius",			m_radius );
 
 							m_coolTime					-= g_game->m_upgrades.trap_cooltime;
@@ -409,7 +390,7 @@ namespace GM
 		}
 	}
 
-	void Mechanic_PA_Trap::OnGUIClick( sx::gui::PControl Sender )
+	void Mechanic_PA_DeathZone::OnGUIClick( sx::gui::PControl Sender )
 	{
 		if ( !m_node ) return;
 
@@ -417,7 +398,7 @@ namespace GM
 
 		if ( m_Time >= m_coolTime && g_game->m_player->m_energy >= m_Cost )
 		{
-			g_game->m_mouseMode = MS_CreateLandMine;
+			g_game->m_mouseMode = MS_CreateDeathZone;
 			m_node->SetRotation( 0, sx::cmn::Random(6.12f), 0 );
 		}
 		else
@@ -429,7 +410,7 @@ namespace GM
 		}
 	}
 
-	void Mechanic_PA_Trap::CreateTrap( void )
+	void Mechanic_PA_DeathZone::CreateTrap( void )
 	{
 		sx_callstack();
 
@@ -493,8 +474,8 @@ namespace GM
 			g_game->m_player->m_energy -= m_Cost;
 
 			Trap* trap = sx_new( Trap );
-			trap->coolTime	= 0.0f;
-			trap->count		= 1;
+			trap->coolTime	= m_attack.actionTime;
+			trap->count		= static_cast<int>(trap->coolTime * 10.0f);
 			trap->pos		= m_pos;
 			trap->node		= m_node->Clone();
 			trap->node->SetPosition( m_node->GetPosition_world() );
@@ -516,7 +497,7 @@ namespace GM
 		}
 	}
 
-	void Mechanic_PA_Trap::ClearTraps( void )
+	void Mechanic_PA_DeathZone::ClearTraps( void )
 	{
 		sx_callstack();
 

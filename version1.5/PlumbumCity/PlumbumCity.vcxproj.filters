@@ -179,6 +179,9 @@
       <Filter>Component</Filter>
     </ClCompile>
     <ClCompile Include="PlumbumCity.cpp" />
+    <ClCompile Include="Mechanic_PA_DeathZone.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -341,6 +344,9 @@
       <Filter>Component</Filter>
     </ClInclude>
     <ClInclude Include="ImportEngine.h" />
+    <ClInclude Include="Mechanic_PA_DeathZone.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cursor_empty.cur">

@@ -459,6 +459,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Mechanic_PA_DeathZone.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Mechanic_PA_DeathZone.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Mechanic_PA_GoldenTowers.cpp"
 				>
 			</File>

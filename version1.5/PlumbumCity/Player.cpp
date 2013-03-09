@@ -21,6 +21,7 @@
 #include "Mechanic_PA_GoldenTowers.h"
 #include "Mechanic_MT_Machinegun.h"
 #include "Mechanic_MT_Sniper.h"
+#include "Mechanic_PA_DeathZone.h"
 
 
 Player::Player( void ):	m_gold(500), m_people(100), m_energy(100), m_fastCoolDown(1.0f)
@@ -337,8 +338,10 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 							m_Mechanics.PushBack( sx_new( GM::Mechanic_PA_GoldenTowers ) );
 						else if ( tmpStr == L"BomberMan" )
 							m_Mechanics.PushBack( sx_new( GM::Mechanic_PA_BomberMan ) );
-						else if ( tmpStr == L"Trap" )
+						else if ( tmpStr == L"LandMine" )
 							m_Mechanics.PushBack( sx_new( GM::Mechanic_PA_Trap ) );
+						else if ( tmpStr == L"DeathZone" )
+							m_Mechanics.PushBack( sx_new( GM::Mechanic_PA_DeathZone ) );
 						else if ( tmpStr == L"Predator" )
 							m_Mechanics.PushBack( sx_new( GM::Mechanic_PA_Predator ) );
 					}

@@ -116,6 +116,7 @@
     <ClCompile Include="GameMenus.cpp" />
     <ClCompile Include="GamePlay.cpp" />
     <ClCompile Include="GameUtils.cpp" />
+    <ClCompile Include="Mechanic_PA_DeathZone.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scripter.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="GamePlay.h" />
     <ClInclude Include="GameTypes.h" />
     <ClInclude Include="GameUtils.h" />
+    <ClInclude Include="Mechanic_PA_DeathZone.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Scripter.h" />
     <ClInclude Include="Entity.h" />

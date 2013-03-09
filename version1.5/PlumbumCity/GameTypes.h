@@ -41,7 +41,8 @@ enum MouseState
 	MS_ShowCreateTower,
 	MS_CreateTower,
 	MS_CreateHotzone,
-	MS_CreateTrap,
+	MS_CreateLandMine,
+	MS_CreateDeathZone,
 	MS_MobileCamera,
 	MS_FreeCamera,
 	MS_ManualTower
