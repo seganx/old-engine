@@ -372,6 +372,11 @@ void d3dDevice_dx::DrawIndexedPrimitive( const d3dPrimitiveType primType, const 
 	//m_device3D->DrawIndexedPrimitive()
 }
 
+void d3dDevice_dx::DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const dword color )
+{
+
+}
+
 bool d3dDevice_dx::BeginScene( void )
 {
 	sx_assert( m_device3D );

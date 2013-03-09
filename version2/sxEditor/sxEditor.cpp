@@ -87,8 +87,8 @@ void AppMainLoop( float elpsTime )
 
 		static float timer = 0;
 		timer =  (float)( 0.0003f * sx_os_get_timer() );
-		//float eye[3] = { 5.0f * sx_sin(timer), 5.0f, 10.0f * sx_cos(timer)	};
-		float eye[3] = { 2.0f , 5.0f, 5.0f };
+		float eye[3] = { 5.0f * sx_sin(timer), 5.0f, 10.0f * sx_cos(timer)	};
+		//float eye[3] = { 2.0f , 5.0f, 5.0f };
 		float at[3] = { 0.0f, 0.0f, 0.0f };
 		float up[3] = { 0.0f, 1.0f, 0.0f };
 		mat = sx_lookat( eye, at, up );
@@ -96,7 +96,7 @@ void AppMainLoop( float elpsTime )
 
 		g_engine->m_device3D->SetTexture( null );
 
-		g_engine->m_device3D->ClearScreen( 0xffbbbbff );
+		g_engine->m_device3D->ClearScreen( 0x000000ff );
 
 #if 0
 		g_engine->m_device3D->SetTexture( tex_000 );
@@ -119,6 +119,16 @@ void AppMainLoop( float elpsTime )
 		}
 #endif
 
+		sx_debug_draw_grid( 10, 0xaaaaaaaa );
+
+		AABox box( -1, 0, -1, 1, 2, 1 );
+		sx_debug_draw_box( box, 0xffffff00 );
+		sx_debug_draw_circle( float3( 5, 0, 4 ), 3, 0xffffffff );
+		sx_debug_draw_sphere( Sphere( -5, 0, -4, 3 ), 0xff00ffff );
+
+		sx_debug_draw_compass();
+
+
 		g_engine->m_device3D->SetTexture( tex_001 );
 
 		float d[3] = { 1.0f, 0.0f, 1.0f }, u[3] = { 0.0f, 1.0f, 0.0f };
@@ -129,6 +139,7 @@ void AppMainLoop( float elpsTime )
 //		matrix mview = g_engine->m_device3D->GetMatrix( MM_VIEW );
 //		mat.Inverse( mview );
 		g_engine->m_device3D->SetMatrix( MM_WORLD, mat );
+
 
 		g_engine->m_device3D->EndScene();
 

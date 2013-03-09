@@ -320,5 +320,9 @@ SEGAN_LIB_INLINE sint sx_random_i_limit( const sint minRange, const sint maxRang
 }
 
 
+#include "math/Math_vec.h"
+#include "math/Math_utils.h"
+#include "math/Math_tools.h"
+
 #endif	//	GUARD_Math_HEADER_FILE
 

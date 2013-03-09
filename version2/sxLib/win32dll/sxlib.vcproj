@@ -224,6 +224,34 @@
 				RelativePath="..\String.h"
 				>
 			</File>
+			<Filter
+				Name="math"
+				>
+				<File
+					RelativePath="..\math\Math.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\math\Math_Generic.h"
+					>
+				</File>
+				<File
+					RelativePath="..\math\Math_SSE.h"
+					>
+				</File>
+				<File
+					RelativePath="..\math\Math_tools.h"
+					>
+				</File>
+				<File
+					RelativePath="..\math\Math_utils.h"
+					>
+				</File>
+				<File
+					RelativePath="..\math\Math_vec.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\sxlib.cpp"

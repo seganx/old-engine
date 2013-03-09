@@ -1,12 +1,9 @@
-#include "Math.h"
+#include "../Math.h"
 #include "Math_Generic.h"
-#include "../System/Log.h"
 
 #if SEGAN_MATH_SIMD
 #include "Math_SSE.h"
 #endif
-
-
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -475,7 +472,7 @@ SEGAN_INLINE void sx_transform_point( float3& dest, const float3& src, const mat
 SEGAN_INLINE matrix sx_scale( const float x, const float y, const float z )
 {
 	matrix res;
-#if SEGAN_MATH_SIMD
+#if 0//SEGAN_MATH_SIMD
 	sse_matrix_scale( &res, x, y, z );
 #else
 	gen_matrix_scale( &res, x, y, z );
@@ -485,7 +482,7 @@ SEGAN_INLINE matrix sx_scale( const float x, const float y, const float z )
 
 SEGAN_INLINE void sx_scale( matrix& res, const float x, const float y, const float z )
 {
-#if SEGAN_MATH_SIMD
+#if 0//SEGAN_MATH_SIMD
 	sse_matrix_scale( &res, x, y, z );
 #else
 	gen_matrix_scale( &res, x, y, z );
@@ -646,18 +643,4 @@ SEGAN_INLINE float3 sx_project_to_screen( const float3& v, const matrix& worldVi
 	res.y += (float)y;
 
 	return res;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-//	math init/finite implementation
-//////////////////////////////////////////////////////////////////////////
-SEGAN_ENG_API void sx_math_initialize( bool useGenericMath /*= false*/ )
-{
-
-}
-
-SEGAN_ENG_API void sx_math_finalize( void )
-{
-
 }

@@ -10,9 +10,6 @@
 #define GUARD_Math_vec_HEADER_FILE
 
 
-#include "../../sxLib/Lib.h"
-
-
 //	forward declarations
 class float2;
 class float3;
@@ -30,7 +27,7 @@ class Ray;
 //////////////////////////////////////////////////////////////////////////
 //	INTEGER POINT 2D
 //////////////////////////////////////////////////////////////////////////
-class int2
+SEGAN_ALIGN_16 class int2
 {
 public:
 	SEGAN_INLINE int2() {}
@@ -130,7 +127,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 //	VECTOR 3D
 //////////////////////////////////////////////////////////////////////////
-SEGAN_ALIGN_16 class float3
+class float3
 {
 public:
 	//! constructors
@@ -440,15 +437,21 @@ public:
 	//! zero all elements of this matrix
 	SEGAN_INLINE matrix& Zero( void )
 	{
-		sx_mem_set( this, 0, sizeof(matrix) );
+		m00 = m01 = m02 = m03 = 0;
+		m10 = m11 = m12 = m13 = 0;
+		m20 = m21 = m22 = m23 = 0;
+		m30 = m31 = m32 = m33 = 0;
 		return *this;
 	}
 
 	//! make this matrix identity
 	SEGAN_INLINE matrix& Identity( void )
 	{
-		sx_mem_set( this, 0, sizeof(matrix) );
-		m00 = 1.0f; m11 = 1.0f; m22 = 1.0f; m33 = 1.0f;
+		m01 = m02 = m03 = 0;
+		m10 = m12 = m13 = 0;
+		m20 = m21 = m23 = 0;
+		m30 = m31 = m32 = 0;
+		m00 = m11 = m22 = m33 = 1.0f;
 		return *this;
 	}
 
@@ -463,7 +466,10 @@ public:
 	//! make this as an scaling matrix. Use this with care. some objects in 3d space have no absolute scale. like rigid bodies, triggers, etc
 	SEGAN_INLINE matrix& MakeScale( const float x, const float y, const float z )
 	{
-		sx_mem_set( this, 0, sizeof(matrix) );
+		m01 = m02 = m03 = 0;
+		m10 = m12 = m13 = 0;
+		m20 = m21 = m23 = 0;
+		m30 = m31 = m32 = 0;
 		m00 = x; m11 = y; m22 = z; m33 = 1.0f;
 		return *this;
 	}

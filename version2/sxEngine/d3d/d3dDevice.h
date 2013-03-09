@@ -144,6 +144,15 @@ struct d3dDebugInfo
 	float		frameTime;		//! frame time in milliseconds
 };
 
+//! color structure used in API
+struct d3dColor
+{
+	float		r;		//	red channel
+	float		g;		//	green channel
+	float		b;		//	blue channel
+	float		a;		//	alpha channel
+};
+
 //! view port structure
 struct d3dViewport
 {
@@ -357,10 +366,13 @@ public:
 	virtual const float* GetMatrix( const d3dMatrixMode mode ) = 0;
 
 	//! draw primitive shapes
-	virtual void DrawPrimitive(const d3dPrimitiveType primType, const int firstVertex, const int vertexCount) = 0;
+	virtual void DrawPrimitive( const d3dPrimitiveType primType, const int firstVertex, const int vertexCount ) = 0;
 
 	//! draw indexed primitive shapes
-	virtual void DrawIndexedPrimitive(const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount) = 0;
+	virtual void DrawIndexedPrimitive( const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount ) = 0;
+
+	//! draw primitive by given vertices
+	virtual void DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const dword color ) = 0;
 
 	//! begin to draw shapes
 	virtual bool BeginScene( void )= 0;

@@ -432,6 +432,40 @@ SEGAN_INLINE void d3dDevice_gl::DrawIndexedPrimitive(const d3dPrimitiveType prim
 	m_debugInfo.drawCalls++;
 }
 
+
+void d3dDevice_gl::DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const dword color )
+{
+	ApplyTextureBuffer();
+
+	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+	switch ( primType )
+	{
+	case PT_POINT:			glBegin( GL_POINTS );			break;
+	case PT_LINE_LIST:		glBegin( GL_LINES );			break;
+	case PT_LINE_STRIP:		glBegin( GL_LINE_STRIP );		break;
+	case PT_TRIANGLE_LIST:	glBegin( GL_TRIANGLES );		break;
+	case PT_TRIANGLE_STRIP:	glBegin( GL_TRIANGLE_STRIP );	break;
+	case PT_TRIANGLE_FAN:	glBegin( GL_TRIANGLE_FAN );		break;
+	default: return;
+	}
+
+	Color c( color );
+	glColor4f( c.r, c.g, c.b, c.a );
+	const float* pos = vertices;
+	for ( uint i=0; i<vertxcount; ++i )
+	{
+		float x = *pos++, y = *pos++, z = *pos++;
+		glVertex3f( x, y, z );
+	}
+
+	glEnd();
+
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+}
+
+
 bool d3dDevice_gl::BeginScene( void )
 {
 #if defined(_WIN32)
@@ -445,6 +479,8 @@ bool d3dDevice_gl::BeginScene( void )
 
 void d3dDevice_gl::EndScene( void )
 {
+	return;
+
 	float x = 0, y = 0, z = sx_random_f_limit( 1, 2 );
 	ApplyTextureBuffer();
   	glColor3f( 1.0f,1.0f,1.0f );
@@ -459,10 +495,10 @@ void d3dDevice_gl::EndScene( void )
 	SetMatrix( MM_WORLD, mat );
 
 	float3 dest, src( 1, 1, -1 );
-	glColor3f( 0.5f, 0.0f, 0.0f );
-	glBegin( GL_POINTS );
-	glVertex3f( src.x, src.y, src.z );
-	glEnd();
+// 	glColor3f( 0.5f, 0.0f, 0.0f );
+// 	glBegin( GL_POINTS );
+// 	glVertex3f( src.x, src.y, src.z );
+// 	glEnd();
 
 	dest = sx_project_to_screen( src, sx_mul( m_view, m_projection ), m_viewport.x, m_viewport.y, m_viewport.width, m_viewport.height );
 	src = dest;
@@ -513,29 +549,6 @@ void d3dDevice_gl::ClearScreen( const dword bgcolor )
 	glDepthMask( GL_TRUE );
 
 	glClear( clearBits );
-
-	m_world.Identity();
-	SetMatrix( MM_WORLD, m_world );
-
-	ApplyTextureBuffer();
-
-	glColor3f( 1.0f, 0.0f, 0.0f );
-	glBegin( GL_LINES );
-	glVertex3f(-1.0f, 0.0f, 0.0f );
-	glVertex3f( 2.0f, 0.0f, 0.0f );
-	glEnd();
-
-	glColor3f( 0.0f, 1.0f, 0.0f );
-	glBegin( GL_LINES );
-	glVertex3f( 0.0f,-1.0f, 0.0f );
-	glVertex3f( 0.0f, 2.0f, 0.0f );
-	glEnd();
-
-	glColor3f( 0.0f, 0.0f, 1.0f );
-	glBegin( GL_LINES );
-	glVertex3f( 0.0f, 0.0f,-1.0f );
-	glVertex3f( 0.0f, 0.0f, 2.0f );
-	glEnd();
 }
 
 void d3dDevice_gl::ClearTarget( const dword bgcolor )

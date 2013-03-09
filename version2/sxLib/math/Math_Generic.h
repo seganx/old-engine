@@ -267,20 +267,11 @@ SEGAN_INLINE void gen_matrix_lookat( matrix* m, const float* eye, const float* a
 	upd[1] /= uplen;
 	upd[2] /= uplen;
 
-	m->m00 = side[0];
-	m->m01 = upd[0];
-	m->m02 = dir[0];
-	m->m03 = 0;
+	m->m00 = side[0];	m->m01 = upd[0];	m->m02 = dir[0];	m->m03 = 0;
 
-	m->m10 = side[1];
-	m->m11 = upd[1];
-	m->m12 = dir[1];
-	m->m13 = 0;
+	m->m10 = side[1];	m->m11 = upd[1];	m->m12 = dir[1];	m->m13 = 0;
 
-	m->m20 = side[2];
-	m->m21 = upd[2];
-	m->m22 = dir[2];
-	m->m23 = 0;
+	m->m20 = side[2];	m->m21 = upd[2];	m->m22 = dir[2];	m->m23 = 0;
 
 	m->m30 = - ( side[0] * eye[0] + side[1] * eye[1] + side[2] * eye[2] );
 	m->m31 = - ( upd[0]  * eye[0] + upd[1]  * eye[1] + upd[2]  * eye[2] );

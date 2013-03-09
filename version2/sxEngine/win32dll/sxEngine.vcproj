@@ -282,38 +282,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="math"
-			>
-			<File
-				RelativePath="..\math\Math.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\math\Math.h"
-				>
-			</File>
-			<File
-				RelativePath="..\math\Math_generic.h"
-				>
-			</File>
-			<File
-				RelativePath="..\math\Math_sse.h"
-				>
-			</File>
-			<File
-				RelativePath="..\math\Math_tools.h"
-				>
-			</File>
-			<File
-				RelativePath="..\math\Math_utils.h"
-				>
-			</File>
-			<File
-				RelativePath="..\math\Math_vec.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="d3d"
 			>
 			<File
@@ -388,6 +356,18 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="engine"
+			>
+			<File
+				RelativePath="..\engine\draw_debugger.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\engine\draw_debugger.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="..\Engine_def.h"

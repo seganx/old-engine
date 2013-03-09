@@ -68,6 +68,8 @@ public:
 
 	virtual void DrawIndexedPrimitive(const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount);
 
+	virtual void DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const dword color );
+
 	virtual bool BeginScene( void );
 
 	virtual void EndScene( void );

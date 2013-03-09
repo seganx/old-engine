@@ -588,13 +588,64 @@ SEGAN_INLINE OBBox sx_transform( const AABox& box, const matrix& mat )
 SEGAN_ENG_API float3 sx_project_to_screen( const float3& v, const matrix& worldViewProjection, const int x, const int y, const int width, const int height );
 
 //! return true if the sphere intersect with the frustum
-SEGAN_INLINE bool sx_intersect( const Sphere& sph, const Frustum& fr );
+SEGAN_INLINE bool sx_intersect( const Sphere& sph, const Frustum& fr )
+{
+	//  return if sphere is fully out side of the frustum
+	for ( int i=0; i<6; ++i )
+	{
+		if ( sx_distance( fr.p[i], sph.center ) < - sph.r ) 
+			return false;
+	}
+	return true;
+}
 
 //! return true if the box intersect with the frustum
-SEGAN_INLINE bool sx_intersect( const AABox& box, const Frustum& fr );
+SEGAN_INLINE bool sx_intersect( const AABox& box, const Frustum& fr )
+{
+	float3 vmin, vmax;
+	for ( int i = 0; i < 6; ++i )
+	{ 
+		if ( fr.p[i].a > 0 ) 
+			vmin.x = box.x1, vmax.x = box.x2;
+		else 
+			vmin.x = box.x2, vmax.x = box.x1;
+		
+		if ( fr.p[i].b > 0 )
+			vmin.y = box.y1, vmax.y = box.y2;
+		else
+			vmin.y = box.y2, vmax.y = box.y1;
+
+		if ( fr.p[i].c > 0 )
+			vmin.z = box.z1, vmax.z = box.z2;
+		else
+			vmin.z = box.z2, vmax.z = box.z1;
+
+		if( sx_dot( (float3)fr.p[i], vmin ) + fr.p[i].d > 0 ) 
+			return false;
+	} 
+	return true;
+}
 
 //! return true if the box intersect with the frustum
-SEGAN_INLINE bool sx_intersect( const OBBox& box, const Frustum& fr );
+SEGAN_INLINE bool sx_intersect( const OBBox& box, const Frustum& fr )
+{
+	// check the visibility via intersect between box and frustum
+	bool result = true;
+	for (int i=0; i<6 && result; i++)
+	{
+		result = false;
+		for (int j=0; j<8; j++)
+		{
+			if ( sx_distance( fr.p[i], box.v[j] ) >= 0 )
+			{
+				result = true;
+				break;
+			}
+		}
+	}
+
+	return result;
+}
 
 
 #endif	//	GUARD_Math_tools_HEADER_FILE

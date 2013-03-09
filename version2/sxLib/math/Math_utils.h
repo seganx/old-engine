@@ -13,6 +13,98 @@
 
 //#define _XM_NO_INTRINSICS_
 //#include "D:\sajad\Engines\API\_DirectX\Include\xnamath.h"
+
+
+//////////////////////////////////////////////////////////////////////////
+//	COLOR
+//////////////////////////////////////////////////////////////////////////
+SEGAN_ALIGN_16 class Color
+{
+public:
+	SEGAN_INLINE Color() {}
+	SEGAN_INLINE Color( const dword c ) { Set( c ); }
+	SEGAN_INLINE Color( const Color& c ): r(c.r), g(c.g), b(c.b), a(c.a) {}
+	SEGAN_INLINE Color( const float* p ): r(p[0]), g(p[1]), b(p[2]), a(p[3]) {}
+	SEGAN_INLINE Color( const float _r, const float _g, const float _b, const float _a ): r(_r), g(_g), b(_b), a(_a) {}
+
+	// assignment operators
+	SEGAN_INLINE Color& operator += ( const Color& c )	{ r += c.r; g += c.g; b += c.b; a += c.a; return *this; }
+	SEGAN_INLINE Color& operator -= ( const Color& c )	{ r -= c.r; g -= c.g; b -= c.b; a -= c.a; return *this; }
+	SEGAN_INLINE Color& operator *= ( const float f )	{ r *= f; g *= f; b *= f; a *= f; return *this; }
+	SEGAN_INLINE Color& operator /= ( const float f )	{ r /= f; g /= f; b /= f; a /= f; return *this; }
+
+	// binary operators
+	SEGAN_INLINE Color operator + ( const Color& c ) const	{ return Color( r + c.r, g + c.g, b + c.b, a + c.a ); }
+	SEGAN_INLINE Color operator - ( const Color& c ) const	{ return Color( r - c.r, g - c.g, b + c.b, a - c.a ); }
+	SEGAN_INLINE Color operator * ( const float f ) const	{ return Color( r * f, g * f, b * f, a * f ); }
+	SEGAN_INLINE Color operator / ( const float f ) const	{ return Color( r / f, g / f, b / f, a / f ); }
+	SEGAN_INLINE bool operator == ( const Color& c ) const	{ return ( r == c.r ) && ( g == c.g ) && ( b == c.b ) && ( a == c.a ); }
+	SEGAN_INLINE bool operator != ( const Color& c ) const	{ return ( r != c.r ) || ( g != c.g ) || ( b != c.b ) || ( a == c.a ); }
+
+	//! conventional operators
+	SEGAN_INLINE operator const float* ( void ) const { return e; }
+	SEGAN_INLINE operator const dword ( void ) const
+	{
+		dword cr = r >= 1.0f ? 0xff : ( r <= 0.0f ? 0x00 : dword( r * 255.0f + 0.5f ) );
+		dword cg = g >= 1.0f ? 0xff : ( g <= 0.0f ? 0x00 : dword( g * 255.0f + 0.5f ) );
+		dword cb = b >= 1.0f ? 0xff : ( b <= 0.0f ? 0x00 : dword( b * 255.0f + 0.5f ) );
+		dword ca = a >= 1.0f ? 0xff : ( a <= 0.0f ? 0x00 : dword( a * 255.0f + 0.5f ) );
+		return ( ca << 24 ) | ( cr << 16 ) | ( cg << 8 ) | cb;
+	}
+
+	//! set new value for this color
+	SEGAN_INLINE Color& Set( const float _r, const float _g, const float _b, const float _a )
+	{
+		r = _r;
+		g = _g;
+		b = _b;
+		a = _a;
+		return *this;
+	}
+
+	//! set new value for this color
+	SEGAN_INLINE Color& Set( const dword c )
+	{
+		const float f = 1.0f / 255.0f;
+		r = f * float( (byte)( c >> 16 ) );
+		g = f * float( (byte)( c >>  8 ) );
+		b = f * float( (byte)( c >>  0 ) );
+		a = f * float( (byte)( c >> 24 ) );
+		return *this;
+	}
+
+	//! return interpolated vector of c1 and c2 by weight of t to this
+	SEGAN_INLINE Color& Lerp( const Color& c1, const Color& c2, const float t )
+	{
+		x = c1.x + ( c2.x - c1.x ) * t;
+		y = c1.y + ( c2.y - c1.y ) * t;
+		z = c1.z + ( c2.z - c1.z ) * t;
+		w = c1.w + ( c2.w - c1.w ) * t;
+		return *this;
+	}
+
+
+public:
+
+	union {
+		struct {
+			float r;
+			float g;
+			float b;
+			float a;
+		};
+
+		struct {
+			float x;
+			float y;
+			float z;
+			float w;
+		};
+
+		float e[4];	//	elements of color
+	};
+};
+
 //////////////////////////////////////////////////////////////////////////
 //	PLANE
 //////////////////////////////////////////////////////////////////////////
@@ -96,16 +188,16 @@ SEGAN_ALIGN_16 class Frustum
 {
 public:
 	SEGAN_INLINE Frustum() {};
-	SEGAN_INLINE Frustum( const float* f ) { memcpy( p, f, sizeof(Frustum) ); }
-	SEGAN_INLINE Frustum( const Frustum& f ) { memcpy( p, f.p, sizeof(Frustum) ); }
+	SEGAN_INLINE Frustum( const float* f ) { *this = *( (Frustum*)f ); }
+	SEGAN_INLINE Frustum( const Frustum& f ) { *this = f; }
 	SEGAN_INLINE Frustum( const float* _p0, const float* _p1, const float* _p2, const float* _p3, const float* _p4, const float* _p5 )
 	{
-		memcpy( &p0, _p0, sizeof(Plane) );
-		memcpy( &p1, _p1, sizeof(Plane) );
-		memcpy( &p2, _p2, sizeof(Plane) );
-		memcpy( &p3, _p3, sizeof(Plane) );
-		memcpy( &p4, _p4, sizeof(Plane) );
-		memcpy( &p5, _p5, sizeof(Plane) );
+		p0 = *( (Plane*)_p0 );
+		p1 = *( (Plane*)_p1 );
+		p2 = *( (Plane*)_p2 );
+		p3 = *( (Plane*)_p3 );
+		p4 = *( (Plane*)_p4 );
+		p5 = *( (Plane*)_p5 );
 	}
 
 	//! conventional operators
@@ -195,7 +287,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 //	AXIS ALIGNED BOX
 //////////////////////////////////////////////////////////////////////////
-SEGAN_ALIGN_16 class AABox
+class AABox
 {
 public:
 	SEGAN_INLINE AABox() {}
@@ -204,6 +296,9 @@ public:
 	SEGAN_INLINE AABox( const float* a ): x1(a[0]), y1(a[1]), z1(a[2]), x2(a[3]), y2(a[4]), z2(a[5]) {}
 	SEGAN_INLINE AABox( const float _x1, const float _y1, const float _z1, const float _x2, const float _y2, const float _z2 )
 		: x1(_x1), y1(_y1), z1(_z1), x2(_x2), y2(_y2),	z2(_z2) {}
+
+	//! conventional operators
+	SEGAN_INLINE operator const float* ( void ) const { return &x1; }
 
 	//! resize the box to the zero
 	SEGAN_INLINE AABox& Zero( void )
@@ -248,22 +343,16 @@ public:
 //////////////////////////////////////////////////////////////////////////
 //	ORIENTED BOX
 //////////////////////////////////////////////////////////////////////////
-SEGAN_ALIGN_16 class OBBox
+class OBBox
 {
 public:
 	SEGAN_INLINE OBBox() {}
-	SEGAN_INLINE OBBox( const float* p)
-	{
-		sx_mem_copy( v, p, sizeof(OBBox) );
-	}
-	SEGAN_INLINE OBBox( const OBBox& box )
-	{
-		memcpy( v, &box, sizeof(OBBox) );
-	}
-	SEGAN_INLINE OBBox( const AABox& box )
-	{
-		SetAABox( box );
-	}
+	SEGAN_INLINE OBBox( const float* p) { *this = *( (OBBox*)p ); }
+	SEGAN_INLINE OBBox( const OBBox& box ) { *this = box; }
+	SEGAN_INLINE OBBox( const AABox& box ) { SetAABox( box ); }
+
+	//! conventional operators
+	SEGAN_INLINE operator const float* ( void ) const { return &v->x; }
 
 	SEGAN_INLINE OBBox& Set( const float3& min, const float3& max )
 	{
@@ -280,8 +369,7 @@ public:
 
 	SEGAN_INLINE OBBox& SetAABox( const AABox& box )
 	{
-		Set( box.min, box.max );
-		return *this;
+		return Set( box.min, box.max );
 	}
 
 public:

@@ -70,10 +70,12 @@ public:
 
 	virtual const float* GetMatrix( const d3dMatrixMode mode );
 
-	virtual void DrawPrimitive(const d3dPrimitiveType primType, const int firstVertex, const int vertexCount);
+	virtual void DrawPrimitive( const d3dPrimitiveType primType, const int firstVertex, const int vertexCount );
 
-	virtual void DrawIndexedPrimitive(const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount);
-	
+	virtual void DrawIndexedPrimitive( const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount );
+
+	virtual void DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const dword color );
+
 	virtual bool BeginScene( void );
 
 	virtual void EndScene( void );
