@@ -450,12 +450,14 @@ SEGAN_INLINE void sx_cover( Sphere& res, const Sphere& s1, const Sphere& s2 )
 	//  check to see if s1 is inside of s2
 	if ( len + s1.r < s2.r )
 	{
-		return s2;
+		res = s2;
+		return;
 	}
 	//  check to see if s2 is inside of s1
 	else if ( len + s2.r < s1.r )
 	{
-		return s1;
+		res = res;
+		return;
 	}
 	else
 	{
@@ -538,16 +540,61 @@ SEGAN_INLINE float sx_get_volume( const AABox& box )
 	return ( box.x2 - box.x1 ) * ( box.y2 - box.y1 ) * ( box.z2 - box.z1 );
 }
 
+//! resize the current box to cover the entry box
+SEGAN_INLINE void sx_Cover( AABox& res, const OBBox& box )
+{
+	for( int i = 0; i < 8; ++i )
+	{
+		if ( res.x1 > box.v[i].x ) res.x1 = box.v[i].x;
+		if ( res.y1 > box.v[i].y ) res.y1 = box.v[i].y;
+		if ( res.z1 > box.v[i].z ) res.z1 = box.v[i].z;
+
+		if ( res.x2 < box.v[i].x ) res.x2 = box.v[i].x;
+		if ( res.y2 < box.v[i].y ) res.y2 = box.v[i].y;
+		if ( res.z2 < box.v[i].z ) res.z2 = box.v[i].z;
+	}
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//	ORIENTED BOX
+//////////////////////////////////////////////////////////////////////////
+
+//! transform AABox to OBBox by matrix mat
+SEGAN_INLINE void sx_transform( OBBox& res, const AABox& box, const matrix& mat )
+{
+	res.SetAABox( box );
+	for ( int i=0; i<8; ++i )
+		sx_transform_point( res.v[i], res.v[i], mat );
+}
+
+//! transform AABox by matrix mat and return OBBox
+SEGAN_INLINE OBBox sx_transform( const AABox& box, const matrix& mat )
+{
+	OBBox res( box );
+	for ( int i=0; i<8; ++i )
+		sx_transform_point( res.v[i], res.v[i], mat );
+	return res;
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////
 //	utility functions
 //////////////////////////////////////////////////////////////////////////
 
+//! return projected vector to the screen by given final transformation matrix
 SEGAN_ENG_API float3 sx_project_to_screen( const float3& v, const matrix& worldViewProjection, const int x, const int y, const int width, const int height );
 
+//! return true if the sphere intersect with the frustum
+SEGAN_INLINE bool sx_intersect( const Sphere& sph, const Frustum& fr );
 
-//! resize the current box to cover the entry box
-SEGAN_INLINE void sx_Cover( AABox& res, const OBBox& box );
+//! return true if the box intersect with the frustum
+SEGAN_INLINE bool sx_intersect( const AABox& box, const Frustum& fr );
+
+//! return true if the box intersect with the frustum
+SEGAN_INLINE bool sx_intersect( const OBBox& box, const Frustum& fr );
 
 
 #endif	//	GUARD_Math_tools_HEADER_FILE

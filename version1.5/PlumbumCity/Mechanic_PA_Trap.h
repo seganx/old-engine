@@ -61,8 +61,9 @@ namespace GM
 		str512				m_Hint;			//  hint of power attack contain name and description
 
 		prpAttack			m_attack;
-		sx::core::PNode		m_node;		//  node to show trap
-		float3				m_pos;		//	position of trap
+		sx::core::PNode		m_node;			//  node to show trap
+		float3				m_pos;			//	position of trap
+		float				m_radius;		//	radius of the dangerous area
 
 
 		Array<struct Trap*> m_traps;	//	array of traps

@@ -203,7 +203,7 @@ public:
 	SEGAN_INLINE AABox( const float3& _min, const float3& _max ): min(_min), max(_max) {}
 	SEGAN_INLINE AABox( const float* a ): x1(a[0]), y1(a[1]), z1(a[2]), x2(a[3]), y2(a[4]), z2(a[5]) {}
 	SEGAN_INLINE AABox( const float _x1, const float _y1, const float _z1, const float _x2, const float _y2, const float _z2 )
-		: x1(_x1), y1(_y1), y1(_y1), x2(_x2), y2(_y2), y2(_y2) {}
+		: x1(_x1), y1(_y1), z1(_z1), x2(_x2), y2(_y2),	z2(_z2) {}
 
 	//! resize the box to the zero
 	SEGAN_INLINE AABox& Zero( void )
@@ -214,7 +214,7 @@ public:
 	}
 
 	//! resize the current box to cover the entry box
-	SEGAN_INLINE AABox& Cover( const AABox box )
+	SEGAN_INLINE AABox& Cover( const AABox& box )
 	{	   
 		if ( x1 > box.x1 ) x1 = box.x1;
 		if ( y1 > box.y1 ) y1 = box.y1;
@@ -248,17 +248,41 @@ public:
 //////////////////////////////////////////////////////////////////////////
 //	ORIENTED BOX
 //////////////////////////////////////////////////////////////////////////
-class SEGAN_ENG_API OBBox
+SEGAN_ALIGN_16 class OBBox
 {
 public:
-	OBBox( const OBBox& box );
-	OBBox( const float* min, const float* max );
+	SEGAN_INLINE OBBox() {}
+	SEGAN_INLINE OBBox( const float* p)
+	{
+		sx_mem_copy( v, p, sizeof(OBBox) );
+	}
+	SEGAN_INLINE OBBox( const OBBox& box )
+	{
+		memcpy( v, &box, sizeof(OBBox) );
+	}
+	SEGAN_INLINE OBBox( const AABox& box )
+	{
+		SetAABox( box );
+	}
 
-	//! transform AABox to this by matrix m
-	void  TransformAABox( const float* aabox, const float* matrx );
+	SEGAN_INLINE OBBox& Set( const float3& min, const float3& max )
+	{
+		v[0] = max;
+		v[1].Set( min.x, max.y, max.z );
+		v[2].Set( min.x, min.y, max.z );
+		v[3].Set( max.x, min.y, max.z );
+		v[4].Set( max.x, min.y, min.z );
+		v[5].Set( max.x, max.y, min.z );
+		v[6].Set( min.x, max.y, min.z );
+		v[7] = min;
+		return *this;
+	}
 
-	//! return true if box intersect with frustum
-	bool IntersectFrustum( const float* frustum ) const;
+	SEGAN_INLINE OBBox& SetAABox( const AABox& box )
+	{
+		Set( box.min, box.max );
+		return *this;
+	}
 
 public:
 

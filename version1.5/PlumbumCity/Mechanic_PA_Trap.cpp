@@ -41,6 +41,7 @@ namespace GM
 		, m_Index( powerAttack_count++ )
 		, m_node(0)
 		, m_pos(0,0,0)
+		, m_radius(0)
 	{
 		sx_callstack();
 
@@ -210,7 +211,7 @@ namespace GM
 			float minDis = FLT_MAX;
 			Entity* enemy = NULL;
 			static sx::core::ArrayPNode enemies(128);	enemies.Clear();
-			sx::core::Scene::GetNodesByArea( trap->pos, 0.5f, enemies, NMT_ALL, PARTY_ENEMY );
+			sx::core::Scene::GetNodesByArea( trap->pos, m_radius, enemies, NMT_ALL, PARTY_ENEMY );
 			for (int j=0; j<enemies.Count(); j++)
 			{
 				sx::core::PNode enNode = enemies[j];
@@ -220,7 +221,7 @@ namespace GM
 					if ( en->m_health.icur > 0 && en->m_move.type == GMT_GROUND )
 					{
 						float dis = trap->pos.Distance_sqr( en->m_pos );
-						if ( dis < 5.0f && dis < minDis )
+						if ( dis < m_radius && dis < minDis )
 						{
 							enemy = en;
 							minDis = dis;
@@ -330,6 +331,7 @@ namespace GM
 							script.GetFloat(i, L"stunTime",			m_attack.stunTime );
 							script.GetFloat(i, L"stunValue",		m_attack.stunValue );
 							script.GetFloat(i, L"actionTime",		m_attack.actionTime );
+							script.GetFloat(i, L"radius",			m_radius );
 							script.GetInteger(i, L"damageCount",	m_attack.actionCount );
 							script.GetInteger(i, L"actionCount",	m_attack.actionCount );
 

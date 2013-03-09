@@ -624,30 +624,6 @@ SEGAN_INLINE void sx_get_frustum( Frustum& res, const matrix& mat )
 
 
 //////////////////////////////////////////////////////////////////////////
-//	axis aligned box implementation
-//////////////////////////////////////////////////////////////////////////
-
-
-SEGAN_INLINE void AABox::CoverOB( const float* obbox )
-{
-	sx_assert( 0 || "AABox::CoverOB no implemented yet" );
-#if 0
-	for ( int i = 0; i < 8; ++i )
-	{
-		if ( x1 > box.v[i].x ) x1 = box.v[i].x;
-		if ( y1 > box.v[i].y ) y1 = box.v[i].y;
-		if ( z1 > box.v[i].z ) z1 = box.v[i].z;
-
-		if ( x2 < box.v[i].x ) x2 = box.v[i].x;
-		if ( y2 < box.v[i].y ) y2 = box.v[i].y;
-		if ( z2 < box.v[i].z ) z2 = box.v[i].z;
-	}
-#endif
-}
-
-
-
-//////////////////////////////////////////////////////////////////////////
 //	utility functions
 //////////////////////////////////////////////////////////////////////////
 
