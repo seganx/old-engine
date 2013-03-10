@@ -205,10 +205,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\system\System_def.h"
-				>
-			</File>
-			<File
 				RelativePath="..\system\ThreadMan.h"
 				>
 			</File>
@@ -366,6 +362,62 @@
 			</File>
 			<File
 				RelativePath="..\engine\draw_debugger.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="input"
+			>
+			<File
+				RelativePath="..\input\Input.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\input\Input.h"
+				>
+			</File>
+			<File
+				RelativePath="..\input\sxInputClass.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\input\sxInputClass.h"
+				>
+			</File>
+			<File
+				RelativePath="..\input\sxJoystic_model_a.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\input\sxJoystic_model_a.h"
+				>
+			</File>
+			<File
+				RelativePath="..\input\sxKeyboard.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\input\sxKeyboard.h"
+				>
+			</File>
+			<File
+				RelativePath="..\input\sxMouse.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\input\sxMouse.h"
+				>
+			</File>
+			<File
+				RelativePath="..\input\sxMouse_editor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\input\sxMouse_editor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\input\sxTypesInput.h"
 				>
 			</File>
 		</Filter>

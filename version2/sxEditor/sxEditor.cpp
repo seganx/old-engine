@@ -87,7 +87,7 @@ void AppMainLoop( float elpsTime )
 
 		static float timer = 0;
 		timer =  (float)( 0.0003f * sx_os_get_timer() );
-		float eye[3] = { 5.0f * sx_sin(-timer), 5.0f, 15.0f * sx_cos(-timer)	};
+		float eye[3] = { 5.0f * sx_sin(-timer), 5.0f, 30.0f * sx_cos(-timer)	};
 		//float eye[3] = { 2.0f , 5.0f, 5.0f };
 		float at[3] = { 0.0f, 0.0f, 0.0f };
 		float up[3] = { 0.0f, 1.0f, 0.0f };
@@ -118,7 +118,7 @@ void AppMainLoop( float elpsTime )
 			vbo_pos->Unlock();
 		}
 #endif
-		float d[3] = { 1.0f, 1.0f, sx_sin(timer) }, u[3] = { 0.0f, 1.0f, 0.0f };
+		float d[3] = { 1.0f, sx_sin(timer*7.0f), sx_sin(timer*3.0f) }, u[3] = { 0.0f, 1.0f, 0.0f };
 		sx_set_direction( mat, d, u );
 
 		sx_debug_draw_grid( 10, 0xaaaaaaaa );
@@ -134,7 +134,7 @@ void AppMainLoop( float elpsTime )
 
 		Sphere sph1( -13, 0, -3, 1 );
 		Sphere sph2( -15 + 6.0f * sx_sin_fast(timer*6.0f), 0, 9.0f * sx_sin_fast(timer*5.0f), 2 );
-		sx_debug_draw_sphere( sph1, 0xff00ffff );
+		sx_debug_draw_sphere( sph1, 0xff00ffff, 7, 9 );
 		sx_debug_draw_sphere( sph2, 0xff00ffff );
 		sx_debug_draw_sphere( sx_cover( sph2, sph1 ), 0xffffffff );
 

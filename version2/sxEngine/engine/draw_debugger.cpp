@@ -3,8 +3,8 @@
 #include "../sxEngine.h"
 
 
-#define SPHERE_PHI		20
-#define SPHERE_THETA	17
+
+
 
 SEGAN_INLINE void sx_debug_draw_line( const float3& v1, const float3& v2, const dword color )
 {
@@ -155,17 +155,20 @@ SEGAN_INLINE void sx_debug_draw_box( const OBBox& box, const dword color )
 	g_engine->m_device3D->DrawDebug( PT_LINE_LIST, 24, &v->x, color );
 }
 
-SEGAN_ENG_API void sx_debug_draw_sphere( const Sphere& sphere, const dword color )
+SEGAN_ENG_API void sx_debug_draw_sphere( const Sphere& sphere, const dword color, const uint stacks_ /*= 17*/, const uint slices_ /*= 20 */ )
 {
-	const float phi = PI_MUL_2 / SPHERE_PHI;
-	const float theta = PI / SPHERE_THETA;
-	const sint vcount = SPHERE_PHI * SPHERE_THETA * 6;
-	float3 v[vcount];
+	float3 v[2400];
+
+	const uint stacks = ( stacks_ < 20 ? stacks_ : 20 );
+	const uint slices = ( slices_ < 20 ? slices_ : 20 );
+	const float theta = PI / stacks;
+	const float phi = PI_MUL_2 / slices;
+	const sint vcount = stacks * slices * 6;
 
 	// compute sphere vertices
-	for ( sint t=0; t<SPHERE_THETA; ++t )
+	for ( sint t=0; t<stacks; ++t )
 	{
-		for ( sint p=0; p<SPHERE_PHI; ++p )
+		for ( sint p=0; p<slices; ++p )
 		{
 			const float p1 = phi * float(p);
 			const float t1 = theta * float(t);
@@ -178,7 +181,7 @@ SEGAN_ENG_API void sx_debug_draw_sphere( const Sphere& sphere, const dword color
 			sx_sin_cos_fast( p2, p2s, p2c );
 			sx_sin_cos_fast( t2, t2s, t2c );
 
-			sint i = ( t * SPHERE_PHI + p ) * 6;
+			sint i = ( t * slices + p ) * 6;
 
 			v[i + 0].Set( sphere.x + sphere.r * p1c * t1s, sphere.y + sphere.r * t1c, sphere.z + sphere.r * p1s * t1s );
 			v[i + 1].Set( sphere.x + sphere.r * p2c * t1s, sphere.y + sphere.r * t1c, sphere.z + sphere.r * p2s * t1s );
