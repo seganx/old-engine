@@ -1,7 +1,6 @@
 #include "d3dDevice_dx.h"
 
 #include "../../system/System.h"
-#include "../../math/Math.h"
 
 
 const D3DVERTEXELEMENT9 SeganVrtxDecl[] = {

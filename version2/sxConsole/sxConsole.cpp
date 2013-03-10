@@ -16,7 +16,7 @@
 #define ID_LOG_TEXT			105
 #define ID_TEXT				106
 
-#define MEMO_MAX_LENGTH		10000
+#define MEMO_MAX_LENGTH		50000
 
 #define NET_DELAY_TIME		60
 #define NET_TIME_OUT		15000
@@ -534,10 +534,11 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		logconf.name = (wchar*)consoleName.Text();
 
 		EngineConfig enconf;
+		enconf.net_id = 0x2727;
 		enconf.logger = &logconf;
-		enconf.window_event_callback = &EventCallback;
+		enconf.window_callback = &EventCallback;
 		g_engine = sx_engine_get_singleton( &enconf );
-		sx_engine_initialize();
+		//sx_engine_initialize();
 	}
 	//////////////////////////////////////////////////////////////////////////
 

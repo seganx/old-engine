@@ -13,7 +13,6 @@ Desc:		This file contain the class of device 3d used OpenGL
 
 
 #include "../d3dDevice.h"
-#include "../../math/Math.h"
 
 #if defined(_WIN32)
 #include <Windows.h>

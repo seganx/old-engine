@@ -1,7 +1,6 @@
 #include "d3dDevice_gl.h"
 
 #include "../../system/System.h"
-#include "../../math/Math.h"
 
 #include "d3dVertexBuffer_gl.h"
 #include "d3dIndexBuffer_gl.h"

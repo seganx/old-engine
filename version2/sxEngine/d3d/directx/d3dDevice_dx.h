@@ -11,7 +11,6 @@
 
 
 #include "../d3dDevice.h"
-#include "../../math/Math.h"
 
 
 #include <d3d9.h>
