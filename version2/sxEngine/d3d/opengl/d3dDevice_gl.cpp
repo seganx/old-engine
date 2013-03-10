@@ -478,29 +478,6 @@ bool d3dDevice_gl::BeginScene( void )
 
 void d3dDevice_gl::EndScene( void )
 {
-	return;
-
-	float x = 0, y = 0, z = sx_random_f_limit( 1, 2 );
-	ApplyTextureBuffer();
-  	glColor3f( 1.0f,1.0f,1.0f );
-  	glBegin( GL_QUADS );
-  	glTexCoord2f( 0, 0 );	glVertex3f( x + 1.0f, y + 1.0f, z );
-  	glTexCoord2f( 1, 0 );	glVertex3f( x - 1.0f, y + 1.0f, z );
-  	glTexCoord2f( 1, 1 );	glVertex3f( x - 1.0f, y - 1.0f, z );
-  	glTexCoord2f( 0, 1 );	glVertex3f( x + 1.0f, y - 1.0f, z );
-  	glEnd();
-
-	matrix mat; mat.Identity();
-	SetMatrix( MM_WORLD, mat );
-
-	float3 dest, src( 1, 1, -1 );
-// 	glColor3f( 0.5f, 0.0f, 0.0f );
-// 	glBegin( GL_POINTS );
-// 	glVertex3f( src.x, src.y, src.z );
-// 	glEnd();
-
-	dest = sx_project_to_screen( src, sx_mul( m_view, m_projection ), m_viewport.x, m_viewport.y, m_viewport.width, m_viewport.height );
-	src = dest;
 
 }
 

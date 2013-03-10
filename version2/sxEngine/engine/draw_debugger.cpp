@@ -3,8 +3,8 @@
 #include "../sxEngine.h"
 
 
-#define SPHERE_PHI		10
-#define SPHERE_THETA	7
+#define SPHERE_PHI		20
+#define SPHERE_THETA	17
 
 SEGAN_INLINE void sx_debug_draw_line( const float3& v1, const float3& v2, const dword color )
 {
@@ -141,7 +141,8 @@ SEGAN_INLINE void sx_debug_draw_circle( const float3& center, const float radius
 
 SEGAN_INLINE void sx_debug_draw_box( const AABox& box, const dword color )
 {
-	const OBBox obbox( box );
+	OBBox obbox;
+	obbox.SetAABox( box );
 	sx_debug_draw_box( obbox, color );
 }
 

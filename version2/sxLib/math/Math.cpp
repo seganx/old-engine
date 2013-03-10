@@ -621,6 +621,65 @@ SEGAN_INLINE void sx_get_frustum( Frustum& res, const matrix& mat )
 
 
 //////////////////////////////////////////////////////////////////////////
+//	SPHERE
+//////////////////////////////////////////////////////////////////////////
+
+SEGAN_INLINE void sx_cover( Sphere& res, const Sphere& s1, const Sphere& s2 )
+{
+	float3 v( s1.x - s2.x, s1.y - s2.y, s1.z - s2.z );
+	float  len = sx_length( v );
+
+	//////////////////////////////////////////////////////////////////////////
+	//  verify that spheres in not completely inside together
+
+	//  check to see if s1 is inside of s2
+	if ( len + s1.r < s2.r )
+	{
+		res = s2;
+		return;
+	}
+	//  check to see if s2 is inside of s1
+	else if ( len + s2.r < s1.r )
+	{
+		res = s1;
+		return;
+	}
+	else
+	{
+		v.Normalize();
+		res.center = ( s1.center + s2.center ) * 0.5f;
+		res.center += v * ( s1.r * 0.5f );
+		res.center -= v * ( s2.r * 0.5f );
+		res.r = ( len + s1.r + s2.r ) * 0.5f;
+	}	
+}
+
+//////////////////////////////////////////////////////////////////////////
+//	AXES ALIGNED BOX
+//////////////////////////////////////////////////////////////////////////
+SEGAN_INLINE AABox sx_cover( const AABox& b1, const OBBox& b2 )
+{
+	AABox res( MAXIMUM, MAXIMUM, MAXIMUM, -MAXIMUM, -MAXIMUM, -MAXIMUM );
+	for( int i = 0; i < 8; ++i )
+	{
+		if ( res.x1 > b2.v[i].x ) res.x1 = b2.v[i].x;
+		if ( res.y1 > b2.v[i].y ) res.y1 = b2.v[i].y;
+		if ( res.z1 > b2.v[i].z ) res.z1 = b2.v[i].z;
+
+		if ( res.x2 < b2.v[i].x ) res.x2 = b2.v[i].x;
+		if ( res.y2 < b2.v[i].y ) res.y2 = b2.v[i].y;
+		if ( res.z2 < b2.v[i].z ) res.z2 = b2.v[i].z;
+	}
+	return AABox(
+		sx_min_f( b1.x1, res.x1 ),
+		sx_min_f( b1.y1, res.y1 ),
+		sx_min_f( b1.z1, res.z1 ),
+		sx_max_f( b1.x2, res.x2 ),
+		sx_max_f( b1.y2, res.y2 ),
+		sx_max_f( b1.z2, res.z2 ) );
+}
+
+//////////////////////////////////////////////////////////////////////////
 //	utility functions
 //////////////////////////////////////////////////////////////////////////
 
@@ -644,3 +703,52 @@ SEGAN_INLINE float3 sx_project_to_screen( const float3& v, const matrix& worldVi
 
 	return res;
 }
+
+
+SEGAN_INLINE bool sx_intersect( const AABox& box, const Frustum& fr )
+{
+	float3 vmin, vmax;
+	for ( int i = 0; i < 6; ++i )
+	{ 
+		if ( fr.p[i].a > 0 ) 
+			vmin.x = box.x1, vmax.x = box.x2;
+		else 
+			vmin.x = box.x2, vmax.x = box.x1;
+
+		if ( fr.p[i].b > 0 )
+			vmin.y = box.y1, vmax.y = box.y2;
+		else
+			vmin.y = box.y2, vmax.y = box.y1;
+
+		if ( fr.p[i].c > 0 )
+			vmin.z = box.z1, vmax.z = box.z2;
+		else
+			vmin.z = box.z2, vmax.z = box.z1;
+
+		if( sx_dot( (float3)fr.p[i], vmin ) + fr.p[i].d > 0 ) 
+			return false;
+	} 
+	return true;
+}
+
+SEGAN_INLINE bool sx_intersect( const OBBox& box, const Frustum& fr )
+{
+	// check the visibility via intersect between box and frustum
+	bool result = true;
+	for (int i=0; i<6 && result; i++)
+	{
+		result = false;
+		for (int j=0; j<8; j++)
+		{
+			if ( sx_distance( fr.p[i], box.v[j] ) >= 0 )
+			{
+				result = true;
+				break;
+			}
+		}
+	}
+
+	return result;
+}
+
+

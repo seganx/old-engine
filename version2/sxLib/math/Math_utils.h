@@ -242,7 +242,6 @@ SEGAN_ALIGN_16 class Sphere
 public:
 	SEGAN_INLINE Sphere() {}
 	SEGAN_INLINE Sphere( const Sphere& s ): x(s.x), y(s.y), z(s.z), r(s.r) {}
-	SEGAN_INLINE Sphere( const float* s ): x(s[0]), y(s[1]), z(s[2]), r(s[3]) {}
 	SEGAN_INLINE Sphere( const float3& c, const float _r ): x(c.x), y(c.y), z(c.z), r(_r) {}
 	SEGAN_INLINE Sphere( const float _x, const float _y, const float _z, const float _r ): x(_x), y(_y), z(_z), r(_r) {}
 
@@ -293,7 +292,6 @@ public:
 	SEGAN_INLINE AABox() {}
 	SEGAN_INLINE AABox( const AABox& a ): min(a.min), max(a.max) {}
 	SEGAN_INLINE AABox( const float3& _min, const float3& _max ): min(_min), max(_max) {}
-	SEGAN_INLINE AABox( const float* a ): x1(a[0]), y1(a[1]), z1(a[2]), x2(a[3]), y2(a[4]), z2(a[5]) {}
 	SEGAN_INLINE AABox( const float _x1, const float _y1, const float _z1, const float _x2, const float _y2, const float _z2 )
 		: x1(_x1), y1(_y1), z1(_z1), x2(_x2), y2(_y2),	z2(_z2) {}
 
@@ -347,9 +345,7 @@ class OBBox
 {
 public:
 	SEGAN_INLINE OBBox() {}
-	SEGAN_INLINE OBBox( const float* p) { *this = *( (OBBox*)p ); }
 	SEGAN_INLINE OBBox( const OBBox& box ) { *this = box; }
-	SEGAN_INLINE OBBox( const AABox& box ) { SetAABox( box ); }
 
 	//! conventional operators
 	SEGAN_INLINE operator const float* ( void ) const { return &v->x; }

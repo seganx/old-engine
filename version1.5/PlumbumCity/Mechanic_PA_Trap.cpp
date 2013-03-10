@@ -223,7 +223,7 @@ namespace GM
 
 						if ( dist2 <= radius2 )
 						{
-							trap->count = 0;
+							trap->count--;
 							worked = true;
 							break;
 						}
@@ -348,6 +348,7 @@ namespace GM
 							script.GetFloat(i, L"stunValue",		m_attack.stunValue );
 							script.GetFloat(i, L"splashRadius",		m_attack.splashRadius );
 							script.GetFloat(i, L"radius",			m_radius );
+							script.GetInteger(i, L"actionCount",	m_attack.actionCount );
 
 							m_coolTime					-= g_game->m_upgrades.trap_cooltime;
 							m_attack.actionCount		= m_attack.actionCount + int(g_game->m_upgrades.trap_count+0.5f); // TODO
@@ -494,7 +495,7 @@ namespace GM
 
 			Trap* trap = sx_new( Trap );
 			trap->coolTime	= 0.0f;
-			trap->count		= 1;
+			trap->count		= m_attack.actionCount;
 			trap->pos		= m_pos;
 			trap->node		= m_node->Clone();
 			trap->node->SetPosition( m_node->GetPosition_world() );

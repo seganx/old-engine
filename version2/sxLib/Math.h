@@ -42,6 +42,7 @@
 #define MS_TO_SEC				0.001f
 #define INFINITY				1e30f
 #define EPSILON					0.00001f
+#define MAXIMUM					3.402823466e+38F
 
 
 //////////////////////////////////////////////////////////////////////////

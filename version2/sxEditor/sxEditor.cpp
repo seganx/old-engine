@@ -87,7 +87,7 @@ void AppMainLoop( float elpsTime )
 
 		static float timer = 0;
 		timer =  (float)( 0.0003f * sx_os_get_timer() );
-		float eye[3] = { 5.0f * sx_sin(timer), 5.0f, 10.0f * sx_cos(timer)	};
+		float eye[3] = { 5.0f * sx_sin(-timer), 5.0f, 15.0f * sx_cos(-timer)	};
 		//float eye[3] = { 2.0f , 5.0f, 5.0f };
 		float at[3] = { 0.0f, 0.0f, 0.0f };
 		float up[3] = { 0.0f, 1.0f, 0.0f };
@@ -118,28 +118,27 @@ void AppMainLoop( float elpsTime )
 			vbo_pos->Unlock();
 		}
 #endif
+		float d[3] = { 1.0f, 1.0f, sx_sin(timer) }, u[3] = { 0.0f, 1.0f, 0.0f };
+		sx_set_direction( mat, d, u );
 
 		sx_debug_draw_grid( 10, 0xaaaaaaaa );
 
-		AABox box( -1, 0, -1, 1, 2, 1 );
-		sx_debug_draw_box( box, 0xffffff00 );
+		AABox box1( -1, 0, -1, 1, 2, 1 );
+		AABox box2( 2, 0, 2, 4, 2, 4 );
+		OBBox box3 = sx_transform( box2, mat );
+		sx_debug_draw_box( box1, 0xffffff00 );
+		sx_debug_draw_box( box3, 0xffffff00 );
+		sx_debug_draw_box( sx_cover( box1, box3 ), 0xffffffff );
+
 		sx_debug_draw_circle( float3( 5, 0, 4 ), 3, 0xffffffff );
-		sx_debug_draw_sphere( Sphere( -5, 0, -4, 3 ), 0xff00ffff );
+
+		Sphere sph1( -13, 0, -3, 1 );
+		Sphere sph2( -15 + 6.0f * sx_sin_fast(timer*6.0f), 0, 9.0f * sx_sin_fast(timer*5.0f), 2 );
+		sx_debug_draw_sphere( sph1, 0xff00ffff );
+		sx_debug_draw_sphere( sph2, 0xff00ffff );
+		sx_debug_draw_sphere( sx_cover( sph2, sph1 ), 0xffffffff );
 
 		sx_debug_draw_compass();
-
-
-		g_engine->m_device3D->SetTexture( tex_001 );
-
-		float d[3] = { 1.0f, 0.0f, 1.0f }, u[3] = { 0.0f, 1.0f, 0.0f };
-		sx_set_direction( mat, d, u );
-//		mat.SetTranslation( 0, 0, 1 );
-//		mat.Identity();
-//		mat.SetRotationPitchYawRoll( 0, 0, (float)sx_os_get_timer() * 0.005f );
-//		matrix mview = g_engine->m_device3D->GetMatrix( MM_VIEW );
-//		mat.Inverse( mview );
-		g_engine->m_device3D->SetMatrix( MM_WORLD, mat );
-
 
 		g_engine->m_device3D->EndScene();
 

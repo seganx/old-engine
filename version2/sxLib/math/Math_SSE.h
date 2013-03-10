@@ -387,13 +387,6 @@ SEGAN_INLINE void sse_matrix_scale( matrix* mat, const float x, const float y, c
 	_mm_storeu_ps( mat->m[3], _mm_set_ps( 0.0f, 0.0f, 0.0f, 1.0f ) );
 }
 
-#if 0
-SEGAN_INLINE void sse_matrix_lookat( Matrix* m, const float* eye, const float* at, const float* up )
-{
-#error " sse_matrix_lookat not implemented !"
-}
-#endif
-
 SEGAN_INLINE void sse_matrix_transform_norm( float* dest, const float* src, const matrix* mat )
 {
 	__declspec(align(16)) const float vsrc[4] = { src[0], src[1], src[2], 0.0f };

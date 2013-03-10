@@ -439,39 +439,7 @@ SEGAN_INLINE Sphere sx_get_sphere( const AABox& box )
 }
 
 //! make res sphere cover the entry spheres
-SEGAN_INLINE void sx_cover( Sphere& res, const Sphere& s1, const Sphere& s2 )
-{
-	float3 ver( s1.x - s2.x, s1.y - s2.y, s1.z - s2.z );
-	float  len = sx_length( ver );
-
-	//////////////////////////////////////////////////////////////////////////
-	//  verify that spheres in not completely inside together
-
-	//  check to see if s1 is inside of s2
-	if ( len + s1.r < s2.r )
-	{
-		res = s2;
-		return;
-	}
-	//  check to see if s2 is inside of s1
-	else if ( len + s2.r < s1.r )
-	{
-		res = res;
-		return;
-	}
-	else
-	{
-		if ( len < EPSILON ) len = EPSILON;
-		ver.x /= len;
-		ver.y /= len;
-		ver.z /= len;
-
-		float3 c1 = s1.center + ( ver * s1.r );
-		res.r = ( len + s1.r + s2.r ) * 0.5f;
-		ver *= res.r;
-		res.center = c1 - ver;
-	}	
-}
+SEGAN_ENG_API void sx_cover( Sphere& res, const Sphere& s1, const Sphere& s2 );
 
 //! return a new sphere which covers the entry spheres
 SEGAN_INLINE Sphere sx_cover( const Sphere& s1, const Sphere& s2 )
@@ -485,13 +453,10 @@ SEGAN_INLINE Sphere sx_cover( const Sphere& s1, const Sphere& s2 )
 SEGAN_INLINE bool sx_intersect( const Sphere& s1, const Sphere& s2, float* OUT distance = null )
 {
 	const float3 d( s2.x - s1.x, s2.y - s1.y, s2.z - s1.z );
-	if ( distance )
-	{
+	if ( distance ) {
 		*distance = sx_sqrt_fast( d.x * d.x + d.y * d.y + d.z * d.z );
 		return ( *distance < ( s2.r + s1.r ) );
-	}
-	else
-	{
+	} else {
 		const float dis = ( d.x * d.x ) + ( d.y * d.y ) + ( d.z * d.z );
 		const float rad = s2.r + s1.r;
 		return ( dis < ( rad * rad ) );
@@ -516,9 +481,9 @@ SEGAN_INLINE void sx_cover( AABox& res, const AABox& b1, const AABox& b2 )
 	res.x1 = sx_min_f( b1.x1, b2.x1 );
 	res.y1 = sx_min_f( b1.y1, b2.y1 );
 	res.z1 = sx_min_f( b1.z1, b2.z1 );
-	res.x2 = sx_min_f( b1.x2, b2.x2 );
-	res.y2 = sx_min_f( b1.y2, b2.y2 );
-	res.z2 = sx_min_f( b1.z2, b2.z2 );
+	res.x2 = sx_max_f( b1.x2, b2.x2 );
+	res.y2 = sx_max_f( b1.y2, b2.y2 );
+	res.z2 = sx_max_f( b1.z2, b2.z2 );
 }
 
 //! return a box which covers the entry box
@@ -528,9 +493,9 @@ SEGAN_INLINE AABox sx_cover( const AABox& b1, const AABox& b2 )
 		sx_min_f( b1.x1, b2.x1 ),
 		sx_min_f( b1.y1, b2.y1 ),
 		sx_min_f( b1.z1, b2.z1 ),
-		sx_min_f( b1.x2, b2.x2 ),
-		sx_min_f( b1.y2, b2.y2 ),
-		sx_min_f( b1.z2, b2.z2 ) );
+		sx_max_f( b1.x2, b2.x2 ),
+		sx_max_f( b1.y2, b2.y2 ),
+		sx_max_f( b1.z2, b2.z2 ) );
 }
 
 
@@ -541,19 +506,7 @@ SEGAN_INLINE float sx_get_volume( const AABox& box )
 }
 
 //! resize the current box to cover the entry box
-SEGAN_INLINE void sx_Cover( AABox& res, const OBBox& box )
-{
-	for( int i = 0; i < 8; ++i )
-	{
-		if ( res.x1 > box.v[i].x ) res.x1 = box.v[i].x;
-		if ( res.y1 > box.v[i].y ) res.y1 = box.v[i].y;
-		if ( res.z1 > box.v[i].z ) res.z1 = box.v[i].z;
-
-		if ( res.x2 < box.v[i].x ) res.x2 = box.v[i].x;
-		if ( res.y2 < box.v[i].y ) res.y2 = box.v[i].y;
-		if ( res.z2 < box.v[i].z ) res.z2 = box.v[i].z;
-	}
-}
+SEGAN_ENG_API AABox sx_cover( const AABox& b1, const OBBox& b2 );
 
 
 
@@ -572,7 +525,8 @@ SEGAN_INLINE void sx_transform( OBBox& res, const AABox& box, const matrix& mat 
 //! transform AABox by matrix mat and return OBBox
 SEGAN_INLINE OBBox sx_transform( const AABox& box, const matrix& mat )
 {
-	OBBox res( box );
+	OBBox res;
+	res.SetAABox( box );
 	for ( int i=0; i<8; ++i )
 		sx_transform_point( res.v[i], res.v[i], mat );
 	return res;
@@ -600,52 +554,10 @@ SEGAN_INLINE bool sx_intersect( const Sphere& sph, const Frustum& fr )
 }
 
 //! return true if the box intersect with the frustum
-SEGAN_INLINE bool sx_intersect( const AABox& box, const Frustum& fr )
-{
-	float3 vmin, vmax;
-	for ( int i = 0; i < 6; ++i )
-	{ 
-		if ( fr.p[i].a > 0 ) 
-			vmin.x = box.x1, vmax.x = box.x2;
-		else 
-			vmin.x = box.x2, vmax.x = box.x1;
-		
-		if ( fr.p[i].b > 0 )
-			vmin.y = box.y1, vmax.y = box.y2;
-		else
-			vmin.y = box.y2, vmax.y = box.y1;
-
-		if ( fr.p[i].c > 0 )
-			vmin.z = box.z1, vmax.z = box.z2;
-		else
-			vmin.z = box.z2, vmax.z = box.z1;
-
-		if( sx_dot( (float3)fr.p[i], vmin ) + fr.p[i].d > 0 ) 
-			return false;
-	} 
-	return true;
-}
+SEGAN_ENG_API bool sx_intersect( const AABox& box, const Frustum& fr );
 
 //! return true if the box intersect with the frustum
-SEGAN_INLINE bool sx_intersect( const OBBox& box, const Frustum& fr )
-{
-	// check the visibility via intersect between box and frustum
-	bool result = true;
-	for (int i=0; i<6 && result; i++)
-	{
-		result = false;
-		for (int j=0; j<8; j++)
-		{
-			if ( sx_distance( fr.p[i], box.v[j] ) >= 0 )
-			{
-				result = true;
-				break;
-			}
-		}
-	}
-
-	return result;
-}
+SEGAN_ENG_API bool sx_intersect( const OBBox& box, const Frustum& fr );
 
 
 #endif	//	GUARD_Math_tools_HEADER_FILE
