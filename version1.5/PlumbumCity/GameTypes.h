@@ -109,6 +109,7 @@ enum GameMessageType
 	GMT_I_FINALIZED,		//  the entity is finalized. data will be pointer to entity
 	GMT_I_BORN,				//  the entity born. data will be pointer to new entity
 	GMT_I_DIED,				//  the entity died. data will be pointer to death entity
+	GMT_I_UPGRADED,			//  the entity upgraded.
 	GMT_LEAVE_ME,			//	notify that cut the reference to this entity. data should be pointer to the entity
 	GMT_GOTO,				//  request entity to go to the specified position. data will be pointer to a mission structure
 	GMT_FIRE,				//  order to entity to fire to a position or some one

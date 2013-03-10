@@ -520,6 +520,8 @@ namespace GM
 			else g_game->m_player->m_gold -= selectedTower->m_cost[level];
 
 			selectedTower->SetLevel( level );
+
+			selectedTower->MsgProc( GMT_I_UPGRADED, NULL );
 			
 		}
 		

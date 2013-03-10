@@ -28,7 +28,8 @@ void com_Supporter::Initialize( void )
 {
 	sx_callstack();
 
-	sx::core::ArrayPNode_inline	nodes(512);
+	static sx::core::ArrayPNode_inline nodes(64);
+	nodes.Clear();
 	sx::core::Scene::GetNodesByArea( m_owner->GetPosition(), m_owner->m_curAttack.maxRange, nodes, NMT_ALL, PARTY_TOWER );
 
 	m_towers.Clear();
@@ -127,15 +128,20 @@ void com_Supporter::Update( float elpsTime )
 		m_energy -= addEnergy;
 		g_game->m_player->m_energy += addEnergy;
 
-		for ( int i = 0; i < m_towers.Count(); ++i )
+		const int addHealth = static_cast<int>(m_repair);
+		
+		if ( addHealth > 0 )
 		{
-			if ( m_towers[i].entity && m_towers[i].entity->m_health.icur > 0 )
+			for ( int i = 0; i < m_towers.Count(); ++i )
 			{
-				const int addHealth = static_cast<int>(m_repair);
-				m_repair -= addHealth;
-				m_towers[i].entity->m_health.icur +=
-					m_towers[i].entity->m_health.icur + addHealth > m_towers[i].entity->m_health.imax ? 0 : addHealth;
+				if ( m_towers[i].entity && m_towers[i].entity->m_health.icur > 0 )
+				{
+					m_towers[i].entity->m_health.icur +=
+						m_towers[i].entity->m_health.icur + addHealth > m_towers[i].entity->m_health.imax ? 0 : addHealth;
+				}
 			}
+
+			m_repair -= addHealth;
 		}
 	}
 
@@ -198,6 +204,7 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 			}
 		}
 		break;
+
 	case GMT_I_FINALIZED:
 		if ( data )
 		{
@@ -205,6 +212,55 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 			if ( entity->m_partyCurrent == PARTY_TOWER )
 			{
 				m_towers.Remove(EntityExp(entity, entity->m_experience));
+			}
+		}
+		break;
+
+	case GMT_I_UPGRADED:
+		{
+			static sx::core::ArrayPNode_inline nodes(64);
+			nodes.Clear();
+			sx::core::Scene::GetNodesByArea( m_owner->GetPosition(), m_owner->m_curAttack.maxRange, nodes, NMT_ALL, PARTY_TOWER );
+
+			for ( int i = 0; i < nodes.Count(); ++i )
+			{
+				sx::core::PNode node = nodes[i];
+				Entity* entity = static_cast<Entity*>(node->GetUserData());
+
+				if ( (!entity) || (entity->m_health.icur < 1) )
+				{
+					continue;
+				}
+
+				const float distance_squared = m_owner->GetPosition().Distance_sqr( entity->GetPosition() );
+				if ( distance_squared > m_owner->m_curAttack.maxRange * m_owner->m_curAttack.maxRange )
+				{
+					continue;
+				}
+
+				bool canAdd = true;
+
+				for ( int j = 0; j < entity->m_components.Count(); ++j )
+				{
+					if ( entity->m_components[j]->m_tag == m_tag )
+					{
+						canAdd = false;
+						break;
+					}
+				}
+
+				for ( int i = 0; i < m_towers.Count(); ++i )
+				{
+					if ( m_towers[i].entity == entity )
+					{
+						canAdd = false;
+					}
+				}
+
+				if ( canAdd )
+				{
+					m_towers.PushBack(EntityExp(entity, entity->m_experience));
+				}
 			}
 		}
 		break;
