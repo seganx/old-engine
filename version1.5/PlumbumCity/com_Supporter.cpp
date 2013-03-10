@@ -182,25 +182,19 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 			Entity* entity = static_cast<Entity*>(data);
 			if ( entity->m_partyCurrent == PARTY_TOWER )
 			{
-				bool notSupporter = true;
-
 				for ( int j = 0; j < entity->m_components.Count(); ++j )
 				{
 					if ( entity->m_components[j]->m_tag == m_tag )
-					{
-						notSupporter = false;
-						break;
+					{				
+						return; // 
 					}
 				}
 
-				if (notSupporter)
+				const float distance_squared = m_owner->GetPosition().Distance_sqr( entity->GetPosition() );
+				if ( distance_squared <= m_owner->m_curAttack.maxRange * m_owner->m_curAttack.maxRange )
 				{
-					const float distance_squared = m_owner->GetPosition().Distance_sqr( entity->GetPosition() );
-					if ( distance_squared <= m_owner->m_curAttack.maxRange * m_owner->m_curAttack.maxRange )
-					{
-						m_towers.PushBack(EntityExp(entity, entity->m_experience));
-					}				
-				}
+					m_towers.PushBack(EntityExp(entity, entity->m_experience));
+				}				
 			}
 		}
 		break;
@@ -238,29 +232,37 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 					continue;
 				}
 
-				bool canAdd = true;
+				bool can_not_add = false;
 
 				for ( int j = 0; j < entity->m_components.Count(); ++j )
 				{
 					if ( entity->m_components[j]->m_tag == m_tag )
 					{
-						canAdd = false;
+						can_not_add = true;
 						break;
 					}
+				}
+
+				if ( can_not_add )
+				{
+					continue;
 				}
 
 				for ( int i = 0; i < m_towers.Count(); ++i )
 				{
 					if ( m_towers[i].entity == entity )
 					{
-						canAdd = false;
+						can_not_add = true;
+						break;
 					}
 				}
 
-				if ( canAdd )
+				if ( can_not_add )
 				{
-					m_towers.PushBack(EntityExp(entity, entity->m_experience));
+					continue;
 				}
+
+				m_towers.PushBack(EntityExp(entity, entity->m_experience));
 			}
 		}
 		break;
