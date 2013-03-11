@@ -58,7 +58,7 @@ public:
 		_Realloc( newSize-1 );
 	}
 
-	SEGAN_LIB_INLINE sint Count( void )
+	SEGAN_LIB_INLINE sint Count( void ) const
 	{
 		return m_count;
 	}

@@ -5,7 +5,7 @@
 
 
 
-#define NET_ACTIVATE	1
+#define NET_ACTIVATE	0
 #define NET_DELAY_TIME	60
 #define NET_TIMEOUT		60000
 
@@ -162,7 +162,10 @@ UINT MainMsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 void MainLoop(float elpsTime)
 {
 	sx_callstack();
+
+#if NET_ACTIVATE
 	client->Update( elpsTime, NET_DELAY_TIME, NET_TIMEOUT );
+#endif
 
 	if ( elpsTime > 1000 ) return;
 

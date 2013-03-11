@@ -13,6 +13,7 @@
 #include "../sxLib/Lib.h"
 
 #include "System/System.h"
+#include "input/Input.h"
 #include "d3d/d3dDevice.h"
 #include "engine/draw_debugger.h"
 
@@ -25,6 +26,8 @@ struct EngineConfig
 	Window*					window_main;				//	main rendering window. this can be null to create a new window a pointer to existing window
 	WindowEventCallback		window_callback;			//	window call back to handle window events. this can be null to leave it to default
 	dword					d3d_flag;					//	rendering device flags
+	InputDevice*			input_device[4];			//	free slot to attach input devices
+
 
 	EngineConfig()
 		: logger(null)
@@ -32,6 +35,7 @@ struct EngineConfig
 		, window_main(null)
 		, window_callback(null)
 		, d3d_flag( SX_D3D_CREATE_GL | SX_D3D_VSYNC )
+		//, input_device(0, 0, 0, 0)
 	{
 
 	}

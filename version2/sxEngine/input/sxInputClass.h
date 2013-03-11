@@ -31,7 +31,7 @@ this is the base of other input devices. other input device classes should inher
 to handle signals for more that one device in same type (2 joystick) the application responsible to attach more
 Input Devices to Input class with different playerID. ( each player need his separate devices )
 */
-typedef class InputDeviceBase
+class InputDeviceBase
 {
 
 public:
@@ -63,12 +63,11 @@ public:
 	this may call by engine in game to send signal to shock, vibration, etc. 
 	use playerID to specify which player should handle this signal.
 	*/
-	virtual void OnSignal(int playerID, IST_ InputSignalType idSignal, void* data) = 0;
+	virtual void OnSignal( uint playerID, IST_ InputSignalType idSignal, void* data ) = 0;
 
 protected:
-	UINT	m_playerID;		//  the player ID of this device
-}
-*PInputDeviceBase;
+	uint	m_playerID;		//  the player ID of this device
+};
 
 
 //////////////////////////////////////////////////////////////////////////

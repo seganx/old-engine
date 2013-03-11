@@ -376,50 +376,6 @@
 				RelativePath="..\input\Input.h"
 				>
 			</File>
-			<File
-				RelativePath="..\input\sxInputClass.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\input\sxInputClass.h"
-				>
-			</File>
-			<File
-				RelativePath="..\input\sxJoystic_model_a.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\input\sxJoystic_model_a.h"
-				>
-			</File>
-			<File
-				RelativePath="..\input\sxKeyboard.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\input\sxKeyboard.h"
-				>
-			</File>
-			<File
-				RelativePath="..\input\sxMouse.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\input\sxMouse.h"
-				>
-			</File>
-			<File
-				RelativePath="..\input\sxMouse_editor.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\input\sxMouse_editor.h"
-				>
-			</File>
-			<File
-				RelativePath="..\input\sxTypesInput.h"
-				>
-			</File>
 		</Filter>
 		<File
 			RelativePath="..\Engine_def.h"

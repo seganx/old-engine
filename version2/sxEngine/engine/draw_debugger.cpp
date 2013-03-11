@@ -166,9 +166,9 @@ SEGAN_ENG_API void sx_debug_draw_sphere( const Sphere& sphere, const dword color
 	const sint vcount = stacks * slices * 6;
 
 	// compute sphere vertices
-	for ( sint t=0; t<stacks; ++t )
+	for ( uint t=0; t<stacks; ++t )
 	{
-		for ( sint p=0; p<slices; ++p )
+		for ( uint p=0; p<slices; ++p )
 		{
 			const float p1 = phi * float(p);
 			const float t1 = theta * float(t);
