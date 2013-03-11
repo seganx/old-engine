@@ -286,9 +286,9 @@ enum InputState
 //! signals that will received by input devices
 enum InputSignalType
 {
-	IST_SET_CURSOR = 1,		//  this will comes by a vector to set device's cursor
-	IST_SET_SIZE,			//  change input box size. data will be a pointer to int2
-	IST_SET_SPEED,			//	change input speed. data will be a pointer to float
+	IST_SET_OS_CURSOR = 1,		//  this will comes by a vector to set device's cursor. use int2 as x and y
+	IST_SET_RECT,				//  change input box size. data will be a pointer to int4 : x, y, width, height
+	IST_SET_SPEED,				//	change input speed. data will be a pointer to float
 };
 
 //! structure of all float values in Input system { cursor, wheel, analogs, ... )
@@ -568,7 +568,7 @@ class SEGAN_ENG_API InputDevice
 
 public:
 
-	InputDevice( uint playerID );
+	InputDevice( const uint playerID );
 	virtual ~InputDevice();
 
 	//! initialize this device
@@ -584,7 +584,7 @@ public:
 	virtual const wchar* GetDesc( void ) = 0;
 
 	//! return device's capabilities. cursor, shock, LCD, LED, etc
-	virtual const dword GetCapabilities( void ) = 0;
+	virtual dword GetCapabilities( void ) = 0;
 
 	//! update input device
 	virtual void Update( float elapsTime ) = 0;
@@ -595,9 +595,9 @@ public:
 	*/
 	virtual void OnSignal( const InputSignalType idSignal, void* data, const uint playerID = 0 ) = 0;
 
-protected:
-
-	uint	m_playerID;		//  the player ID of this device
+public:
+	class Input*	m_owner;		//	owner to the input system
+	uint			m_playerID;		//  the player ID of this device
 };
 
 
@@ -631,7 +631,7 @@ public:
 	void Update( float elpsTime );
 
 	//! return values of cursor structure
-	InputValues* GetFloats( const uint playerID = 0 );
+	InputValues* GetValues( const uint playerID = 0 );
 
 	//! return buttons value
 	InputKeys* GetKeys( const uint playerID = 0 );

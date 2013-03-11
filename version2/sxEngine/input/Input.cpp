@@ -12,7 +12,8 @@ InputDevice::~InputDevice() {}
 //////////////////////////////////////////////////////////////////////////
 Input::Input( void )
 {
-
+	sx_mem_set( m_values, 0, sizeof(m_values) );
+	sx_mem_set( m_keys, 0, sizeof(m_keys) );
 }
 
 Input::~Input( void )
@@ -22,8 +23,10 @@ Input::~Input( void )
 
 void Input::Attach( const InputDevice* device )
 {
+	if ( !device ) return;
 	InputDevice* dev = (InputDevice*)device;
 	m_devices.PushBack( dev );
+	dev->m_owner = this;
 }
 
 uint Input::GetDeviceCount( void ) const
@@ -53,7 +56,7 @@ void Input::Update( float elpsTime )
 	}
 }
 
-SEGAN_INLINE InputValues* Input::GetFloats( const uint playerID /*= 0 */ )
+SEGAN_INLINE InputValues* Input::GetValues( const uint playerID /*= 0 */ )
 {
 	return &m_values[ playerID ];
 }

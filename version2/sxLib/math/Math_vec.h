@@ -42,6 +42,23 @@ public:
 	sint x, y;
 };
 
+//////////////////////////////////////////////////////////////////////////
+//	INTEGER RECT 4D
+//////////////////////////////////////////////////////////////////////////
+SEGAN_ALIGN_16 class int4
+{
+public:
+	SEGAN_INLINE int4() {}
+	SEGAN_INLINE int4( const int4& i ): x(i.x), y(i.y), w(i.w), h(i.h) {}
+	SEGAN_INLINE int4( const sint* p ): x(p[0]), y(p[1]), w(p[2]), h(p[3]) {}
+	SEGAN_INLINE int4( const sint _x, const sint _y, const sint _w, const sint _h ): x(_x), y(_y), w(_w), h(_h) {}
+
+	SEGAN_INLINE bool operator== (const int4& i ) { return ( x == i.x ) && ( y == i.y ) && ( w == i.w ) && ( h == i.h ); }
+	SEGAN_INLINE bool operator!= (const int4& i ) { return ( x != i.x ) || ( y != i.y ) || ( w != i.w ) || ( h != i.h ); }
+
+public:
+	sint x, y, w, h;
+};
 
 //////////////////////////////////////////////////////////////////////////
 //	VECTOR 2D

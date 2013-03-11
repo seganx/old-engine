@@ -376,6 +376,14 @@
 				RelativePath="..\input\Input.h"
 				>
 			</File>
+			<File
+				RelativePath="..\input\Mouse_editor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\input\Mouse_editor.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="..\Engine_def.h"

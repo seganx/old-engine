@@ -49,14 +49,17 @@ int WindowEventCall( Window* Sender, const WindowEvent* data )
 		
 			RECT prc;
 			GetWindowRect( hWnd, &prc );
-			curRect.left	= prc.left;
-			curRect.top		= prc.top;
+			curRect.left	= prc.left + iW / 2;
+			curRect.top		= prc.top + iH / 2;
 			curRect.width	= prc.right - prc.left - iW;
 			curRect.height	= prc.bottom - prc.top - iH;
 
 #if 1
 			if ( Sender && Sender == g_engine->m_window )
 			{
+				if ( g_engine->m_input )
+					g_engine->m_input->SendSignal( IST_SET_RECT, &curRect );
+
 				if ( g_engine->m_device3D && ( g_engine->m_device3D->m_creationData.flag & SX_D3D_FULLSCREEN ) == 0  )
 					g_engine->m_device3D->SetSize( curRect.width, curRect.height, -1 );
 			}
@@ -79,6 +82,8 @@ void AppMainLoop( float elpsTime )
 
 	client->Update( elpsTime, NET_DELAY_TIME, NET_TIMEOUT );
 
+	g_engine->m_input->Update( elpsTime );
+
 #if 1
 	if ( g_engine->m_device3D && g_engine->m_device3D->BeginScene() )
 	{
@@ -87,7 +92,7 @@ void AppMainLoop( float elpsTime )
 
 		static float timer = 0;
 		timer =  (float)( 0.0003f * sx_os_get_timer() );
-		float eye[3] = { 5.0f * sx_sin(-timer), 5.0f, 30.0f * sx_cos(-timer)	};
+		float eye[3] = { 5.0f * sx_sin(-timer), g_engine->m_input->GetValues()->abs_x, 30.0f * sx_cos(-timer)	};
 		//float eye[3] = { 2.0f , 5.0f, 5.0f };
 		float at[3] = { 0.0f, 0.0f, 0.0f };
 		float up[3] = { 0.0f, 1.0f, 0.0f };
@@ -216,6 +221,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	config.logger = &loggerconfig;
 	config.window_callback = &WindowEventCall;
 	config.d3d_flag = SX_D3D_CREATE_GL | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
+	config.input_device[0] = sx_new( Mouse_editor(0) );
 
 	sx_engine_get_singleton( &config );
 

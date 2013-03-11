@@ -38,6 +38,7 @@ void sx_engine_finalize( void );
 void sx_engine_start( ApplicationMainLoop mainloop );
 
 
+
 #if defined(_WIN32)
 #define _WIN32_WINNT	0x0500		// use new features of the windows
 #ifndef WIN32_LEAN_AND_MEAN
