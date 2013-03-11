@@ -30,6 +30,7 @@ Entity::Entity( void )
 , m_experience(0)
 , test_onDamageXP(0)
 , test_onDeadXP(0)
+, test_towerDistance(7.0f)
 {
 	sx_callstack();
 

@@ -106,6 +106,7 @@ void EntityManager::LoadTypes( Callback_Draw_Loading drawLoading )
 
 				script.GetFloat( i, L"onDamageXP", pe->test_onDamageXP );
 				script.GetFloat( i, L"onDeadXP", pe->test_onDeadXP );
+				script.GetFloat( i, L"distance", pe->test_towerDistance );
 
 				if ( script.GetString(i, L"targetType", tmpStr) )
 				{

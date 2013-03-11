@@ -67,8 +67,8 @@ namespace GM
 		sx::gui::PPanelEx	m_pnlCreate1;		//  background panel of tower creator
 		sx::gui::PPanelEx	m_pnlArrow;			//	arrow to selected tower
 		sx::gui::PPanelEx	m_btnCreate[NUM_TOWERS];		//  buttons to create towers
-		
-		float				m_tower_distance;	//	minimum distance of towers
+
+		float				m_add_distance;	//	additional distance of towers
 		int					m_towerIndex;		//  index of tower type
 		Entity*				m_Tower;			//  tower entity to place
 		com_ShowRange		m_ShowRange;		//  use to show the range of tower

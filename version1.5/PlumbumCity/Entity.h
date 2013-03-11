@@ -120,6 +120,7 @@ public:
 	//	TEST
 	float					test_onDamageXP;
 	float					test_onDeadXP;
+	float					test_towerDistance;
 };
 
 #endif	//	GUARD_GameEntity_HEADER_FILE

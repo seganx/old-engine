@@ -18,7 +18,7 @@ namespace GM
 		,	m_pnlCreate0(0)
 		,	m_pnlCreate1(0)
 		,	m_pnlArrow(0)
-		,	m_tower_distance(7.0f)
+		,	m_add_distance(0)
 		,	m_towerIndex(0)
 		,	m_Tower(0)
 	{
@@ -172,7 +172,10 @@ namespace GM
 					//float2 threshold( (box.Max.x - box.Min.x) * 0.5f, (box.Max.z - box.Min.z) * 0.5f );
 					//float boxRadius = 7.0f;//threshold.Length();
 					static sx::core::ArrayPNode nodelist(256); nodelist.Clear();
-					sx::core::Scene::GetNodesByArea(towerPos, m_tower_distance, nodelist, NMT_MESH, PARTY_TOWER);
+
+					const float tower_distance = m_Tower->test_towerDistance + m_add_distance;
+
+					sx::core::Scene::GetNodesByArea(towerPos, tower_distance, nodelist, NMT_MESH, PARTY_TOWER);
 
 					for (int i=0; i<nodelist.Count(); i++)
 					{
@@ -184,7 +187,7 @@ namespace GM
 						float2 otherThreshold( (otherBox.Max.x - otherBox.Min.x) * 0.5f, (otherBox.Max.z - otherBox.Min.z) * 0.5f );
 						float otherRadius = otherThreshold.Length();						
 						
-						if ( towerPos.Distance( nodelist[i]->GetPosition_world() ) < m_tower_distance + otherRadius )
+						if ( towerPos.Distance( nodelist[i]->GetPosition_world() ) < tower_distance + otherRadius )
 						{
 							doCreate = false;
 							break;
@@ -372,8 +375,8 @@ namespace GM
 
 							if ( tmpStr == L"NORMAL" )
 							{
-								m_tower_distance = 7.0f;
-								script.GetFloat( i, L"tower_distance", m_tower_distance );
+								m_add_distance = 0.0f;
+								script.GetFloat( i, L"tower_add_distance", m_add_distance );
 
 								for ( int t=0; t<NUM_TOWERS; t++ )
 								{

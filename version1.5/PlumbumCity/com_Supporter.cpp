@@ -45,26 +45,14 @@ void com_Supporter::Initialize( void )
 		}
 
 		const float distance_squared = m_owner->GetPosition().Distance_sqr( entity->GetPosition() );
-		if ( distance_squared > m_owner->m_curAttack.maxRange * m_owner->m_curAttack.maxRange )
+
+		if ( (distance_squared > m_owner->m_curAttack.maxRange * m_owner->m_curAttack.maxRange) ||
+			 (m_owner->m_weaponType == GWT_NULL) )
 		{
 			continue;
 		}
-
-		bool notSupporter = true;
-
-		for ( int j = 0; j < entity->m_components.Count(); ++j )
-		{
-			if ( entity->m_components[j]->m_tag == m_tag )
-			{
-				notSupporter = false;
-				break;
-			}
-		}
 		
-		if (notSupporter)
-		{
-			m_towers.PushBack(EntityExp(entity, entity->m_experience));
-		}
+		m_towers.PushBack(EntityExp(entity, entity->m_experience));
 	}
 
 	m_time = 0.0f;
@@ -72,6 +60,7 @@ void com_Supporter::Initialize( void )
 	m_repair = 0.0f;
 	m_overActiveTime = 0.0f;
 	m_time_exp = 0.0f;
+	m_owner->m_weaponType = GWT_NULL;
 	m_owner->m_experience = 0.0f;	
 }
 
@@ -230,23 +219,14 @@ void com_Supporter::MsgProc( UINT msg, void* data )
 				if ( distance_squared > m_owner->m_curAttack.maxRange * m_owner->m_curAttack.maxRange )
 				{
 					continue;
-				}
+				}		
 
-				bool can_not_add = false;
-
-				for ( int j = 0; j < entity->m_components.Count(); ++j )
-				{
-					if ( entity->m_components[j]->m_tag == m_tag )
-					{
-						can_not_add = true;
-						break;
-					}
-				}
-
-				if ( can_not_add )
+				if ( m_owner->m_weaponType == GWT_NULL )
 				{
 					continue;
 				}
+				
+				bool can_not_add = false;
 
 				for ( int i = 0; i < m_towers.Count(); ++i )
 				{
