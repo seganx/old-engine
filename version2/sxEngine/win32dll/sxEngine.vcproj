@@ -357,11 +357,27 @@
 			Name="engine"
 			>
 			<File
-				RelativePath="..\engine\draw_debugger.cpp"
+				RelativePath="..\engine\Camera.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\engine\draw_debugger.h"
+				RelativePath="..\engine\Camera.h"
+				>
+			</File>
+			<File
+				RelativePath="..\engine\Draw_debugger.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\engine\Draw_debugger.h"
+				>
+			</File>
+			<File
+				RelativePath="..\engine\Network.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\engine\Network.h"
 				>
 			</File>
 		</Filter>

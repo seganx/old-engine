@@ -16,7 +16,9 @@
 #include "input/Input.h"
 #include "input/Mouse_editor.h"
 #include "d3d/d3dDevice.h"
-#include "engine/draw_debugger.h"
+#include "engine/Network.h"
+#include "engine/Draw_debugger.h"
+#include "engine/Camera.h"
 
 
 //! structure of engine configuration

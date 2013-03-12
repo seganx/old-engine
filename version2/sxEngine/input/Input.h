@@ -657,14 +657,14 @@ public:
 };
 
 
-#define sx_key_down(key, playerID)		g_engine->m_Input->KeyDown( key, playerID )
-#define sx_key_hold(key, playerID)		g_engine->m_Input->KeyHold( key, playerID )
-#define sx_key_up(key, playerID)		g_engine->m_Input->KeyUp( key, playerID )
-#define sx_key_double(key, playerID)	g_engine->m_Input->KeyDouble( key, playerID )
-#define sx_mouse_rlx(playerID)			g_engine->m_Input->GetCursor( playerID )->rl_x
-#define sx_mouse_rly(playerID)			g_engine->m_Input->GetCursor( playerID )->rl_y
-#define sx_mouse_absx(playerID)			g_engine->m_Input->GetCursor( playerID )->abs_x
-#define sx_mouse_absy(playerID)			g_engine->m_Input->GetCursor( playerID )->abs_y
+#define sx_key_down(key, playerID)		g_engine->m_input->KeyDown( key, playerID )
+#define sx_key_hold(key, playerID)		g_engine->m_input->KeyHold( key, playerID )
+#define sx_key_up(key, playerID)		g_engine->m_input->KeyUp( key, playerID )
+#define sx_key_double(key, playerID)	g_engine->m_input->KeyDouble( key, playerID )
+#define sx_mouse_rlx(playerID)			g_engine->m_input->GetCursor( playerID )->rl_x
+#define sx_mouse_rly(playerID)			g_engine->m_input->GetCursor( playerID )->rl_y
+#define sx_mouse_absx(playerID)			g_engine->m_input->GetCursor( playerID )->abs_x
+#define sx_mouse_absy(playerID)			g_engine->m_input->GetCursor( playerID )->abs_y
 
 byte SEGAN_ENG_API sx_io_get_acci( InputKey inputButton );
 byte SEGAN_ENG_API sx_io_get_acci_with_shift( InputKey inputButton );

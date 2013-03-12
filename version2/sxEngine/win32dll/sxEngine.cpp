@@ -4,8 +4,9 @@
 #include "../sxEngine.h"
 #include "../System/win32/Win6.h"
 
-extern Engine*	g_engine = 0;
-EngineConfig	s_config;
+extern Engine*		g_engine = 0;
+EngineConfig		s_config;
+ApplicationMainLoop s_mainloop = null;
 
 //////////////////////////////////////////////////////////////////////////
 //	MAIN ENGINE DLL
@@ -25,6 +26,77 @@ BOOL APIENTRY DllMain ( HMODULE hModule, dword  ul_reason_for_call, LPVOID lpRes
 	return TRUE;
 }
 
+WindowRect window_get_rect( handle windowHandle )
+{
+	WindowRect curRect;
+
+	HWND hWnd = *( (HWND*)windowHandle );
+
+	WINDOWINFO winfo;
+	GetWindowInfo( hWnd, &winfo );
+	sint iW = (winfo.rcClient.left - winfo.rcWindow.left) + (winfo.rcWindow.right - winfo.rcClient.right);
+	sint iH = (winfo.rcClient.top  - winfo.rcWindow.top)  + (winfo.rcWindow.bottom - winfo.rcClient.bottom);
+
+	RECT prc;
+	GetWindowRect( hWnd, &prc );
+	curRect.left	= prc.left + iW / 2;
+	curRect.top		= prc.top + iH / 2;
+	curRect.width	= prc.right - prc.left - iW;
+	curRect.height	= prc.bottom - prc.top - iH;
+
+	return curRect;
+}
+
+sint window_events( Window* Sender, const WindowEvent* data )
+{
+	if ( !data ) return 0;
+
+	switch ( data->msg )
+	{
+	case WM_SIZE:
+		switch ( data->wparam )
+		{
+		case SIZE_MAXIMIZED:	break;
+		case SIZE_RESTORED:		break;
+		case SIZE_MINIMIZED:
+		default:				return data->msg;
+		}
+
+	case WM_EXITSIZEMOVE:
+		{
+			WindowRect curRect = window_get_rect( data->windowHandle );
+
+			if ( Sender && Sender == g_engine->m_window )
+			{
+				if ( g_engine->m_input )
+					g_engine->m_input->SendSignal( IST_SET_RECT, &curRect );
+
+				if ( g_engine->m_device3D && ( g_engine->m_device3D->m_creationData.flag & SX_D3D_FULLSCREEN ) == 0  )
+					g_engine->m_device3D->SetSize( curRect.width, curRect.height, -1 );
+			}
+
+			g_engine->m_logger->Log_( L"Window '%s' has been resized [ %d x %d ]", Sender ? Sender->m_name : L"???", curRect.width, curRect.height );
+			return 0;
+		}
+		break;
+	}
+
+	if ( s_config.window_callback )
+		return s_config.window_callback( Sender, data );
+
+	return data->msg;
+}
+
+void engine_main_loop( float elpsTime )
+{
+	g_engine->m_input->Update( elpsTime );
+
+	g_engine->m_network->Update( elpsTime );
+
+	s_mainloop( elpsTime );
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////
 //	ENGINE CLASS
@@ -33,8 +105,18 @@ SEGAN_ENG_API Engine* engine_get_singleton( EngineConfig* config /*= null */ )
 {
 	if ( g_engine ) return g_engine;
 
+	Logger_Callback loggercallback = null;
 	if ( config )
+	{
 		s_config = *config;
+
+		if ( config->logger )
+		{
+			loggercallback = config->logger->callback;
+			config->logger->callback = null;
+		}
+	}
+	
 
 	//	create instance of engine
 	g_engine = sx_new( Engine );
@@ -47,6 +129,10 @@ SEGAN_ENG_API Engine* engine_get_singleton( EngineConfig* config /*= null */ )
 	g_logger->Log_(L"SeganX Engine 0.2 \r\n\r\n");
 
 
+	//////////////////////////////////////////////////////////////////////////
+	//	initialize systems
+	//////////////////////////////////////////////////////////////////////////
+
 	//	initialize OS objects and functions
 	sx_os_initialize();
 
@@ -54,13 +140,22 @@ SEGAN_ENG_API Engine* engine_get_singleton( EngineConfig* config /*= null */ )
 	sx_thread_initilize();
 
 	//	initialize application
-	sx_app_initialize( s_config.window_callback );
+	sx_app_initialize( window_events );
 
 	//	initialize network
 	sx_net_initialize( s_config.net_id );
 
 	//	initialize device 3D system
 	sx_d3d_initialize( s_config.d3d_flag );
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//	create devices
+	//////////////////////////////////////////////////////////////////////////
+
+	//	create network class
+	g_engine->m_network = sx_new( Network );
 
 	//	create man window for engine
 	if ( !s_config.window_main )
@@ -83,16 +178,24 @@ SEGAN_ENG_API Engine* engine_get_singleton( EngineConfig* config /*= null */ )
 	g_engine->m_input->Attach( s_config.input_device[2] );
 	g_engine->m_input->Attach( s_config.input_device[3] );
 
+
+	g_logger->m_callback = loggercallback;
 	return g_engine;
 }
 
 
 SEGAN_ENG_API bool engine_initialize( void )
 {
+	//	initialize network device
+	g_engine->m_network->Initialize();
+
 	//	initialize rendering device
 	g_engine->m_device3D->Initialize( g_engine->m_window->GetHandle() );
 	g_engine->m_device3D->SetSize( -1, -1, s_config.d3d_flag );
 
+	//	initialize input device
+	WindowRect rect = window_get_rect( g_engine->m_window->GetHandle() );
+	g_engine->m_input->SendSignal( IST_SET_RECT, &rect );
 
 #if 0
 	static bool engine_initialized = false;
@@ -146,18 +249,41 @@ SEGAN_ENG_API bool engine_initialize( void )
 void engine_finalize( void )
 {
 	if ( !g_logger ) return;
-
-	//////////////////////////////////////////////////////////////////////////
-	//	FINALIZE OBJECTS
-	//////////////////////////////////////////////////////////////////////////
-
+	g_logger->m_callback = null;
 	g_logger->Log( L"Shutting down SeganX ...\r\n" );
 
-	//g_engine->m_network->Finalize();
-	//sx_d3d_destroy_device( g_engine->m_device3D );
+	//////////////////////////////////////////////////////////////////////////
+	//	finalize devices
+	//////////////////////////////////////////////////////////////////////////
+	
+	g_engine->m_network->Finalize();
 
-	//	finalize device 3D system
-	//sx_d3d_finalize();
+
+	//////////////////////////////////////////////////////////////////////////
+	//	destroy devices
+	//////////////////////////////////////////////////////////////////////////
+
+	//	destroy input system
+	sx_delete_and_null( g_engine->m_input );
+
+	// destroy network device
+	sx_delete_and_null( g_engine->m_network );
+
+	//	destroy 3D device
+	sx_d3d_destroy_device( g_engine->m_device3D );
+
+	//	destroy window
+	if ( ! s_config.window_main )
+		sx_app_destroy_window( g_engine->m_window );
+	g_engine->m_window = null;
+
+
+	//////////////////////////////////////////////////////////////////////////
+	//	finalize systems
+	//////////////////////////////////////////////////////////////////////////
+
+	//	finalize 3D system
+	sx_d3d_finalize();
 
 	//	finalize network
 	sx_net_finalize();
@@ -181,5 +307,6 @@ void engine_finalize( void )
 
 SEGAN_ENG_API void engine_start( ApplicationMainLoop mainloop )
 {
-	sx_app_run( mainloop );
+	s_mainloop = mainloop;
+	sx_app_run( engine_main_loop );
 }
