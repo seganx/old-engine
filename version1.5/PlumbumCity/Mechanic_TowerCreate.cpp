@@ -162,32 +162,21 @@ namespace GM
 				else
 				{
 					//  verify that no tower is in place
-					AABox box;
-					{
-						static sx::core::ArrayPNodeMember memberlist(256); memberlist.Clear();
-						m_Tower->m_node->GetMembersByType(NMT_MESH, memberlist, true);
-						memberlist[0]->MsgProc(MT_GETBOX_LOCAL, &box);
-					}
-
-					//float2 threshold( (box.Max.x - box.Min.x) * 0.5f, (box.Max.z - box.Min.z) * 0.5f );
-					//float boxRadius = 7.0f;//threshold.Length();
-					static sx::core::ArrayPNode nodelist(256); nodelist.Clear();
-
 					const float tower_distance = m_Tower->test_towerDistance + m_add_distance;
 
-					sx::core::Scene::GetNodesByArea(towerPos, tower_distance, nodelist, NMT_MESH, PARTY_TOWER);
+					static sx::core::ArrayPNode nodelist(256); nodelist.Clear();
+					sx::core::Scene::GetNodesByArea( towerPos, tower_distance, nodelist, NMT_MESH, PARTY_TOWER );
 
 					for (int i=0; i<nodelist.Count(); i++)
 					{
-						AABox otherBox;
-						static sx::core::ArrayPNodeMember memberlist(256); memberlist.Clear();
-						nodelist[i]->GetMembersByType(NMT_MESH, memberlist, true);
-						memberlist[0]->MsgProc(MT_GETBOX_LOCAL, &otherBox);
+						Entity* en = (Entity*)nodelist[i]->GetUserData();
+						if ( !en ) continue;
 
-						float2 otherThreshold( (otherBox.Max.x - otherBox.Min.x) * 0.5f, (otherBox.Max.z - otherBox.Min.z) * 0.5f );
-						float otherRadius = otherThreshold.Length();						
-						
-						if ( towerPos.Distance( nodelist[i]->GetPosition_world() ) < tower_distance + otherRadius )
+						const float en_distance = en->test_towerDistance + m_add_distance;
+
+						const float mindis = sx_min_f( tower_distance, en_distance );
+					
+						if ( towerPos.Distance( en->m_node->GetPosition_world() ) < mindis )
 						{
 							doCreate = false;
 							break;

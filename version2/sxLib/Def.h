@@ -123,8 +123,7 @@ typedef byte				*pbyte;
 #define SEGAN_3TH_BYTEOF(var)				((byte*)(&var))[2]
 #define SEGAN_4TH_BYTEOF(var)				((byte*)(&var))[3]
 
-#define SEGAN_CLAMP(var, Min, Max)			{ if (var<Min) var=Min; if (var>Max) var=Max; }
-#define	SEGAN_BETWEEN(var, Min, Max)		(Min<=var && var<=Max)
+#define SEGAN_FCC(ch0, ch1, ch2, ch3)		((dword)(byte)(ch0) | ((dword)(byte)(ch1) << 8) | ((dword)(byte)(ch2) << 16) | ((dword)(byte)(ch3) << 24 ))
 
 //! avoid class from copy constructor and assign operator
 #define SEGAN_STERILE_CLASS(classname)		private: classname(classname& obj); void operator= (classname& obj);

@@ -28,9 +28,10 @@ void com_Supporter::Initialize( void )
 {
 	sx_callstack();
 
-	static sx::core::ArrayPNode_inline nodes(64);
-	nodes.Clear();
-	sx::core::Scene::GetNodesByArea( m_owner->GetPosition(), m_owner->m_curAttack.maxRange, nodes, NMT_ALL, PARTY_TOWER );
+	const float range = m_owner->m_curAttack.maxRange;
+
+	static sx::core::ArrayPNode_inline nodes(64); nodes.Clear();
+	sx::core::Scene::GetNodesByArea( m_owner->GetPosition(), range, nodes, NMT_ALL, PARTY_TOWER );
 
 	m_towers.Clear();
 
@@ -39,20 +40,13 @@ void com_Supporter::Initialize( void )
 		sx::core::PNode node = nodes[i];
 		Entity* entity = static_cast<Entity*>(node->GetUserData());
 
-		if ( (!entity) || (entity->m_health.icur < 1) )
-		{
+		if ( (!entity) || (entity->m_health.icur < 1) || (entity->m_weaponType == GWT_NULL) )
 			continue;
-		}
 
 		const float distance_squared = m_owner->GetPosition().Distance_sqr( entity->GetPosition() );
 
-		if ( (distance_squared > m_owner->m_curAttack.maxRange * m_owner->m_curAttack.maxRange) ||
-			 (m_owner->m_weaponType == GWT_NULL) )
-		{
-			continue;
-		}
-		
-		m_towers.PushBack(EntityExp(entity, entity->m_experience));
+		if ( distance_squared <= range * range )
+			m_towers.PushBack(EntityExp(entity, entity->m_experience));
 	}
 
 	m_time = 0.0f;

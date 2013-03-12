@@ -683,8 +683,9 @@ Entity* Entity::Clone( void )
 		pe->SetPosition( float3(5000, 5000, 5000) );
 		pe->SetDirection( GetDirection() );
 
-		pe->test_onDamageXP = test_onDamageXP;
-		pe->test_onDeadXP = test_onDeadXP;
+		pe->test_onDamageXP		= test_onDamageXP;
+		pe->test_onDeadXP		= test_onDeadXP;
+		pe->test_towerDistance	= test_towerDistance;
 
 		pe->m_partyCurrent	= m_partyCurrent;
 		pe->m_partyEnemies	= m_partyEnemies;

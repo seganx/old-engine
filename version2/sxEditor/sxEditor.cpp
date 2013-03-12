@@ -11,7 +11,6 @@
 
 //////////////////////////////////////////////////////////////////////////
 //  SOME GLOBAL VARIABLES
-Client* client = null;
 
 #if 1
 d3dVertexBuffer* vbo_pos = null;
@@ -21,68 +20,14 @@ d3dTexture*	tex_000	=	null;
 d3dTexture*	tex_001	=	null;
 #endif
 
-int WindowEventCall( Window* Sender, const WindowEvent* data )
+sint window_event_call( Window* Sender, const WindowEvent* data )
 {
-	if ( !data ) return 0;
-	
-	switch ( data->msg )
-	{
-	case WM_SIZE:
-		switch ( data->wparam )
-		{
-		case SIZE_MAXIMIZED:	break;
-		case SIZE_RESTORED:		break;
-		case SIZE_MINIMIZED:
-		default:				return data->msg;
-		}
-
-	case WM_EXITSIZEMOVE:
-		{
-			WindowRect curRect;
-			
-			HWND hWnd = *( (HWND*)data->windowHandle );
-
-			WINDOWINFO winfo;
-			GetWindowInfo( hWnd, &winfo );
-			sint iW = (winfo.rcClient.left - winfo.rcWindow.left) + (winfo.rcWindow.right - winfo.rcClient.right);
-			sint iH = (winfo.rcClient.top  - winfo.rcWindow.top)  + (winfo.rcWindow.bottom - winfo.rcClient.bottom);
-		
-			RECT prc;
-			GetWindowRect( hWnd, &prc );
-			curRect.left	= prc.left + iW / 2;
-			curRect.top		= prc.top + iH / 2;
-			curRect.width	= prc.right - prc.left - iW;
-			curRect.height	= prc.bottom - prc.top - iH;
-
-#if 1
-			if ( Sender && Sender == g_engine->m_window )
-			{
-				if ( g_engine->m_input )
-					g_engine->m_input->SendSignal( IST_SET_RECT, &curRect );
-
-				if ( g_engine->m_device3D && ( g_engine->m_device3D->m_creationData.flag & SX_D3D_FULLSCREEN ) == 0  )
-					g_engine->m_device3D->SetSize( curRect.width, curRect.height, -1 );
-			}
-#else
-			static int counter = 0;
-			g_engine->m_logger->Log_( L"%d > Window has been resized [ %d x %d ]", counter++, curRect.width, curRect.height );
-#endif
-			return 0;
-		}
-		break;
-	}
-
 	return data->msg;
-	
 }
 
-void AppMainLoop( float elpsTime )
+void app_main_loop( float elpsTime )
 {
 	sx_mem_enable_debug( true, 2 );
-
-	client->Update( elpsTime, NET_DELAY_TIME, NET_TIMEOUT );
-
-	g_engine->m_input->Update( elpsTime );
 
 #if 1
 	if ( g_engine->m_device3D && g_engine->m_device3D->BeginScene() )
@@ -92,12 +37,17 @@ void AppMainLoop( float elpsTime )
 
 		static float timer = 0;
 		timer =  (float)( 0.0003f * sx_os_get_timer() );
-		float eye[3] = { 5.0f * sx_sin(-timer), g_engine->m_input->GetValues()->abs_x, 30.0f * sx_cos(-timer)	};
-		//float eye[3] = { 2.0f , 5.0f, 5.0f };
-		float at[3] = { 0.0f, 0.0f, 0.0f };
-		float up[3] = { 0.0f, 1.0f, 0.0f };
-		mat = sx_lookat( eye, at, up );
-		g_engine->m_device3D->SetMatrix( MM_VIEW, mat );
+		
+
+		static float cam_r = 20.0f, cam_p = 0.0f, cam_t = 0.5f;
+		if ( sx_key_hold( IK_MOUSE_LEFT, 0 ) || sx_key_down( IK_MOUSE_LEFT, 0 ) )
+		{
+			cam_p += g_engine->m_input->GetValues()->rl_x * 0.005f;
+			cam_t -= g_engine->m_input->GetValues()->rl_y * 0.005f;
+		}
+		Camera camera;
+		camera.SetSpherical( cam_r, cam_p, cam_t );
+		g_engine->m_device3D->SetMatrix( MM_VIEW, camera.GetViewMatrix() );
 
 		g_engine->m_device3D->SetTexture( null );
 
@@ -162,15 +112,8 @@ void AppMainLoop( float elpsTime )
 
 #if 1
 
-void clientCallback( Client* client, const byte* buffer, const uint size )
+void logger_callback( const wchar* message )
 {
-
-}
-
-void loggerCallback( const wchar* message )
-{
-	if ( !client ) return;
-
 	char msg[512] = {0};
 	
 	int i = 0;
@@ -183,23 +126,21 @@ void loggerCallback( const wchar* message )
 	}
 	msg[i++]=0;
 
-	client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
-	client->Send( msg, i, false );
-	client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
+	g_engine->m_network->Update(0);
+	g_engine->m_network->Send( msg, i, false );
+	g_engine->m_network->Update(0);
 }
 
-void mem_CallBack( const wchar* file, const uint line, const uint size, const uint tag, const bool corrupted )
+void mem_callback( const wchar* file, const uint line, const uint size, const uint tag, const bool corrupted )
 {
-	if ( !client ) return;
-
 	int len = 0;
 	char msg[512] = {0};
 	if ( corrupted )
 		len = sprintf_s( msg, 512, "ERROR : memory corruption detected on %S - line %d - size %d - tag %d", file, line, size, tag );
 	else
 		len = sprintf_s( msg, 512, "WARNING : memory leak detected on %S - line %d - size %d - tag %d", file, line, size, tag );
-	client->Send( msg, len+1 );
-	client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
+	g_engine->m_network->Send( msg, len+1 );
+	g_engine->m_network->Update(0);
 }
 
 #endif
@@ -213,13 +154,13 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	LoggerConfig loggerconfig;
 	loggerconfig.name = L"sx_editor";
 	loggerconfig.fileName = L"sx_editor_log.txt";
-	loggerconfig.callback = &loggerCallback;
+	loggerconfig.callback = &logger_callback;
 	loggerconfig.mode = LM_FILE;
 
 	EngineConfig config;
 	config.net_id = 0x2727;
 	config.logger = &loggerconfig;
-	config.window_callback = &WindowEventCall;
+	config.window_callback = &window_event_call;
 	config.d3d_flag = SX_D3D_CREATE_GL | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
 	config.input_device[0] = sx_new( Mouse_editor(0) );
 
@@ -229,20 +170,20 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	//	connect to console
 #if 1
 	{
-		client = sx_new( Client );
+		Client* client = g_engine->m_network->m_client;
 		client->m_name.Format( L"editor %s", sx_os_get_user_name() );
-		client->Start( 2727, clientCallback );
+		client->Start( 2727, null );
 		client->Listen();
 		int tryToConnect = 0;
 		while ( tryToConnect < 500 )
 		{
-			client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
+			g_engine->m_network->Update( 10 );
 
 			if ( client->m_servers.Count() )
 			{
 				client->Connect( client->m_servers[0].address );
 
-				client->Update( 10, NET_DELAY_TIME, NET_TIMEOUT );
+				g_engine->m_network->Update( 10 );
 				break;
 			}
 
@@ -261,7 +202,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		winChild->SetRect( 50, 500, 200, 150 );
 		winChild->SetVisible( true );
 
-		client->Send( "window created !", 17 );
+		g_engine->m_network->Send( "window created !", 17 );
 	}
 #endif
 
@@ -382,7 +323,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			tex_001->SetImage( data, 0 );
 		}
 
-		sx_engine_start( &AppMainLoop );
+		sx_engine_start( &app_main_loop );
 
 		if ( tex_000 )
 		{
@@ -413,20 +354,17 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		sx_d3d_destroy_device( g_engine->m_device3D );
 	}
 #else
-	sx_engine_start( &AppMainLoop );
+	sx_engine_start( &app_main_loop );
 #endif
 
-	sx_mem_report_debug( &mem_CallBack, 0 );
+	sx_mem_report_debug( &mem_callback, 0 );
 
-#if 1
 	//////////////////////////////////////////////////////////////////////////
  	for ( int i=0; i<60; i++ )
  	{
- 		client->Update( 16, 60, 5000 );
+ 		g_engine->m_network->Update( 16 );
  		sx_os_sleep(1);
  	}
- 	sx_delete_and_null( client );
-#endif
 
 	sx_engine_finalize();
 
