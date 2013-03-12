@@ -45,6 +45,10 @@ void app_main_loop( float elpsTime )
 			cam_p += g_engine->m_input->GetValues()->rl_x * 0.005f;
 			cam_t -= g_engine->m_input->GetValues()->rl_y * 0.005f;
 		}
+		if ( sx_key_hold( IK_MOUSE_RIGHT, 0 ) || sx_key_down( IK_MOUSE_RIGHT, 0 ) )
+		{
+			cam_r += g_engine->m_input->GetValues()->rl_y * 0.05f;
+		}
 		Camera camera;
 		camera.SetSpherical( cam_r, cam_p, cam_t );
 		g_engine->m_device3D->SetMatrix( MM_VIEW, camera.GetViewMatrix() );
