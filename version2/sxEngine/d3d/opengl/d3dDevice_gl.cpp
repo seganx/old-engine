@@ -36,6 +36,12 @@ d3dDevice_gl::d3dDevice_gl( void )
 	m_world.Identity();
 	m_view.Identity();
 	m_projection.Identity();
+
+	m_rs_alpha = 0;
+	m_rs_cull = 1;
+	m_rs_fill = 1;
+	m_rs_zenable = 1;
+	m_rs_zwrite = 1;
 }
 
 d3dDevice_gl::~d3dDevice_gl( void )
@@ -191,18 +197,19 @@ void d3dDevice_gl::Initialize( const handle displayHandle )
 		m_creationData.height	= winfo.rcClient.bottom - winfo.rcClient.top;
 #endif
 
-		glEnable( GL_DEPTH_TEST );
 		glClearDepth( 1.0f );
 		glClearStencil( 0 );
 		glDepthFunc( GL_LEQUAL );
-		glFrontFace( GL_CCW );
-		glEnable(  GL_CULL_FACE );
  		glPixelStorei( GL_PACK_ALIGNMENT,   1 );
  		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
 		glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 		glHint( GL_GENERATE_MIPMAP_HINT, GL_NICEST );
 		glHint( GL_TEXTURE_COMPRESSION_HINT, GL_NICEST );
+
+		SetRenderState( RS_ZENABLE, true );
+		SetRenderState( RS_FILL, true );
+		SetRenderState( RS_CULL, SX_CULL_CCW );
 
 		String slog = L"Graphic card information:";
 		slog <<
@@ -409,6 +416,101 @@ SEGAN_INLINE const float* d3dDevice_gl::GetMatrix( const d3dMatrixMode mode )
 	case MM_PROJECTION:		res = &m_projection.m00;	break;
 	}
 	return res;
+}
+
+void d3dDevice_gl::SetRenderState( const d3dRenderState type, const uint mode )
+{
+	switch ( type )
+	{
+	case RS_ALPHA:
+		if ( mode != m_rs_alpha )
+		{
+			switch ( mode )
+			{
+			case SX_ALPHA_BLEND:
+				glEnable( GL_BLEND );
+				glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+				glBlendEquation( GL_FUNC_ADD );
+				break;
+
+			case SX_ALPHA_ADD:
+				glEnable( GL_BLEND );
+				glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+				glBlendEquation( GL_FUNC_ADD );
+				break;
+
+			case SX_ALPHA_SUB:
+				glEnable( GL_BLEND );
+				glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+				glBlendEquation( GL_FUNC_SUBTRACT );
+				break;
+
+			case SX_ALPHA_OFF:
+				glDisable( GL_BLEND );
+				break;
+			}
+		}
+		break;
+
+	case RS_CULL:
+		if ( mode != m_rs_cull )
+		{
+			switch ( mode )
+			{
+			case SX_CULL_CCW:	glEnable(  GL_CULL_FACE ); glFrontFace( GL_CCW );	break;
+			case SX_CULL_CW:	glEnable(  GL_CULL_FACE ); glFrontFace( GL_CW );	break;
+			case SX_CULL_OFF:	glDisable(  GL_CULL_FACE );	break;
+			}
+			m_rs_cull = mode;
+		}
+		break;
+
+	case RS_FILL:
+		if ( mode != m_rs_fill )
+		{
+			if ( mode )
+				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+			else
+				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			m_rs_fill = mode;
+		}
+		break;
+
+	case RS_ZENABLE:
+		if ( mode != m_rs_zenable )
+		{
+			if ( mode )
+				glEnable( GL_DEPTH_TEST );
+			else
+				glDisable( GL_DEPTH_TEST );
+			m_rs_zenable = mode;
+		}
+		break;
+
+	case RS_ZWRITE:
+		if ( mode != m_rs_zwrite )
+		{
+			if ( mode )
+				glDepthMask( GL_TRUE );
+			else
+				glDepthMask( GL_FALSE );
+			m_rs_zwrite = mode;
+		}
+		break;
+	}
+}
+
+uint d3dDevice_gl::GetRenderState( const d3dRenderState type )
+{
+	switch ( type)
+	{
+	case RS_ALPHA:		return m_rs_alpha;
+	case RS_CULL:		return m_rs_cull;
+	case RS_FILL:		return m_rs_fill;
+	case RS_ZENABLE:	return m_rs_zenable;
+	case RS_ZWRITE:		return m_rs_zwrite;
+	default:			return 0;
+	}
 }
 
 SEGAN_INLINE void d3dDevice_gl::DrawPrimitive(const d3dPrimitiveType primType, const int firstVertex, const int vertexCount)
@@ -768,7 +870,6 @@ void d3dDevice_gl::ApplyTextureBuffer( void )
 		tx->lastTarget	= tx->target;
 	}
 }
-
 
 
 

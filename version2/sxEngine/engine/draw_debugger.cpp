@@ -59,12 +59,14 @@ SEGAN_ENG_API void sx_debug_draw_grid( const uint size, const dword color )
 		z += 1.0f;
 	}
 
-	g_engine->m_device3D->DrawDebug( PT_LINE_LIST, xpoints + zpoints, &v->x, color );
+	g_engine->m_device3D->DrawDebug( PT_LINE_LIST, zpoints, &v->x, color );
 
 
-	sx_debug_draw_line( float3(   -s, 0.001f, 0.0f ), float3(    s, 0.001f, 0.0f ), 0xffff0000 );
-	sx_debug_draw_line( float3( 0.0f, 0.001f, 0.0f ), float3( 0.0f, 2.001f, 0.0f ), 0xff00ff00 );
-	sx_debug_draw_line( float3( 0.0f, 0.001f,   -s ), float3( 0.0f, 0.001f,    s ), 0xff0000ff );
+	g_engine->m_device3D->SetRenderState( RS_ZENABLE, false );
+	sx_debug_draw_line( float3(   -s, 0.0f, 0.0f ), float3(    s, 0.0f, 0.0f ), 0xffff0000 );
+	sx_debug_draw_line( float3( 0.0f, 0.0f,   -s ), float3( 0.0f, 0.0f,    s ), 0xff0000ff );
+	g_engine->m_device3D->SetRenderState( RS_ZENABLE, true );
+	sx_debug_draw_line( float3( 0.0f, 0.0f, 0.0f ), float3( 0.0f, 2.0f, 0.0f ), 0xff00ff00 );
 }
 
 SEGAN_ENG_API void sx_debug_draw_compass( void )
@@ -116,9 +118,11 @@ SEGAN_ENG_API void sx_debug_draw_compass( void )
 	g_engine->m_device3D->SetMatrix( MM_PROJECTION, cmpsproj );
 
 	//  draw compass
+	g_engine->m_device3D->SetRenderState( RS_ZENABLE, false );
 	g_engine->m_device3D->DrawDebug(PT_LINE_STRIP, 4, v[0], 0xffff0000 );
 	g_engine->m_device3D->DrawDebug(PT_LINE_STRIP, 7, v[5], 0xff00ff00 );
 	g_engine->m_device3D->DrawDebug(PT_LINE_STRIP, 4, v[13], 0xff0000ff );
+	g_engine->m_device3D->SetRenderState( RS_ZENABLE, true );
 
 	g_engine->m_device3D->SetMatrix( MM_VIEW, currview );
 	g_engine->m_device3D->SetMatrix( MM_PROJECTION, currproj );

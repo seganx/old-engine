@@ -68,6 +68,10 @@ public:
 	virtual void SetMatrix( const d3dMatrixMode mode, const float* _matrix );
 
 	virtual const float* GetMatrix( const d3dMatrixMode mode );
+	
+	virtual void SetRenderState( const d3dRenderState type, const uint mode );
+
+	virtual uint GetRenderState( const d3dRenderState type );
 
 	virtual void DrawPrimitive( const d3dPrimitiveType primType, const int firstVertex, const int vertexCount );
 
@@ -138,6 +142,12 @@ public:
 	matrix						m_world;
 	matrix						m_view;
 	matrix						m_projection;
+
+	uint						m_rs_alpha;
+	uint						m_rs_cull;
+	uint						m_rs_fill;
+	uint						m_rs_zenable;
+	uint						m_rs_zwrite;
 };
 
 

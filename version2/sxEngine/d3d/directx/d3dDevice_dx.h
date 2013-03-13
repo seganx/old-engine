@@ -63,6 +63,10 @@ public:
 
 	virtual const float* GetMatrix( const d3dMatrixMode mode );
 
+	virtual void SetRenderState( const d3dRenderState type, const uint mode );
+
+	virtual uint GetRenderState( const d3dRenderState type );
+
 	virtual void DrawPrimitive(const d3dPrimitiveType primType, const int firstVertex, const int vertexCount);
 
 	virtual void DrawIndexedPrimitive(const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount);

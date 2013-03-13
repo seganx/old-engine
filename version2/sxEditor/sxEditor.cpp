@@ -85,17 +85,17 @@ void app_main_loop( float elpsTime )
 		AABox box1( -1, 0, -1, 1, 2, 1 );
 		AABox box2( 2, 0, 2, 4, 2, 4 );
 		OBBox box3 = sx_transform( box2, mat );
-		sx_debug_draw_box( box1, 0xffffff00 );
-		sx_debug_draw_box( box3, 0xffffff00 );
-		sx_debug_draw_box( sx_cover( box1, box3 ), 0xffffffff );
+		//sx_debug_draw_box( box1, 0xffffff00 );
+		//sx_debug_draw_box( box3, 0xffffff00 );
+		//sx_debug_draw_box( sx_cover( box1, box3 ), 0xffffffff );
 
-		sx_debug_draw_circle( float3( 5, 0, 4 ), 3, 0xffffffff );
+		//sx_debug_draw_circle( float3( 5, 0, 4 ), 3, 0xffffffff );
 
 		Sphere sph1( -13, 0, -3, 1 );
 		Sphere sph2( -15 + 6.0f * sx_sin_fast(timer*6.0f), 0, 9.0f * sx_sin_fast(timer*5.0f), 2 );
-		sx_debug_draw_sphere( sph1, 0xff00ffff, 7, 9 );
-		sx_debug_draw_sphere( sph2, 0xff00ffff );
-		sx_debug_draw_sphere( sx_cover( sph2, sph1 ), 0xffffffff );
+		//sx_debug_draw_sphere( sph1, 0xff00ffff, 7, 9 );
+		//sx_debug_draw_sphere( sph2, 0xff00ffff );
+		//sx_debug_draw_sphere( sx_cover( sph2, sph1 ), 0xffffffff );
 
 		sx_debug_draw_compass();
 
@@ -120,7 +120,7 @@ void app_main_loop( float elpsTime )
 		sx_element_add_batch( &e1 );
 		sx_element_add_batch( &e2 );
 		sx_element_end_batch( &eb );
-		sx_debug_draw_gui_element( &eb );
+		//sx_debug_draw_gui_element( &eb );
 
 		g_engine->m_device3D->EndScene();
 

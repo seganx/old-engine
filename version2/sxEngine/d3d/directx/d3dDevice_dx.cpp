@@ -361,6 +361,16 @@ const float* d3dDevice_dx::GetMatrix( const d3dMatrixMode mode )
 	return res;
 }
 
+void d3dDevice_dx::SetRenderState( const d3dRenderState type, const uint mode )
+{
+
+}
+
+uint d3dDevice_dx::GetRenderState( const d3dRenderState type )
+{
+	return 0;
+}
+
 void d3dDevice_dx::DrawPrimitive( const d3dPrimitiveType primType, const int firstVertex, const int vertexCount )
 {
 
@@ -679,6 +689,7 @@ void d3dDevice_dx::SetIndexBuffer( const d3dIndexBuffer* indexBuffer )
 {
 
 }
+
 
 
 

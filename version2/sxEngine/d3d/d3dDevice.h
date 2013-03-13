@@ -13,12 +13,23 @@
 
 
 //! flags of rendering device
-#define	 SX_D3D_
-#define  SX_D3D_CREATE_DX				0x00000001		//	create directX device
-#define  SX_D3D_CREATE_GL				0x00000002		//	create openGL device
-#define	 SX_D3D_VSYNC					0x00000004		//  init device with vertical synchronization
-#define	 SX_D3D_FULLSCREEN				0x00000008		//	init device in full screen mode
-#define	 SX_D3D_RESOURCE_DYNAMIC		0x00000010		//	create dynamic resource
+#define	SX_D3D_
+#define SX_D3D_CREATE_DX				0x00000001		//	create directX device
+#define SX_D3D_CREATE_GL				0x00000002		//	create openGL device
+#define	SX_D3D_VSYNC					0x00000004		//  init device with vertical synchronization
+#define	SX_D3D_FULLSCREEN				0x00000008		//	init device in full screen mode
+#define SX_D3D_RESOURCE_DYNAMIC			0x00000010		//	create dynamic resource
+
+//! flags of alpha blending mode
+#define SX_ALPHA_OFF					0		//	turn alpha blending off
+#define	SX_ALPHA_BLEND					1		//	blend source and destination color
+#define	SX_ALPHA_ADD					2		//	add source color to destination color
+#define	SX_ALPHA_SUB					3		//	subtract source color from destination color
+
+//! flags of culling mode
+#define SX_CULL_OFF						0		//	turn culling mode off
+#define SX_CULL_CW						1		//	use clock wise system to cull triangles
+#define SX_CULL_CCW						2		//	use counter clock wise facing to cull triangles
 
 //! resource formats
 enum d3dFormat
@@ -52,6 +63,19 @@ enum d3dMatrixMode
 	MM_32BITENUM = 0xffffffff
 };
 #define MM_
+
+//! render state mode
+enum d3dRenderState
+{
+	RS_ALPHA = 1,		//! use SX_ALPHA_ to turn on/off alpha blending mode
+	RS_CULL,			//!	use SX_CULL_ to turn on/off culling mode
+	RS_FILL,			//! use true or false to fill/wire triangles
+	RS_ZENABLE,			//! use true or false to enable/disable z depth check
+	RS_ZWRITE,			//! use true or false to enable/disable z write
+
+	RS_32BITENUM = 0xffffffff
+};
+#define RS_
 
 //! primitives supported by draw-primitive API
 enum d3dPrimitiveType
@@ -142,15 +166,6 @@ struct d3dDebugInfo
 	uint		setVertices;	//! number of vertex buffer changes
 	uint		setIndices;		//! number of index buffer changes
 	float		frameTime;		//! frame time in milliseconds
-};
-
-//! color structure used in API
-struct d3dColor
-{
-	float		r;		//	red channel
-	float		g;		//	green channel
-	float		b;		//	blue channel
-	float		a;		//	alpha channel
 };
 
 //! view port structure
@@ -365,6 +380,12 @@ public:
 	//! return selected matrix
 	virtual const float* GetMatrix( const d3dMatrixMode mode ) = 0;
 
+	//! set render state
+	virtual void SetRenderState( const d3dRenderState type, const uint mode ) = 0;
+
+	//! return render state mode
+	virtual uint GetRenderState( const d3dRenderState type ) = 0;
+
 	//! draw primitive shapes
 	virtual void DrawPrimitive( const d3dPrimitiveType primType, const int firstVertex, const int vertexCount ) = 0;
 
@@ -391,7 +412,7 @@ public:
 
 	//! clear back buffer
 	virtual void ClearZBuffer( void ) = 0;
- 
+
 	//! set clip plane
  	virtual void SetClipPlane( const uint index, const float* plane ) = 0;
  
