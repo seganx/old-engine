@@ -19,6 +19,7 @@
 #include "engine/Network.h"
 #include "engine/Draw_debugger.h"
 #include "engine/Camera.h"
+#include "gui/Element.h"
 
 
 //! structure of engine configuration

@@ -401,6 +401,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="gui"
+			>
+			<File
+				RelativePath="..\gui\Element.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\gui\Element.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\Engine_def.h"
 			>

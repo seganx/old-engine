@@ -195,5 +195,20 @@ SEGAN_ENG_API void sx_debug_draw_sphere( const Sphere& sphere, const dword color
 	g_engine->m_device3D->DrawDebug( PT_TRIANGLE_LIST, vcount, &v->x, color );
 }
 
+SEGAN_ENG_API void sx_debug_draw_gui_element( const class Element* elem )
+{
+	if ( elem && elem->m_numVertices && elem->m_pos )
+	{
+		const float width  = (float)g_engine->m_device3D->m_viewport.width;
+		const float height = (float)g_engine->m_device3D->m_viewport.height;
+		matrix mat = sx_orthographic( width, height, -2000.0f, 2000.0f );
+		g_engine->m_device3D->SetMatrix( MM_PROJECTION, mat );
+		mat.Identity();
+		g_engine->m_device3D->SetMatrix( MM_VIEW, mat );
+		g_engine->m_device3D->SetMatrix( MM_WORLD, mat );
+		g_engine->m_device3D->DrawDebug( PT_TRIANGLE_LIST, elem->m_numVertices, &elem->m_pos->x, 0xffff3333 );
+	}
+}
+
 
 

@@ -35,4 +35,7 @@ SEGAN_ENG_API void sx_debug_draw_box( const OBBox& box, const dword color );
 //! visualize a simple sphere
 SEGAN_ENG_API void sx_debug_draw_sphere( const Sphere& sphere, const dword color, const uint stacks = 17, const uint slices = 20 );
 
+//! visualize an element of GUI
+SEGAN_ENG_API void sx_debug_draw_gui_element( const class Element* elem );
+
 #endif	//	GUARD_draw_debugger_HEADER_FILE

@@ -99,6 +99,29 @@ void app_main_loop( float elpsTime )
 
 		sx_debug_draw_compass();
 
+		Element e1, e2, eb;
+		e1.CreateVertices( 6 );
+		e1.m_pos[0].Set(  50,  50, 0.0f );
+		e1.m_pos[1].Set( -50,  50, 0.0f );
+		e1.m_pos[2].Set( -50, -50, 0.0f );
+		e1.m_pos[3].Set( -50, -50, 0.0f );
+		e1.m_pos[4].Set(  50, -50, 0.0f );
+		e1.m_pos[5].Set(  50,  50, 0.0f );
+
+		e2.CreateVertices( 6 );
+		e2.m_pos[0].Set(  160, 150, 0.0f );
+		e2.m_pos[1].Set(  60,  150, 0.0f );
+		e2.m_pos[2].Set(  60,  50, 0.0f );
+		e2.m_pos[3].Set(  60,  50, 0.0f );
+		e2.m_pos[4].Set(  160, 50, 0.0f );
+		e2.m_pos[5].Set(  160, 150, 0.0f );
+
+		sx_element_begin_batch();
+		sx_element_add_batch( &e1 );
+		sx_element_add_batch( &e2 );
+		sx_element_end_batch( &eb );
+		sx_debug_draw_gui_element( &eb );
+
 		g_engine->m_device3D->EndScene();
 
 		g_engine->m_device3D->Present();
@@ -161,12 +184,14 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	loggerconfig.callback = &logger_callback;
 	loggerconfig.mode = LM_FILE;
 
+	Mouse_editor ioMouse(0);
+
 	EngineConfig config;
 	config.net_id = 0x2727;
 	config.logger = &loggerconfig;
 	config.window_callback = &window_event_call;
 	config.d3d_flag = SX_D3D_CREATE_GL | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
-	config.input_device[0] = sx_new( Mouse_editor(0) );
+	config.input_device[0] = &ioMouse;
 
 	sx_engine_get_singleton( &config );
 
