@@ -138,10 +138,11 @@ struct prpHealth
 	int		level[8];
 	int		imax;
 	int		icur;
+	float	damage;
 	float	deleteTime;		// after this time in seconds entity will be deleted
 	float	deathTime;		// death time will valued by animator
 
-	prpHealth(void): imax(0), icur(0), deleteTime(6.0f), deathTime(0) { ZeroMemory(level, sizeof(level)); }
+	prpHealth(void): imax(0), icur(0), damage(0), deleteTime(6.0f), deathTime(0) { ZeroMemory(level, sizeof(level)); }
 	void SetMax(int f){ imax = f; if (imax<icur) icur = imax; }
 	void SetCur(int f){ icur = f; if (imax<icur) icur = imax; }
 };

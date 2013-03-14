@@ -20,6 +20,12 @@ SEGAN_INLINE float sx_length( const float2& v )
 	return sx_sqrt_fast( v.x * v.x + v.y * v.y );
 }
 
+//! return the square length of vector
+SEGAN_INLINE float sx_length_sqr( const float2& v )
+{
+	return ( v.x * v.x + v.y * v.y );
+}
+
 //! return normalized vector
 SEGAN_INLINE float2 sx_normalize( const float2& v )
 {
@@ -80,6 +86,12 @@ SEGAN_INLINE float sx_distance_sqr( const float2& v1, const float2& v2 )
 SEGAN_INLINE float sx_length( const float3& v )
 {
 	return sx_sqrt_fast( v.x * v.x + v.y * v.y + v.z * v.z );
+}
+
+//! return the square length of vector
+SEGAN_INLINE float sx_length_sqr( const float3& v )
+{
+	return ( v.x * v.x + v.y * v.y + v.z * v.z );
 }
 
 //! return normalized vector
@@ -158,6 +170,12 @@ SEGAN_INLINE void sx_lerp( float3& res, const float3& v1, const float3& v2, cons
 SEGAN_INLINE float sx_length( const float4& v )
 {
 	return sx_sqrt_fast( v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w );
+}
+
+//! return the square length of vector
+SEGAN_INLINE float sx_length_sqr( const float4& v )
+{
+	return ( v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w );
 }
 
 //! return normalized vector
@@ -531,6 +549,56 @@ SEGAN_INLINE OBBox sx_transform( const AABox& box, const matrix& mat )
 		sx_transform_point( res.v[i], res.v[i], mat );
 	return res;
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+//	RAY
+//////////////////////////////////////////////////////////////////////////
+
+//! compute ray by screen space parameters
+SEGAN_ENG_API Ray sx_ray( const float x, const float y, const float width, const float height, const matrix& view, const matrix& proj );
+
+//! transform ray by a matrix
+SEGAN_ENG_API Ray sx_transform( const Ray& ray, const matrix& mat );
+
+/*! 
+return true if this ray intersect with plan and fill out outPoint if outPonit be exist and 
+fill out outNormal with normal vector of intersection if outNormal be exist
+*/
+SEGAN_ENG_API bool sx_intersect( const Ray& ray, const Plane& plane, float3* outPoint = null, float3* outNormal = null );
+
+/*! 
+return true if this ray intersect with Rectangle and fill out outPoint if outPonit be exist and 
+fill out outNormal with normal vector of intersection if outNormal be exist
+*/
+SEGAN_ENG_API bool sx_intersect( const Ray& ray, const float4& rect3d, float3* outPoint = null, float3* outNormal = null );
+
+/*! 
+return true if this ray intersect with Sphere and fill out outPoint if outPonit be exist and 
+fill out outNormal with normal vector of intersection if outNormal be exist
+NOTE: return true if ray be inside of the shape with outPoint=Ray.pos and outNormal=-Ray.dir
+*/
+SEGAN_ENG_API bool sx_intersect( const Ray& ray, const Sphere& sphere, float3* outPoint = null, float3* outNormal = null );
+
+/*!
+return true if this ray intersect with AABox and fill out outPoint if outPonit be exist and 
+fill out outNormal with normal vector of intersection if outNormal be exist
+NOTE: return true if ray be inside of the shape with outPoint=Ray.pos and outNormal=-Ray.dir
+*/
+SEGAN_ENG_API bool sx_intersect( const Ray& ray, const AABox& box, float3* outPoint = null, float3* outNormal = null );
+
+/*! 
+return true if this ray intersect with OBBox and fill out outPoint if outPonit be exist and 
+fill out outNormal with normal vector of intersection if outNormal be exist
+NOTE: return true if ray be inside of the shape with outPoint=Ray.pos and outNormal=-Ray.dir
+*/
+SEGAN_ENG_API bool sx_intersect( const Ray& ray, const OBBox& box, float3* outPoint = null, float3* outNormal = null );
+
+/*! 
+return true if this ray intersect with Triangle and fill out outPoint if outPonit be exist and 
+fill out outNormal with normal vector of intersection if outNormal be exist
+*/
+SEGAN_ENG_API bool sx_intersect( const Ray& ray, const float3& v0, const float3& v1, const float3& v2, float3* outPoint = null, float3* outNormal = null );
 
 
 

@@ -40,6 +40,11 @@ void app_main_loop( float elpsTime )
 		
 
 		static float cam_r = 20.0f, cam_p = 0.0f, cam_t = 0.5f;
+		static float3 cam_at;
+		Camera camera;
+		camera.m_at = cam_at;
+		camera.SetSpherical( cam_r, cam_p, cam_t );
+		g_engine->m_device3D->SetMatrix( MM_VIEW, camera.GetViewMatrix() );
 		if ( sx_key_hold( IK_MOUSE_LEFT, 0 ) || sx_key_down( IK_MOUSE_LEFT, 0 ) )
 		{
 			cam_p += g_engine->m_input->GetValues()->rl_x * 0.005f;
@@ -49,9 +54,13 @@ void app_main_loop( float elpsTime )
 		{
 			cam_r += g_engine->m_input->GetValues()->rl_y * 0.05f;
 		}
-		Camera camera;
-		camera.SetSpherical( cam_r, cam_p, cam_t );
-		g_engine->m_device3D->SetMatrix( MM_VIEW, camera.GetViewMatrix() );
+		if ( sx_key_hold( IK_MOUSE_MIDDLE, 0 ) || sx_key_down( IK_MOUSE_MIDDLE, 0 ) )
+		{
+			sx_inverse( mat, g_engine->m_device3D->GetMatrix(MM_VIEW) );
+			float3 tv, mv( -sx_mouse_rlx(0), sx_mouse_rly(0), 0.0f );
+			sx_transform_normal( tv, mv, mat );
+			cam_at += tv * ( cam_r * 0.003f );
+		}
 
 		g_engine->m_device3D->SetTexture( null );
 
@@ -85,17 +94,17 @@ void app_main_loop( float elpsTime )
 		AABox box1( -1, 0, -1, 1, 2, 1 );
 		AABox box2( 2, 0, 2, 4, 2, 4 );
 		OBBox box3 = sx_transform( box2, mat );
-		//sx_debug_draw_box( box1, 0xffffff00 );
-		//sx_debug_draw_box( box3, 0xffffff00 );
-		//sx_debug_draw_box( sx_cover( box1, box3 ), 0xffffffff );
+		sx_debug_draw_box( box1, 0xffffff00 );
+		sx_debug_draw_box( box3, 0xffffff00 );
+		sx_debug_draw_box( sx_cover( box1, box3 ), 0xffffffff );
 
-		//sx_debug_draw_circle( float3( 5, 0, 4 ), 3, 0xffffffff );
+		sx_debug_draw_circle( float3( 5, 0, 4 ), 3, 0xffffffff );
 
 		Sphere sph1( -13, 0, -3, 1 );
 		Sphere sph2( -15 + 6.0f * sx_sin_fast(timer*6.0f), 0, 9.0f * sx_sin_fast(timer*5.0f), 2 );
-		//sx_debug_draw_sphere( sph1, 0xff00ffff, 7, 9 );
-		//sx_debug_draw_sphere( sph2, 0xff00ffff );
-		//sx_debug_draw_sphere( sx_cover( sph2, sph1 ), 0xffffffff );
+		sx_debug_draw_sphere( sph1, 0xff00ffff, 7, 9 );
+		sx_debug_draw_sphere( sph2, 0xff00ffff );
+		sx_debug_draw_sphere( sx_cover( sph2, sph1 ), 0xffffffff );
 
 		sx_debug_draw_compass();
 
@@ -120,7 +129,7 @@ void app_main_loop( float elpsTime )
 		sx_element_add_batch( &e1 );
 		sx_element_add_batch( &e2 );
 		sx_element_end_batch( &eb );
-		//sx_debug_draw_gui_element( &eb );
+		sx_debug_draw_gui_element( &eb );
 
 		g_engine->m_device3D->EndScene();
 

@@ -594,8 +594,9 @@ void Entity::MsgProc( UINT msg, void* data )
 			m_curAttackLevel.electricalArmor -= damage->electricalArmor;
 			if ( m_curAttackLevel.electricalArmor < 0 ) m_curAttackLevel.electricalArmor = 0;
 
-			float healthdamage = damage->physicalDamage * ( 1 - m_curAttackLevel.physicalArmor ) + damage->electricalDamage	* ( 1 - m_curAttackLevel.electricalArmor );
-			m_health.icur -= int( healthdamage + 0.5f );
+			m_health.damage += damage->physicalDamage * ( 1 - m_curAttackLevel.physicalArmor ) + damage->electricalDamage	* ( 1 - m_curAttackLevel.electricalArmor );
+			if ( m_health.damage > 1.0f )
+				m_health.icur -= int( m_health.damage + 0.5f );
 
 			//	compute experience
 			if ( damage->sender && damage->sender->m_partyCurrent == PARTY_TOWER )

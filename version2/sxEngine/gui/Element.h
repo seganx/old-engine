@@ -43,5 +43,6 @@ SEGAN_ENG_API bool sx_element_add_batch( const Element* elem );
 //! end patch and append them to the end of dest element
 SEGAN_ENG_API void sx_element_end_batch( Element* dest );
 
+
 #endif	//	GUARD_Element_HEADER_FILE
 

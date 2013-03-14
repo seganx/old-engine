@@ -679,6 +679,223 @@ SEGAN_INLINE AABox sx_cover( const AABox& b1, const OBBox& b2 )
 		sx_max_f( b1.z2, res.z2 ) );
 }
 
+
+//////////////////////////////////////////////////////////////////////////
+//	RAY
+//////////////////////////////////////////////////////////////////////////
+
+SEGAN_INLINE Ray sx_ray( const float x, const float y, const float width, const float height, const matrix& view, const matrix& proj )
+{
+	/*	code from "Keith Ditchburn" (www.toymaker.info/Games/html/picking.html)	*/
+	Ray res;
+
+	float3 v;
+	v.x =  ( ( ( 2.0f * x ) / width  ) - 1.0f ) / proj.m00;
+	v.y = -( ( ( 2.0f * y ) / height ) - 1.0f ) / proj.m11;
+	v.z =  1.0f;
+
+	matrix m;
+	sx_inverse( m, view );
+
+	// Transform the screen space pick ray into 3D space
+	sx_transform_normal( res.m_dir, v, m );
+	res.m_pos.Set( m.m30, m.m31, m.m32 );
+	res.m_dir.Normalize();
+}
+
+SEGAN_INLINE Ray sx_transform( const Ray& ray, const matrix& mat )
+{
+	matrix m = sx_inverse( mat );
+	return Ray( sx_transform_point( ray.m_pos, m ), sx_transform_normal( ray.m_dir, m ) );
+}
+
+SEGAN_INLINE bool sx_intersect( const Ray& ray, const Plane& plane, float3* outPoint = null, float3* outNormal = null )
+{
+	// code from : www.bandedsoftware.com/hexgear/concepts/tutorials/ray/ray.html
+
+	float3 n( plane.a, plane.b, plane.c );
+	float d = sx_dot( n, ray.m_dir );
+
+	if ( d >= EPSILON )
+	{
+		return false;
+	}
+	else
+	{
+		if ( outPoint )
+		{
+			float amount = - sx_distance( plane, ray.m_pos ) / d;
+			*outPoint = ray.m_pos + ray.m_dir * amount;
+		}
+
+		if ( outNormal )
+		{
+			*outNormal = n;
+		}
+
+		return true;		
+	}	
+}
+
+SEGAN_INLINE bool sx_intersect( const Ray& ray, const Sphere& sphere, float3* outPoint = null, float3* outNormal = null )
+{
+	/*	code from "Tuomas Tonteri" ( www.sci.tuomastonteri.fi/programming/sse/example3 )	*/
+
+	float a = sx_length_sqr( ray.m_dir );
+	float b = 2.0f * ray.m_dir * ( ray.m_pos - sphere.center );
+	float c = sx_length_sqr( sphere.center ) + sx_length_sqr( ray.m_pos ) - 2.0f * sx_dot( ray.m_pos, sphere.center ) - sphere.r * sphere.r;
+	float D = b * b - 4.0f * a * c;
+
+	// If ray can not intersect then stop
+	if ( D < 0 ) return false;
+	D = sx_sqrt_fast( D );
+
+	// Ray can intersect the sphere, solve the closer hit point
+	float t = - 0.5f * ( b + D ) / a;
+	if ( t > 0.0f )
+	{
+		float3 p = ray.m_pos + t * ray.m_dir;
+		if (outPoint)	*outPoint = p;
+		if (outNormal)	*outNormal = ( p - sphere.center ) / sphere.r;		
+	}
+	else
+	{
+		if (outPoint)	*outPoint = ray.m_pos;
+		if (outNormal)	*outNormal = - ray.m_dir;
+	}
+
+	return true;
+}
+
+SEGAN_INLINE bool sx_intersect( const Ray& ray, const AABox& aabox, float3* outPoint = null, float3* outNormal = null )
+{
+	/*	code from "Sepehr Taghdissian" ( www.hmrEngine.com - sep.tagh@gmail.com )	*/
+
+	float3 pos = ray.m_pos;
+	float3 dir = ray.m_dir;
+	AABox  box = aabox;
+
+	// Check for point inside box, trivial reject, and determine parametric
+	// distance to each front face
+
+	bool inside = true;
+
+	float xt, xn;
+	if ( pos.x < box.min.x )
+	{
+		xt = box.min.x - pos.x;
+		xt /= dir.x;
+		inside = false;
+		xn = -1.0f;
+	} else if ( pos.x > box.max.x ) {
+		xt = box.max.x - pos.x;
+		xt /= dir.x;
+		inside = false;
+		xn = 1.0f;
+	} else {
+		xt = -1.0f;
+	}
+
+	float yt, yn;
+	if ( pos.y < box.min.y ) {
+		yt = box.min.y - pos.y;
+		yt /= dir.y;
+		inside = false;
+		yn = -1.0f;
+	} else if ( pos.y > box.max.y ) {
+		yt = box.max.y - pos.y;
+		yt /= dir.y;
+		inside = false;
+		yn = 1.0f;
+	} else {
+		yt = -1.0f;
+	}
+
+	float zt, zn;
+	if ( pos.z < box.min.z ) {
+		zt = box.min.z - pos.z;
+		zt /= dir.z;
+		inside = false;
+		zn = -1.0f;
+	} else if ( pos.z > box.max.z ) {
+		zt = box.max.z - pos.z;
+		zt /= dir.z;
+		inside = false;
+		zn = 1.0f;
+	} else {
+		zt = -1.0f;
+	}
+
+	// Inside box?
+	if ( inside ) 
+	{
+		if ( outPoint )	*outPoint = pos;
+		if ( outNormal )	*outNormal = - dir;
+		return true;
+	}
+
+	// Select farthest Plane - this is
+	// the Plane of intersection.
+	int which = 0;
+	float t = xt;
+	if ( yt > t ) {
+		which = 1;
+		t = yt;
+	}
+	if ( zt > t ) {
+		which = 2;
+		t = zt;
+	}
+
+	switch ( which )
+	{
+		case 0: // intersect with yz Plane
+			{
+				float y = pos.y + dir.y*t;
+				if ( y < box.min.y || y > box.max.y ) return false;
+				float z = pos.z + dir.z*t;
+				if ( z < box.min.z || z > box.max.z ) return false;
+
+				if ( outNormal ) outNormal->Set( xn, 0.0f, 0.0f );
+			} break;
+
+		case 1: // intersect with xz Plane
+			{
+				float x = pos.x + dir.x*t;
+				if ( x < box.min.x || x > box.max.x ) return false;
+				float z = pos.z + dir.z*t;
+				if ( z < box.min.z || z > box.max.z ) return false;
+
+				if ( outNormal ) outNormal->Set( 0.0f, yn, 0.0f );
+			} break;
+
+		case 2: // intersect with xy Plane
+			{
+				float x = pos.x + dir.x*t;
+				if ( x < box.min.x || x > box.max.x ) return false;
+				float y = pos.y + dir.y*t;
+				if ( y < box.min.y || y > box.max.y ) return false;
+
+				if ( outNormal ) outNormal->Set( 0.0f, 0.0f, zn );
+			} break;
+	}
+
+	if ( outPoint ) *outPoint = pos + t * dir;
+
+	return true;
+}
+
+SEGAN_INLINE bool sx_intersect( const Ray& ray, const OBBox& box, float3* outPoint = null, float3* outNormal = null )
+{
+
+}
+
+SEGAN_INLINE bool sx_intersect( const Ray& ray, const float3& v0, const float3& v1, const float3& v2, float3* outPoint = null, float3* outNormal = null )
+{
+
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 //	utility functions
 //////////////////////////////////////////////////////////////////////////

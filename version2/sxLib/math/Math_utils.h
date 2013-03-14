@@ -374,70 +374,29 @@ public:
 
 };
 
-#if 0
-
-
-
 //////////////////////////////////////////////////////////////////////////
 //	RAY
 //////////////////////////////////////////////////////////////////////////
-struct SEGAN_ENG_API Ray
+class Ray
 {
-	float3 pos;			//  origin of the ray
-	float3 dir;			//  direction of the ray
-
-	Ray(const float3& _pos, const float3& _dir);
-	Ray(float mouse_abs_x, float mouse_abs_y, float vpWidth, float vpHeight, Matrix& matView, Matrix& matProj);
+public:
+	SEGAN_INLINE Ray(){}
+	SEGAN_INLINE Ray( const float3& pos, const float3& dir ): m_pos(pos), m_dir(dir) {};
 
 	//! set new value for this ray
-	void Set(const float3& _pos, const float3& _dir);
+	SEGAN_INLINE void Set( const float3& pos, const float3& dir )
+	{
+		m_pos = pos;
+		m_dir = dir;
+	}
 
-	//! compute ray
-	void Compute(float mouse_abs_x, float mouse_abs_y, float vpWidth, float vpHeight, Matrix& matView, Matrix& matProj);
+public:
 
-	/*! 
-	return true if this ray intersect with plan and fill out outPoint if outPonit be exist and 
-	fill out outNormal with normal vector of intersection if outNormal be exist
-	*/
-	bool Intersect_Plane(const Plane& plane, pfloat3 outPoint = NULL, pfloat3 outNormal = NULL);
+	float3 m_pos;			//  origin of the ray
+	float3 m_dir;			//  direction of the ray
 
-	/*! 
-	return true if this ray intersect with Rectangle and fill out outPoint if outPonit be exist and 
-	fill out outNormal with normal vector of intersection if outNormal be exist
-	*/
-	bool Intersect_Rect3D(const Rect3D& rect3d, pfloat3 outPoint = NULL, pfloat3 outNormal = NULL);
-
-	/*! 
-	return true if this ray intersect with Sphere and fill out outPoint if outPonit be exist and 
-	fill out outNormal with normal vector of intersection if outNormal be exist
-	NOTE: return true if ray be inside of the shape with outPoint=Ray.pos and outNormal=-Ray.dir
-	*/
-	bool Intersect_Sphere(const Sphere& sphere, pfloat3 outPoint = NULL, pfloat3 outNormal = NULL);
-
-	/*!
-	return true if this ray intersect with AABox and fill out outPoint if outPonit be exist and 
-	fill out outNormal with normal vector of intersection if outNormal be exist
-	NOTE: return true if ray be inside of the shape with outPoint=Ray.pos and outNormal=-Ray.dir
-	*/
-	bool Intersect_AABox(const AABox& box, pfloat3 outPoint = NULL, pfloat3 outNormal = NULL);
-
-	/*! 
-	return true if this ray intersect with OBBox and fill out outPoint if outPonit be exist and 
-	fill out outNormal with normal vector of intersection if outNormal be exist
-	NOTE: return true if ray be inside of the shape with outPoint=Ray.pos and outNormal=-Ray.dir
-	*/
-	bool Intersect_OBBox(const OBBox& box, pfloat3 outPoint = NULL, pfloat3 outNormal = NULL);
-
-	/*! 
-	return true if this ray intersect with Triangle and fill out outPoint if outPonit be exist and 
-	fill out outNormal with normal vector of intersection if outNormal be exist
-	*/
-	bool Intersect_Triangle(const float3& v0, const float3& v1, const float3& v2, pfloat3 outPoint = NULL, pfloat3 outNormal = NULL);
 };
-typedef Ray *PRay;
 
-
-#endif
 
 #endif	//	GUARD_Math_utils_HEADER_FILE
 
