@@ -595,8 +595,10 @@ void Entity::MsgProc( UINT msg, void* data )
 			if ( m_curAttackLevel.electricalArmor < 0 ) m_curAttackLevel.electricalArmor = 0;
 
 			m_health.damage += damage->physicalDamage * ( 1 - m_curAttackLevel.physicalArmor ) + damage->electricalDamage	* ( 1 - m_curAttackLevel.electricalArmor );
-			if ( m_health.damage > 1.0f )
-				m_health.icur -= int( m_health.damage + 0.5f );
+
+			const int addHealth = static_cast<int>(m_health.damage);
+			m_health.icur -= addHealth;
+			m_health.damage -= addHealth;
 
 			//	compute experience
 			if ( damage->sender && damage->sender->m_partyCurrent == PARTY_TOWER )
