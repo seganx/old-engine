@@ -64,6 +64,7 @@ namespace GM
 		sx::core::PNode		m_nodePipe;			//  pipe of weapon to shoot
 		int					m_shootCount;		//  number of shooting
 		float				m_shootTime;		//  time of shooting
+		float				m_maxShootTime;
 		float3				m_rot;				//  direction of weapon
 		float3				m_rotOffset;		//  offset of direction
 		float3				m_rotMax;			//	maximum rotation value
@@ -76,7 +77,6 @@ namespace GM
 		int					m_fire;				//  fire order for weapon
 		bool				m_selected;			//	true of this tower has been selected
 		int					m_energyPerBullet;
-
 
 		sx::gui::Label*		m_bulletIndicator;
 	};

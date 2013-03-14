@@ -19,6 +19,7 @@ namespace GM
 		, m_nodePipe(null)
 		, m_shootCount(0)
 		, m_shootTime(0)
+		, m_maxShootTime(0.0f)
 		, m_rot(0,0,0)
 		, m_rotOffset(0,0,0)
 		, m_rotMax(0.5f, 1.0f, 0)
@@ -124,7 +125,7 @@ namespace GM
 			//	just check the number of bullets and player does fire
 			if ( SEGAN_KEYDOWN(0, SX_INPUT_KEY_MOUSE_LEFT) )
 			{
-				if ( (!m_fire) && (g_game->m_player->m_energy >= m_energyPerBullet) )
+				if ( (!m_fire) && (m_shootTime > m_maxShootTime) && (g_game->m_player->m_energy >= m_energyPerBullet) )
 				{
 					m_fire = 1;
 				}
@@ -206,9 +207,7 @@ namespace GM
 			m_nodeWeapon->SetRotation( m_rot.x, m_rot.y, m_rot.z );
 		}
 
-		//  compute max shoot time depend on fire rate
-		const float	maxShootTime = (m_attack.rate > 0.01f) ? (1000.0f / m_attack.rate) : 500.0f;
-		if ( m_fire && (m_shootTime > maxShootTime) && (g_game->m_player->m_energy >= m_energyPerBullet) )
+		if ( m_fire && (m_shootTime > m_maxShootTime) && (g_game->m_player->m_energy >= m_energyPerBullet) )
 		{
 			m_shootTime = 0.0f;
 
@@ -352,7 +351,9 @@ namespace GM
 					}
 				}
 
-				m_shootTime = 0.0f;
+				//  compute max shoot time depend on fire rate
+				m_maxShootTime = (m_attack.rate > 0.01f) ? (1000.0f / m_attack.rate) : 500.0f;
+				m_shootTime = m_maxShootTime;
 
 				m_fov = (m_fov_min + m_fov_max) * 0.5f;
 
