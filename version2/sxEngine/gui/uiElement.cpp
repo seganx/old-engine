@@ -1,7 +1,7 @@
-#include "Element.h"
+#include "uiDevice.h"
 
 
-Element::Element( void )
+uiElement::uiElement( void )
 : m_numVertices(0)
 , m_pos(null)
 , m_uv(null)
@@ -10,13 +10,13 @@ Element::Element( void )
 
 }
 
-Element::~Element( void )
+uiElement::~uiElement( void )
 {
 	if ( m_numVertices )
 		ClearVertives();
 }
 
-void Element::CreateVertices( const uint count )
+void uiElement::CreateVertices( const uint count )
 {
 	if ( count )
 	{
@@ -28,7 +28,7 @@ void Element::CreateVertices( const uint count )
 	else ClearVertives();
 }
 
-void Element::ClearVertives( void )
+void uiElement::ClearVertives( void )
 {
 	if ( m_numVertices )
 	{
@@ -45,25 +45,25 @@ void Element::ClearVertives( void )
 //	batch system
 //////////////////////////////////////////////////////////////////////////
 static uint			s_batch_count = 0;
-static Element*		s_elements[2048];
+static uiElement*		s_elements[2048];
 
 SEGAN_INLINE void sx_element_begin_batch( void )
 {
 	s_batch_count = 0;
 }
 
-SEGAN_INLINE bool sx_element_add_batch( const Element* elem )
+SEGAN_INLINE bool sx_element_add_batch( const uiElement* elem )
 {
 	bool res = false;
 	if ( s_batch_count < 2048 )
 	{
-		s_elements[s_batch_count++] = (Element*)elem;
+		s_elements[s_batch_count++] = (uiElement*)elem;
 		res = true;
 	}
 	return res;
 }
 
-SEGAN_INLINE void sx_element_end_batch( Element* dest )
+SEGAN_INLINE void sx_element_end_batch( uiElement* dest )
 {
 	// compute number of vertices
 	uint sumVertices = 0;
@@ -78,7 +78,7 @@ SEGAN_INLINE void sx_element_end_batch( Element* dest )
 	uint index = destVertices;
 	for ( uint i=0; i<s_batch_count; ++i )
 	{
-		const Element* src = s_elements[i];
+		const uiElement* src = s_elements[i];
 		const uint srcvertcount = src->m_numVertices;
 		sx_mem_copy( &dest->m_pos[index],	src->m_pos,		srcvertcount * sizeof(float3) );
 		sx_mem_copy( &dest->m_uv[index],	src->m_uv,		srcvertcount * sizeof(float2) );

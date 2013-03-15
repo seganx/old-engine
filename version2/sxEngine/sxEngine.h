@@ -16,10 +16,10 @@
 #include "input/Input.h"
 #include "input/Mouse_editor.h"
 #include "d3d/d3dDevice.h"
+#include "gui/uiManager.h"
 #include "engine/Network.h"
 #include "engine/Draw_debugger.h"
 #include "engine/Camera.h"
-#include "gui/Element.h"
 
 
 //! structure of engine configuration
@@ -64,7 +64,7 @@ public:
 	class FileManager*			m_file;
 	class Renderer*				m_renderer;
 	class SceneManager*			m_scene;
-	class GuiManager*			m_gui;
+	class GUIManager*			m_gui;
 	class PhysicsManager*		m_physics;
 	class SoundManager*			m_sound;
 

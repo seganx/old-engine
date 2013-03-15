@@ -405,11 +405,19 @@
 			Name="gui"
 			>
 			<File
-				RelativePath="..\gui\Element.cpp"
+				RelativePath="..\gui\uiDevice.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\gui\Element.h"
+				RelativePath="..\gui\uiDevice.h"
+				>
+			</File>
+			<File
+				RelativePath="..\gui\uiElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\gui\uiElement.h"
 				>
 			</File>
 		</Filter>

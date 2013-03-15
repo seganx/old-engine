@@ -65,7 +65,7 @@ void app_main_loop( float elpsTime )
 
 		g_engine->m_device3D->SetTexture( null );
 
-		g_engine->m_device3D->ClearScreen( 0x000000ff );
+		g_engine->m_device3D->ClearScreen( 0xff000000 );
 
 #if 0
 		g_engine->m_device3D->SetTexture( tex_000 );
@@ -98,7 +98,7 @@ void app_main_loop( float elpsTime )
 			g_engine->m_device3D->GetMatrix(MM_VIEW),
 			g_engine->m_device3D->GetMatrix(MM_PROJECTION));
 
-		Element e1, e2, eb;
+		uiElement e1, e2, eb;
 		e1.CreateVertices( 6 );
 		e1.m_pos[0].Set(  50,  50, 0.0f );
 		e1.m_pos[1].Set( -50,  50, 0.0f );
@@ -134,7 +134,7 @@ void app_main_loop( float elpsTime )
 
 	sx_mem_enable_debug( true, -1 );
 
-	sx_os_sleep(1);
+//	sx_os_sleep(1);
 }
 
 #if 1

@@ -35,27 +35,20 @@ Stack
 Stream
 String
 
-
-//////////////////////////////////
-../math
-
 int2
-int3
 int4
 float2
 float3
 float4
 matrix
 quat
-rotation
-transform
-plane
-rect2D
-rect3D
-aaBox
-obBox
-sphere
-ray
+Color
+Plane
+Frustum
+Sphere
+AABox
+OBBox
+Ray
 
 
 //////////////////////////////////
@@ -64,7 +57,8 @@ sx_os_initialize()
 sx_os_finalize()
 ...
 Logger
-Network
+Client
+Server
 Window
 Application
 File
@@ -98,16 +92,32 @@ d3dShader
 //////////////////////////////////
 ../input
 
-inInput ----| Initialize()
-			| Finalize()
-			| Attach()
-			| Update()
-			| GetKey()
-inInputDevice
-inInputDevice_keyboard
-inInputDevice_mouse
-inInputDevice_joystick
+Input --| Initialize()
+		| Finalize()
+		| Attach()
+		| Update()
+		| GetKey()
+InputDevice
+InputDevice_keyboard
+InputDevice_mouse
+InputDevice_joystick
 
+
+//////////////////////////////////
+../ui
+
+uiDevice ---| Initialize()
+			| Finalize()
+uiElement
+uiControl
+uiPanel
+uiButton
+uiCheckBox
+uiScrollBar
+uiProgressBar
+uiListBox
+uiLabel
+uiEditBox
 
 //////////////////////////////////
 ../physics
@@ -155,23 +165,6 @@ aiState
 aiState_move
 aiState_pickup
 aiMind
-
-
-//////////////////////////////////
-../ui
-
-uiDevice ---| Initialize()
-			| Finalize()
-uiElement
-uiControl
-uiPanel
-uiButton
-uiCheckBox
-uiScrollBar
-uiProgressBar
-uiListBox
-uiLabel
-uiEditBox
 
 
 ////////////////////////////////

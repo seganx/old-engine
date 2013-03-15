@@ -613,11 +613,8 @@ void d3dDevice_gl::ClearScreen( const dword bgcolor )
 {
 	GLbitfield clearBits = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
 
-	float r = SEGAN_2TH_BYTEOF(bgcolor) / 255.0f;
-	float g = SEGAN_3TH_BYTEOF(bgcolor) / 255.0f;
-	float b = SEGAN_4TH_BYTEOF(bgcolor) / 255.0f;
-	float a = SEGAN_1TH_BYTEOF(bgcolor) / 255.0f;
-	glClearColor( r, g, b, a );
+	Color color( bgcolor );
+	glClearColor( color.r, color.g, color.b, color.a );
 
 	if ( m_driverDisplayMode.depthFormat == FMT_D24S8 )
 		clearBits |= GL_STENCIL_BUFFER_BIT;

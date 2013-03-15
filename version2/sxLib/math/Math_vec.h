@@ -10,20 +10,6 @@
 #define GUARD_Math_vec_HEADER_FILE
 
 
-//	forward declarations
-class float2;
-class float3;
-class float4;
-class quat;
-class matrix;
-class Plane;
-class Frustum;
-class Sphere;
-class AABox;
-class OBBox;
-class Ray;
-
-
 //////////////////////////////////////////////////////////////////////////
 //	INTEGER POINT 2D
 //////////////////////////////////////////////////////////////////////////

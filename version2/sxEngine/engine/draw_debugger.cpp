@@ -201,7 +201,7 @@ SEGAN_ENG_API void sx_debug_draw_sphere( const Sphere& sphere, const dword color
 	g_engine->m_device3D->DrawDebug( PT_TRIANGLE_LIST, vcount, &v->x, color );
 }
 
-SEGAN_ENG_API void sx_debug_draw_gui_element( const class Element* elem )
+SEGAN_ENG_API void sx_debug_draw_gui_element( const class uiElement* elem )
 {
 	if ( elem && elem->m_numVertices && elem->m_pos )
 	{
