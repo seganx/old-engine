@@ -112,10 +112,10 @@ void app_main_loop( float elpsTime )
 		e2.m_pos[1].Set(  60,  150, 0.0f );
 		e2.m_pos[2].Set(  60,  50, 0.0f );
 
-		sx_element_begin_batch();
-		sx_element_add_batch( &e1 );
-		sx_element_add_batch( &e2 );
-		sx_element_end_batch( &eb );
+		g_engine->m_deviceUI->BeginBatchElements( 0, 2 );
+		g_engine->m_deviceUI->AddBatchElements( &e1 );
+		g_engine->m_deviceUI->AddBatchElements( &e2 );
+		g_engine->m_deviceUI->EndBatchElements( &eb );
 		sx_debug_draw_gui_element( &eb );
 
 		sx_debug_draw_compass();

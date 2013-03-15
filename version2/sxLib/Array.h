@@ -208,7 +208,7 @@ private:
 		
 	}
 
-private:
+public:
 
 	T*			m_item;			//  items in array
 	sint		m_count;		//  number of items in array
@@ -387,7 +387,7 @@ public:
 		}
 	}
 
-private:
+public:
 
 	T		m_item[count];	//  items in array
 	int		m_count;		//  number of items in array

@@ -373,6 +373,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\engine\GUIManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\engine\GUIManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\engine\Network.cpp"
 				>
 			</File>
@@ -414,10 +422,6 @@
 			</File>
 			<File
 				RelativePath="..\gui\uiElement.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\gui\uiElement.h"
 				>
 			</File>
 		</Filter>

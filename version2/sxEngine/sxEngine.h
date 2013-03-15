@@ -16,7 +16,7 @@
 #include "input/Input.h"
 #include "input/Mouse_editor.h"
 #include "d3d/d3dDevice.h"
-#include "gui/uiManager.h"
+#include "gui/uiDevice.h"
 #include "engine/Network.h"
 #include "engine/Draw_debugger.h"
 #include "engine/Camera.h"
