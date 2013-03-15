@@ -745,9 +745,9 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const Sphere& sphere, float3* ou
 	/*	code from "Tuomas Tonteri" ( www.sci.tuomastonteri.fi/programming/sse/example3 )	*/
 
 	float a = sx_length_sqr( ray.dir );
-	float b = sx_dot( ray.dir, ray.pos - sphere.center ) * 2.0f;
-	float c = sx_length_sqr( sphere.center ) + sx_length_sqr( ray.pos ) - 2.0f * sx_dot( ray.pos, sphere.center ) - sphere.r * sphere.r;
-	float D = b * b - 4.0f * a * c;
+ 	float b = sx_dot( ray.dir, ray.pos - sphere.center ) * 2.0f;
+ 	float c = sx_length_sqr( sphere.center ) + sx_length_sqr( ray.pos ) - 2.0f * sx_dot( ray.pos, sphere.center ) - sphere.r * sphere.r;
+ 	float D = b * b - 4.0f * a * c;
 
 	// If ray can not intersect then stop
 	if ( D < 0 ) return false;
@@ -927,8 +927,85 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const OBBox& box, float3* outPoi
 
 SEGAN_INLINE bool sx_intersect( const Ray& ray, const float3& v0, const float3& v1, const float3& v2, float3* outPoint /*= null*/, float3* outNormal /*= null*/ )
 {
-	return false;
+	float3 edge1 = v1 - v0;
+	float3 edge2 = v2 - v0;
+	float3 pvec;
+
+	sx_cross( pvec, ray.dir, edge2 ); 
+	float det = sx_dot( edge1, pvec );
+
+	if( det < EPSILON )
+		return false;
+
+	float3 tvec = ray.pos - v0;
+	float u = sx_dot( tvec, pvec );
+	if( u < 0.0f || u > det )
+		return false;
+
+	float3 qvec;
+	sx_cross( qvec, tvec, edge1 );
+	float v = sx_dot( ray.dir, qvec );
+	if( v < 0.0f || u + v > det )
+		return false;
+
+	float t = sx_dot( edge2, qvec ) / det;
+	if ( t < 0 ) return false;
+
+	if ( outPoint )
+	{
+		*outPoint = ray.pos + ray.dir * t;
+	}
+
+	if ( outNormal )
+	{
+		qvec.Cross(edge1, edge2);
+		outNormal->Normalize( qvec );
+	}
+
+	return true;
 }
+
+
+SEGAN_INLINE bool sx_intersect( const Ray& ray, const float3& v0, const float3& v1, const float3& v2, float2& outuv, const bool twoside /*= false */ )
+{
+	float3 edge1 = v1 - v0;
+	float3 edge2 = v2 - v0;
+	float3 pvec, tvec;
+
+	sx_cross( pvec, ray.dir, edge2 ); 
+	float det = sx_dot( edge1, pvec );
+	if ( det > 0 )
+	{
+		tvec = ray.pos - v0;
+	}
+	else
+	{
+		if ( !twoside ) // for 2side detection remove this line 
+			return false;		
+
+		tvec = v0 - ray.pos; 
+		det = - det;
+	}
+
+	if( det < EPSILON )
+		return false;
+
+	float u = sx_dot( tvec, pvec ); 
+	if ( u < 0.0f || u > det )
+		return false;
+
+	float3 qvec;
+	sx_cross( qvec, tvec, edge1 ); 
+	float v = sx_dot( qvec, ray.dir );
+	if ( v < 0.0f || (u + v) > det )
+		return false;
+
+	outuv.x = ( u / det ) - 0.5f;
+	outuv.y = 0.5f - ( v / det );
+
+	return true;
+}
+
 
 
 //////////////////////////////////////////////////////////////////////////

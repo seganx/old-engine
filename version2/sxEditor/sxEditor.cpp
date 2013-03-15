@@ -40,7 +40,7 @@ void app_main_loop( float elpsTime )
 		//timer = 2.0f;
 		
 
-		static float cam_r = 20.0f, cam_p = 0.0f, cam_t = 0.5f;
+		static float cam_r = 20.0f, cam_p = 0.0f, cam_t = 0.0f;
 		static float3 cam_at;
 		Camera camera;
 		camera.m_at = cam_at;
@@ -48,8 +48,8 @@ void app_main_loop( float elpsTime )
 		g_engine->m_device3D->SetMatrix( MM_VIEW, camera.GetViewMatrix() );
 		if ( sx_key_hold( IK_MOUSE_LEFT, 0 ) || sx_key_down( IK_MOUSE_LEFT, 0 ) )
 		{
-			cam_p += g_engine->m_input->GetValues()->rl_x * 0.005f;
-			cam_t -= g_engine->m_input->GetValues()->rl_y * 0.005f;
+			cam_p -= g_engine->m_input->GetValues()->rl_x * 0.005f;
+			cam_t += g_engine->m_input->GetValues()->rl_y * 0.005f;
 		}
 		if ( sx_key_hold( IK_MOUSE_RIGHT, 0 ) || sx_key_down( IK_MOUSE_RIGHT, 0 ) )
 		{
@@ -98,36 +98,6 @@ void app_main_loop( float elpsTime )
 			g_engine->m_device3D->GetMatrix(MM_VIEW),
 			g_engine->m_device3D->GetMatrix(MM_PROJECTION));
 
-		AABox box1( -1, 0, -1, 1, 2, 1 );
-		AABox box2( 2, 0, 2, 4, 2, 4 );
-		OBBox box3 = sx_transform( box2, mat );
-
-		bool intersect = sx_intersect( ray, box1, 10.0f );
-		sx_debug_draw_box( box1, intersect ? 0xffff0000 : 0xffffff00 );
-
-		float3 ipoint, inorm;
-		intersect = sx_intersect( ray, box3, &ipoint, &inorm );
-		sx_debug_draw_box( box3, intersect ? 0xffff0000 : 0xffffff00 );
-
-		if ( intersect )
-		{
-			sx_debug_draw_sphere( Sphere( ipoint, 0.1f ), 0xffaaaaff, 4, 6 );
-			sx_debug_draw_line( ipoint, ipoint + inorm, 0xffaaaaff );
-		}
-
-		sx_debug_draw_box( sx_cover( box1, box3 ), 0xffffffff );
-
-
-#if 0
-		sx_debug_draw_circle( float3( 5, 0, 4 ), 3, 0xffffffff );
-
-		Sphere sph1( -13, 0, -3, 1 );
-		Sphere sph2( -15 + 6.0f * sx_sin_fast(timer*6.0f), 0, 9.0f * sx_sin_fast(timer*5.0f), 2 );
-		sx_debug_draw_sphere( sph1, 0xff00ffff, 7, 9 );
-		sx_debug_draw_sphere( sph2, 0xff00ffff );
-		sx_debug_draw_sphere( sx_cover( sph2, sph1 ), 0xffffffff );
-
-
 		Element e1, e2, eb;
 		e1.CreateVertices( 6 );
 		e1.m_pos[0].Set(  50,  50, 0.0f );
@@ -147,7 +117,6 @@ void app_main_loop( float elpsTime )
 		sx_element_add_batch( &e2 );
 		sx_element_end_batch( &eb );
 		sx_debug_draw_gui_element( &eb );
-#endif
 
 		sx_debug_draw_compass();
 
@@ -156,9 +125,9 @@ void app_main_loop( float elpsTime )
 		g_engine->m_device3D->Present();
 
 		str128 str;
-		str.Format( L"fps : %d - ft : %.2f - mouse : %d , %d - intersect : %d ", 
+		str.Format( L"fps : %d - ft : %.2f - mouse : %d , %d ", 
 			g_engine->m_device3D->m_debugInfo.fps, g_engine->m_device3D->m_debugInfo.frameTime,
-			int(sx_mouse_absx(0)), int(sx_mouse_absy(0)), intersect );
+			int(sx_mouse_absx(0)), int(sx_mouse_absy(0)) );
 		g_engine->m_window->SetTitle( str );
 	}
 #endif
@@ -221,7 +190,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	config.net_id = 0x2727;
 	config.logger = &loggerconfig;
 	config.window_callback = &window_event_call;
-	config.d3d_flag = SX_D3D_CREATE_GL | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
+	config.d3d_flag = SX_D3D_CREATE_GL;// | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
 	config.input_device[0] = &ioMouse;
 
 	sx_engine_get_singleton( &config );

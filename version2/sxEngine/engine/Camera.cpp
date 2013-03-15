@@ -22,9 +22,9 @@ SEGAN_INLINE void Camera::SetSpherical( const float radius, const float phi, con
 	sx_sin_cos_fast( phi, sphi, cphi );
 	sx_sin_cos_fast( theta, stheta, ctheta );
 
-	m_eye.x = m_at.x + radius * cphi * stheta;
-	m_eye.y = m_at.y + radius * ctheta;
-	m_eye.z = m_at.z + radius * sphi * stheta;
+	m_eye.x = m_at.x + radius * sphi * ctheta;
+	m_eye.y = m_at.y + radius * stheta;
+	m_eye.z = m_at.z + radius * cphi * ctheta;
 }
 
 void Camera::GetSpherical( float* raduis /*= NULL*/, float* phi /*= NULL*/, float* theta /*= NULL*/ ) const

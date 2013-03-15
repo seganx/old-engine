@@ -86,7 +86,7 @@ void com_Supporter::Update( float elpsTime )
 				g_game->m_player->m_fastCoolDown += m_owner->m_curAbility.minRange;
 			}
 		}
-		else
+		else if ( m_overActiveTime > 0.0f )
 		{
 			m_overActiveTime -= delta;
 

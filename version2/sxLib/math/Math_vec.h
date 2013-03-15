@@ -161,7 +161,7 @@ public:
 
 	// binary operators
 	SEGAN_INLINE float3 operator + ( const float3& v ) const	{ return float3( x + v.x, y + v.y, z + v.z ); }
-	SEGAN_INLINE float3 operator - ( const float3& v ) const	{ return float3( x - v.x, y - v.y, z + v.z ); }
+	SEGAN_INLINE float3 operator - ( const float3& v ) const	{ return float3( x - v.x, y - v.y, z - v.z ); }
 	SEGAN_INLINE float3 operator * ( const float f ) const		{ return float3( x * f, y * f, z * f ); }
 	SEGAN_INLINE float3 operator / ( const float f ) const		{ return float3( x / f, y / f, z / f ); }
 	SEGAN_INLINE bool operator == ( const float3& v ) const		{ return ( x == v.x ) && ( y == v.y ) && ( z == v.z ); }
@@ -256,7 +256,7 @@ public:
 
 	// binary operators
 	SEGAN_INLINE float4 operator + ( const float4& v ) const	{ return float4( x + v.x, y + v.y, z + v.z, w + v.w ); }
-	SEGAN_INLINE float4 operator - ( const float4& v ) const	{ return float4( x - v.x, y - v.y, z + v.z, w - v.w ); }
+	SEGAN_INLINE float4 operator - ( const float4& v ) const	{ return float4( x - v.x, y - v.y, z - v.z, w - v.w ); }
 	SEGAN_INLINE float4 operator * ( const float f ) const		{ return float4( x * f, y * f, z * f, w * f ); }
 	SEGAN_INLINE float4 operator / ( const float f ) const		{ return float4( x / f, y / f, z / f, w / f ); }
 	SEGAN_INLINE bool operator == ( const float4& v ) const		{ return ( x == v.x ) && ( y == v.y ) && ( z == v.z ) && ( w == v.w ); }

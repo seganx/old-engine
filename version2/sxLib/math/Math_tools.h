@@ -573,42 +573,35 @@ SEGAN_ENG_API Ray sx_ray( const float x, const float y, const float width, const
 //! transform ray by a matrix
 SEGAN_ENG_API Ray sx_transform( const Ray& ray, const matrix& mat );
 
-/*! 
-return true if this ray intersect with plan and fill out outPoint if outPonit be exist and 
-fill out outNormal with normal vector of intersection if outNormal be exist
-*/
+/*! return true if the ray intersect with plan and fill out outPoint if the outPonit be exist and 
+fill out outNormal with normal vector of intersection if the outNormal be exist */
 SEGAN_ENG_API bool sx_intersect( const Ray& ray, const Plane& plane, float3* outPoint = null, float3* outNormal = null );
 
-/*! 
-return true if this ray intersect with Sphere and fill out outPoint if outPonit be exist and 
-fill out outNormal with normal vector of intersection if outNormal be exist
-NOTE: return true if ray be inside of the shape with outPoint=Ray.pos and outNormal=-Ray.dir
-*/
+/*! return true if the ray intersect with Sphere and fill out outPoint if the outPonit be exist and 
+fill out outNormal with normal vector of intersection if the outNormal be exist
+NOTE: return true if ray be inside of the shape with outPoint = Ray.pos and outNormal = - Ray.dir */
 SEGAN_ENG_API bool sx_intersect( const Ray& ray, const Sphere& sphere, float3* outPoint = null, float3* outNormal = null );
 
 /*!
-return true if this ray intersect with AABox and fill out outPoint if outPonit be exist and 
-fill out outNormal with normal vector of intersection if outNormal be exist
-NOTE: return true if ray be inside of the shape with outPoint=Ray.pos and outNormal=-Ray.dir
-*/
+return true if the ray intersect with AABox and fill out outPoint if the outPonit be exist and 
+fill out outNormal with normal vector of intersection if the outNormal be exist
+NOTE: return true if ray be inside of the shape with outPoint = Ray.pos and outNormal = - Ray.dir */
 SEGAN_ENG_API bool sx_intersect( const Ray& ray, const AABox& box, float3* outPoint, float3* outNormal );
 
-//! return true if this ray intersect with AABox. use far to limit ray travel distance
+//! return true if the ray intersect with AABox. use far to limit ray travel distance
 SEGAN_ENG_API bool sx_intersect( const Ray& ray, const AABox& box, const float far = MAXIMUM );
 
-/*! 
-return true if this ray intersect with OBBox and fill out outPoint if outPonit be exist and 
-fill out outNormal with normal vector of intersection if outNormal be exist
-NOTE: return true if ray be inside of the shape with outPoint=Ray.pos and outNormal=-Ray.dir
-*/
+/*! return true if the ray intersect with OBBox and fill out outPoint if the outPonit be exist and 
+fill out outNormal with normal vector of intersection if the outNormal be exist
+NOTE: return true if ray be inside of the shape with outPoint = Ray.pos and outNormal = - Ray.dir */
 SEGAN_ENG_API bool sx_intersect( const Ray& ray, const OBBox& box, float3* outPoint = null, float3* outNormal = null );
 
-/*! 
-return true if this ray intersect with Triangle and fill out outPoint if outPonit be exist and 
-fill out outNormal with normal vector of intersection if outNormal be exist
-*/
+/*! return true if the ray intersect with Triangle and fill out outPoint if the outPonit be exist and 
+fill out outNormal with normal vector of intersection if the outNormal be exist */
 SEGAN_ENG_API bool sx_intersect( const Ray& ray, const float3& v0, const float3& v1, const float3& v2, float3* outPoint = null, float3* outNormal = null );
 
+/*! return true if the ray intersect with the triangle and fill out u,v coordinate */
+SEGAN_ENG_API bool sx_intersect( const Ray& ray, const float3& v0, const float3& v1, const float3& v2, float2& outUV, const bool twoside = false );
 
 
 //////////////////////////////////////////////////////////////////////////
