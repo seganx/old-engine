@@ -298,6 +298,13 @@ public:
 	//! conventional operators
 	SEGAN_INLINE operator const float* ( void ) const { return &x1; }
 
+	SEGAN_INLINE AABox& Set( const float3& _min, const float3& _max )
+	{
+		min = _min;
+		max = _max;
+		return *this;
+	}
+
 	//! resize the box to the zero
 	SEGAN_INLINE AABox& Zero( void )
 	{
@@ -334,6 +341,10 @@ public:
 			float3 min;
 			float3 max;
 		};
+
+		struct {
+			float3 bounds[2];
+		};
 	};
 };
 
@@ -344,34 +355,43 @@ public:
 class OBBox
 {
 public:
-	SEGAN_INLINE OBBox() {}
+	SEGAN_INLINE OBBox() { world.Identity(); }
 	SEGAN_INLINE OBBox( const OBBox& box ) { *this = box; }
 
 	//! conventional operators
-	SEGAN_INLINE operator const float* ( void ) const { return &v->x; }
+	SEGAN_INLINE operator const float* ( void ) const { return &aabox.x1; }
 
-	SEGAN_INLINE OBBox& Set( const float3& min, const float3& max )
+	SEGAN_INLINE OBBox& Set( const float3& min, const float3& max, const matrix& matworld )
 	{
-		v[0] = max;
-		v[1].Set( min.x, max.y, max.z );
-		v[2].Set( min.x, min.y, max.z );
-		v[3].Set( max.x, min.y, max.z );
-		v[4].Set( max.x, min.y, min.z );
-		v[5].Set( max.x, max.y, min.z );
-		v[6].Set( min.x, max.y, min.z );
-		v[7] = min;
+// 		v[0] = max;
+// 		v[1].Set( min.x, max.y, max.z );
+// 		v[2].Set( min.x, min.y, max.z );
+// 		v[3].Set( max.x, min.y, max.z );
+// 		v[4].Set( max.x, min.y, min.z );
+// 		v[5].Set( max.x, max.y, min.z );
+// 		v[6].Set( min.x, max.y, min.z );
+// 		v[7] = min;
+		world = matworld;
+		aabox.Set( min, max );
+		return *this;
+	}
+
+	SEGAN_INLINE OBBox& Set( const AABox& box, const matrix& matworld )
+	{
+		world = matworld;
+		aabox = box;
 		return *this;
 	}
 
 	SEGAN_INLINE OBBox& SetAABox( const AABox& box )
 	{
-		return Set( box.min, box.max );
+		aabox.Set( box.min, box.max );
+		return *this;
 	}
 
 public:
-
-	float3 v[8];
-
+	AABox	aabox;
+	matrix	world;	//	transformation matrix
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -381,19 +401,25 @@ class Ray
 {
 public:
 	SEGAN_INLINE Ray(){}
-	SEGAN_INLINE Ray( const float3& pos, const float3& dir ): m_pos(pos), m_dir(dir) {};
+	SEGAN_INLINE Ray( const float3& _pos, const float3& _dir ){ Set( _pos, _dir ); };
 
 	//! set new value for this ray
-	SEGAN_INLINE void Set( const float3& pos, const float3& dir )
+	SEGAN_INLINE void Set( const float3& _pos, const float3& _dir )
 	{
-		m_pos = pos;
-		m_dir = dir;
+		pos = _pos;
+		dir = _dir;
+		dirInv.Set( 1 / _dir.x, 1 / _dir.y, 1 / _dir.z );
+		sign[0] = ( dirInv.x < 0 );
+		sign[1] = ( dirInv.y < 0 );
+		sign[2] = ( dirInv.z < 0 );
 	}
 
 public:
 
-	float3 m_pos;			//  origin of the ray
-	float3 m_dir;			//  direction of the ray
+	float3	pos;		//  origin of the ray
+	float3	dir;		//  direction of the ray
+	float3	dirInv;		//	inverse of direction to use Smits’ method
+	sint	sign[3];	//	use of http://cag.csail.mit.edu/~amy/papers/box-jgt.pdf
 
 };
 

@@ -20,10 +20,10 @@ SEGAN_ENG_API void sx_debug_draw_grid( const uint size, const dword color )
 	const float s = (float)lines;
 
 	matrix mat;
-	const matrix* matview = (matrix*)g_engine->m_device3D->GetMatrix( MM_VIEW );
-	sx_inverse( mat, *matview );
+	const matrix& matview = g_engine->m_device3D->GetMatrix( MM_VIEW );
+	sx_inverse( mat, matview );
 	float dis = 5.0f + lines;
-	float3 cen( sx_round( mat.m30 + dis * matview->m02 ), 0.0f, sx_round( mat.m32 + dis * matview->m22 ) );
+	float3 cen( sx_round( mat.m30 + dis * matview.m02 ), 0.0f, sx_round( mat.m32 + dis * matview.m22 ) );
 
 	mat.Identity();
 	g_engine->m_device3D->SetMatrix( MM_WORLD, mat );
@@ -152,10 +152,12 @@ SEGAN_INLINE void sx_debug_draw_box( const AABox& box, const dword color )
 
 SEGAN_INLINE void sx_debug_draw_box( const OBBox& box, const dword color )
 {
+	float3 box_v[8];
+	sx_get_points( box_v, box );
 	const float3 v[24] = { 
-		box.v[0], box.v[1], box.v[1], box.v[2], box.v[2], box.v[3], box.v[3], box.v[0],
-		box.v[4], box.v[5], box.v[5], box.v[6], box.v[6], box.v[7], box.v[7], box.v[4],
-		box.v[0], box.v[5], box.v[1], box.v[6], box.v[2], box.v[7], box.v[3], box.v[4] };
+		box_v[0], box_v[1], box_v[1], box_v[2], box_v[2], box_v[3], box_v[3], box_v[0],
+		box_v[4], box_v[5], box_v[5], box_v[6], box_v[6], box_v[7], box_v[7], box_v[4],
+		box_v[0], box_v[5], box_v[1], box_v[6], box_v[2], box_v[7], box_v[3], box_v[4] };
 	g_engine->m_device3D->DrawDebug( PT_LINE_LIST, 24, &v->x, color );
 }
 

@@ -37,6 +37,7 @@ void app_main_loop( float elpsTime )
 
 		static float timer = 0;
 		timer =  (float)( 0.0003f * sx_os_get_timer() );
+		//timer = 2.0f;
 		
 
 		static float cam_r = 20.0f, cam_p = 0.0f, cam_t = 0.5f;
@@ -91,13 +92,33 @@ void app_main_loop( float elpsTime )
 
 		sx_debug_draw_grid( 10, 0xaaaaaaaa );
 
+		Ray ray = sx_ray( sx_mouse_absx(0), sx_mouse_absy(0), 
+			(float)g_engine->m_device3D->m_viewport.width,
+			(float)g_engine->m_device3D->m_viewport.height,
+			g_engine->m_device3D->GetMatrix(MM_VIEW),
+			g_engine->m_device3D->GetMatrix(MM_PROJECTION));
+
 		AABox box1( -1, 0, -1, 1, 2, 1 );
 		AABox box2( 2, 0, 2, 4, 2, 4 );
 		OBBox box3 = sx_transform( box2, mat );
-		sx_debug_draw_box( box1, 0xffffff00 );
-		sx_debug_draw_box( box3, 0xffffff00 );
+
+		bool intersect = sx_intersect( ray, box1, 10.0f );
+		sx_debug_draw_box( box1, intersect ? 0xffff0000 : 0xffffff00 );
+
+		float3 ipoint, inorm;
+		intersect = sx_intersect( ray, box3, &ipoint, &inorm );
+		sx_debug_draw_box( box3, intersect ? 0xffff0000 : 0xffffff00 );
+
+		if ( intersect )
+		{
+			sx_debug_draw_sphere( Sphere( ipoint, 0.1f ), 0xffaaaaff, 4, 6 );
+			sx_debug_draw_line( ipoint, ipoint + inorm, 0xffaaaaff );
+		}
+
 		sx_debug_draw_box( sx_cover( box1, box3 ), 0xffffffff );
 
+
+#if 0
 		sx_debug_draw_circle( float3( 5, 0, 4 ), 3, 0xffffffff );
 
 		Sphere sph1( -13, 0, -3, 1 );
@@ -106,7 +127,6 @@ void app_main_loop( float elpsTime )
 		sx_debug_draw_sphere( sph2, 0xff00ffff );
 		sx_debug_draw_sphere( sx_cover( sph2, sph1 ), 0xffffffff );
 
-		sx_debug_draw_compass();
 
 		Element e1, e2, eb;
 		e1.CreateVertices( 6 );
@@ -117,26 +137,28 @@ void app_main_loop( float elpsTime )
 		e1.m_pos[4].Set(  50, -50, 0.0f );
 		e1.m_pos[5].Set(  50,  50, 0.0f );
 
-		e2.CreateVertices( 6 );
+		e2.CreateVertices( 3 );
 		e2.m_pos[0].Set(  160, 150, 0.0f );
 		e2.m_pos[1].Set(  60,  150, 0.0f );
 		e2.m_pos[2].Set(  60,  50, 0.0f );
-		e2.m_pos[3].Set(  60,  50, 0.0f );
-		e2.m_pos[4].Set(  160, 50, 0.0f );
-		e2.m_pos[5].Set(  160, 150, 0.0f );
 
 		sx_element_begin_batch();
 		sx_element_add_batch( &e1 );
 		sx_element_add_batch( &e2 );
 		sx_element_end_batch( &eb );
 		sx_debug_draw_gui_element( &eb );
+#endif
+
+		sx_debug_draw_compass();
 
 		g_engine->m_device3D->EndScene();
 
 		g_engine->m_device3D->Present();
 
 		str128 str;
-		str.Format( L"fps : %d - ft : %.2f", g_engine->m_device3D->m_debugInfo.fps, g_engine->m_device3D->m_debugInfo.frameTime );
+		str.Format( L"fps : %d - ft : %.2f - mouse : %d , %d - intersect : %d ", 
+			g_engine->m_device3D->m_debugInfo.fps, g_engine->m_device3D->m_debugInfo.frameTime,
+			int(sx_mouse_absx(0)), int(sx_mouse_absy(0)), intersect );
 		g_engine->m_window->SetTitle( str );
 	}
 #endif

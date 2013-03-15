@@ -532,21 +532,33 @@ SEGAN_ENG_API AABox sx_cover( const AABox& b1, const OBBox& b2 );
 //	ORIENTED BOX
 //////////////////////////////////////////////////////////////////////////
 
+//! extract 8 points of oriented bounding box. the destination pointer must have 8 float3 at least
+SEGAN_INLINE void sx_get_points( float3* dest, const OBBox& box )
+{
+	dest[0] = box.aabox.max;
+	dest[1].Set( box.aabox.min.x, box.aabox.max.y, box.aabox.max.z );
+	dest[2].Set( box.aabox.min.x, box.aabox.min.y, box.aabox.max.z );
+	dest[3].Set( box.aabox.max.x, box.aabox.min.y, box.aabox.max.z );
+	dest[4].Set( box.aabox.max.x, box.aabox.min.y, box.aabox.min.z );
+	dest[5].Set( box.aabox.max.x, box.aabox.max.y, box.aabox.min.z );
+	dest[6].Set( box.aabox.min.x, box.aabox.max.y, box.aabox.min.z );
+	dest[7] = box.aabox.min;
+
+	for ( int i=0; i<8; ++i )
+		sx_transform_point( dest[i], dest[i], box.world );
+}
+
 //! transform AABox to OBBox by matrix mat
 SEGAN_INLINE void sx_transform( OBBox& res, const AABox& box, const matrix& mat )
 {
-	res.SetAABox( box );
-	for ( int i=0; i<8; ++i )
-		sx_transform_point( res.v[i], res.v[i], mat );
+	res.Set( box, mat );
 }
 
 //! transform AABox by matrix mat and return OBBox
 SEGAN_INLINE OBBox sx_transform( const AABox& box, const matrix& mat )
 {
 	OBBox res;
-	res.SetAABox( box );
-	for ( int i=0; i<8; ++i )
-		sx_transform_point( res.v[i], res.v[i], mat );
+	res.Set( box, mat );
 	return res;
 }
 
@@ -568,12 +580,6 @@ fill out outNormal with normal vector of intersection if outNormal be exist
 SEGAN_ENG_API bool sx_intersect( const Ray& ray, const Plane& plane, float3* outPoint = null, float3* outNormal = null );
 
 /*! 
-return true if this ray intersect with Rectangle and fill out outPoint if outPonit be exist and 
-fill out outNormal with normal vector of intersection if outNormal be exist
-*/
-SEGAN_ENG_API bool sx_intersect( const Ray& ray, const float4& rect3d, float3* outPoint = null, float3* outNormal = null );
-
-/*! 
 return true if this ray intersect with Sphere and fill out outPoint if outPonit be exist and 
 fill out outNormal with normal vector of intersection if outNormal be exist
 NOTE: return true if ray be inside of the shape with outPoint=Ray.pos and outNormal=-Ray.dir
@@ -585,7 +591,10 @@ return true if this ray intersect with AABox and fill out outPoint if outPonit b
 fill out outNormal with normal vector of intersection if outNormal be exist
 NOTE: return true if ray be inside of the shape with outPoint=Ray.pos and outNormal=-Ray.dir
 */
-SEGAN_ENG_API bool sx_intersect( const Ray& ray, const AABox& box, float3* outPoint = null, float3* outNormal = null );
+SEGAN_ENG_API bool sx_intersect( const Ray& ray, const AABox& box, float3* outPoint, float3* outNormal );
+
+//! return true if this ray intersect with AABox. use far to limit ray travel distance
+SEGAN_ENG_API bool sx_intersect( const Ray& ray, const AABox& box, const float far = MAXIMUM );
 
 /*! 
 return true if this ray intersect with OBBox and fill out outPoint if outPonit be exist and 

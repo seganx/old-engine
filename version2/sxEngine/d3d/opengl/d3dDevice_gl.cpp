@@ -375,7 +375,7 @@ SEGAN_INLINE void d3dDevice_gl::SetViewport( const d3dViewport* viewport )
 	m_viewport = *viewport;
 }
 
-SEGAN_INLINE void d3dDevice_gl::SetMatrix( const d3dMatrixMode mode, const float* _matrix )
+SEGAN_INLINE void d3dDevice_gl::SetMatrix( const d3dMatrixMode mode, const matrix& _matrix )
 {
 	switch ( mode )
 	{
@@ -406,16 +406,15 @@ SEGAN_INLINE void d3dDevice_gl::SetMatrix( const d3dMatrixMode mode, const float
 	}
 }
 
-SEGAN_INLINE const float* d3dDevice_gl::GetMatrix( const d3dMatrixMode mode )
+SEGAN_INLINE const matrix& d3dDevice_gl::GetMatrix( const d3dMatrixMode mode )
 {
-	float* res = null;
 	switch ( mode )
 	{
-	case MM_WORLD:			res = &m_world.m00;			break;
-	case MM_VIEW:			res = &m_view.m00;			break;
-	case MM_PROJECTION:		res = &m_projection.m00;	break;
+	case MM_WORLD:			return m_world;
+	case MM_VIEW:			return m_view;
+	case MM_PROJECTION:		return m_projection;
 	}
-	return res;
+	return m_world;
 }
 
 void d3dDevice_gl::SetRenderState( const d3dRenderState type, const uint mode )

@@ -34,15 +34,20 @@ WindowRect window_get_rect( handle windowHandle )
 
 	WINDOWINFO winfo;
 	GetWindowInfo( hWnd, &winfo );
-	sint iW = (winfo.rcClient.left - winfo.rcWindow.left) + (winfo.rcWindow.right - winfo.rcClient.right);
-	sint iH = (winfo.rcClient.top  - winfo.rcWindow.top)  + (winfo.rcWindow.bottom - winfo.rcClient.bottom);
 
-	RECT prc;
-	GetWindowRect( hWnd, &prc );
-	curRect.left	= prc.left + iW / 2;
-	curRect.top		= prc.top + iH / 2;
-	curRect.width	= prc.right - prc.left - iW;
-	curRect.height	= prc.bottom - prc.top - iH;
+	curRect.left = winfo.rcClient.left;
+	curRect.top = winfo.rcClient.top;
+	curRect.width = winfo.rcWindow.right - winfo.rcClient.left - winfo.cxWindowBorders;
+	curRect.height = winfo.rcWindow.bottom - winfo.rcClient.top - winfo.cyWindowBorders;
+//	sint iW = (winfo.rcClient.left - winfo.rcWindow.left) + (winfo.rcWindow.right - winfo.rcClient.right);
+//	sint iH = (winfo.rcClient.top  - winfo.rcWindow.top)  + (winfo.rcWindow.bottom - winfo.rcClient.bottom);
+
+//	RECT prc;
+//	GetWindowRect( hWnd, &prc );
+// 	curRect.left	= prc.left + iW / 2;
+// 	curRect.top		= prc.top + iH / 2;
+// 	curRect.width	= prc.right - prc.left - iW;
+// 	curRect.height	= prc.bottom - prc.top - iH;
 
 	return curRect;
 }

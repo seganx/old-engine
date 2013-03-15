@@ -659,17 +659,21 @@ SEGAN_INLINE void sx_cover( Sphere& res, const Sphere& s1, const Sphere& s2 )
 //////////////////////////////////////////////////////////////////////////
 SEGAN_INLINE AABox sx_cover( const AABox& b1, const OBBox& b2 )
 {
+	float3 v[8];
+	sx_get_points( v, b2 );
+
 	AABox res( MAXIMUM, MAXIMUM, MAXIMUM, -MAXIMUM, -MAXIMUM, -MAXIMUM );
 	for( int i = 0; i < 8; ++i )
 	{
-		if ( res.x1 > b2.v[i].x ) res.x1 = b2.v[i].x;
-		if ( res.y1 > b2.v[i].y ) res.y1 = b2.v[i].y;
-		if ( res.z1 > b2.v[i].z ) res.z1 = b2.v[i].z;
+		if ( res.x1 > v[i].x ) res.x1 = v[i].x;
+		if ( res.y1 > v[i].y ) res.y1 = v[i].y;
+		if ( res.z1 > v[i].z ) res.z1 = v[i].z;
 
-		if ( res.x2 < b2.v[i].x ) res.x2 = b2.v[i].x;
-		if ( res.y2 < b2.v[i].y ) res.y2 = b2.v[i].y;
-		if ( res.z2 < b2.v[i].z ) res.z2 = b2.v[i].z;
+		if ( res.x2 < v[i].x ) res.x2 = v[i].x;
+		if ( res.y2 < v[i].y ) res.y2 = v[i].y;
+		if ( res.z2 < v[i].z ) res.z2 = v[i].z;
 	}
+
 	return AABox(
 		sx_min_f( b1.x1, res.x1 ),
 		sx_min_f( b1.y1, res.y1 ),
@@ -687,8 +691,6 @@ SEGAN_INLINE AABox sx_cover( const AABox& b1, const OBBox& b2 )
 SEGAN_INLINE Ray sx_ray( const float x, const float y, const float width, const float height, const matrix& view, const matrix& proj )
 {
 	/*	code from "Keith Ditchburn" (www.toymaker.info/Games/html/picking.html)	*/
-	Ray res;
-
 	float3 v;
 	v.x =  ( ( ( 2.0f * x ) / width  ) - 1.0f ) / proj.m00;
 	v.y = -( ( ( 2.0f * y ) / height ) - 1.0f ) / proj.m11;
@@ -698,23 +700,24 @@ SEGAN_INLINE Ray sx_ray( const float x, const float y, const float width, const 
 	sx_inverse( m, view );
 
 	// Transform the screen space pick ray into 3D space
-	sx_transform_normal( res.m_dir, v, m );
-	res.m_pos.Set( m.m30, m.m31, m.m32 );
-	res.m_dir.Normalize();
+	float3 dir;
+	sx_transform_normal( dir, v, m );
+	dir.Normalize();
+	return Ray( float3( m.m30, m.m31, m.m32 ), dir );
 }
 
 SEGAN_INLINE Ray sx_transform( const Ray& ray, const matrix& mat )
 {
 	matrix m = sx_inverse( mat );
-	return Ray( sx_transform_point( ray.m_pos, m ), sx_transform_normal( ray.m_dir, m ) );
+	return Ray( sx_transform_point( ray.pos, m ), sx_transform_normal( ray.dir, m ) );
 }
 
-SEGAN_INLINE bool sx_intersect( const Ray& ray, const Plane& plane, float3* outPoint = null, float3* outNormal = null )
+SEGAN_INLINE bool sx_intersect( const Ray& ray, const Plane& plane, float3* outPoint /*= null*/, float3* outNormal /*= null*/ )
 {
 	// code from : www.bandedsoftware.com/hexgear/concepts/tutorials/ray/ray.html
 
 	float3 n( plane.a, plane.b, plane.c );
-	float d = sx_dot( n, ray.m_dir );
+	float d = sx_dot( n, ray.dir );
 
 	if ( d >= EPSILON )
 	{
@@ -724,8 +727,8 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const Plane& plane, float3* outP
 	{
 		if ( outPoint )
 		{
-			float amount = - sx_distance( plane, ray.m_pos ) / d;
-			*outPoint = ray.m_pos + ray.m_dir * amount;
+			float amount = - sx_distance( plane, ray.pos ) / d;
+			*outPoint = ray.pos + ray.dir * amount;
 		}
 
 		if ( outNormal )
@@ -737,13 +740,13 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const Plane& plane, float3* outP
 	}	
 }
 
-SEGAN_INLINE bool sx_intersect( const Ray& ray, const Sphere& sphere, float3* outPoint = null, float3* outNormal = null )
+SEGAN_INLINE bool sx_intersect( const Ray& ray, const Sphere& sphere, float3* outPoint /*= null*/, float3* outNormal /*= null*/ )
 {
 	/*	code from "Tuomas Tonteri" ( www.sci.tuomastonteri.fi/programming/sse/example3 )	*/
 
-	float a = sx_length_sqr( ray.m_dir );
-	float b = 2.0f * ray.m_dir * ( ray.m_pos - sphere.center );
-	float c = sx_length_sqr( sphere.center ) + sx_length_sqr( ray.m_pos ) - 2.0f * sx_dot( ray.m_pos, sphere.center ) - sphere.r * sphere.r;
+	float a = sx_length_sqr( ray.dir );
+	float b = sx_dot( ray.dir, ray.pos - sphere.center ) * 2.0f;
+	float c = sx_length_sqr( sphere.center ) + sx_length_sqr( ray.pos ) - 2.0f * sx_dot( ray.pos, sphere.center ) - sphere.r * sphere.r;
 	float D = b * b - 4.0f * a * c;
 
 	// If ray can not intersect then stop
@@ -754,25 +757,25 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const Sphere& sphere, float3* ou
 	float t = - 0.5f * ( b + D ) / a;
 	if ( t > 0.0f )
 	{
-		float3 p = ray.m_pos + t * ray.m_dir;
+		float3 p = ray.pos + ray.dir * t;
 		if (outPoint)	*outPoint = p;
 		if (outNormal)	*outNormal = ( p - sphere.center ) / sphere.r;		
 	}
 	else
 	{
-		if (outPoint)	*outPoint = ray.m_pos;
-		if (outNormal)	*outNormal = - ray.m_dir;
+		if (outPoint)	*outPoint = ray.pos;
+		if (outNormal)	*outNormal = - ray.dir;
 	}
 
 	return true;
 }
 
-SEGAN_INLINE bool sx_intersect( const Ray& ray, const AABox& aabox, float3* outPoint = null, float3* outNormal = null )
+SEGAN_INLINE bool sx_intersect( const Ray& ray, const AABox& aabox, float3* outPoint, float3* outNormal )
 {
 	/*	code from "Sepehr Taghdissian" ( www.hmrEngine.com - sep.tagh@gmail.com )	*/
 
-	float3 pos = ray.m_pos;
-	float3 dir = ray.m_dir;
+	float3 pos = ray.pos;
+	float3 dir = ray.dir;
 	AABox  box = aabox;
 
 	// Check for point inside box, trivial reject, and determine parametric
@@ -781,8 +784,7 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const AABox& aabox, float3* outP
 	bool inside = true;
 
 	float xt, xn;
-	if ( pos.x < box.min.x )
-	{
+	if ( pos.x < box.min.x ) {
 		xt = box.min.x - pos.x;
 		xt /= dir.x;
 		inside = false;
@@ -829,14 +831,14 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const AABox& aabox, float3* outP
 	// Inside box?
 	if ( inside ) 
 	{
-		if ( outPoint )	*outPoint = pos;
+		if ( outPoint )		*outPoint = pos;
 		if ( outNormal )	*outNormal = - dir;
 		return true;
 	}
 
 	// Select farthest Plane - this is
 	// the Plane of intersection.
-	int which = 0;
+	sint which = 0;
 	float t = xt;
 	if ( yt > t ) {
 		which = 1;
@@ -880,19 +882,52 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const AABox& aabox, float3* outP
 			} break;
 	}
 
-	if ( outPoint ) *outPoint = pos + t * dir;
+	if ( outPoint ) *outPoint = pos + dir * t;
 
 	return true;
 }
 
-SEGAN_INLINE bool sx_intersect( const Ray& ray, const OBBox& box, float3* outPoint = null, float3* outNormal = null )
+SEGAN_ENG_API bool sx_intersect( const Ray& ray, const AABox& box, const float far /*= MAXIMUM */ )
 {
-
+#if SEGAN_MATH_SIMD
+	return sse_aabox_intersect( ray, box, far );
+#else
+	//	improved Smits’ method : http://cag.csail.mit.edu/~amy/papers/box-jgt.pdf
+	//	improved by SeganX to use in BVH scene manager
+	bool res = false;
+	float tmin  = ( box.bounds[ray.sign[0]].x		- ray.pos.x ) * ray.dirInv.x;
+	float tmax  = ( box.bounds[1 - ray.sign[0]].x	- ray.pos.x ) * ray.dirInv.x;
+	float tymin = ( box.bounds[ray.sign[1]].y		- ray.pos.y ) * ray.dirInv.y;
+	float tymax = ( box.bounds[1 - ray.sign[1]].y	- ray.pos.y ) * ray.dirInv.y;
+	if ( tmin < tymax && tymin < tmax )
+	{
+		if ( tymin > tmin ) tmin = tymin;
+		if ( tymax < tmax )	tmax = tymax;
+		float tzmin = ( box.bounds[ray.sign[2]].z		- ray.pos.z ) * ray.dirInv.z;
+		float tzmax = ( box.bounds[1 - ray.sign[2]].z	- ray.pos.z ) * ray.dirInv.z;
+		if ( tmin < tzmax && tzmin < tmax )
+		{
+			if ( tzmin > tmin ) tmin = tzmin;
+			if ( tzmax < tmax ) tmax = tzmax;
+			res = ( tmax > 0 && tmin < far );
+		}
+	}
+	return res;
+#endif
 }
 
-SEGAN_INLINE bool sx_intersect( const Ray& ray, const float3& v0, const float3& v1, const float3& v2, float3* outPoint = null, float3* outNormal = null )
+SEGAN_INLINE bool sx_intersect( const Ray& ray, const OBBox& box, float3* outPoint /*= null*/, float3* outNormal /*= null*/ )
 {
+	Ray r = sx_transform( ray, box.world );
+	bool res = sx_intersect( r, box.aabox, outPoint, outNormal );
+	if ( outPoint ) sx_transform_point( *outPoint, *outPoint, box.world );
+	if ( outNormal ) sx_transform_normal( *outNormal, *outNormal, box.world );
+	return res;
+}
 
+SEGAN_INLINE bool sx_intersect( const Ray& ray, const float3& v0, const float3& v1, const float3& v2, float3* outPoint /*= null*/, float3* outNormal /*= null*/ )
+{
+	return false;
 }
 
 
@@ -950,6 +985,9 @@ SEGAN_INLINE bool sx_intersect( const AABox& box, const Frustum& fr )
 
 SEGAN_INLINE bool sx_intersect( const OBBox& box, const Frustum& fr )
 {
+	float3 v[8];
+	sx_get_points( v, box );
+
 	// check the visibility via intersect between box and frustum
 	bool result = true;
 	for (int i=0; i<6 && result; i++)
@@ -957,7 +995,7 @@ SEGAN_INLINE bool sx_intersect( const OBBox& box, const Frustum& fr )
 		result = false;
 		for (int j=0; j<8; j++)
 		{
-			if ( sx_distance( fr.p[i], box.v[j] ) >= 0 )
+			if ( sx_distance( fr.p[i], v[j] ) >= 0 )
 			{
 				result = true;
 				break;

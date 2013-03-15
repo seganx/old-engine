@@ -328,37 +328,36 @@ SEGAN_INLINE void d3dDevice_dx::SetViewport( const d3dViewport* viewport )
 	m_device3D->SetViewport( &vp );
 }
 
-void d3dDevice_dx::SetMatrix( const d3dMatrixMode mode, const float* matrix )
+void d3dDevice_dx::SetMatrix( const d3dMatrixMode mode, const matrix& _matrix )
 {
 	switch ( mode )
 	{
 	case MM_WORLD:
-		m_world = matrix;
+		m_world = _matrix;
 		m_device3D->SetTransform( D3DTS_WORLD, (D3DMATRIX*)&m_world );
 		break;
 
 	case MM_VIEW:
-		m_view = matrix;
+		m_view = _matrix;
 		m_device3D->SetTransform( D3DTS_VIEW, (D3DMATRIX*)&m_view );
 		break;
 
 	case MM_PROJECTION:
-		m_projection = matrix;
+		m_projection = _matrix;
 		m_device3D->SetTransform( D3DTS_PROJECTION, (D3DMATRIX*)&m_projection );
 		break;
 	}
 }
 
-const float* d3dDevice_dx::GetMatrix( const d3dMatrixMode mode )
+const matrix& d3dDevice_dx::GetMatrix( const d3dMatrixMode mode )
 {
-	float* res = null;
 	switch ( mode )
 	{
-	case MM_WORLD:			res = &m_world.m00;			break;
-	case MM_VIEW:			res = &m_view.m00;			break;
-	case MM_PROJECTION:		res = &m_projection.m00;	break;
+	case MM_WORLD:			return m_world;
+	case MM_VIEW:			return m_view;
+	case MM_PROJECTION:		return m_projection;
 	}
-	return res;
+	return m_world;
 }
 
 void d3dDevice_dx::SetRenderState( const d3dRenderState type, const uint mode )

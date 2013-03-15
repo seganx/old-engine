@@ -354,8 +354,8 @@ SEGAN_INLINE void sse_matrix_transpose( matrix* res, const matrix* mat )
 
 SEGAN_INLINE void sse_matrix_setrotate_pyr( matrix* mat, const float pitch, const float yaw, const float roll )
 {
-	float pyr[4] = { pitch, yaw, roll, 0.0f };
-	__m128 angles = _mm_loadu_ps( pyr );
+	SEGAN_ALIGN_16 float pyr[4] = { pitch, yaw, roll, 0.0f };
+	__m128 angles = _mm_load_ps( pyr );
 
 	__m128 s, c;
 	sincosf4( angles, &s, &c );
@@ -364,7 +364,7 @@ SEGAN_INLINE void sse_matrix_setrotate_pyr( matrix* mat, const float pitch, cons
 	__m128 Z0 = _mm_unpackhi_ps( c, s );
 	__m128 Z1 = _mm_unpackhi_ps( negS, c );
 
-	__declspec(align(16)) unsigned int select_xyz[4] = {0xffffffff, 0xffffffff, 0xffffffff, 0};
+	SEGAN_ALIGN_16 unsigned int select_xyz[4] = {0xffffffff, 0xffffffff, 0xffffffff, 0};
 	Z1 = _mm_and_ps( Z1, _mm_loadu_ps( (float *)select_xyz ) );
 
 	__m128 Y0 = _mm_shuffle_ps( c, negS, _MM_SHUFFLE(0,1,1,1) );
@@ -389,12 +389,12 @@ SEGAN_INLINE void sse_matrix_scale( matrix* mat, const float x, const float y, c
 
 SEGAN_INLINE void sse_matrix_transform_norm( float* dest, const float* src, const matrix* mat )
 {
-	__declspec(align(16)) const float vsrc[4] = { src[0], src[1], src[2], 0.0f };
+	SEGAN_ALIGN_16 const float vsrc[4] = { src[0], src[1], src[2], 0.0f };
 	__m128 vec = _mm_load_ps( vsrc );
 	__m128 row0 = _mm_loadu_ps( mat->m[0] );
 	__m128 row1 = _mm_loadu_ps( mat->m[1] );
 	__m128 row2 = _mm_loadu_ps( mat->m[2] );	
-	__declspec(align(16)) float vdst[4];
+	SEGAN_ALIGN_16 float vdst[4];
 	_mm_store_ps( vdst, 
 		_mm_add_ps(
 		_mm_add_ps(
@@ -407,13 +407,13 @@ SEGAN_INLINE void sse_matrix_transform_norm( float* dest, const float* src, cons
 
 SEGAN_INLINE void sse_matrix_transform_point( float* dest, const float* src, const matrix* mat )
 {
-	__declspec(align(16)) const float vsrc[4] = { src[0], src[1], src[2], 0.0f };
+	SEGAN_ALIGN_16 const float vsrc[4] = { src[0], src[1], src[2], 0.0f };
 	__m128 vec = _mm_load_ps( vsrc );
 	__m128 row0 = _mm_loadu_ps( mat->m[0] );
 	__m128 row1 = _mm_loadu_ps( mat->m[1] );
 	__m128 row2 = _mm_loadu_ps( mat->m[2] );
 	__m128 row3 = _mm_loadu_ps( mat->m[3] );
-	__declspec(align(16)) float vdst[4];
+	SEGAN_ALIGN_16 float vdst[4];
 	_mm_store_ps( vdst, 
 		_mm_add_ps(
 		_mm_add_ps(
@@ -443,8 +443,51 @@ SEGAN_INLINE void sse_quat_mul( quat* res, const quat* quat0, const quat* quat1 
 	__m128 qw = vec_nmsub( l_wxyz, r_wxyz, product );
 	__m128 xy = vec_madd( l_wxyz, r_wxyz, product );
 	qw = _mm_sub_ps( qw, _mm_ror_ps( xy, 2 ) );
-	__declspec(align(16)) unsigned int sw[4] = { 0, 0, 0, 0xffffffff };
+	SEGAN_ALIGN_16 unsigned int sw[4] = { 0, 0, 0, 0xffffffff };
 	_mm_storeu_ps( res->e, vec_sel( qv, qw, sw ) );
+}
+
+SEGAN_INLINE bool sse_aabox_intersect( const Ray& ray, const AABox& box, const float far )
+{
+	//	code from : www.flipcode.com/archives/SSE_RayBox_Intersection_Test.shtml
+	const __m128 tmax = _mm_set_ps1( far );
+	const __m128 tmin = _mm_setzero_ps();
+
+	// use whatever's appropriate to load.
+	const __m128 box_min	= _mm_setr_ps( box.min.z, box.min.y, box.min.x, 0.0f );
+	const __m128 box_max	= _mm_setr_ps( box.max.z, box.max.y, box.max.x, 0.0f );
+	const __m128 pos		= _mm_setr_ps( ray.pos.z, ray.pos.y, ray.pos.x, 0.0f );
+	const __m128 inv_dir	= _mm_setr_ps( ray.dirInv.z, ray.dirInv.y, ray.dirInv.x, 0.0f );
+
+	// use a div if inverted directions aren't available
+	const __m128 l1 = _mm_mul_ps( _mm_sub_ps(box_min, pos), inv_dir );
+	const __m128 l2 = _mm_mul_ps( _mm_sub_ps(box_max, pos), inv_dir );
+
+	// the order we use for those min/max is vital to filter out
+	// NaNs that happens when an inv_dir is +/- inf and
+	// (box_min - pos) is 0. inf * 0 = NaN
+	const __m128 filtered_l1a = _mm_min_ps( l1, tmax );
+	const __m128 filtered_l2a = _mm_min_ps( l2, tmax );
+
+	const __m128 filtered_l1b = _mm_max_ps( l1, tmin );
+	const __m128 filtered_l2b = _mm_max_ps( l2, tmin );
+
+	// now that we're back on our feet, test those slabs.
+	__m128 lmax = _mm_max_ps( filtered_l1a, filtered_l2a );
+	__m128 lmin = _mm_min_ps( filtered_l1b, filtered_l2b );
+
+	// unfold back. try to hide the latency of the shufps & co.
+	const __m128 lmax0 = _mm_shuffle_ps( lmax, lmax, 0x39 );
+	const __m128 lmin0 = _mm_shuffle_ps( lmin, lmin, 0x39 );
+	lmax = _mm_min_ss( lmax, lmax0 );
+	lmin = _mm_max_ss( lmin, lmin0 );
+
+	const __m128 lmax1 = _mm_movehl_ps( lmax, lmax );
+	const __m128 lmin1 = _mm_movehl_ps( lmin, lmin );
+	lmax = _mm_min_ss( lmax, lmax1 );
+	lmin = _mm_max_ss( lmin, lmin1 );
+
+	return ( _mm_comige_ss( lmax, tmin ) & _mm_comige_ss( lmax, lmin ) ) > 0;
 }
 
 #endif	//	GUARD_Math_SSE_HEADER_FILE

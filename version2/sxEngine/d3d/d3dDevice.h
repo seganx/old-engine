@@ -375,10 +375,10 @@ public:
 	virtual void SetViewport( const d3dViewport* viewport ) = 0;
 
 	//! set matrix
-	virtual void SetMatrix( const d3dMatrixMode mode, const float* _matrix ) = 0;
+	virtual void SetMatrix( const d3dMatrixMode mode, const matrix& _matrix ) = 0;
 
 	//! return selected matrix
-	virtual const float* GetMatrix( const d3dMatrixMode mode ) = 0;
+	virtual const matrix& GetMatrix( const d3dMatrixMode mode ) = 0;
 
 	//! set render state
 	virtual void SetRenderState( const d3dRenderState type, const uint mode ) = 0;

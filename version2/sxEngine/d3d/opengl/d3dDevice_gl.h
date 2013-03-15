@@ -65,9 +65,9 @@ public:
 	
 	virtual void SetViewport( const d3dViewport* viewport );
 
-	virtual void SetMatrix( const d3dMatrixMode mode, const float* _matrix );
+	virtual void SetMatrix( const d3dMatrixMode mode, const matrix& _matrix );
 
-	virtual const float* GetMatrix( const d3dMatrixMode mode );
+	virtual const matrix& GetMatrix( const d3dMatrixMode mode );
 	
 	virtual void SetRenderState( const d3dRenderState type, const uint mode );
 
