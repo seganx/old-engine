@@ -33,6 +33,7 @@ void app_main_loop( float elpsTime )
 	if ( g_engine->m_device3D && g_engine->m_device3D->BeginScene() )
 	{
 		matrix mat = sx_perspective_fov( PI / 3.0f, (float)g_engine->m_device3D->m_viewport.height / (float)g_engine->m_device3D->m_viewport.width, 0.5f, 1000.0f );
+		//matrix mat = sx_orthographic( (float)g_engine->m_device3D->m_viewport.width, (float)g_engine->m_device3D->m_viewport.height, -1000, 1000.0f );
 		g_engine->m_device3D->SetMatrix( MM_PROJECTION, mat );
 
 		static float timer = 0;
@@ -92,33 +93,24 @@ void app_main_loop( float elpsTime )
 
 		sx_debug_draw_grid( 10, 0xaaaaaaaa );
 
+		sx_debug_draw_line( float3(0,2,0), float3(100,2,0), 0xffff0000 );
+
 		Ray ray = sx_ray( sx_mouse_absx(0), sx_mouse_absy(0), 
 			(float)g_engine->m_device3D->m_viewport.width,
 			(float)g_engine->m_device3D->m_viewport.height,
 			g_engine->m_device3D->GetMatrix(MM_VIEW),
 			g_engine->m_device3D->GetMatrix(MM_PROJECTION));
 
-		uiElement e1, e2, eb;
-		e1.CreateVertices( 6 );
-		e1.m_pos[0].Set(  50,  50, 0.0f );
-		e1.m_pos[1].Set( -50,  50, 0.0f );
-		e1.m_pos[2].Set( -50, -50, 0.0f );
-		e1.m_pos[3].Set( -50, -50, 0.0f );
-		e1.m_pos[4].Set(  50, -50, 0.0f );
-		e1.m_pos[5].Set(  50,  50, 0.0f );
-
-		e2.CreateVertices( 3 );
-		e2.m_pos[0].Set(  160, 150, 0.0f );
-		e2.m_pos[1].Set(  60,  150, 0.0f );
-		e2.m_pos[2].Set(  60,  50, 0.0f );
-
-		g_engine->m_deviceUI->BeginBatchElements( 0, 2 );
-		g_engine->m_deviceUI->AddBatchElements( &e1 );
-		g_engine->m_deviceUI->AddBatchElements( &e2 );
-		g_engine->m_deviceUI->EndBatchElements( &eb );
-		sx_debug_draw_gui_element( &eb );
-
 		sx_debug_draw_compass();
+
+		uiPanel panel1, panel2;
+		panel1.SetSize( 200.0f, 50.0f );
+		panel2.SetSize( 100.0f, 30.0f );
+ 		g_engine->m_gui->Add( &panel1 );
+ 		g_engine->m_gui->Add( &panel2 );
+ 		g_engine->m_gui->Draw_topleft( 0 );
+ 		g_engine->m_gui->Remove( &panel2 );
+ 		g_engine->m_gui->Remove( &panel1 );
 
 		g_engine->m_device3D->EndScene();
 

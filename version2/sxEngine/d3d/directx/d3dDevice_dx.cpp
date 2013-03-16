@@ -3,6 +3,18 @@
 #include "../../system/System.h"
 
 
+const D3DPRIMITIVETYPE dxPrimitiveTypes[] =
+{
+	D3DPT_POINTLIST,
+	D3DPT_LINELIST,
+	D3DPT_LINESTRIP,
+	D3DPT_TRIANGLELIST,
+	D3DPT_TRIANGLESTRIP,
+	D3DPT_TRIANGLEFAN,
+	D3DPT_TRIANGLELIST	//	as QUAD
+};
+
+
 const D3DVERTEXELEMENT9 SeganVrtxDecl[] = {
 	{0, 0,	D3DDECLTYPE_FLOAT3,		D3DDECLMETHOD_DEFAULT,	D3DDECLUSAGE_POSITION,		0 },
 
@@ -38,14 +50,11 @@ d3dDevice_dx::d3dDevice_dx( void )
 : d3dDevice()
 , m_direct3D(0)
 , m_device3D(0)
-, m_rs_zEnabled(true)
-, m_rs_zWritable(true)
-, m_rs_culling(true)
-, m_rs_alphaBlend(false)
-, m_rs_Anisotropy(false)
-, m_rs_wireFrame(false)
-, m_rs_fog(false)
-
+, m_rs_zenable(true)
+, m_rs_zwrite(true)
+, m_rs_cull(SX_CULL_CCW)
+, m_rs_alpha(SX_ALPHA_OFF)
+, m_rs_fill(true)
 {
 	ZeroMemory( &m_initData, sizeof(m_initData) );
 }
@@ -362,7 +371,88 @@ const matrix& d3dDevice_dx::GetMatrix( const d3dMatrixMode mode )
 
 void d3dDevice_dx::SetRenderState( const d3dRenderState type, const uint mode )
 {
+	switch ( type )
+	{
+	case RS_ALPHA:
+		if ( mode != m_rs_alpha )
+		{
+			switch ( mode )
+			{
+			case SX_ALPHA_BLEND:
+				m_device3D->SetRenderState( D3DRS_SRCBLEND,			D3DBLEND_SRCALPHA );
+				m_device3D->SetRenderState( D3DRS_DESTBLEND,		D3DBLEND_INVSRCALPHA );
+				m_device3D->SetRenderState( D3DRS_BLENDOP,			D3DBLENDOP_ADD );
+				m_device3D->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+				break;
 
+			case SX_ALPHA_ADD:
+				m_device3D->SetRenderState( D3DRS_SRCBLEND,			D3DBLEND_SRCALPHA );
+				m_device3D->SetRenderState( D3DRS_DESTBLEND,		D3DBLEND_ONE );
+				m_device3D->SetRenderState( D3DRS_BLENDOP,			D3DBLENDOP_ADD );
+				m_device3D->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+				break;
+
+			case SX_ALPHA_SUB:
+				m_device3D->SetRenderState( D3DRS_SRCBLEND,			D3DBLEND_SRCALPHA );
+				m_device3D->SetRenderState( D3DRS_DESTBLEND,		D3DBLEND_ONE );
+				m_device3D->SetRenderState( D3DRS_BLENDOP,			D3DBLENDOP_REVSUBTRACT );
+				m_device3D->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+				break;
+
+			case SX_ALPHA_OFF:
+				m_device3D->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
+				break;
+			}
+			m_rs_alpha = mode;
+		}
+		break;
+
+	case RS_CULL:
+		if ( mode != m_rs_cull )
+		{
+			switch ( mode )
+			{
+			case SX_CULL_CCW:	m_device3D->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );	break;
+			case SX_CULL_CW:	m_device3D->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );	break;
+			case SX_CULL_OFF:	m_device3D->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );	break;
+			}
+			m_rs_cull = mode;
+		}
+		break;
+
+	case RS_FILL:
+		if ( mode != m_rs_fill )
+		{
+			if ( mode )
+				m_device3D->SetRenderState( D3DRS_FILLMODE, D3DFILL_SOLID );
+			else
+				m_device3D->SetRenderState( D3DRS_FILLMODE, D3DFILL_WIREFRAME );
+			m_rs_fill = mode;
+		}
+		break;
+
+	case RS_ZENABLE:
+		if ( mode != m_rs_zenable )
+		{
+			if ( mode )
+				m_device3D->SetRenderState( D3DRS_ZENABLE, TRUE );
+			else
+				m_device3D->SetRenderState( D3DRS_ZENABLE, FALSE );
+			m_rs_zenable = mode;
+		}
+		break;
+
+	case RS_ZWRITE:
+		if ( mode != m_rs_zwrite )
+		{
+			if ( mode )
+				m_device3D->SetRenderState( D3DRS_ZWRITEENABLE, TRUE );
+			else
+				m_device3D->SetRenderState( D3DRS_ZWRITEENABLE, FALSE );
+			m_rs_zwrite = mode;
+		}
+		break;
+	}
 }
 
 uint d3dDevice_dx::GetRenderState( const d3dRenderState type )
@@ -382,7 +472,26 @@ void d3dDevice_dx::DrawIndexedPrimitive( const d3dPrimitiveType primType, const 
 
 void d3dDevice_dx::DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const dword color )
 {
+	D3DMATERIAL9 mtl; ZeroMemory( &mtl, sizeof(mtl) );
+	mtl.Ambient = D3DXCOLOR(color);
+	mtl.Diffuse = mtl.Ambient;
+	m_device3D->SetMaterial( &mtl );
 
+	uint primCount = 0;
+	switch ( primType )
+	{
+	case PT_POINT:			primCount = vertxcount;			break;
+	case PT_LINE_LIST:		primCount = vertxcount / 2;		break;
+	case PT_LINE_STRIP:		primCount = vertxcount - 1;		break;
+	case PT_TRIANGLE_LIST:	primCount = vertxcount / 3;		break;
+	case PT_TRIANGLE_STRIP:	primCount = vertxcount - 2;		break;
+	case PT_TRIANGLE_FAN:	primCount = vertxcount - 2;		break;
+	case PT_QUAD_LIST:		primCount = vertxcount / 3;		break;
+	}
+
+	m_device3D->SetRenderState( D3DRS_FILLMODE, D3DFILL_WIREFRAME );
+	m_device3D->DrawPrimitiveUP( dxPrimitiveTypes[primType], primCount, vertices, sizeof(float3) );
+	m_device3D->SetRenderState( D3DRS_FILLMODE, D3DFILL_SOLID );
 }
 
 bool d3dDevice_dx::BeginScene( void )
@@ -415,16 +524,6 @@ bool d3dDevice_dx::BeginScene( void )
 void d3dDevice_dx::EndScene( void )
 {
 	sx_assert( m_device3D );
-
-	{
-		D3DMATERIAL9 mtl; ZeroMemory( &mtl, sizeof(mtl) );
-		mtl.Ambient = D3DXCOLOR( 0.5f, 0, 0.5f, 1.0f );
-		mtl.Diffuse = mtl.Ambient;
-		m_device3D->SetMaterial( &mtl );
-		float vx[9] = { 1, 1, 5, 2, 1, 5, 2, 2, 5 };	
-		m_device3D->DrawPrimitiveUP( D3DPT_LINESTRIP, 2, &vx, 12);
-	}
-
 	m_device3D->EndScene();
 }
 
@@ -458,30 +557,6 @@ void d3dDevice_dx::ClearScreen( const dword bgcolor )
 	sx_assert( m_device3D );
 
 	m_device3D->Clear( 0, null, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, bgcolor, 1.0f, 0 );
-
-	D3DMATERIAL9 mtl; ZeroMemory( &mtl, sizeof(mtl) );
-	{
-		mtl.Ambient = D3DXCOLOR(1, 0, 0, 1);
-		mtl.Diffuse = mtl.Ambient;
-		m_device3D->SetMaterial( &mtl );
-		float vx[6] = { 2, 0, 0, -1, 0, 0 };	
-		m_device3D->DrawPrimitiveUP( D3DPT_LINESTRIP, 1, &vx, 12);
-	}
-	{
-		mtl.Ambient = D3DXCOLOR(0, 1, 0, 1);
-		mtl.Diffuse = mtl.Ambient;
-		m_device3D->SetMaterial( &mtl );
-		float vx[6] = { 0, 2, 0, 0, -1, 0 };	
-		m_device3D->DrawPrimitiveUP( D3DPT_LINESTRIP, 1, &vx, 12);
-	}
-	{
-		mtl.Ambient = D3DXCOLOR(0, 0, 1, 1);
-		mtl.Diffuse = mtl.Ambient;
-		m_device3D->SetMaterial( &mtl );
-		float vx[6] = { 0, 0, 2, 0, 0, -1 };	
-		m_device3D->DrawPrimitiveUP( D3DPT_LINESTRIP, 1, &vx, 12);
-	}
-
 }
 
 void d3dDevice_dx::ClearTarget( const dword bgcolor )
@@ -620,13 +695,11 @@ void d3dDevice_dx::ResetStates( void )
 {
 	sx_assert( m_device3D );
 
-	m_rs_zEnabled		= true;
-	m_rs_zWritable		= true;
-	m_rs_culling		= true;
-	m_rs_alphaBlend		= false;
-	m_rs_Anisotropy		= false;
-	m_rs_wireFrame		= false;
-	m_rs_fog			= false;
+	m_rs_zenable		= true;
+	m_rs_zwrite			= true;
+	m_rs_cull			= SX_CULL_CCW;
+	m_rs_alpha			= SX_ALPHA_OFF;
+	m_rs_fill			= true;
 
 	m_world.Identity();
 	m_view.Identity();
@@ -640,7 +713,7 @@ void d3dDevice_dx::ResetStates( void )
 		// render state initialization
 		m_device3D->SetRenderState( D3DRS_ZENABLE,					TRUE );
 		m_device3D->SetRenderState( D3DRS_ZWRITEENABLE,				TRUE );
-		m_device3D->SetRenderState( D3DRS_CULLMODE,					D3DCULL_CCW );
+		m_device3D->SetRenderState( D3DRS_CULLMODE,					D3DCULL_CW );
 		m_device3D->SetRenderState( D3DRS_ALPHABLENDENABLE,			FALSE );
 		m_device3D->SetRenderState( D3DRS_FILLMODE,					D3DFILL_SOLID );
 		m_device3D->SetRenderState( D3DRS_FOGENABLE,				FALSE );
@@ -690,8 +763,6 @@ void d3dDevice_dx::SetIndexBuffer( const d3dIndexBuffer* indexBuffer )
 }
 
 
-
-
 //////////////////////////////////////////////////////////////////////////
 //	other implementations
 //////////////////////////////////////////////////////////////////////////
@@ -721,7 +792,7 @@ HRESULT IsDepthFormatOK( LPDIRECT3D9 d3dInterface, UINT adapter, D3DCAPS9* pCaps
 
 D3DFORMAT FindBestDepthFormat( LPDIRECT3D9 d3dInterface, UINT adapter, D3DCAPS9* pCaps, D3DFORMAT AdapterFormat )
 {
-	//  First try to 32 bit depth buffer and then 24 bit and so on...
+	//  first try to 32 bit depth buffer and then 24 bit and so on...
 	if ( SUCCEEDED( IsDepthFormatOK( d3dInterface, adapter, pCaps, AdapterFormat, D3DFMT_D32, AdapterFormat ) ) )
 		return D3DFMT_D32;
 

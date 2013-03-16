@@ -16,7 +16,8 @@ const GLenum glPrimitiveTypes[] =
 	GL_LINE_STRIP,
 	GL_TRIANGLES,
 	GL_TRIANGLE_STRIP,
-	GL_TRIANGLE_FAN
+	GL_TRIANGLE_FAN,
+	GL_QUADS,
 };
 
 
@@ -448,6 +449,8 @@ void d3dDevice_gl::SetRenderState( const d3dRenderState type, const uint mode )
 				glDisable( GL_BLEND );
 				break;
 			}
+
+			m_rs_alpha = mode;
 		}
 		break;
 
@@ -547,6 +550,7 @@ void d3dDevice_gl::DrawDebug( const d3dPrimitiveType primType, const uint vertxc
 	case PT_TRIANGLE_LIST:	glBegin( GL_TRIANGLES );		break;
 	case PT_TRIANGLE_STRIP:	glBegin( GL_TRIANGLE_STRIP );	break;
 	case PT_TRIANGLE_FAN:	glBegin( GL_TRIANGLE_FAN );		break;
+	case PT_QUAD_LIST:		glBegin( GL_QUADS );			break;
 	default: return;
 	}
 

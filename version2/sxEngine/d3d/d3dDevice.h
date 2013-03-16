@@ -86,6 +86,7 @@ enum d3dPrimitiveType
 	PT_TRIANGLE_LIST,
 	PT_TRIANGLE_STRIP,
 	PT_TRIANGLE_FAN,
+	PT_QUAD_LIST,
 
 	PT_32BITENUM = 0xffffffff
 };

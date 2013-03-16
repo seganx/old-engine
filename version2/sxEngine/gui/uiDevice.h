@@ -12,6 +12,8 @@
 
 #include "../../sxLib/Lib.h"
 
+#define SX_GUI_MAX_ELEMENT				4
+
 //! these flags used as GUI properties
 #define SX_GUI_VISIBLE					0x00000001		//  control is visible
 #define SX_GUI_ENABLE					0x00000002		//  control is enable
@@ -41,17 +43,31 @@ enum GUIType
 	GUI_LABEL,
 	GUI_EDITBOX,
 	GUI_PANELEX,
-	GUI_LISTBOX
-};
-#define GUI_
+	GUI_LISTBOX,
 
+	GUI_32BITENUM = 0xffffffff
+};
+
+//! indicate that which primitive type should be used in batch system
+enum GUIBatchMode
+{
+	GBM_SIMPLE = 0,
+	GBM_TRIANGLES,
+	GBM_QUADS_CCW,
+	GMB_QUADS_CW,
+
+	GBM_32BITENUM = 0xffffffff
+};
+
+//! describe text alignment
 enum GUITextAlign
 {
 	GTA_LEFT,
 	GTA_RIGHT,
-	GTA_CENTER
+	GTA_CENTER,
+
+	GTA_32BITENUM = 0xffffffff
 };
-#define GTA_
 
 //! the value of this enumerations should set with care. values lower than 0x01000000 used for LTR and the higher values used for RTL languages
 enum GUIInputLanguage
@@ -82,7 +98,6 @@ enum GUIInputLanguage
 	GLI_ARABIC  = 0x40000000,	//	|
 	GIL_PERSIAN = 0x80000000	//	|
 };
-#define GIL_
 
 //! describe font information
 struct GUIFontDesc
@@ -121,38 +136,61 @@ public:
 
 public:
 
-	uint		m_numVertices;
-	float3*		m_pos;
-	float2*		m_uv;
-	Color*		m_color;
+	uint		m_image;			//	image id helps the manager to compound elements
+	uint		m_numVertices;		//	number of vertices
+	float3*		m_pos;				//	positions
+	float2*		m_uv;				//	UV coordinates
+	Color*		m_color;			//	colors
 };
 
 
 //! basic GUI control
-class SEGAN_ENG_API uiContorl
+class SEGAN_ENG_API uiControl
 {
-	SEGAN_STERILE_CLASS(uiContorl);
+	SEGAN_STERILE_CLASS(uiControl);
 public:
-	uiContorl( void );
-	~uiContorl( void );
+	uiControl( void );
+	~uiControl( void );
 
 	//! set the parent of this control
-	void SetParent( const uiContorl* parent );
+	virtual void SetParent( uiControl* parent );
 
 	//! set size of control
-	void SetSize( const float width, const float height );
+	virtual void SetSize( const float width, const float height );
 
+	//! update the control
+	virtual void Update( float elpsTime );
 
 public:
 
+	GUIType				m_type;
 	str128				m_name;
 	dword				m_option;
-	uiContorl*			m_parent;
-	Array<uiContorl*>	m_child;
-	Array<uiElement*>	m_element;
+	float2				m_size;
+	float3				m_position;
+	float3				m_position_offset;
+	float3				m_rotation;
+	float3				m_rotation_offset;
+	float3				m_scale;
+	float3				m_scale_offset;
+	uiElement			m_element[SX_GUI_MAX_ELEMENT];
+	uiControl*			m_parent;
+	Array<uiControl*>	m_child;
 
 };
 
+//! the Panel Control. this object has only one element as background
+class SEGAN_ENG_API uiPanel: public uiControl
+{
+	SEGAN_STERILE_CLASS(uiPanel);
+public:
+	uiPanel( void );
+	~uiPanel( void );
+
+	//! set size of control
+	virtual void SetSize( const float width, const float height );
+
+};
 
 //! uiDevice contain some additional functions
 class SEGAN_ENG_API uiDevice
@@ -164,12 +202,15 @@ public:
 	~uiDevice( void );
 
 	//! create and return a GUI by given type
-	uiContorl* CreateContorl( const GUIType type );
+	uiControl* CreateContorl( const GUIType type );
 
-	//! prepare for batching elements
-	void BeginBatchElements( const dword flag, const uint count );
+	//! copy the src element to the dest element in the given index position
+	void Copy( uiElement* dest, uint& index, const uiElement* src, const GUIBatchMode mode );
 
-	//! add an element to the batch and return false if can't batch given element with another or more that specified batch count
+	//! prepare for batching elements. if mode was not simple the only element's with 4 vertices will accepted to the batch
+	void BeginBatchElements( const GUIBatchMode mode, const uint count );
+
+	//! add an element to the batch and return false if can't batch given element with another
 	bool AddBatchElements( const uiElement* elem );
 
 	//! end patch and append them to the end of dest element
@@ -177,6 +218,7 @@ public:
 
 public:
 
+	GUIBatchMode		m_batchMode;	//! batch mode 
 	Array<uiElement*>	m_batches;		//!	us in batch system
 	float				m_minAlpha;		//!	minimum alpha value that controls can be shown
 	float				m_minScale;		//! minimum scale value that controls can be shown
@@ -189,6 +231,7 @@ public:
 #define _SX_GUI_NOT_VISIBLE_			0x10000000
 #define _SX_GUI_NOT_ENABLE_				0x20000000
 #define _SX_GUI_IN_3DSPACE_				0x40000000
+
 
 
 #endif	//	GUARD_uiDevice_HEADER_FILE

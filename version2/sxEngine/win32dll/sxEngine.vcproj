@@ -421,7 +421,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\gui\uiElement.cpp"
+				RelativePath="..\gui\uiPanel.cpp"
 				>
 			</File>
 		</Filter>

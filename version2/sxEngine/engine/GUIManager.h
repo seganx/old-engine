@@ -35,6 +35,9 @@ public:
 	//! delete a control and make null the reference
 	void Delete( uiControl*& control );
 
+	//! clear and delete all GUI in the manager
+	void Clear( void );
+
 	//! update all controls
 	void Update( float elpsTime );
 

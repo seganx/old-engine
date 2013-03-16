@@ -629,5 +629,13 @@ SEGAN_ENG_API bool sx_intersect( const AABox& box, const Frustum& fr );
 //! return true if the box intersect with the frustum
 SEGAN_ENG_API bool sx_intersect( const OBBox& box, const Frustum& fr );
 
+//! convert position of a quad to two triangles. the dest buffer must have 6 float3 at least
+SEGAN_ENG_API void sx_convert_quat_triangle( float3* dest, const float3* src );
+
+//! convert UV of a quad to two triangles. the dest buffer must have 6 float2 at least
+SEGAN_ENG_API void sx_convert_quat_triangle( float2* dest, const float2* src );
+
+//! convert colors of a quad to two triangles. the dest buffer must have 6 color at least
+SEGAN_ENG_API void sx_convert_quat_triangle( Color* dest, const Color* src );
 
 #endif	//	GUARD_Math_tools_HEADER_FILE

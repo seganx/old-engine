@@ -186,6 +186,7 @@ SEGAN_ENG_API Engine* engine_get_singleton( EngineConfig* config /*= null */ )
 
 	//	create GUI device and GUI manager for the engine
 	g_engine->m_deviceUI = sx_new( uiDevice );
+	g_engine->m_gui = sx_new( GUIManager );
 
 	g_logger->m_callback = loggercallback;
 	return g_engine;
@@ -265,11 +266,15 @@ void engine_finalize( void )
 	//////////////////////////////////////////////////////////////////////////
 	
 	g_engine->m_network->Finalize();
+	g_engine->m_gui->Clear();
 
 
 	//////////////////////////////////////////////////////////////////////////
 	//	destroy devices
 	//////////////////////////////////////////////////////////////////////////
+
+	//	destroy GUI manager
+	sx_delete_and_null( g_engine->m_gui );
 
 	//	destroy GUI device
 	sx_delete_and_null( g_engine->m_deviceUI );

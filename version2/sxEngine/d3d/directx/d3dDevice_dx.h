@@ -107,17 +107,16 @@ public:
 	LPDIRECT3D9					m_direct3D;
 	IDirect3DDevice9*			m_device3D;
 	Array<LPDIRECT3DRESOURCE9>	m_resources;
-	bool						m_rs_zEnabled;
-	bool						m_rs_zWritable;
-	bool						m_rs_culling;
-	bool						m_rs_alphaBlend;
-	bool						m_rs_Anisotropy;
-	bool						m_rs_wireFrame;
-	bool						m_rs_fog;
 
 	matrix						m_world;
 	matrix						m_view;
 	matrix						m_projection;
+
+	uint						m_rs_alpha;
+	uint						m_rs_cull;
+	uint						m_rs_fill;
+	uint						m_rs_zenable;
+	uint						m_rs_zwrite;
 };
 
 
