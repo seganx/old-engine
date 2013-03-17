@@ -65,21 +65,22 @@ SEGAN_INLINE matrix Camera::GetViewMatrix( void ) const
 
 SEGAN_INLINE matrix Camera::GetProjectionMatrix( void ) const
 {
+	const float width = sx_vp_width;
+	const float height = sx_vp_height;
+	const float aspect = height / width;
+
 	if ( m_mode == CM_PERSPECTIVE )
 	{
 		//  compute near distance depend on m_far distance
 		const float znear = ( 0.00005f * m_far );
-		const float width = sx_vp_width;
-		const float height = sx_vp_height;
-		return sx_perspective_fov( m_fov, ( height / width ), znear, m_far );
+		const float fov = ( aspect < 1.0f ) ? ( m_fov + ( aspect - 1.0f ) * 0.5f ) : m_fov;
+		return sx_perspective_fov( fov, aspect, znear, m_far );
 	}
 	else
 	{
 		const float3 d = m_eye - m_at;
 		const float r = sx_length( d );
-		const float width = sx_vp_width;
-		const float height = sx_vp_height;
-		return sx_orthographic( r * ( height / width ), r, - m_far, m_far );
+		return sx_orthographic( r * aspect, r, - m_far, m_far );
 	}
 }
 
@@ -87,7 +88,11 @@ SEGAN_INLINE matrix Camera::GetPerspectiveMatrix( const uint viewportWidth, cons
 {
 	//  compute near distance depend on m_far distance
 	const float znear = nearZ < 0 ? ( 0.00005f * m_far ) : nearZ;
-	return sx_perspective_fov( m_fov, (float)viewportWidth / (float)viewportHeight, znear, m_far );
+	const float width = sx_vp_width;
+	const float height = sx_vp_height;
+	const float aspect = height / width;
+	const float fov = ( aspect < 1.0f ) ? ( m_fov + ( aspect - 1.0f ) * 0.5f ) : m_fov;
+	return sx_perspective_fov( fov, aspect, znear, m_far );
 }
 
 SEGAN_INLINE matrix Camera::GetOrthographicMatrix( const uint viewportWidth, const uint viewportHeight ) const

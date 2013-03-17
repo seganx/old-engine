@@ -28,6 +28,7 @@ void uiElement::CreateVertices( const uint count )
 			sx_mem_realloc( m_pos,		count * sizeof(float3) );
 			sx_mem_realloc( m_uv,		count * sizeof(float2) );
 			sx_mem_realloc( m_color,	count * sizeof(float4) );
+			sx_mem_realloc( m_tmp,		count * sizeof(float3) );
 		}
 		m_numVertices = count;
 	}
@@ -41,6 +42,7 @@ void uiElement::ClearVertives( void )
 		sx_mem_free_and_null( m_pos );
 		sx_mem_free_and_null( m_uv );
 		sx_mem_free_and_null( m_color );
+		sx_mem_free_and_null( m_tmp );
 		m_numVertices = 0;
 	}
 }
@@ -50,7 +52,7 @@ void uiElement::ClearVertives( void )
 //	CONTROL
 //////////////////////////////////////////////////////////////////////////
 uiControl::uiControl( void )
-: m_type(GUI_NONE)
+: m_type(UT_NONE)
 , m_option(0)
 , m_size(0,0)
 , m_position(0,0,0)
@@ -116,7 +118,7 @@ uiDevice::~uiDevice( void )
 
 }
 
-uiControl* uiDevice::CreateContorl( const GUIType type )
+uiControl* uiDevice::CreateContorl( const uiType type )
 {
 #if 0
 	switch ( type )
@@ -135,17 +137,17 @@ uiControl* uiDevice::CreateContorl( const GUIType type )
 	return null;
 }
 
-void uiDevice::Copy( uiElement* dest, uint& index, const uiElement* src, const GUIBatchMode mode )
+void uiDevice::Copy( uiElement* dest, uint& index, const uiElement* src, const uiBatchMode mode )
 {
 	switch ( mode )
 	{
-	case GBM_SIMPLE:
+	case BM_SIMPLE:
 		{
 			sx_assert( L"uiControl::Batch mode can't be simple !" );
 		}
 		break;
 
-	case GBM_TRIANGLES:
+	case BM_TRIANGLES:
 		{
 			if ( src->m_numVertices )
 			{
@@ -157,7 +159,7 @@ void uiDevice::Copy( uiElement* dest, uint& index, const uiElement* src, const G
 		}
 		break;
 
-	case GBM_QUADS_CCW:
+	case BM_QUADS_CCW:
 		{
 			const uint srcvertcount = src->m_numVertices;
 			if ( srcvertcount )
@@ -170,7 +172,7 @@ void uiDevice::Copy( uiElement* dest, uint& index, const uiElement* src, const G
 		}
 		break;
 
-	case GMB_QUADS_CW:
+	case MB_QUADS_CW:
 		{
 			sx_assert( L"uiControl::Batch mode can't be Quad CW because is not implemented yet !" );
 		}
@@ -179,7 +181,7 @@ void uiDevice::Copy( uiElement* dest, uint& index, const uiElement* src, const G
 
 }
 
-void uiDevice::BeginBatchElements( const GUIBatchMode mode, const uint count )
+void uiDevice::BeginBatchElements( const uiBatchMode mode, const uint count )
 {
 	m_batchMode = mode;
 	if ( count )
@@ -193,7 +195,7 @@ bool uiDevice::AddBatchElements( const uiElement* elem )
 		if ( m_batches[0]->m_image != elem->m_image ) return false;
 
 	//	check the batch mode
-	if ( m_batchMode == GBM_SIMPLE )
+	if ( m_batchMode == BM_SIMPLE )
 	{
 		m_batches.PushBack( (uiElement*)elem );
 		return true;
@@ -211,7 +213,7 @@ bool uiDevice::AddBatchElements( const uiElement* elem )
 
 void uiDevice::EndBatchElements( uiElement* dest )
 {
-	const uint additionalVertices = ( m_batchMode == GBM_TRIANGLES ? 2 : 0 );
+	const uint additionalVertices = ( m_batchMode == BM_TRIANGLES ? 2 : 0 );
 
 	// compute number of vertices
 	uint sumVertices = 0;
@@ -224,7 +226,7 @@ void uiDevice::EndBatchElements( uiElement* dest )
 
 	//	copy batches to dest element
 	uint index = destVertices;
-	if ( m_batchMode == GBM_SIMPLE )
+	if ( m_batchMode == BM_SIMPLE )
 	{
 		for ( sint i=0; i<m_batches.m_count; ++i )
 		{

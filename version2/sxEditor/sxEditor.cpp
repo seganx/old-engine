@@ -190,7 +190,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	sx_engine_initialize();
 
-#if 1
+#if 0
 	{
 		Window* winChild = sx_app_create_window( L"test", WBT_WINTOOL_RESIZABLE, true );
 		winChild->SetCursor( WCT_HAND );

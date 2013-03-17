@@ -21,103 +21,180 @@
 #define SX_GUI_PROCESSKEY				0x00000008		//	control can process keyboard input
 #define SX_GUI_PROCESSMOUSE				0x00000010		//  make control active and can be selected by mouse.
 #define SX_GUI_CLIPCHILDS				0x00000020		//  use clip plane to avoid drawing child out of control area
-#define SX_GUI_TOPLEFT					0x00000040		//  control will show in top / left 2D system
-#define SX_GUI_BILLBOARD				0x00000080		//	control will display as billboard
-#define SX_GUI_3DSPACE					0x00000100		//  control will show in 3D space
-#define SX_GUI_DISCRETE					0x00000200		//	Scroll : indicator will scroll in discrete values
-#define SX_GUI_MULTILINE				0x00000400		//	Label/EditBox : allow to the label or edit control to show multi line text
-#define SX_GUI_WORDWRAP					0x00000800		//	Label/EditBox : label or edit control will break the long size lines to fit in the box
-#define SX_GUI_AUTOSIZE					0x00001000		//	Label/EditBox : label or edit control will resize to fit the text
-#define SX_GUI_PROGRESSCIRCLE			0x00002000		//	Progress : control will display as circle mode
-#define SX_GUI_PROGRESSUV				0x00004000		//	Progress : control will display as linear mode and UV alignment
+#define SX_GUI_BILLBOARD				0x00000040		//	control will display as billboard
+#define SX_GUI_3DSPACE					0x00000080		//  control will show in 3D space
+#define SX_GUI_DISCRETE					0x00000100		//	Scroll : indicator will scroll in discrete values
+#define SX_GUI_MULTILINE				0x00000200		//	Label/EditBox : allow to the label or edit control to show multi line text
+#define SX_GUI_WORDWRAP					0x00000400		//	Label/EditBox : label or edit control will break the long size lines to fit in the box
+#define SX_GUI_AUTOSIZE					0x00000800		//	Label/EditBox : label or edit control will resize to fit the text
+#define SX_GUI_PROGRESSCIRCLE			0x00001000		//	Progress : control will display as circle mode
+#define SX_GUI_PROGRESSUV				0x00002000		//	Progress : control will display as linear mode and UV alignment
 
 //! these are types of GUI controls
-enum GUIType
+enum uiType
 {
-	GUI_NONE = 0,
-	GUI_PANEL,
-	GUI_BUTTON,
-	GUI_CHECKBOX,
-	GUI_Scroll,
-	GUI_PROGRESS,
-	GUI_LABEL,
-	GUI_EDITBOX,
-	GUI_PANELEX,
-	GUI_LISTBOX,
+	UT_NONE = 0,
+	UT_PANEL,
+	UT_BUTTON,
+	UT_CHECKBOX,
+	UT_SCROLL,
+	UT_PROGRESS,
+	UT_LABEL,
+	UT_EDITBOX,
+	UT_PANELEX,
+	UT_LISTBOX,
 
-	GUI_32BITENUM = 0xffffffff
+	UT_32BITENUM = 0xffffffff
 };
 
 //! indicate that which primitive type should be used in batch system
-enum GUIBatchMode
+enum uiBatchMode
 {
-	GBM_SIMPLE = 0,
-	GBM_TRIANGLES,
-	GBM_QUADS_CCW,
-	GMB_QUADS_CW,
+	BM_SIMPLE = 0,
+	BM_TRIANGLES,
+	BM_QUADS_CCW,
+	MB_QUADS_CW,
 
-	GBM_32BITENUM = 0xffffffff
+	BM_32BITENUM = 0xffffffff
 };
 
 //! describe text alignment
-enum GUITextAlign
+enum uiTextAlign
 {
-	GTA_LEFT,
-	GTA_RIGHT,
-	GTA_CENTER,
+	TA_LEFT,
+	TA_RIGHT,
+	TA_CENTER,
 
-	GTA_32BITENUM = 0xffffffff
+	TA_32BITENUM = 0xffffffff
 };
 
 //! the value of this enumerations should set with care. values lower than 0x01000000 used for LTR and the higher values used for RTL languages
-enum GUIInputLanguage
+enum uiInputLanguage
 {
-	GIL_ENGLISH	= 0x00000100,	//	|	
-	GIL_GERMAN	= 0x00000200,	//	|
-	GIL_FRENCH	= 0x00000400,	//	|
-	GIL_SPANISH	= 0x00000800,	//	|
-	GIL_LANG5	= 0x00001000,	//	|
-	GIL_LANG6	= 0x00002000,	//	|
-	GIL_LANG7	= 0x00004000,	//	|
-	GIL_LANG8	= 0x00008000,	//	|
-	GIL_LANG9	= 0x00010000,	//	|===> Left To Right Languages
-	GIL_LANG10	= 0x00020000,	//	|
-	GIL_LANG11	= 0x00040000,	//	|
-	GIL_LANG12	= 0x00080000,	//	|
-	GIL_LANG13	= 0x00100000,	//	|
-	GIL_LANG14	= 0x00200000,	//	|
-	GIL_LANG15	= 0x00400000,	//	|
-	GIL_LANG16	= 0x00800000,	//	|
+	IL_ENGLISH	= 0x00000100,	//	|	
+	IL_GERMAN	= 0x00000200,	//	|
+	IL_FRENCH	= 0x00000400,	//	|
+	IL_SPANISH	= 0x00000800,	//	|
+	IL_LANG5	= 0x00001000,	//	|
+	IL_LANG6	= 0x00002000,	//	|
+	IL_LANG7	= 0x00004000,	//	|
+	IL_LANG8	= 0x00008000,	//	|
+	IL_LANG9	= 0x00010000,	//	|===> Left To Right Languages
+	IL_LANG10	= 0x00020000,	//	|
+	IL_LANG11	= 0x00040000,	//	|
+	IL_LANG12	= 0x00080000,	//	|
+	IL_LANG13	= 0x00100000,	//	|
+	IL_LANG14	= 0x00200000,	//	|
+	IL_LANG15	= 0x00400000,	//	|
+	IL_LANG16	= 0x00800000,	//	|
 
-	GIL_LANG17	= 0x01000000,	//	|
-	GIL_LANG18	= 0x02000000,	//	|
-	GIL_LANG19	= 0x04000000,	//	|
-	GIL_LANG20	= 0x08000000,	//	|===> Right To Left Languages
-	GIL_LANG21	= 0x10000000,	//	|
-	GIL_LANG22	= 0x20000000,	//	|
-	GLI_ARABIC  = 0x40000000,	//	|
-	GIL_PERSIAN = 0x80000000	//	|
+	IL_LANG17	= 0x01000000,	//	|
+	IL_LANG18	= 0x02000000,	//	|
+	IL_LANG19	= 0x04000000,	//	|
+	IL_LANG20	= 0x08000000,	//	|===> Right To Left Languages
+	IL_LANG21	= 0x10000000,	//	|
+	IL_LANG22	= 0x20000000,	//	|
+	LI_ARABIC	= 0x40000000,	//	|
+	IL_PERSIAN	= 0x80000000	//	|
 };
 
-//! describe font information
-struct GUIFontDesc
+struct uiState
 {
-	sint	size;			//  size of the font
-	sint	charCount;		//  number of characters
-	sint	outline;		//  outline thickness
-	sint	lineHeight;		//	distance in pixels between each line of text  
-	sint	charBase;		//	number of pixels from the absolute top of the line to the base of the characters
+	float2		align;			//  align system of the control
+	float3		center;			//  center of the control
+	float3		position;		//  position of the control
+	float3		rotation;		//  rotation of the control
+	float3		scale;			//  scale of the control
+	float4		color;			//  color of the control
+	float2		blender;		//  blending weights for velocity and amplitude
 
-	GUIFontDesc(): size(0), charCount(0), outline(0), lineHeight(0), charBase(0) {};
+	uiState():	align(0,0), center(0,0,0), position(0,0,0), rotation(0,0,0), scale(0,0,0), color(1,1,1,1), blender(0.7f, 0.5f) {}
 };
 
 //! describe character information
-struct GUIFontChar
+struct uiFontChar
 {
-	dword id;
-	sint x, y, width, height, xOffset, yOffset, xAdvance, page;
+	dword	id;
+	sint	x;
+	sint	y;
+	sint	width;
+	sint	height;
+	sint	xOffset;
+	sint	yOffset;
+	sint	xAdvance;
+	sint	page;
 
-	GUIFontChar(): id(0), x(0), y(0), width(0), height(0),	xOffset(0),	yOffset(0),	xAdvance(0), page(0) {};
+	uiFontChar(): id(0), x(0), y(0), width(0), height(0), xOffset(0), yOffset(0), xAdvance(0), page(0) {};
+};
+
+//! describe font information
+struct uiFontDesc
+{
+	sint	size;				//  size of the font
+	sint	charCount;			//  number of characters
+	sint	outline;			//  outline thickness
+	sint	lineHeight;			//	distance in pixels between each line of text  
+	sint	charBase;			//	number of pixels from the absolute top of the line to the base of the characters
+
+	uiFontDesc(): size(0), charCount(0), outline(0), lineHeight(0), charBase(0) {};
+};
+
+//! state controller
+class SEGAN_ENG_API uiStateController
+{
+	SEGAN_STERILE_CLASS(uiStateController);
+public:
+	uiStateController( void );
+	~uiStateController( void );
+
+	//! clear all states except one first state
+	void Clear( void );
+
+	//! return the number of states
+	uint Count( void ) const;
+
+	//! add a new state and fill it by current state and return index of new state
+	uint Add( void );
+
+	//! remove an state by specified index
+	void Remove( const uint index );
+
+	//! return the index of current state
+	uint GetIndex( void ) const;
+
+	//! set index of the state
+	void SetIndex( const uint index );
+
+	//! return reference to the current state structure
+	uiState& GetCurrent( void );
+
+	//! return reference to state by index
+	uiState& GetByIndex( const uint index );
+
+	//! return reference of the blended state structure
+	uiState& GetBlended( void );
+
+	//! return true if the state is blending
+	bool IsBlending( void ) const;
+
+	//! update controller
+	void Update( float elpsTime );
+
+public:
+
+	Array<uiState>	m_states;	//	array of states
+	uiState			m_curr;		//	current state
+	uiState			m_last;		//	last state
+	sint			m_index;	//	index of current state
+
+	struct Blender
+	{
+		float vel;
+		float amp;
+		float w;
+		float a;
+		float v;
+	} 				m_blender;	//	simple blending system to blend between states
 };
 
 //!	basic element of a graphical user interface
@@ -141,6 +218,7 @@ public:
 	float3*		m_pos;				//	positions
 	float2*		m_uv;				//	UV coordinates
 	Color*		m_color;			//	colors
+	float3*		m_tmp;				//	use temporary positions to transform elements from local space to the world space
 };
 
 
@@ -163,10 +241,11 @@ public:
 
 public:
 
-	GUIType				m_type;
+	uiType				m_type;
 	str128				m_name;
 	dword				m_option;
 	float2				m_size;
+
 	float3				m_position;
 	float3				m_position_offset;
 	float3				m_rotation;
@@ -202,13 +281,13 @@ public:
 	~uiDevice( void );
 
 	//! create and return a GUI by given type
-	uiControl* CreateContorl( const GUIType type );
+	uiControl* CreateContorl( const uiType type );
 
 	//! copy the src element to the dest element in the given index position
-	void Copy( uiElement* dest, uint& index, const uiElement* src, const GUIBatchMode mode );
+	void Copy( uiElement* dest, uint& index, const uiElement* src, const uiBatchMode mode );
 
 	//! prepare for batching elements. if mode was not simple the only element's with 4 vertices will accepted to the batch
-	void BeginBatchElements( const GUIBatchMode mode, const uint count );
+	void BeginBatchElements( const uiBatchMode mode, const uint count );
 
 	//! add an element to the batch and return false if can't batch given element with another
 	bool AddBatchElements( const uiElement* elem );
@@ -218,7 +297,7 @@ public:
 
 public:
 
-	GUIBatchMode		m_batchMode;	//! batch mode 
+	uiBatchMode		m_batchMode;	//! batch mode 
 	Array<uiElement*>	m_batches;		//!	us in batch system
 	float				m_minAlpha;		//!	minimum alpha value that controls can be shown
 	float				m_minScale;		//! minimum scale value that controls can be shown

@@ -57,7 +57,7 @@ void GUIManager::Draw_topleft( const dword flag )
 {
 	static uiElement elemfinal;
 
-#if 1
+#if 0
 
 	//	extract elements
 	uint elemcount = 0;
@@ -97,7 +97,7 @@ void GUIManager::Draw_topleft( const dword flag )
 	
 #else
 
-	GUIBatchMode mode = ( g_engine->m_device3D->m_creationData.flag & SX_D3D_CREATE_GL ) ? GBM_QUADS_CCW : GBM_TRIANGLES;
+	uiBatchMode mode = ( g_engine->m_device3D->m_creationData.flag & SX_D3D_CREATE_GL ) ? BM_QUADS_CCW : BM_TRIANGLES;
 	g_engine->m_deviceUI->BeginBatchElements( mode, 0 );
 
 	for ( sint i=0; i<m_gui.m_count; ++i )
@@ -116,6 +116,11 @@ void GUIManager::Draw_topleft( const dword flag )
 	g_engine->m_deviceUI->EndBatchElements( &elemfinal );
 #endif
 
+	for ( uint i=0; i<elemfinal.m_numVertices; ++i )
+	{
+		elemfinal.m_pos[i].x -= 200.0f;
+		elemfinal.m_pos[i].y += 200.0f;
+	}
 	sx_debug_draw_gui_element( &elemfinal );
 }
 

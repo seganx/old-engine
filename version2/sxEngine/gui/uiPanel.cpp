@@ -2,7 +2,7 @@
 
 uiPanel::uiPanel( void ): uiControl()
 {
-	m_type = GUI_PANEL;
+	m_type = UT_PANEL;
 }
 
 uiPanel::~uiPanel( void )
