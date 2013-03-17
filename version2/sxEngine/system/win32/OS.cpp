@@ -690,14 +690,14 @@ bool sx_os_file_exist( const wchar* fileName)
 {
 	if ( !fileName ) return false;
 	dword Res = GetFileAttributes( fileName );
-	return ( Res != INVALID_FILE_ATTRIBUTES && !SEGAN_SET_HAS(Res, FILE_ATTRIBUTE_DIRECTORY) );
+	return ( Res != INVALID_FILE_ATTRIBUTES && !sx_set_has(Res, FILE_ATTRIBUTE_DIRECTORY) );
 }
 
 bool sx_os_dir_exist( const wchar* dirName )
 {
 	if (!dirName) return false;
 	dword Res = GetFileAttributes(dirName);
-	return ( Res != INVALID_FILE_ATTRIBUTES && SEGAN_SET_HAS(Res, FILE_ATTRIBUTE_DIRECTORY) );
+	return ( Res != INVALID_FILE_ATTRIBUTES && sx_set_has(Res, FILE_ATTRIBUTE_DIRECTORY) );
 }
 
 const wchar* sx_os_get_user_name( void )

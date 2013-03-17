@@ -48,7 +48,7 @@ void Logger::Initialize( LoggerConfig* config /*= null */ )
 		}
 		else
 		{
-			SEGAN_SET_REM( m_mode, LM_FILE );
+			sx_set_rem( m_mode, LM_FILE );
 		}
 	}
 }

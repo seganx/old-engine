@@ -45,7 +45,7 @@ public:
 	void ProcessInput( void );
 
 	//! draw GUIs in screen space coordinate which started from top and left
-	void Draw_topleft( const dword flag );
+	void Draw( const dword flag );
 
 public:
 

@@ -140,27 +140,27 @@ public:
 	virtual void SetTopMostEnable( const bool enable )
 	{
 		if ( enable )
-			SEGAN_SET_ADD( m_option, WINDOW_TOPMOST );
+			sx_set_add( m_option, WINDOW_TOPMOST );
 		else
-			SEGAN_SET_REM( m_option, WINDOW_TOPMOST );
+			sx_set_rem( m_option, WINDOW_TOPMOST );
 		Update();
 	}
 
 	virtual void SetVisible( const bool visible )
 	{
 		if ( visible )
-			SEGAN_SET_ADD( m_option, WINDOW_VISIBLE );
+			sx_set_add( m_option, WINDOW_VISIBLE );
 		else
-			SEGAN_SET_REM( m_option, WINDOW_VISIBLE	);
+			sx_set_rem( m_option, WINDOW_VISIBLE	);
 		Update();
 	}
 
 	virtual void SetFullScreen( const bool fullscreen )
 	{
 		if ( fullscreen )
-			SEGAN_SET_ADD( m_option, WINDOW_FULLSCREEN );
+			sx_set_add( m_option, WINDOW_FULLSCREEN );
 		else
-			SEGAN_SET_REM( m_option, WINDOW_FULLSCREEN );
+			sx_set_rem( m_option, WINDOW_FULLSCREEN );
 		Update();
 	}
 

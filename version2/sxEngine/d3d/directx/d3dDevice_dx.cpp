@@ -102,7 +102,7 @@ void d3dDevice_dx::Initialize( const handle displayHandle )
 	if ( adapter == -1 )
 	{
 		g_logger->Log( L"Error: no display adapter found which support 3D acceleration !" );
-		SEGAN_RELEASE_AND_NULL( m_direct3D );
+		sx_release_and_null( m_direct3D );
 		return;
 	}
 
@@ -115,7 +115,7 @@ void d3dDevice_dx::Initialize( const handle displayHandle )
 	if ( FAILED( m_direct3D->GetAdapterDisplayMode( adapter, &curDisplayMode ) ) )
 	{
 		g_logger->Log( L"Error: I can not get adapter display mode !" );
-		SEGAN_RELEASE_AND_NULL( m_direct3D );
+		sx_release_and_null( m_direct3D );
 		return;
 	}
 	m_driverDisplayMode.width			= curDisplayMode.Width;
@@ -130,7 +130,7 @@ void d3dDevice_dx::Initialize( const handle displayHandle )
 	if ( FAILED( m_direct3D->GetAdapterIdentifier( adapter, 0, &adinfo ) ) )
 	{
 		g_logger->Log( L"Error: I can not get driver information !" );
-		SEGAN_RELEASE_AND_NULL( m_direct3D );
+		sx_release_and_null( m_direct3D );
 		return;
 	}
 
@@ -219,8 +219,8 @@ void d3dDevice_dx::Finalize( void )
 {
 	if ( !m_direct3D ) return;
 
-	SEGAN_RELEASE_AND_NULL( m_device3D );
-	SEGAN_RELEASE_AND_NULL( m_direct3D );
+	sx_release_and_null( m_device3D );
+	sx_release_and_null( m_direct3D );
 }
 
 bool d3dDevice_dx::SetSize( const uint width, const uint height, const dword SX_D3D_ flag )
@@ -592,12 +592,12 @@ void d3dDevice_dx::PreReset( void )
 {
 	LPDIRECT3DVERTEXDECLARATION9 vertexDecl = null;
 	m_device3D->GetVertexDeclaration( &vertexDecl );
-	SEGAN_RELEASE_AND_NULL( vertexDecl );
+	sx_release_and_null( vertexDecl );
 
-	SEGAN_RELEASE_AND_NULL( m_initData.depthSurface );
-	SEGAN_RELEASE_AND_NULL( m_initData.depthTexture );
-	SEGAN_RELEASE_AND_NULL( m_initData.colorSurface );
-	SEGAN_RELEASE_AND_NULL( m_initData.resetStateBlock );
+	sx_release_and_null( m_initData.depthSurface );
+	sx_release_and_null( m_initData.depthTexture );
+	sx_release_and_null( m_initData.colorSurface );
+	sx_release_and_null( m_initData.resetStateBlock );
 }
 
 void d3dDevice_dx::PostReset( void )
@@ -616,8 +616,8 @@ void d3dDevice_dx::PostReset( void )
 	if ( depthSurface )
 	{
 		g_logger->Log( L"Warning: device created with depth stencil surface! I released it manually!" );
-		SEGAN_RELEASE( depthSurface );
-		SEGAN_RELEASE_AND_NULL( depthSurface );
+		sx_release( depthSurface );
+		sx_release_and_null( depthSurface );
 	}
 	m_device3D->SetDepthStencilSurface( null );
 

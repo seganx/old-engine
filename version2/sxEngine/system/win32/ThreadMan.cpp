@@ -83,7 +83,7 @@ public:
 			//  select a task automatically
 			m_taskIndex++;
 			if ( m_taskIndex >= m_numThread ) m_taskIndex = 1;
-			SEGAN_1TH_BYTEOF( newTask->m_flag ) = (byte)m_taskIndex;
+			sx_1th_byte_of( newTask->m_flag ) = (byte)m_taskIndex;
 
 			sx_os_enter_critical_section();
 			m_taskList[m_taskIndex].PushBack( newTask );
@@ -96,7 +96,7 @@ public:
 			if ( destThread >= m_numThread )
 				destThread = m_numThread - 1;
 
-			SEGAN_1TH_BYTEOF( newTask->m_flag ) = (byte)destThread;
+			sx_1th_byte_of( newTask->m_flag ) = (byte)destThread;
 
 			//  push task to the specified thread
 			sx_os_enter_critical_section();
@@ -112,7 +112,7 @@ public:
 	{
 		if ( !pTask ) return;
 
-		int index = SEGAN_1TH_BYTEOF( pTask->m_flag );
+		int index = sx_1th_byte_of( pTask->m_flag );
 
 		sx_os_enter_critical_section();
 		while( m_taskList[index].Remove( pTask ) );
@@ -233,7 +233,7 @@ void sx_thread_update( float elpsTime )
 		if ( task->m_flag & SX_TASKBASE_AUTO_FREE ) {
 			sx_delete( task );
 		} else {
-			SEGAN_SET_REM( task->m_flag, SX_TASKBASE_EXECUTING );
+			sx_set_rem( task->m_flag, SX_TASKBASE_EXECUTING );
 		}
 
 		s_threadMan->m_runing[0] = false;
@@ -259,9 +259,9 @@ void ThreadTask::FreeOnTerminate( bool enable )
 	sx_os_enter_critical_section();
 
 	if ( enable )
-		SEGAN_SET_ADD( m_flag, SX_TASKBASE_AUTO_FREE );
+		sx_set_add( m_flag, SX_TASKBASE_AUTO_FREE );
 	else
-		SEGAN_SET_REM( m_flag, SX_TASKBASE_AUTO_FREE );
+		sx_set_rem( m_flag, SX_TASKBASE_AUTO_FREE );
 
 	sx_os_leave_critical_section();
 }
@@ -308,7 +308,7 @@ DWORD WINAPI threadProc1( __in  LPVOID lpParameter )
 		if ( task->m_flag & SX_TASKBASE_AUTO_FREE ) {
 			sx_delete(task);
 		} else {
-			SEGAN_SET_REM( task->m_flag, SX_TASKBASE_EXECUTING );
+			sx_set_rem( task->m_flag, SX_TASKBASE_EXECUTING );
 		}
 		sx_os_leave_critical_section();
 
@@ -348,7 +348,7 @@ DWORD WINAPI threadProc2( __in  LPVOID lpParameter )
 		if ( task->m_flag & SX_TASKBASE_AUTO_FREE ) {
 			sx_delete( task );
 		} else {
-			SEGAN_SET_REM( task->m_flag, SX_TASKBASE_EXECUTING );
+			sx_set_rem( task->m_flag, SX_TASKBASE_EXECUTING );
 		}
 		sx_os_leave_critical_section();
 
@@ -388,7 +388,7 @@ DWORD WINAPI threadProc3( __in  LPVOID lpParameter )
 		if ( task->m_flag & SX_TASKBASE_AUTO_FREE ) {
 			sx_delete( task );
 		} else {
-			SEGAN_SET_REM( task->m_flag, SX_TASKBASE_EXECUTING );
+			sx_set_rem( task->m_flag, SX_TASKBASE_EXECUTING );
 		}
 		sx_os_leave_critical_section();
 
@@ -428,7 +428,7 @@ DWORD WINAPI threadProc4( __in  LPVOID lpParameter )
 		if ( task->m_flag & SX_TASKBASE_AUTO_FREE ) {
 			sx_delete( task );
 		} else {
-			SEGAN_SET_REM( task->m_flag, SX_TASKBASE_EXECUTING );
+			sx_set_rem( task->m_flag, SX_TASKBASE_EXECUTING );
 		}
 		sx_os_leave_critical_section();
 

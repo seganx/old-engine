@@ -631,10 +631,10 @@ void d3dDevice_gl::ClearScreen( const dword bgcolor )
 
 void d3dDevice_gl::ClearTarget( const dword bgcolor )
 {
-	float r = SEGAN_2TH_BYTEOF(bgcolor) / 255.0f;
-	float g = SEGAN_3TH_BYTEOF(bgcolor) / 255.0f;
-	float b = SEGAN_4TH_BYTEOF(bgcolor) / 255.0f;
-	float a = SEGAN_1TH_BYTEOF(bgcolor) / 255.0f;
+	float r = sx_2th_byte_of(bgcolor) / 255.0f;
+	float g = sx_3th_byte_of(bgcolor) / 255.0f;
+	float b = sx_4th_byte_of(bgcolor) / 255.0f;
+	float a = sx_1th_byte_of(bgcolor) / 255.0f;
 	glClearColor( r, g, b, a );
 
 	glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );

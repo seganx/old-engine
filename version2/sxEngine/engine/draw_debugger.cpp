@@ -212,7 +212,7 @@ SEGAN_ENG_API void sx_debug_draw_gui_element( const class uiElement* elem )
 		mat.Identity();
 		g_engine->m_device3D->SetMatrix( MM_VIEW, mat );
 		g_engine->m_device3D->SetMatrix( MM_WORLD, mat );
-		g_engine->m_device3D->DrawDebug( PT_QUAD_LIST, elem->m_numVertices, &elem->m_pos->x, 0xffff3333 );
+		g_engine->m_device3D->DrawDebug( PT_QUAD_LIST, elem->m_numVertices, &elem->m_posfinal->x, 0xffff3333 );
 	}
 }
 

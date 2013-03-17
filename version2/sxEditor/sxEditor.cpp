@@ -81,10 +81,15 @@ void app_main_loop( float elpsTime )
 #if 1
 		uiPanel panel1, panel2;
 		panel1.SetSize( 200.0f, 50.0f );
+		uiState* state = panel1.m_state.GetCurrent();
+		state->align.Set( -0.5f, 0.5f );
+		state->position.Set( 200.0f, -200.0f, 0.0f );
+		panel2.SetParent( &panel1 );
 		panel2.SetSize( 100.0f, 30.0f );
- 		g_engine->m_gui->Add( &panel1 );
- 		g_engine->m_gui->Add( &panel2 );
- 		g_engine->m_gui->Draw_topleft( 0 );
+		g_engine->m_gui->Add( &panel1 );
+ 		//g_engine->m_gui->Add( &panel2 );
+		g_engine->m_gui->Update( elpsTime );
+ 		g_engine->m_gui->Draw( 0 );
  		g_engine->m_gui->Remove( &panel2 );
  		g_engine->m_gui->Remove( &panel1 );
 #endif

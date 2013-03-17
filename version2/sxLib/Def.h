@@ -107,26 +107,28 @@ typedef byte				*pbyte;
 //!!!  DO NOT CHANGE THIS AREA ANY MORE	 !!!//
 //////////////////////////////////////////////////////////////////////////
 
-// release preprocessors
-#define SEGAN_RELEASE(Obj)					{ if (Obj) { Obj->Release(); } }
-#define SEGAN_RELEASE_AND_NULL(Obj)			{ if (Obj) { Obj->Release(); Obj = null; } }
-
-// some useful macros for cardinal handling
-#define SEGAN_SET_HAS(set, subset)			( ( set & subset ) != 0 )
-#define SEGAN_SET_ADD(set, subset)			( set |= subset )
-#define SEGAN_SET_REM(set, subset)			( set &= ~subset )
-
-// some useful functions for byte operations
-#define SEGAN_BYTEOF(var, index)			((byte*)(&var))[index]
-#define SEGAN_1TH_BYTEOF(var)				((byte*)(&var))[0]
-#define SEGAN_2TH_BYTEOF(var)				((byte*)(&var))[1]
-#define SEGAN_3TH_BYTEOF(var)				((byte*)(&var))[2]
-#define SEGAN_4TH_BYTEOF(var)				((byte*)(&var))[3]
-
-#define SEGAN_FCC(ch0, ch1, ch2, ch3)		((dword)(byte)(ch0) | ((dword)(byte)(ch1) << 8) | ((dword)(byte)(ch2) << 16) | ((dword)(byte)(ch3) << 24 ))
-
 //! avoid class from copy constructor and assign operator
 #define SEGAN_STERILE_CLASS(classname)		private: classname(classname& obj); void operator= (classname& obj);
+
+
+// release preprocessors
+#define sx_release(Obj)						{ if (Obj) { Obj->Release(); } }
+#define sx_release_and_null(Obj)			{ if (Obj) { Obj->Release(); Obj = null; } }
+
+// some useful macros for cardinal handling
+#define sx_set_has(set, subset)				( set & subset )
+#define sx_set_hasnt(set, subset)			( !( set & subset ) )
+#define sx_set_add(set, subset)				( set |= subset )
+#define sx_set_rem(set, subset)				( set &= ~subset )
+
+// some useful functions for byte operations
+#define sx_byte_of(var, index)				( ( (byte*)(&var) )[index] )
+#define sx_1th_byte_of(var)					( ( (byte*)(&var) )[0] )
+#define sx_2th_byte_of(var)					( ( (byte*)(&var) )[1] )
+#define sx_3th_byte_of(var)					( ( (byte*)(&var) )[2] )
+#define sx_4th_byte_of(var)					( ( (byte*)(&var) )[3] )
+
+#define sx_fourcc(ch0, ch1, ch2, ch3)		( (dword)(byte)(ch0) | ((dword)(byte)(ch1) << 8) | ((dword)(byte)(ch2) << 16) | ((dword)(byte)(ch3) << 24 ) )
 
 
 //! disable container warnings

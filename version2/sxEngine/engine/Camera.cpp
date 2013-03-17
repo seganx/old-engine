@@ -2,7 +2,7 @@
 #include "../sxEngine.h"
 
 
-static const uint cameraFileID = SEGAN_FCC('C', 'A', 'M', 'R');
+static const uint cameraFileID = sx_fourcc('C', 'A', 'M', 'R');
 
 //////////////////////////////////////////////////////////////////////////
 //	CAMERA STRUCTURE

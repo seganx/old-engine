@@ -15,20 +15,28 @@
 #define SX_GUI_MAX_ELEMENT				4
 
 //! these flags used as GUI properties
-#define SX_GUI_VISIBLE					0x00000001		//  control is visible
-#define SX_GUI_ENABLE					0x00000002		//  control is enable
-#define SX_GUI_FREEZE					0x00000004		//  control is froze and can't be selected. this is useful for editors
-#define SX_GUI_PROCESSKEY				0x00000008		//	control can process keyboard input
-#define SX_GUI_PROCESSMOUSE				0x00000010		//  make control active and can be selected by mouse.
-#define SX_GUI_CLIPCHILDS				0x00000020		//  use clip plane to avoid drawing child out of control area
-#define SX_GUI_BILLBOARD				0x00000040		//	control will display as billboard
-#define SX_GUI_3DSPACE					0x00000080		//  control will show in 3D space
-#define SX_GUI_DISCRETE					0x00000100		//	Scroll : indicator will scroll in discrete values
-#define SX_GUI_MULTILINE				0x00000200		//	Label/EditBox : allow to the label or edit control to show multi line text
-#define SX_GUI_WORDWRAP					0x00000400		//	Label/EditBox : label or edit control will break the long size lines to fit in the box
-#define SX_GUI_AUTOSIZE					0x00000800		//	Label/EditBox : label or edit control will resize to fit the text
-#define SX_GUI_PROGRESSCIRCLE			0x00001000		//	Progress : control will display as circle mode
-#define SX_GUI_PROGRESSUV				0x00002000		//	Progress : control will display as linear mode and UV alignment
+#define SX_GUI_VISIBLE					0x00000001		//!	control is visible
+#define SX_GUI_ENABLE					0x00000002		//!	control is enable
+#define SX_GUI_BLENDSTATES				0x00000004		//!	control can blend between states
+#define SX_GUI_FREEZE					0x00000008		//!	control is froze and can't be selected. this is useful for editors
+#define SX_GUI_PROCESSKEY				0x00000010		//!	control can process keyboard input
+#define SX_GUI_PROCESSMOUSE				0x00000020		//!	make control active and can be selected by mouse.
+#define SX_GUI_CLIPCHILDS				0x00000040		//!	use clip plane to avoid drawing child out of control area
+#define SX_GUI_BILLBOARD				0x00000080		//!	control will display as billboard
+#define SX_GUI_3DSPACE					0x00000100		//!	control will show in 3D space
+#define SX_GUI_DISCRETE					0x00000200		//!	Scroll : indicator will scroll in discrete values
+#define SX_GUI_MULTILINE				0x00000400		//!	Label/EditBox : allow to the label or edit control to show multi line text
+#define SX_GUI_WORDWRAP					0x00000800		//!	Label/EditBox : label or edit control will break the long size lines to fit in the box
+#define SX_GUI_AUTOSIZE					0x00001000		//!	Label/EditBox : label or edit control will resize to fit the text
+#define SX_GUI_PROGRESSCIRCLE			0x00002000		//!	Progress : control will display as circle mode
+#define SX_GUI_PROGRESSUV				0x00004000		//!	Progress : control will display as linear mode and UV alignment
+
+//! bounding conditions
+#define SX_GUI_MINIMUM_ALPHA			0.001f			//!	minimum alpha value that controls can be shown
+#define SX_GUI_MINIMUM_SCALE			0.0001f			//! minimum scale value that controls can be shown
+
+//! prevent rubbing surfaces
+#define SX_GUI_Z_BIAS					-0.15f
 
 //! these are types of GUI controls
 enum uiType
@@ -108,7 +116,7 @@ struct uiState
 	float4		color;			//  color of the control
 	float2		blender;		//  blending weights for velocity and amplitude
 
-	uiState():	align(0,0), center(0,0,0), position(0,0,0), rotation(0,0,0), scale(0,0,0), color(1,1,1,1), blender(0.7f, 0.5f) {}
+	uiState():	align(0,0), center(0,0,0), position(0,0,0), rotation(0,0,0), scale(1,1,1), color(1,1,1,1), blender(0.7f, 0.5f) {}
 };
 
 //! describe character information
@@ -139,7 +147,7 @@ struct uiFontDesc
 	uiFontDesc(): size(0), charCount(0), outline(0), lineHeight(0), charBase(0) {};
 };
 
-//! state controller
+//! state controller can manage and update states. state controller has one state at least
 class SEGAN_ENG_API uiStateController
 {
 	SEGAN_STERILE_CLASS(uiStateController);
@@ -166,19 +174,19 @@ public:
 	void SetIndex( const uint index );
 
 	//! return reference to the current state structure
-	uiState& GetCurrent( void );
+	uiState* GetCurrent( void );
 
 	//! return reference to state by index
-	uiState& GetByIndex( const uint index );
+	uiState* GetByIndex( const uint index );
 
 	//! return reference of the blended state structure
-	uiState& GetBlended( void );
+	uiState* GetBlended( void );
 
 	//! return true if the state is blending
 	bool IsBlending( void ) const;
 
-	//! update controller
-	void Update( float elpsTime );
+	//! TODO: move option from this to the uiControl body !! get options and update controller then return new option 
+	void Update( const dword option, float elpsTime );
 
 public:
 
@@ -218,7 +226,7 @@ public:
 	float3*		m_pos;				//	positions
 	float2*		m_uv;				//	UV coordinates
 	Color*		m_color;			//	colors
-	float3*		m_tmp;				//	use temporary positions to transform elements from local space to the world space
+	float3*		m_posfinal;				//	use temporary positions to transform elements from local space to the world space
 };
 
 
@@ -237,25 +245,22 @@ public:
 	virtual void SetSize( const float width, const float height );
 
 	//! update the control
-	virtual void Update( float elpsTime );
+	virtual void Update( float elpsTime, const matrix& viewInverse, const matrix& viewProjection, const uint vpwidth, const uint vpheight );
 
 public:
 
-	uiType				m_type;
-	str128				m_name;
-	dword				m_option;
-	float2				m_size;
-
-	float3				m_position;
-	float3				m_position_offset;
-	float3				m_rotation;
-	float3				m_rotation_offset;
-	float3				m_scale;
-	float3				m_scale_offset;
-	uiElement			m_element[SX_GUI_MAX_ELEMENT];
-	uiControl*			m_parent;
-	Array<uiControl*>	m_child;
-
+	uiType				m_type;								//!	type of control
+	str128				m_name;								//!	name of control
+	dword				m_option;							//!	include control options started with SX_GUI_
+	float2				m_size;								//!	control dimensions
+	uiStateController	m_state;							//!	state of control include origin, orientation, scale, ...
+	float3				m_position_offset;					//!	additional position offset
+	float3				m_rotation_offset;					//!	additional rotation offset
+	float3				m_scale_offset;						//!	additional scale offset
+	matrix				m_matrix;							//!	final matrix computed from states
+	uiElement			m_element[SX_GUI_MAX_ELEMENT];		//!	elements of control
+	uiControl*			m_parent;							//!	parent of this control
+	Array<uiControl*>	m_child;							//!	array of children
 };
 
 //! the Panel Control. this object has only one element as background
@@ -297,10 +302,8 @@ public:
 
 public:
 
-	uiBatchMode		m_batchMode;	//! batch mode 
+	uiBatchMode			m_batchMode;	//! batch mode 
 	Array<uiElement*>	m_batches;		//!	us in batch system
-	float				m_minAlpha;		//!	minimum alpha value that controls can be shown
-	float				m_minScale;		//! minimum scale value that controls can be shown
 	float				m_zbias;		//! prevent rubbing surfaces of GUI controls in 3D mode
 	bool				m_editor;		//! indicates that GUI is running in editor mode
 };
