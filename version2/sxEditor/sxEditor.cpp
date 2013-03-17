@@ -2,12 +2,8 @@
 //
 #include "sxEditor.h"
 
-//#include <Windows.h>
 #include <stdio.h>
 
-
-#define NET_DELAY_TIME	60
-#define NET_TIMEOUT		10000
 
 //////////////////////////////////////////////////////////////////////////
 //  SOME GLOBAL VARIABLES
@@ -32,77 +28,57 @@ void app_main_loop( float elpsTime )
 #if 1
 	if ( g_engine->m_device3D && g_engine->m_device3D->BeginScene() )
 	{
-		matrix mat = sx_perspective_fov( PI / 3.0f, (float)g_engine->m_device3D->m_viewport.height / (float)g_engine->m_device3D->m_viewport.width, 0.5f, 1000.0f );
-		//matrix mat = sx_orthographic( (float)g_engine->m_device3D->m_viewport.width, (float)g_engine->m_device3D->m_viewport.height, -1000, 1000.0f );
-		g_engine->m_device3D->SetMatrix( MM_PROJECTION, mat );
-
 		static float timer = 0;
-		timer =  (float)( 0.0003f * sx_os_get_timer() );
-		//timer = 2.0f;
-		
+		timer += elpsTime * 0.001f;		
 
-		static float cam_r = 20.0f, cam_p = 0.0f, cam_t = 0.0f;
 		static float3 cam_at;
-		Camera camera;
-		camera.m_at = cam_at;
-		camera.SetSpherical( cam_r, cam_p, cam_t );
-		g_engine->m_device3D->SetMatrix( MM_VIEW, camera.GetViewMatrix() );
+		static float cam_r = 20.0f, cam_p = 0.0f, cam_t = 0.0f;
 		if ( sx_key_hold( IK_MOUSE_LEFT, 0 ) || sx_key_down( IK_MOUSE_LEFT, 0 ) )
 		{
-			cam_p -= g_engine->m_input->GetValues()->rl_x * 0.005f;
-			cam_t += g_engine->m_input->GetValues()->rl_y * 0.005f;
+			cam_p -= sx_mouse_rlx(0) * 0.005f;
+			cam_t += sx_mouse_rly(0) * 0.005f;
 		}
 		if ( sx_key_hold( IK_MOUSE_RIGHT, 0 ) || sx_key_down( IK_MOUSE_RIGHT, 0 ) )
 		{
-			cam_r += g_engine->m_input->GetValues()->rl_y * 0.05f;
+			cam_r += sx_mouse_rly(0) * 0.05f;
 		}
 		if ( sx_key_hold( IK_MOUSE_MIDDLE, 0 ) || sx_key_down( IK_MOUSE_MIDDLE, 0 ) )
 		{
-			sx_inverse( mat, g_engine->m_device3D->GetMatrix(MM_VIEW) );
+			matrix mat = sx_inverse( g_engine->m_device3D->GetMatrix(MM_VIEW) );
 			float3 tv, mv( -sx_mouse_rlx(0), sx_mouse_rly(0), 0.0f );
 			sx_transform_normal( tv, mv, mat );
 			cam_at += tv * ( cam_r * 0.003f );
 		}
 
-		g_engine->m_device3D->SetTexture( null );
+		Camera camera;
+		camera.m_at = cam_at;
+		camera.SetSpherical( cam_r, cam_p, cam_t );
+		camera.SetToDevice();
+		Ray ray = camera.GetRay();
 
+		g_engine->m_device3D->SetTexture( null );
 		g_engine->m_device3D->ClearScreen( 0xff000000 );
 
-#if 0
-		g_engine->m_device3D->SetTexture( tex_000 );
-
+		sx_debug_draw_grid( 10, 0xaaaaaaaa );
+#if 1
+		g_engine->m_device3D->SetTexture( tex_001 );
 		g_engine->m_device3D->SetVertexBuffer( vbo_pos, 0 );
- 		g_engine->m_device3D->SetVertexBuffer( vbo_tx0, 2 );
- 		g_engine->m_device3D->SetVertexBuffer( vbo_col, 5 );
-
+		g_engine->m_device3D->SetVertexBuffer( vbo_tx0, 2 );
+		g_engine->m_device3D->SetVertexBuffer( vbo_col, 5 );
 		g_engine->m_device3D->DrawPrimitive( PT_TRIANGLE_LIST, 0, 6 );
+		g_engine->m_device3D->SetTexture( null );
 
-		if ( vbo_pos )
-		{
-			static float s_time = 0;
-			s_time += elpsTime;
+		if ( vbo_pos ) {
 			float* pos = (float*)vbo_pos->Lock();
-			pos[0] = sx_sin_fast( s_time * 0.001f );
-			pos[1] = sx_cos_fast( s_time * 0.001f ) - 1.0f;
-			pos[2] = sx_sin_fast( s_time * 0.005f );
+			pos[0] = sx_sin_fast( timer );
+			pos[1] = sx_cos_fast( timer ) - 1.0f;
+			pos[2] = sx_sin_fast( timer * 5 );
 			vbo_pos->Unlock();
 		}
 #endif
-		float d[3] = { 1.0f, sx_sin(timer*7.0f), sx_sin(timer*3.0f) }, u[3] = { 0.0f, 1.0f, 0.0f };
-		sx_set_direction( mat, d, u );
-
-		sx_debug_draw_grid( 10, 0xaaaaaaaa );
-
-		sx_debug_draw_line( float3(0,2,0), float3(100,2,0), 0xffff0000 );
-
-		Ray ray = sx_ray( sx_mouse_absx(0), sx_mouse_absy(0), 
-			(float)g_engine->m_device3D->m_viewport.width,
-			(float)g_engine->m_device3D->m_viewport.height,
-			g_engine->m_device3D->GetMatrix(MM_VIEW),
-			g_engine->m_device3D->GetMatrix(MM_PROJECTION));
-
 		sx_debug_draw_compass();
 
+#if 1
 		uiPanel panel1, panel2;
 		panel1.SetSize( 200.0f, 50.0f );
 		panel2.SetSize( 100.0f, 30.0f );
@@ -111,9 +87,9 @@ void app_main_loop( float elpsTime )
  		g_engine->m_gui->Draw_topleft( 0 );
  		g_engine->m_gui->Remove( &panel2 );
  		g_engine->m_gui->Remove( &panel1 );
+#endif
 
 		g_engine->m_device3D->EndScene();
-
 		g_engine->m_device3D->Present();
 
 		str128 str;
@@ -125,8 +101,6 @@ void app_main_loop( float elpsTime )
 #endif
 
 	sx_mem_enable_debug( true, -1 );
-
-//	sx_os_sleep(1);
 }
 
 #if 1
@@ -155,11 +129,11 @@ void mem_callback( const wchar* file, const uint line, const uint size, const ui
 	int len = 0;
 	char msg[512] = {0};
 	if ( corrupted )
+	{
 		len = sprintf_s( msg, 512, "ERROR : memory corruption detected on %S - line %d - size %d - tag %d", file, line, size, tag );
-	else
-		len = sprintf_s( msg, 512, "WARNING : memory leak detected on %S - line %d - size %d - tag %d", file, line, size, tag );
-	g_engine->m_network->Send( msg, len+1 );
-	g_engine->m_network->Update(0);
+		g_engine->m_network->Send( msg, len+1 );
+		g_engine->m_network->Update(0);
+	}
 }
 
 #endif
@@ -296,33 +270,16 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			desc.mipmaps = 1;
 			tex_000->SetDesc( desc );
 
-			FileStream file;
-			if ( file.Open( L"D:/tex_000.txt", FM_OPEN_READ ) )
+			for ( uint l=0; l<=tex_000->GetDesc()->mipmaps; l++ )
 			{
-				for ( uint l=0; l<=tex_000->GetDesc()->mipmaps; l++ )
+				const uint size = tex_000->GetDataSize(l);
 				{
-					const uint size = tex_000->GetDataSize(l);
 					byte* data = (byte*)sx_mem_alloc( size );
-					file.Read( data, size );
+					for ( uint i=0; i<size; i++ )
+						data[i] = sx_random_i( i % 255 );
 					tex_000->SetImage( data, l );
 					sx_mem_free( data );
 				}
-				file.Close();
-			}
-			else
-			{
-				for ( uint l=0; l<=tex_000->GetDesc()->mipmaps; l++ )
-				{
-					const uint size = tex_000->GetDataSize(l);
-					{
-						byte* data = (byte*)sx_mem_alloc( size );
-						for ( uint i=0; i<size; i++ )
-							data[i] = sx_random_i( i % 255 );
-						tex_000->SetImage( data, l );
-						sx_mem_free( data );
-					}
-				}
-
 			}
 		}
 
@@ -346,26 +303,6 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 		sx_engine_start( &app_main_loop );
 
-		if ( tex_000 )
-		{
-			FileStream file;
-			file.Open( L"D:/tex_000.txt", FM_CREATE );
-
-			for ( uint l=0; l<=tex_000->GetDesc()->mipmaps; l++ )
-			{
-				uint size = tex_000->GetDataSize(l);
-				byte* data = (byte*)sx_mem_alloc( size );
-				ZeroMemory( data, size );
-
-				tex_000->GetImage( data, l );
-				file.Write( data, size );
-
-				sx_mem_free( data );
-			}
-
-			file.Close();
-		}
-
 		g_engine->m_device3D->DestroyTexture( tex_000 );
 		g_engine->m_device3D->DestroyTexture( tex_001 );
 		g_engine->m_device3D->DestroyVertexBuffer( vbo_col );
@@ -377,7 +314,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 #else
 	sx_engine_start( &app_main_loop );
 #endif
-
+	
 	sx_mem_report_debug( &mem_callback, 0 );
 
 	//////////////////////////////////////////////////////////////////////////

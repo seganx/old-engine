@@ -1,17 +1,20 @@
 #include "Camera.h"
+#include "../sxEngine.h"
+
 
 static const uint cameraFileID = SEGAN_FCC('C', 'A', 'M', 'R');
 
 //////////////////////////////////////////////////////////////////////////
 //	CAMERA STRUCTURE
 Camera::Camera( void )
-: m_fov(PI/3.0f)
+: m_mode(CM_PERSPECTIVE)
+, m_fov(PI/3.0f)
 , m_far(6000.0f)
 , m_velocity(0)
 , m_amplitude(0)
-, m_eye(0.0f, 0.0f, -1.0f)
-, m_at(0.0f, 0.0f, 0.0f)
-, m_up(0.0f, 1.0f, 0.0f)
+, m_eye(0, 0, 1)
+, m_at(0, 0, 0)
+, m_up(0, 1, 0)
 {
 	
 }
@@ -27,7 +30,7 @@ SEGAN_INLINE void Camera::SetSpherical( const float radius, const float phi, con
 	m_eye.z = m_at.z + radius * cphi * ctheta;
 }
 
-void Camera::GetSpherical( float* raduis /*= NULL*/, float* phi /*= NULL*/, float* theta /*= NULL*/ ) const
+SEGAN_INLINE void Camera::GetSpherical( float* raduis /*= NULL*/, float* phi /*= NULL*/, float* theta /*= NULL*/ ) const
 {
 	float3 d = m_eye - m_at;
 	float r = sx_length( d );
@@ -60,6 +63,26 @@ SEGAN_INLINE matrix Camera::GetViewMatrix( void ) const
 	return sx_lookat( m_eye, m_at, m_up );
 }
 
+SEGAN_INLINE matrix Camera::GetProjectionMatrix( void ) const
+{
+	if ( m_mode == CM_PERSPECTIVE )
+	{
+		//  compute near distance depend on m_far distance
+		const float znear = ( 0.00005f * m_far );
+		const float width = sx_vp_width;
+		const float height = sx_vp_height;
+		return sx_perspective_fov( m_fov, ( height / width ), znear, m_far );
+	}
+	else
+	{
+		const float3 d = m_eye - m_at;
+		const float r = sx_length( d );
+		const float width = sx_vp_width;
+		const float height = sx_vp_height;
+		return sx_orthographic( r * ( height / width ), r, - m_far, m_far );
+	}
+}
+
 SEGAN_INLINE matrix Camera::GetPerspectiveMatrix( const uint viewportWidth, const uint viewportHeight, const float nearZ /*= -1 */ ) const
 {
 	//  compute near distance depend on m_far distance
@@ -67,81 +90,78 @@ SEGAN_INLINE matrix Camera::GetPerspectiveMatrix( const uint viewportWidth, cons
 	return sx_perspective_fov( m_fov, (float)viewportWidth / (float)viewportHeight, znear, m_far );
 }
 
-matrix Camera::GetOrthographicMatrix( const uint viewportWidth, const uint viewportHeight ) const
+SEGAN_INLINE matrix Camera::GetOrthographicMatrix( const uint viewportWidth, const uint viewportHeight ) const
 {
 	const float3 d = m_eye - m_at;
 	const float r = sx_length( d );
 	return sx_orthographic( r * ( viewportWidth / viewportHeight ), r, -m_far, m_far );
 }
 
-#if 0
-
-Ray& Camera::GetRay( float absX, float absY )
+SEGAN_INLINE Ray Camera::GetRay( const float absX /*= -1*/, const float absY /*= -1*/ )
 {
-	static Ray ray(math::VEC3_ZERO, math::VEC3_ZERO);
-
-	Matrix matView, matProj;
-	GetViewMatrix(matView);
-	GetPerspectiveMatrix(matProj);
-	ray.Compute( absX, absY, SEGAN_VP_WIDTH, SEGAN_VP_HEIGHT, matView, matProj );
-	return ray;
+	matrix matview = GetViewMatrix();
+	matrix matProj = GetProjectionMatrix();
+	const float width = sx_vp_width;
+	const float height = sx_vp_height;
+	const float x = ( absX > -0.1f ) ? absX : sx_mouse_absx(0);
+	const float y = ( absY > -0.1f ) ? absY : sx_mouse_absy(0);
+	return sx_ray( x, y, width, height, matview, matProj );
+	
 }
 
-FORCEINLINE float Camera::ComputeViewDistance( const float3& position, float objRadius )
+SEGAN_INLINE float Camera::ComputeViewDistance( const float3& position, float objRadius )
 {
-	return cmn::ViewDistanceByCamera(m_eye, m_at, m_fov, position, objRadius);
+	return sx_view_distance( m_eye, m_at, m_fov, position, objRadius );
 }
 
 void Camera::Save( Stream& stream )
 {
-	SEGAN_STREAM_WRITE(stream, cameraFileID);
+	sx_stream_write( cameraFileID );
 
-	int version = 1;
-	SEGAN_STREAM_WRITE(stream, version);
-
-	SEGAN_STREAM_WRITE(stream, m_fov);
-	SEGAN_STREAM_WRITE(stream, m_aspect);
-	SEGAN_STREAM_WRITE(stream, m_far);
-	SEGAN_STREAM_WRITE(stream, m_velocity);
-	SEGAN_STREAM_WRITE(stream, m_amplitude);
-	SEGAN_STREAM_WRITE(stream, m_eye);
-	SEGAN_STREAM_WRITE(stream, m_at);
-	SEGAN_STREAM_WRITE(stream, m_up);
-	SEGAN_STREAM_WRITE(stream, m_orthoWidth);
-	SEGAN_STREAM_WRITE(stream, m_orthoHeight);
-	SEGAN_STREAM_WRITE(stream, m_matMode);
-
+	uint version = 1;
+	sx_stream_write( version);
+	sx_stream_write( m_mode );
+	sx_stream_write( m_eye );
+	sx_stream_write( m_at );
+	sx_stream_write( m_up );
+	sx_stream_write( m_fov );
+	sx_stream_write( m_far );
+	sx_stream_write( m_velocity );
+	sx_stream_write( m_amplitude );
 }
 
 void Camera::Load( Stream& stream )
 {
-	UINT id = 0;
-	SEGAN_STREAM_READ(stream, id);
-	if (id != cameraFileID)
+	uint id = 0;
+	sx_stream_read( id );
+	if ( id != cameraFileID )
 	{
-		sxLog::Log(L"Incompatible file format for loading camera !");
+		g_logger->Log( L"Incompatible file format for loading camera !" );
 		return;
 	}
 
-	int version = 0;
-	SEGAN_STREAM_READ(stream, version);
+	sint version = 0;
+	sx_stream_read( version );
 
 	if ( version == 1 )
 	{
-		SEGAN_STREAM_READ(stream, m_fov);
-		SEGAN_STREAM_READ(stream, m_aspect);
-		SEGAN_STREAM_READ(stream, m_far);
-		SEGAN_STREAM_READ(stream, m_velocity);
-		SEGAN_STREAM_READ(stream, m_amplitude);
-		SEGAN_STREAM_READ(stream, m_eye);
-		SEGAN_STREAM_READ(stream, m_at);
-		SEGAN_STREAM_READ(stream, m_up);
-		SEGAN_STREAM_READ(stream, m_orthoWidth);
-		SEGAN_STREAM_READ(stream, m_orthoHeight);
-		SEGAN_STREAM_READ(stream, m_matMode);
+		sx_stream_read( version);
+		sx_stream_read( m_mode );
+		sx_stream_read( m_eye );
+		sx_stream_read( m_at );
+		sx_stream_read( m_up );
+		sx_stream_read( m_fov );
+		sx_stream_read( m_far );
+		sx_stream_read( m_velocity );
+		sx_stream_read( m_amplitude );
 	}
-
 }
 
-#endif
+void Camera::SetToDevice( void )
+{
+	matrix matview = GetViewMatrix();
+	matrix matProj = GetProjectionMatrix();
+	g_engine->m_device3D->SetMatrix( MM_VIEW, matview );
+	g_engine->m_device3D->SetMatrix( MM_PROJECTION, matProj );
+}
 

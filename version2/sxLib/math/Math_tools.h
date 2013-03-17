@@ -638,4 +638,23 @@ SEGAN_ENG_API void sx_convert_quat_triangle( float2* dest, const float2* src );
 //! convert colors of a quad to two triangles. the dest buffer must have 6 color at least
 SEGAN_ENG_API void sx_convert_quat_triangle( Color* dest, const Color* src );
 
+//! compute view parameter used to set level of detail for the object
+SEGAN_INLINE float sx_view_distance( const Frustum& frustun, const float cameraFov, const float3& position, const float obj_radius )
+{
+	const float vp = sx_distance( frustun.p0, position ) - obj_radius;
+	const float cosfov = 1.0f - sx_cos_fast( cameraFov );
+	return ( vp * cosfov );
+}
+
+/*! compute view parameter used to set level of detail for the object
+note that we need distance of objects from the near plane instead of camera position */
+SEGAN_INLINE float sx_view_distance( const float3& cameraEye, const float3& cameraAt, const float cameraFov, const float3& position, const float obj_radius )
+{
+	float3 dir = cameraAt - cameraEye;
+	dir.Normalize();
+	const float vp = sx_dot( dir, position ) - sx_dot( dir, cameraEye ) - obj_radius;
+	const float cosfov = 1.0f - sx_cos_fast( cameraFov );
+	return ( vp * cosfov );
+}
+
 #endif	//	GUARD_Math_tools_HEADER_FILE

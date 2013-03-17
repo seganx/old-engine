@@ -12,6 +12,17 @@
 
 #include "../../sxLib/Lib.h"
 
+
+//! the mode of camera is perspective or orthographic
+enum CameraMode
+{
+	CM_PERSPECTIVE,			//!	camera has a perspective view
+	CM_ORTHOGRAPHIC,		//!	camera has an orthographic view
+
+	CM_32BITENUM = 0xffffffff
+};
+
+
 //! structure of camera
 class SEGAN_ENG_API Camera
 {
@@ -30,15 +41,17 @@ public:
 	//! return view matrix
 	matrix GetViewMatrix( void ) const;
 
+	//! return the projection matrix
+	matrix GetProjectionMatrix( void ) const;
+
 	//! return perspective matrix. pass -1 for nearZ to compute that automatically
 	matrix GetPerspectiveMatrix( const uint viewportWidth, const uint viewportHeight, const float nearZ = -1 ) const;
 
 	//! return orthographic matrix. NOTE: make matrix depend on camera eye, so is not suitable for shadow map generation
 	matrix GetOrthographicMatrix( const uint viewportWidth, const uint viewportHeight ) const;
 
-#if 0
 	//! return ray depend on camera
-	Ray& GetRay( const float absX, const float absY );
+	Ray GetRay( const float absX = -1, const float absY = -1 );
 
 	//! compute and return view parameter use to set LOD of the objects
 	float ComputeViewDistance( const float3& position, const float objRadius );
@@ -48,17 +61,20 @@ public:
 
 	//! load properties from stream
 	void Load( Stream& stream );
-#endif
+
+	//! set this camera to the device
+	void SetToDevice( void );
 
 public:
-	
-	float3	m_eye;
-	float3	m_at;
-	float3	m_up;
-	float	m_fov;
-	float	m_far;
-	float	m_velocity;
-	float	m_amplitude;
+
+	CameraMode	m_mode;
+	float3		m_eye;
+	float3		m_at;
+	float3		m_up;
+	float		m_fov;
+	float		m_far;
+	float		m_velocity;
+	float		m_amplitude;
 
 };
 

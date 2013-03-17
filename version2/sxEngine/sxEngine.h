@@ -88,4 +88,10 @@ SEGAN_ENG_API void engine_finalize( void );
 //!	start engine and call the main game loop
 SEGAN_ENG_API void engine_start( ApplicationMainLoop mainloop );
 
+
+#define sx_vp_x			float(g_engine->m_device3D->m_viewport.x)
+#define sx_vp_y			float(g_engine->m_device3D->m_viewport.y)
+#define sx_vp_width		float(g_engine->m_device3D->m_viewport.width)
+#define sx_vp_height	float(g_engine->m_device3D->m_viewport.height)
+
 #endif	//	GUARD_sxEngine_HEADER_FILE
