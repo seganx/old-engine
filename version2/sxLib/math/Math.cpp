@@ -1,4 +1,5 @@
 #include "../Math.h"
+#include "../Memory.h"
 #include "Math_Generic.h"
 
 #if SEGAN_MATH_SIMD
@@ -1085,21 +1086,21 @@ SEGAN_INLINE bool sx_intersect( const OBBox& box, const Frustum& fr )
 
 SEGAN_INLINE void sx_convert_quat_triangle( float3* dest, const float3* src )
 {
-	memcpy( &dest[0], &src[0], sizeof(float3) * 3);
-	memcpy( &dest[3], &src[0], sizeof(float3) );
-	memcpy( &dest[4], &src[2], sizeof(float3) * 2);
+	sx_mem_copy( &dest[0], &src[0], sizeof(float3) * 3);
+	sx_mem_copy( &dest[3], &src[0], sizeof(float3) );
+	sx_mem_copy( &dest[4], &src[2], sizeof(float3) * 2);
 }
 
 SEGAN_INLINE void sx_convert_quat_triangle( float2* dest, const float2* src )
 {
-	memcpy( &dest[0], &src[0], sizeof(float2) * 3);
-	memcpy( &dest[3], &src[0], sizeof(float2) );
-	memcpy( &dest[4], &src[2], sizeof(float2) * 2);
+	sx_mem_copy( &dest[0], &src[0], sizeof(float2) * 3);
+	sx_mem_copy( &dest[3], &src[0], sizeof(float2) );
+	sx_mem_copy( &dest[4], &src[2], sizeof(float2) * 2);
 }
 
 SEGAN_INLINE void sx_convert_quat_triangle( Color* dest, const Color* src )
 {
-	memcpy( &dest[0], &src[0], sizeof(Color) * 3);
-	memcpy( &dest[3], &src[0], sizeof(Color) );
-	memcpy( &dest[4], &src[2], sizeof(Color) * 2);
+	sx_mem_copy( &dest[0], &src[0], sizeof(Color) * 3);
+	sx_mem_copy( &dest[3], &src[0], sizeof(Color) );
+	sx_mem_copy( &dest[4], &src[2], sizeof(Color) * 2);
 }

@@ -11,7 +11,7 @@
 
 #include "Math.h"
 
-SEGAN_INLINE float gen_matrix_det( matrix* mat )
+SEGAN_INLINE float gen_matrix_det( const matrix* mat )
 {
 	float tmp0 = ( ( mat->m22 * mat->m03 ) - ( mat->m02 * mat->m23 ) );
 	float tmp1 = ( ( mat->m32 * mat->m13 ) - ( mat->m12 * mat->m33 ) );

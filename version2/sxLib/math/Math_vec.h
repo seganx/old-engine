@@ -462,7 +462,7 @@ public:
  	//! set translation of this matrix without change of rotation
  	SEGAN_INLINE matrix& SetTranslation( const float x, const float y, const float z )
 	{
-		m31 = x; m32 = y; m33 = z;
+		m30 = x; m30 = y; m32 = z;
 		return *this;
 	}
 
