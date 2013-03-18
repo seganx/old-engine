@@ -83,10 +83,10 @@ void app_main_loop( float elpsTime )
 		panel1.SetSize( 200.0f, 50.0f );
 		uiState* state = panel1.m_state.GetCurrent();
 		state->align.Set( -0.5f, 0.5f );
-		state->position.Set( 200.0f, -200.0f, 0.0f );
-		state->rotation.Set( 0.1f, sx_sin(timer), 0.0f );
-		state->scale.Set( 2.0f, 1.0f, 1.0f );
-		panel2.SetParent( &panel1 );
+		state->center.Set( -0.5f, 0.5f, 0.0f );
+		state->position.Set( 100.0f, -50.0f, 0.0f );
+		//state->scale.Set( 1.0f, 2.0f, 1.0f );
+		//panel2.SetParent( &panel1 );
 		panel2.SetSize( 100.0f, 30.0f );
 		g_engine->m_gui->Add( &panel1 );
  		g_engine->m_gui->Add( &panel2 );
@@ -163,7 +163,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	config.net_id = 0x2727;
 	config.logger = &loggerconfig;
 	config.window_callback = &window_event_call;
-	config.d3d_flag = SX_D3D_CREATE_GL;// | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
+	config.d3d_flag = SX_D3D_CREATE_DX;// | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
 	config.input_device[0] = &ioMouse;
 
 	sx_engine_get_singleton( &config );

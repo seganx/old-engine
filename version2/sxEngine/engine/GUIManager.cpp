@@ -3,38 +3,41 @@
 
 
 GUIManager::GUIManager( void )
+: m_controls(128)
+, m_elements(128)
 {
-
+	m_drawable = sx_new( uiElement );
+	m_drawable->m_type = ET_TRIANGLES;
 }
 
 GUIManager::~GUIManager( void )
 {
-
+	sx_delete_and_null( m_drawable );
 }
 
 void GUIManager::Add( const uiControl* control )
 {
-	m_gui.PushBack( (uiControl*)control );
+	m_controls.PushBack( (uiControl*)control );
 }
 
 void GUIManager::Remove( const uiControl* control )
 {
-	m_gui.Remove( (uiControl*)control );
+	m_controls.Remove( (uiControl*)control );
 }
 
 void GUIManager::Delete( uiControl*& control )
 {
-	m_gui.Remove( control );
+	m_controls.Remove( control );
 	sx_delete_and_null( control );
 }
 
 void GUIManager::Clear( void )
 {
-	for ( uint i=0; i<m_gui.m_count; ++i )
+	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
-		sx_delete( m_gui[i] );
+		sx_delete( m_controls[i] );
 	}
-	m_gui.Clear();
+	m_controls.Clear();
 }
 
 void GUIManager::Update( float elpsTime )
@@ -44,48 +47,59 @@ void GUIManager::Update( float elpsTime )
 	matrix viewproj = sx_mul( view, proj );
 	matrix viewinvr = sx_inverse( view );
 
-	for ( uint i=0; i<m_gui.m_count; ++i )
+	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
-		m_gui[i]->Update( elpsTime, viewinvr, viewproj, g_engine->m_device3D->m_viewport.width, g_engine->m_device3D->m_viewport.height );
+		m_controls.m_item[i]->Update( elpsTime, viewinvr, viewproj, g_engine->m_device3D->m_viewport.width, g_engine->m_device3D->m_viewport.height );
 	}
 }
 
 void GUIManager::ProcessInput( void )
 {
-	for ( uint i=0; i<m_gui.m_count; ++i )
+	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
-	//	m_gui[i]->Update( elpsTime );
+	//	m_controls[i]->Update( elpsTime );
 	}
 }
 
 void GUIManager::Draw( const dword flag )
 {
-	static uiElement elemfinal;
-	elemfinal.m_numVertices = 0;
-
-	uiBatchMode mode = ( g_engine->m_device3D->m_creationData.flag & SX_D3D_CREATE_GL ) ? BM_QUADS_CCW : BM_TRIANGLES;
-	g_engine->m_deviceUI->BeginBatchElements( mode, 0 );
-
-	for ( uint i=0; i<m_gui.m_count; ++i )
+	//	extract all elements that should be draw
+	m_elements.Clear();
+	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
-		uiControl* control = m_gui[i];
-
-		for ( sint e=0; e<SX_GUI_MAX_ELEMENT; ++e )
+		for ( uint j=0; j<SX_GUI_MAX_ELEMENT; ++j )
 		{
-			uiElement* element = &control->m_element[e];
-			const uint numvertices = element->m_numVertices;
-			if ( numvertices )
+			uiElement* element = &m_controls.m_item[i]->m_element[j];
+			if ( element->m_numVertices )
 			{
-				for ( uint v=0; v < numvertices; ++v )
-					sx_transform_point( element->m_posfinal[v], element->m_pos[v], control->m_matrix );
-
-				g_engine->m_deviceUI->AddBatchElements( &control->m_element[e] );
+				m_elements.PushBack( element );
 			}
+			else break;
 		}
 	}
 
-	g_engine->m_deviceUI->EndBatchElements( &elemfinal );
+	//	batch elements and draw them
+	while ( m_elements.m_count )
+	{
+		m_drawable->m_numVertices = 0;
 
-	sx_debug_draw_gui_element( &elemfinal );
+		g_engine->m_deviceUI->BeginBatch( 0 );
+		for ( sint i=0; i<m_elements.m_count; ++i )
+		{
+			if ( g_engine->m_deviceUI->AddBatch( m_elements.m_item[i] ) )
+				m_elements.RemoveByIndex( i-- );
+			else
+				break;
+		}
+
+		//	verify that one element batched at least
+		if ( g_engine->m_deviceUI->m_batches.m_count < 1 ) break;
+
+		//	end batch
+		g_engine->m_deviceUI->EndBatch( m_drawable );
+
+		//	draw the final element
+		sx_debug_draw_gui_element( m_drawable );
+	}
 }
 

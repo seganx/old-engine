@@ -84,7 +84,7 @@ public:
 
 	SEGAN_LIB_INLINE void Insert( sint index, const T& newItem )
 	{
-		sx_assert(index<=m_count);
+		sx_assert(index>=0 && index<=m_count);
 		_Realloc( ++m_count );
 		for ( sint i = m_count-1; i>index; i-- )
 			m_item[i] = m_item[i-1];
@@ -99,17 +99,17 @@ public:
 		return true;
 	}
 
-	SEGAN_LIB_INLINE void RemoveByIndex( uint index )
+	SEGAN_LIB_INLINE void RemoveByIndex( sint index )
 	{
-		sx_assert(index<m_count);
-		for ( uint i=index; i<m_count-1; i++ )
+		sx_assert(index>=0 && index<m_count);
+		for ( sint i=index; i<m_count-1; i++ )
 			m_item[i] = m_item[i+1];
 		_Realloc( --m_count );
 	}
 
-	SEGAN_LIB_INLINE void Swap( uint index1, uint index2 )
+	SEGAN_LIB_INLINE void Swap( sint index1, sint index2 )
 	{
-		sx_assert(index1<m_count && index2<m_count);
+		sx_assert(index1>=0 && index1<m_count && index2>=0 && index2<m_count);
 		if ( index1 == index2 ) return;
 		T _tmp = m_item[index1];
 		m_item[index1] = m_item[index2];
@@ -123,7 +123,7 @@ public:
 
 	SEGAN_LIB_INLINE sint IndexOf( const T& item )
 	{
-		for ( uint i=0; i<m_count; i++ ) {
+		for ( sint i=0; i<m_count; i++ ) {
 			if ( m_item[i] == item ) {
 				return i;
 			}
@@ -131,41 +131,54 @@ public:
 		return -1;
 	}
 
-	SEGAN_LIB_INLINE T& At( uint index )
+	SEGAN_LIB_INLINE T& At( sint index )
 	{
-		sx_assert(index<m_count);
+		sx_assert(index>=0 && index<m_count);
 		return m_item[index];
 	}
 
-	SEGAN_LIB_INLINE T& operator[]( uint index )
+	SEGAN_LIB_INLINE T& operator[]( sint index )
 	{
-		sx_assert(index<m_count);
+		sx_assert(index>=0 && index<m_count);
 		return m_item[index];
 	}
 
-	SEGAN_LIB_INLINE void QuickSort( compFunc cmpFunc, uint leftarg, uint rightarg )
+	SEGAN_LIB_INLINE void QuickSort( compFunc cmpFunc, sint leftarg, sint rightarg )
 	{	//	base code from IBM with some changes : http://publib.boulder.ibm.com/infocenter/lnxpcomp/v8v101/index.jsp?topic=%2Fcom.ibm.xlcpp8l.doc%2Flanguage%2Fref%2Ffunction_templates.htm&topic=%2Fcom.ibm.xlcpp8l.doc%2Flanguage%2Fref%2Ffunction_templates.htm
 		if ( leftarg < rightarg )
 		{
+			sx_assert( leftarg >= 0 );
 			sx_assert( leftarg < m_count );
+
+			sx_assert( rightarg >= 0 );
 			sx_assert( rightarg < m_count );
 
-			uint pivotvalue = ( leftarg + rightarg ) / 2;
-			uint left = leftarg - 1;
-			uint right = rightarg + 1;
+			int pivotvalue = ( leftarg + rightarg ) / 2;
+			int left = leftarg - 1;
+			int right = rightarg + 1;
 
-			for(;;) {;
+			for(;;) {
+				sx_assert( pivotvalue >= 0 );
 				sx_assert( pivotvalue < m_count );
+
+				sx_assert( right-1 >= 0 );
 				sx_assert( right-1 < m_count );
 				while ( --right >= 0 && cmpFunc( m_item[right], m_item[pivotvalue] ) > 0 );
+
+				sx_assert( left+1 >= 0 );
 				sx_assert( left+1 < m_count );
 				while ( ++left < m_count && cmpFunc( m_item[left], m_item[pivotvalue] ) < 0 );
+
 				if ( left >= right ) break;
+
+				sx_assert( left >= 0 );
 				sx_assert( left < m_count );
+				sx_assert( right >= 0 );
 				sx_assert( right < m_count );
 				T temp = m_item[right];
 				m_item[right] = m_item[left];
 				m_item[left] = temp;
+
 				if ( pivotvalue == right )		pivotvalue = left;
 				else if ( pivotvalue == left )	pivotvalue = right;
 			}
@@ -178,12 +191,12 @@ public:
 
 private:
 
-	SEGAN_LIB_INLINE void _Realloc( uint newSize )
+	SEGAN_LIB_INLINE void _Realloc( sint newSize )
 	{
 		if ( m_sampler )
 		{
 			if ( newSize > m_size || ( m_size - newSize ) > m_sampler ) {
-				m_size = uint( newSize / m_sampler  + 1 ) * m_sampler;
+				m_size = sint( newSize / m_sampler  + 1 ) * m_sampler;
 				mem_realloc( (void*&)m_item, m_size * sizeof(T) );
 			}
 		}
@@ -198,9 +211,9 @@ private:
 public:
 
 	T*			m_item;			//  items in array
-	uint		m_count;		//  number of items in array
-	uint		m_size;			//	size of the whole array
-	uint		m_sampler;		//  use to sample memory to reduce allocation
+	sint		m_count;		//  number of items in array
+	sint		m_size;			//	size of the whole array
+	sint		m_sampler;		//  use to sample memory to reduce allocation
 };
 
 
@@ -377,7 +390,7 @@ public:
 public:
 
 	T		m_item[count];	//  items in array
-	int		m_count;		//  number of items in array
+	sint	m_count;		//  number of items in array
 };
 
 

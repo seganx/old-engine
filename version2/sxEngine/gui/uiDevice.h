@@ -56,12 +56,12 @@ enum uiType
 };
 
 //! indicate that which primitive type should be used in batch system
-enum uiBatchMode
+enum uiElementType
 {
-	BM_SIMPLE = 0,
-	BM_TRIANGLES,
-	BM_QUADS_CCW,
-	MB_QUADS_CW,
+	ET_NONE = 0,
+	ET_LINES,			//! element contain list of lines
+	ET_TRIANGLES,		//! element contain list of triangles
+	ET_QUADS,			//! element contain list of quads
 
 	BM_32BITENUM = 0xffffffff
 };
@@ -165,19 +165,19 @@ public:
 	uint Add( void );
 
 	//! remove an state by specified index
-	void Remove( const uint index );
+	void Remove( const sint index );
 
 	//! return the index of current state
 	uint GetIndex( void ) const;
 
 	//! set index of the state
-	void SetIndex( const uint index );
+	void SetIndex( const sint index );
 
 	//! return reference to the current state structure
 	uiState* GetCurrent( void );
 
 	//! return reference to state by index
-	uiState* GetByIndex( const uint index );
+	uiState* GetByIndex( const sint index );
 
 	//! return reference of the blended state structure
 	uiState* GetBlended( void );
@@ -220,13 +220,13 @@ public:
 	void ClearVertives( void );
 
 public:
-
-	uint		m_image;			//	image id helps the manager to compound elements
-	uint		m_numVertices;		//	number of vertices
-	float3*		m_pos;				//	positions
-	float2*		m_uv;				//	UV coordinates
-	Color*		m_color;			//	colors
-	float3*		m_posfinal;				//	use temporary positions to transform elements from local space to the world space
+	uiElementType	m_type;				//	type of data in the element
+	uint			m_image;			//	image id helps the manager to compound elements
+	uint			m_numVertices;		//	number of vertices
+	float3*			m_pos;				//	positions
+	float2*			m_uv;				//	UV coordinates
+	Color*			m_color;			//	colors
+	float3*			m_posfinal;			//	use temporary positions to transform elements from local space to the world space
 };
 
 
@@ -289,22 +289,24 @@ public:
 	uiControl* CreateContorl( const uiType type );
 
 	//! copy the src element to the dest element in the given index position
-	void Copy( uiElement* dest, uint& index, const uiElement* src, const uiBatchMode mode );
+	void Copy( uiElement* dest, uint& index, const uiElement* src );
 
-	//! prepare for batching elements. if mode was not simple the only element's with 4 vertices will accepted to the batch
-	void BeginBatchElements( const uiBatchMode mode, const uint count );
+	//! prepare for batching elements. pass count 0 to compute number of batch automatically
+	void BeginBatch( const uint count );
 
-	//! add an element to the batch and return false if can't batch given element with another
-	bool AddBatchElements( const uiElement* elem );
+	//! add an element to the batch and return false if can't batch the element with another
+	bool AddBatch( const uiElement* elem );
+
+	//! return number of vertices need to batch all added elements
+	uint GetBatchVertexCount( void );
 
 	//! end patch and append them to the end of dest element
-	void EndBatchElements( uiElement* dest );
+	void EndBatch( uiElement* dest );
+
 
 public:
 
-	uiBatchMode			m_batchMode;	//! batch mode 
 	Array<uiElement*>	m_batches;		//!	us in batch system
-	float				m_zbias;		//! prevent rubbing surfaces of GUI controls in 3D mode
 	bool				m_editor;		//! indicates that GUI is running in editor mode
 };
 

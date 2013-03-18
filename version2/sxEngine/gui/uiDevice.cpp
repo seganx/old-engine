@@ -36,7 +36,7 @@ uint uiStateController::Add( void )
 	return m_states.m_count - 1;
 }
 
-void uiStateController::Remove( const uint index )
+void uiStateController::Remove( const sint index )
 {
 	if ( index >= 0 && index < m_states.m_count && m_states.m_count > 1 )
 	{
@@ -44,7 +44,7 @@ void uiStateController::Remove( const uint index )
 	}
 }
 
-void uiStateController::SetIndex( const uint index )
+void uiStateController::SetIndex( const sint index )
 {
 	if ( index != m_index )
 	{
@@ -68,9 +68,9 @@ SEGAN_INLINE uiState* uiStateController::GetCurrent( void )
 	return &m_states[m_index];
 }
 
-SEGAN_INLINE uiState* uiStateController::GetByIndex( const uint index )
+SEGAN_INLINE uiState* uiStateController::GetByIndex( const sint index )
 {
-	if ( index < m_states.m_count )
+	if ( index >=0 && index < m_states.m_count )
 		return &m_states[index];
 	else
 		return null;
@@ -125,7 +125,8 @@ SEGAN_INLINE void uiStateController::Update( const dword option, float elpsTime 
 //	ELEMENT
 //////////////////////////////////////////////////////////////////////////
 uiElement::uiElement( void )
-: m_numVertices(0)
+: m_type(ET_QUADS)
+, m_numVertices(0)
 , m_pos(null)
 , m_uv(null)
 , m_color(null)
@@ -146,10 +147,20 @@ void uiElement::CreateVertices( const uint count )
 	{
 		if ( count > m_numVertices )
 		{
-			sx_mem_realloc( m_pos,		count * sizeof(float3) );
-			sx_mem_realloc( m_uv,		count * sizeof(float2) );
-			sx_mem_realloc( m_color,	count * sizeof(float4) );
-			sx_mem_realloc( m_posfinal,		count * sizeof(float3) );
+			//	delete last buffer
+			sx_mem_free_and_null( m_pos );
+
+			const uint size_pos			= count * sizeof(float3);
+			const uint size_uv			= count * sizeof(float2);
+			const uint size_color		= count * sizeof(Color);
+			const uint size_posfinal	= count * sizeof(float3);
+
+			byte* buffer = (byte*)sx_mem_alloc( size_pos + size_uv + size_color + size_posfinal );
+
+			m_pos		= (float3*)( buffer );
+			m_uv		= (float2*)( buffer + ( size_pos ) );
+			m_color		= (Color*) ( buffer + ( size_pos + size_uv ) );
+			m_posfinal	= (float3*)( buffer + ( size_pos + size_uv + size_color ) );
 		}
 		m_numVertices = count;
 	}
@@ -161,9 +172,9 @@ void uiElement::ClearVertives( void )
 	if ( m_numVertices )
 	{
 		sx_mem_free_and_null( m_pos );
-		sx_mem_free_and_null( m_uv );
-		sx_mem_free_and_null( m_color );
-		sx_mem_free_and_null( m_posfinal );
+		m_uv		= null;
+		m_color		= null;
+		m_posfinal	= null;
 		m_numVertices = 0;
 	}
 }
@@ -190,7 +201,7 @@ uiControl::~uiControl( void )
 	if ( m_parent )	SetParent( null );
 
 	//	delete all children
-	for ( uint i=0; i<m_child.m_count; ++i )
+	for ( sint i=0; i<m_child.m_count; ++i )
 	{
 		uiControl* child = m_child[i];
 		child->m_parent = null;
@@ -267,10 +278,10 @@ void uiControl::Update( float elpsTime, const matrix& viewInverse, const matrix&
 		mat.Identity();
 
 		//  apply center
-		mat.SetTranslation( state->center.x * m_size.x, state->center.y * m_size.y, state->center.z );
+		mat.SetTranslation( - state->center.x * m_size.x, - state->center.y * m_size.y, state->center.z );
 
 		//  apply scale to matrix
-		mat.SetScale( state->scale.x, state->scale.y, state->scale.z );
+		//mat.SetScale( state->scale.x, state->scale.y, state->scale.z );
 
 		//  apply rotation
 		sx_set_rotation_xyz( matTmp, 
@@ -329,6 +340,15 @@ void uiControl::Update( float elpsTime, const matrix& viewInverse, const matrix&
 			sx_set_rem( m_option, _SX_GUI_IN_3DSPACE_ );
 	}
 
+	//	transform vertices from local space to the world space
+	for ( uint i=0; i<SX_GUI_MAX_ELEMENT && m_element[i].m_numVertices; ++i )
+	{
+		for ( uint j=0; j<m_element[i].m_numVertices; ++j )
+		{
+			sx_transform_point( m_element[i].m_posfinal[j], m_element[i].m_pos[j], m_matrix );
+		}
+	}
+
 	// after that all let's update the children
 	for ( sint i = (sint)m_child.m_count - 1; i >= 0; --i )
 	{
@@ -381,88 +401,93 @@ uiControl* uiDevice::CreateContorl( const uiType type )
 	return null;
 }
 
-void uiDevice::Copy( uiElement* dest, uint& index, const uiElement* src, const uiBatchMode mode )
+void uiDevice::Copy( uiElement* dest, uint& index, const uiElement* src )
 {
-	switch ( mode )
+	switch ( src->m_type )
 	{
-	case BM_SIMPLE:
+	case ET_NONE:
 		{
-			sx_assert( L"uiControl::Batch mode can't be simple !" );
+			sx_assert( L"uiDevice::Copy : Element type is not defined !" );
 		}
 		break;
 
-	case BM_TRIANGLES:
+	case ET_LINES:
 		{
-			if ( src->m_numVertices )
-			{
-				sx_convert_quat_triangle( &dest->m_posfinal[index],		src->m_posfinal	 );
-				sx_convert_quat_triangle( &dest->m_uv[index],		src->m_uv	 );
-				sx_convert_quat_triangle( &dest->m_color[index],	src->m_color );
-				index += src->m_numVertices + 2;
-			}
+			sx_assert( L"uiDevice::Copy : Copy Line elements is not implemented yet !" );
 		}
 		break;
 
-	case BM_QUADS_CCW:
+	case ET_TRIANGLES:
 		{
 			const uint srcvertcount = src->m_numVertices;
 			if ( srcvertcount )
 			{
-				sx_mem_copy( &dest->m_posfinal[index],	src->m_posfinal,		srcvertcount * sizeof(float3) );
-				sx_mem_copy( &dest->m_uv[index],	src->m_uv,		srcvertcount * sizeof(float2) );
-				sx_mem_copy( &dest->m_color[index], src->m_color,	srcvertcount * sizeof(float4) );
+				sx_mem_copy( &dest->m_posfinal[index],	src->m_posfinal,	srcvertcount * sizeof(float3) );
+				sx_mem_copy( &dest->m_uv[index],		src->m_uv,			srcvertcount * sizeof(float2) );
+				sx_mem_copy( &dest->m_color[index],		src->m_color,		srcvertcount * sizeof(float4) );
 				index += srcvertcount;
 			}
 		}
 		break;
 
-	case MB_QUADS_CW:
+	case ET_QUADS:
 		{
-			sx_assert( L"uiControl::Batch mode can't be Quad CW because is not implemented yet !" );
+			if ( src->m_numVertices )
+			{
+				sx_convert_quat_triangle( &dest->m_posfinal[index],		src->m_posfinal		);
+				sx_convert_quat_triangle( &dest->m_uv[index],			src->m_uv			);
+				sx_convert_quat_triangle( &dest->m_color[index],		src->m_color		);
+				index += src->m_numVertices + 2;
+			}
 		}
 		break;
 	}
-
 }
 
-void uiDevice::BeginBatchElements( const uiBatchMode mode, const uint count )
+void uiDevice::BeginBatch( const uint count )
 {
-	m_batchMode = mode;
 	if ( count )
 		m_batches.SetSize( count );
 }
 
-bool uiDevice::AddBatchElements( const uiElement* elem )
+SEGAN_INLINE bool uiDevice::AddBatch( const uiElement* elem )
 {
 	//	verify that all these have the same image id
-	if ( m_batches.m_count )
-		if ( m_batches[0]->m_image != elem->m_image ) return false;
+	if ( m_batches.m_count && m_batches[0]->m_image != elem->m_image ) return false;
 
-	//	check the batch mode
-	if ( m_batchMode == BM_SIMPLE )
+	//	verify element type
+	switch ( elem->m_type )
 	{
-		m_batches.PushBack( (uiElement*)elem );
-		return true;
+	case ET_NONE:
+		sx_assert( L"uiDevice::AddBatch : Element type is not defined !" );
+		return false;
+
+	case ET_LINES:
+		sx_assert( L"uiDevice::AddBatch : Line elements is not implemented yet !" );
+		return false;
 	}
 
-	//	for the other batch mode number of vertices should be 4
-	if ( elem->m_numVertices == 4 )
-	{
-		m_batches.PushBack( (uiElement*)elem );
-		return true;
-	}
-
-	return false;
+	m_batches.PushBack( (uiElement*)elem );
+	return true;
 }
 
-void uiDevice::EndBatchElements( uiElement* dest )
+SEGAN_INLINE uint uiDevice::GetBatchVertexCount( void )
 {
-	const uint additionalVertices = ( m_batchMode == BM_TRIANGLES ? 2 : 0 );
-
 	// compute number of vertices
 	uint sumVertices = 0;
-	for ( uint i=0; i<m_batches.m_count; ++i )
-		sumVertices += m_batches.m_item[i]->m_numVertices + additionalVertices;
+	for ( sint i=0; i<m_batches.m_count; ++i )
+	{
+		uiElement* elem = m_batches.m_item[i];
+		if ( elem->m_type == ET_QUADS )
+			sumVertices += elem->m_numVertices + 2;
+	}
+	return sumVertices;
+}
+
+void uiDevice::EndBatch( uiElement* dest )
+{
+	//	get number of vertices needed to batch them
+	uint sumVertices = GetBatchVertexCount();
 
 	//	prepare destination element
 	uint destVertices = dest->m_numVertices;
@@ -470,26 +495,11 @@ void uiDevice::EndBatchElements( uiElement* dest )
 
 	//	copy batches to dest element
 	uint index = destVertices;
-	if ( m_batchMode == BM_SIMPLE )
+	for ( sint i=0; i<m_batches.m_count; ++i )
 	{
-		for ( uint i=0; i<m_batches.m_count; ++i )
-		{
-			const uiElement* src = m_batches.m_item[i];
-			const uint srcvertcount = src->m_numVertices;
-			sx_mem_copy( &dest->m_posfinal[index],	src->m_posfinal,		srcvertcount * sizeof(float3) );
-			sx_mem_copy( &dest->m_uv[index],	src->m_uv,		srcvertcount * sizeof(float2) );
-			sx_mem_copy( &dest->m_color[index], src->m_color,	srcvertcount * sizeof(float4) );
-			index += srcvertcount;
-		}
+		Copy( dest, index, m_batches.m_item[i] );
 	}
-	else
-	{
-		for ( uint i=0; i<m_batches.m_count; ++i )
-		{
-			Copy( dest, index, m_batches.m_item[i], m_batchMode );
-		}
-	}
-
+	
 	//	release array
 	m_batches.Clear();
 }

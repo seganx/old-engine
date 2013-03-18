@@ -15,6 +15,7 @@
 
 //! forward declarations
 class uiControl;
+class uiElement;
 
 /*! this class draw controls on the screen and manage events */
 class SEGAN_ENG_API GUIManager
@@ -49,8 +50,9 @@ public:
 
 public:
 
-	Array<uiControl*>	m_gui;		//	array of all controls
-
+	Array<uiControl*>	m_controls;		//	array of all controls
+	Array<uiElement*>	m_elements;		//	array of elements
+	uiElement*			m_drawable;		//	final drawable element
 };
 
 #endif	//	GUARD_GUIManager_HEADER_FILE
