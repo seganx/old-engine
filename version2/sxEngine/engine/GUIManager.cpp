@@ -63,19 +63,13 @@ void GUIManager::ProcessInput( void )
 
 void GUIManager::Draw( const dword flag )
 {
+	g_engine->m_device3D->SetRenderState( RS_FILL, false );
+
 	//	extract all elements that should be draw
 	m_elements.Clear();
 	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
-		for ( uint j=0; j<SX_GUI_MAX_ELEMENT; ++j )
-		{
-			uiElement* element = &m_controls.m_item[i]->m_element[j];
-			if ( element->m_numVertices )
-			{
-				m_elements.PushBack( element );
-			}
-			else break;
-		}
+		g_engine->m_deviceUI->GetElements( m_controls[i], &m_elements );
 	}
 
 	//	batch elements and draw them
@@ -101,5 +95,8 @@ void GUIManager::Draw( const dword flag )
 		//	draw the final element
 		sx_debug_draw_gui_element( m_drawable );
 	}
+
+	g_engine->m_device3D->SetRenderState( RS_FILL, true );
+
 }
 

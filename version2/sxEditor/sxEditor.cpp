@@ -85,14 +85,16 @@ void app_main_loop( float elpsTime )
 		state->align.Set( -0.5f, 0.5f );
 		state->center.Set( -0.5f, 0.5f, 0.0f );
 		state->position.Set( 100.0f, -50.0f, 0.0f );
-		//state->scale.Set( 1.0f, 2.0f, 1.0f );
-		//panel2.SetParent( &panel1 );
+		
+		panel2.SetParent( &panel1 );
 		panel2.SetSize( 100.0f, 30.0f );
+		state = panel2.m_state.GetCurrent();
+		state->align.Set( 0.5f, 0.5f );
+		state->center.Set( 0.5f, 0.5f, 0.0f );
+
 		g_engine->m_gui->Add( &panel1 );
- 		g_engine->m_gui->Add( &panel2 );
-		g_engine->m_gui->Update( elpsTime );
+ 		g_engine->m_gui->Update( elpsTime );
  		g_engine->m_gui->Draw( 0 );
- 		g_engine->m_gui->Remove( &panel2 );
  		g_engine->m_gui->Remove( &panel1 );
 #endif
 
@@ -163,7 +165,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	config.net_id = 0x2727;
 	config.logger = &loggerconfig;
 	config.window_callback = &window_event_call;
-	config.d3d_flag = SX_D3D_CREATE_DX;// | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
+	config.d3d_flag = SX_D3D_CREATE_GL;// | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
 	config.input_device[0] = &ioMouse;
 
 	sx_engine_get_singleton( &config );

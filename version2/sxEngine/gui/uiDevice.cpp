@@ -504,3 +504,23 @@ void uiDevice::EndBatch( uiElement* dest )
 	m_batches.Clear();
 }
 
+void uiDevice::GetElements( const uiControl* control, Array<uiElement*> *elementArray )
+{
+	// extract current elements
+	for ( uint i=0; i<SX_GUI_MAX_ELEMENT; ++i )
+	{
+		uiElement* element = (uiElement*)&control->m_element[i];
+		if ( element->m_numVertices )
+		{
+			elementArray->PushBack( element );
+		}
+		else break;
+	}
+
+	// extract elements of children
+	for ( sint i=0; i<control->m_child.m_count; ++i )
+	{
+		GetElements( control->m_child[i], elementArray );
+	}
+}
+

@@ -49,7 +49,6 @@ enum uiType
 	UT_PROGRESS,
 	UT_LABEL,
 	UT_EDITBOX,
-	UT_PANELEX,
 	UT_LISTBOX,
 
 	UT_32BITENUM = 0xffffffff
@@ -303,6 +302,8 @@ public:
 	//! end patch and append them to the end of dest element
 	void EndBatch( uiElement* dest );
 
+	//! extract all elements in the control
+	void GetElements( const uiControl* control, Array<uiElement*> *elementArray );
 
 public:
 

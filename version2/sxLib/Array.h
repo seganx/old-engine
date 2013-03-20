@@ -137,7 +137,7 @@ public:
 		return m_item[index];
 	}
 
-	SEGAN_LIB_INLINE T& operator[]( sint index )
+	SEGAN_LIB_INLINE T& operator[]( sint index ) const
 	{
 		sx_assert(index>=0 && index<m_count);
 		return m_item[index];
@@ -334,7 +334,7 @@ public:
 		return m_item[index];
 	}
 
-	SEGAN_LIB_INLINE T& operator[]( sint index )
+	SEGAN_LIB_INLINE T& operator[]( sint index ) const
 	{
 		sx_assert(index>=0 && index<m_count);
 		return m_item[index];

@@ -540,8 +540,6 @@ void d3dDevice_gl::DrawDebug( const d3dPrimitiveType primType, const uint vertxc
 {
 	ApplyTextureBuffer();
 
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
 	switch ( primType )
 	{
 	case PT_POINT:			glBegin( GL_POINTS );			break;
@@ -564,8 +562,6 @@ void d3dDevice_gl::DrawDebug( const d3dPrimitiveType primType, const uint vertxc
 	}
 
 	glEnd();
-
-	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 }
 
