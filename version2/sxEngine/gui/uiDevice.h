@@ -105,17 +105,12 @@ enum uiInputLanguage
 	IL_PERSIAN	= 0x80000000	//	|
 };
 
-struct uiState
+/*! input reporter reports that which input values used in other processes */
+struct uiInputReport
 {
-	float2		align;			//  align system of the control
-	float3		center;			//  center of the control
-	float3		position;		//  position of the control
-	float3		rotation;		//  rotation of the control
-	float3		scale;			//  scale of the control
-	float4		color;			//  color of the control
-	float2		blender;		//  blending weights for velocity and amplitude
-
-	uiState():	align(0,0), center(0,0,0), position(0,0,0), rotation(0,0,0), scale(1,1,1), color(1,1,1,1), blender(0.7f, 0.5f) {}
+	Ray			ray;				//	ray comes from the mouse
+	uint		mouseLocked;		//	contain the id of object who locked mouse
+	uint		keyboardLocked;		//	contain the id of object who locked keyboard
 };
 
 //! describe character information
@@ -145,6 +140,21 @@ struct uiFontDesc
 
 	uiFontDesc(): size(0), charCount(0), outline(0), lineHeight(0), charBase(0) {};
 };
+
+//! state of control
+struct uiState
+{
+	float2		align;			//  align system of the control
+	float3		center;			//  center of the control
+	float3		position;		//  position of the control
+	float3		rotation;		//  rotation of the control
+	float3		scale;			//  scale of the control
+	float4		color;			//  color of the control
+	float2		blender;		//  blending weights for velocity and amplitude
+
+	uiState():	align(0,0), center(0,0,0), position(0,0,0), rotation(0,0,0), scale(1,1,1), color(1,1,1,1), blender(0.7f, 0.5f) {}
+};
+
 
 //! state controller can manage and update states. state controller has one state at least
 class SEGAN_ENG_API uiStateController
@@ -246,6 +256,9 @@ public:
 	//! update the control
 	virtual void Update( float elpsTime, const matrix& viewInverse, const matrix& viewProjection, const uint vpwidth, const uint vpheight );
 
+	//! process input for this control
+	virtual void ProcessInput( uiInputReport* inputReport );
+
 public:
 
 	uiType				m_type;								//!	type of control
@@ -303,7 +316,7 @@ public:
 	void EndBatch( uiElement* dest );
 
 	//! extract all elements in the control
-	void GetElements( const uiControl* control, Array<uiElement*> *elementArray );
+	void GetElements( const uiControl* control, Array<uiElement*> * elementArray );
 
 public:
 

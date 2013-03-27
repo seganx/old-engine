@@ -46,6 +46,9 @@ public:
 	//! seek in the file
 	uint Seek( SeekType ST_ seekType, const uint offset = 0 );
 
+	//! lock file
+	bool LockFile( void );
+
 	//! return true if file exist
 	static bool FileExist( const wchar* FileName );
 

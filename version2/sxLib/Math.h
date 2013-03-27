@@ -321,6 +321,14 @@ SEGAN_LIB_INLINE sint sx_random_i_limit( const sint minRange, const sint maxRang
 }
 
 
+//! set new counter for the id generator
+SEGAN_LIB_API void sx_id_set_counter( const uint id );
+
+//! return unique id and increase the internal id counter
+SEGAN_LIB_API uint sx_id_generate( void );
+
+
+
 #include "math/Math_vec.h"
 #include "math/Math_utils.h"
 #include "math/Math_tools.h"

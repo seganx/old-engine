@@ -1,5 +1,6 @@
 #include "uiDevice.h"
 
+
 uiPanel::uiPanel( void ): uiControl()
 {
 	m_type = UT_PANEL;

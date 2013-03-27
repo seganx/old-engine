@@ -103,5 +103,17 @@ bool FileStream::FileExist( const wchar* FileName )
 	return ( Res != INVALID_FILE_ATTRIBUTES && !(Res & FILE_ATTRIBUTE_DIRECTORY) );
 }
 
+bool FileStream::LockFile( void )
+{
+	OVERLAPPED overlap;
+	overlap.hEvent = null;
+	overlap.Internal = 0;
+	overlap.InternalHigh = 0;
+	overlap.Offset = 0;
+	overlap.OffsetHigh = Size();
+	overlap.Pointer = null;
+	return ( LockFileEx( m_handle, LOCKFILE_EXCLUSIVE_LOCK, 0, 0, Size(), &overlap ) == TRUE );
+}
+
 
 #endif

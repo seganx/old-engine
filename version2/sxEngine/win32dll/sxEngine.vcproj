@@ -413,6 +413,10 @@
 			Name="gui"
 			>
 			<File
+				RelativePath="..\gui\uiControl.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\gui\uiDevice.cpp"
 				>
 			</File>

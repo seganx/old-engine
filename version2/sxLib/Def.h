@@ -71,20 +71,16 @@ typedef byte				*pbyte;
 //////////////////////////////////////////////////////////////////////////
 //!!!    CHANGE THESE PREPROCESSORS TO CHANGE COMPILER BEHAVIOR      !!!//
 //////////////////////////////////////////////////////////////////////////
-#if !defined( SEGAN_LIB_API )
-	#if defined( SEGAN_LIB_API )
-		#define SEGAN_LIB_API		__declspec(dllimport)
-	#else
-		#define SEGAN_LIB_API		__declspec(dllexport)
-	#endif
+#if defined( SEGAN_IMPORT )
+	#define SEGAN_LIB_API		__declspec(dllimport)
+#else
+	#define SEGAN_LIB_API		__declspec(dllexport)
 #endif
 
-#if !defined( SEGAN_ENG_API )
-	#if defined( SEGAN_ENG_API )
-		#define SEGAN_ENG_API		__declspec(dllimport)
-	#else
-		#define SEGAN_ENG_API		__declspec(dllexport)
-	#endif
+#if defined( SEGAN_IMPORT )
+	#define SEGAN_ENG_API		__declspec(dllimport)
+#else
+	#define SEGAN_ENG_API		__declspec(dllexport)
 #endif
 
 

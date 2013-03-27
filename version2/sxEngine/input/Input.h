@@ -557,6 +557,16 @@ struct InputKeys
 };
 
 
+/*! input reporter reports that which input values used in other processes */
+struct InputReport
+{
+	uint		playerID;		//	id of the player
+	uint		locked;			//	contain the id of object who locked input system
+	bool		usedKey[256];	//	true if the key has been used
+	float		elpsTime;		//	elapsed time of frame
+};
+
+
 /*!
 this is the base of other input device. other input device classes should inherit from this class.
 to handle signals for more that one device in same type (2 joystick) the application responsible to attach more

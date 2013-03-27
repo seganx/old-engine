@@ -1,6 +1,3 @@
-// sxEngine.cpp : Defines the entry point for the DLL application.
-//
-
 #include "../sxEngine.h"
 #include "../System/win32/Win6.h"
 

@@ -43,7 +43,7 @@ public:
 	void Update( float elpsTime );
 
 	//! handle process input
-	void ProcessInput( void );
+	void ProcessInput( struct InputReport* inputReport );
 
 	//! draw GUIs in screen space coordinate
 	void Draw( const dword flag );

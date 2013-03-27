@@ -53,7 +53,7 @@ void GUIManager::Update( float elpsTime )
 	}
 }
 
-void GUIManager::ProcessInput( void )
+void GUIManager::ProcessInput( struct InputReport* inputReport )
 {
 	for ( sint i=0; i<m_controls.m_count; ++i )
 	{

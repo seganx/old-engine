@@ -4,6 +4,10 @@
 
 #include <stdio.h>
 
+#include <ShellAPI.h>
+#include <ShlObj.h>
+#pragma comment(lib, "shell32.lib")
+
 
 //////////////////////////////////////////////////////////////////////////
 //  SOME GLOBAL VARIABLES
@@ -33,6 +37,12 @@ void app_main_loop( float elpsTime )
 
 		static float3 cam_at;
 		static float cam_r = 20.0f, cam_p = 0.0f, cam_t = 0.0f;
+		Camera camera;
+		camera.m_at = cam_at;
+		camera.SetSpherical( cam_r, cam_p, cam_t );
+		camera.SetToDevice();
+		Ray ray = camera.GetRay();
+
 		if ( sx_key_hold( IK_MOUSE_LEFT, 0 ) || sx_key_down( IK_MOUSE_LEFT, 0 ) )
 		{
 			cam_p -= sx_mouse_rlx(0) * 0.005f;
@@ -49,12 +59,6 @@ void app_main_loop( float elpsTime )
 			sx_transform_normal( tv, mv, mat );
 			cam_at += tv * ( cam_r * 0.003f );
 		}
-
-		Camera camera;
-		camera.m_at = cam_at;
-		camera.SetSpherical( cam_r, cam_p, cam_t );
-		camera.SetToDevice();
-		Ray ray = camera.GetRay();
 
 		g_engine->m_device3D->SetTexture( null );
 		g_engine->m_device3D->ClearScreen( 0xff000000 );
@@ -167,6 +171,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	config.window_callback = &window_event_call;
 	config.d3d_flag = SX_D3D_CREATE_GL;// | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
 	config.input_device[0] = &ioMouse;
+
 
 	sx_engine_get_singleton( &config );
 
