@@ -20,6 +20,55 @@ d3dTexture*	tex_000	=	null;
 d3dTexture*	tex_001	=	null;
 #endif
 
+class guiTest : public Form
+{
+public:
+	guiTest(){
+		m_panel1.m_onEnter.m_form = this;
+		m_panel1.m_onEnter.m_func = (GUICallback)&guiTest::OnEnter;
+		m_panel1.m_onExit.m_form = this;
+		m_panel1.m_onExit.m_func = (GUICallback)&guiTest::OnExit;
+		m_panel1.m_onClick.m_form = this;
+		m_panel1.m_onClick.m_func = (GUICallback)&guiTest::OnClick;
+
+		m_panel2.m_onEnter.m_form = this;
+		m_panel2.m_onEnter.m_func = (GUICallback)&guiTest::OnEnter;
+		m_panel2.m_onExit.m_form = this;
+		m_panel2.m_onExit.m_func = (GUICallback)&guiTest::OnExit;
+		m_panel2.m_onClick.m_form = this;
+		m_panel2.m_onClick.m_func = (GUICallback)&guiTest::OnClick;
+	}
+	virtual ~guiTest(){}
+
+	void OnEnter( uiControl* sender )
+	{
+		if ( sender == &m_panel1 )
+			g_engine->m_window->SetTitle( L"OnEnter : Panel 1" );
+		else
+			g_engine->m_window->SetTitle( L"OnEnter : Panel 2" );
+	}
+
+	void OnExit( uiControl* sender )
+	{
+		if ( sender == &m_panel1 )
+			g_engine->m_window->SetTitle( L"OnExit : Panel 1" );
+		else
+			g_engine->m_window->SetTitle( L"OnExit : Panel 2" );
+	}
+
+	void OnClick( uiControl* sender )
+	{
+		if ( sender == &m_panel1 )
+			g_engine->m_window->SetTitle( L"OnClick : Panel 1" );
+		else
+			g_engine->m_window->SetTitle( L"OnClick : Panel 2" );
+	}
+
+public:
+	uiPanel		m_panel1;
+	uiPanel		m_panel2;
+};
+
 sint window_event_call( Window* Sender, const WindowEvent* data )
 {
 	return data->msg;
@@ -28,6 +77,11 @@ sint window_event_call( Window* Sender, const WindowEvent* data )
 void app_main_loop( float elpsTime )
 {
 	sx_mem_enable_debug( true, 2 );
+
+	InputReport inputReport;
+	inputReport.elpsTime = elpsTime;
+	inputReport.locked = 0;
+	inputReport.playerID = 0;
 
 #if 1
 	if ( g_engine->m_device3D && g_engine->m_device3D->BeginScene() )
@@ -80,26 +134,29 @@ void app_main_loop( float elpsTime )
 			vbo_pos->Unlock();
 		}
 #endif
-		sx_debug_draw_compass();
+//		sx_debug_draw_compass();
 
 #if 1
-		uiPanel panel1, panel2;
-		panel1.SetSize( 200.0f, 50.0f );
-		uiState* state = panel1.m_state.GetCurrent();
+		static guiTest gtest;
+		gtest.m_panel1.SetSize( 200.0f, 50.0f );
+		uiState* state = gtest.m_panel1.m_state.GetCurrent();
 		state->align.Set( -0.5f, 0.5f );
 		state->center.Set( -0.5f, 0.5f, 0.0f );
 		state->position.Set( 100.0f, -50.0f, 0.0f );
 		
-		panel2.SetParent( &panel1 );
-		panel2.SetSize( 100.0f, 30.0f );
-		state = panel2.m_state.GetCurrent();
-		state->align.Set( 0.5f, 0.5f );
-		state->center.Set( 0.5f, 0.5f, 0.0f );
+// 		panel2.SetParent( &panel1 );
+ 		gtest.m_panel2.SetSize( 100.0f, 30.0f );
+ 		state = gtest.m_panel2.m_state.GetCurrent();
+ 		state->align.Set( -0.5f, 0.5f );
+ 		state->center.Set( -0.5f, 0.5f, 0.0f );
 
-		g_engine->m_gui->Add( &panel1 );
+		g_engine->m_gui->Add( &gtest.m_panel1 );
+		g_engine->m_gui->Add( &gtest.m_panel2 );
  		g_engine->m_gui->Update( elpsTime );
+		g_engine->m_gui->ProcessInput( &inputReport );
  		g_engine->m_gui->Draw( 0 );
- 		g_engine->m_gui->Remove( &panel1 );
+		g_engine->m_gui->Remove( &gtest.m_panel2 );
+		g_engine->m_gui->Remove( &gtest.m_panel1 );
 #endif
 
 		g_engine->m_device3D->EndScene();
@@ -109,7 +166,7 @@ void app_main_loop( float elpsTime )
 		str.Format( L"fps : %d - ft : %.2f - mouse : %d , %d ", 
 			g_engine->m_device3D->m_debugInfo.fps, g_engine->m_device3D->m_debugInfo.frameTime,
 			int(sx_mouse_absx(0)), int(sx_mouse_absy(0)) );
-		g_engine->m_window->SetTitle( str );
+		//g_engine->m_window->SetTitle( str );
 	}
 #endif
 
@@ -169,7 +226,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	config.net_id = 0x2727;
 	config.logger = &loggerconfig;
 	config.window_callback = &window_event_call;
-	config.d3d_flag = SX_D3D_CREATE_GL;// | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
+	config.d3d_flag = SX_D3D_CREATE_GL | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
 	config.input_device[0] = &ioMouse;
 
 

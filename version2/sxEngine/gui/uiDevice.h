@@ -105,13 +105,35 @@ enum uiInputLanguage
 	IL_PERSIAN	= 0x80000000	//	|
 };
 
+//! describe state of mouse on a control
+enum uiMouseState
+{
+	MS_NORMAL	= 0,
+	MS_ENTERED,
+	MS_DOWN,
+	MS_UP,
+
+	MS_32BITENUM = 0xffffffff
+};
+
 /*! input reporter reports that which input values used in other processes */
 struct uiInputReport
 {
-	Ray			ray;				//	ray comes from the mouse
-	uint		mouseLocked;		//	contain the id of object who locked mouse
-	uint		keyboardLocked;		//	contain the id of object who locked keyboard
+	Ray				ray;				//!	ray comes from the mouse
+	uint			mouseLocked;		//!	contain the id of object who locked mouse
+	uint			keyboardLocked;		//!	contain the id of object who locked keyboard
+	uiMouseState	mouseLeft;			//!	state of left mouse button 
+	uiMouseState	mouseRight;			//!	state of right mouse button
+	uiMouseState	mouseMidd;			//!	state of middle mouse button
+	char			mouseWheel;			//! value of mouse wheel [ -1 , 0 , 1 ]
+	word			keycode;			//!	key down code
+	word			keychar;			//!	key down character
+	dword			keycodeEx;			//!	additional extended key code
+
+	uiInputReport(void): ray( float3(0,0,0), float3(0,0,0) ), mouseLocked(0), keyboardLocked(0), 
+		mouseLeft(MS_NORMAL), mouseRight(MS_NORMAL), mouseMidd(MS_NORMAL), mouseWheel(0), keycode(0), keychar(0), keycodeEx(0) {}
 };
+
 
 //! describe character information
 struct uiFontChar
@@ -238,6 +260,32 @@ public:
 	float3*			m_posfinal;			//	use temporary positions to transform elements from local space to the world space
 };
 
+//! base class of forms
+class Form
+{
+public:	
+	virtual ~Form( void ) {};
+};
+
+//! this is the standard GUI callback event.
+typedef void (Form::*GUICallback)(class uiControl* sender);
+
+//! object structure used to assign GUI member functions
+class GUIFuncPtr
+{
+public:
+	GUIFuncPtr(): m_form(null), m_func(null) {};
+	GUIFuncPtr( Form* form, GUICallback func ): m_form(form), m_func(func) {};
+	void operator ()( class uiControl* sender )
+	{
+		if ( m_form && m_func )
+			( m_form->*m_func)( sender );
+	}
+
+public:
+	Form*			m_form;
+	GUICallback		m_func;
+};
 
 //! basic GUI control
 class SEGAN_ENG_API uiControl
@@ -259,10 +307,17 @@ public:
 	//! process input for this control
 	virtual void ProcessInput( uiInputReport* inputReport );
 
+	//! extract valid elements in the control
+	void GetElements( Array<uiElement*> * elementArray, const bool traversChilds = true );
+
+	/*! return index of element contacted by mouse ray and fill out uv point of intersection. return -1 if no contact */
+	sint IntersectRay( const Ray* ray, const sint element = -1, OUT float2* uv = null );
+
 public:
 
 	uiType				m_type;								//!	type of control
 	str128				m_name;								//!	name of control
+	uint				m_id;
 	dword				m_option;							//!	include control options started with SX_GUI_
 	float2				m_size;								//!	control dimensions
 	uiStateController	m_state;							//!	state of control include origin, orientation, scale, ...
@@ -273,7 +328,17 @@ public:
 	uiElement			m_element[SX_GUI_MAX_ELEMENT];		//!	elements of control
 	uiControl*			m_parent;							//!	parent of this control
 	Array<uiControl*>	m_child;							//!	array of children
+
+	uiMouseState		m_mouseState;						//!	hold the state of mouse
+	GUIFuncPtr			m_onClick;							//!	callback function for mouse click
+	GUIFuncPtr			m_onEnter;							//!	callback function for mouse enter
+	GUIFuncPtr			m_onExit;							//!	callback function for mouse leave
+	GUIFuncPtr			m_onMove;							//!	callback function for mouse move
+	GUIFuncPtr			m_onWheel;							//!	callback function for mouse wheel
+	GUIFuncPtr			m_onKeyDown;						//!	callback function for key down
+
 };
+
 
 //! the Panel Control. this object has only one element as background
 class SEGAN_ENG_API uiPanel: public uiControl
@@ -315,9 +380,6 @@ public:
 	//! end patch and append them to the end of dest element
 	void EndBatch( uiElement* dest );
 
-	//! extract all elements in the control
-	void GetElements( const uiControl* control, Array<uiElement*> * elementArray );
-
 public:
 
 	Array<uiElement*>	m_batches;		//!	us in batch system
@@ -330,6 +392,7 @@ public:
 #define _SX_GUI_NOT_ENABLE_				0x20000000
 #define _SX_GUI_IN_3DSPACE_				0x40000000
 
-
+//! return true if the ray intersect with element
+SEGAN_ENG_API bool sx_intersect( const Ray* ray, const uiElement* element, OUT float2* uv = null );
 
 #endif	//	GUARD_uiDevice_HEADER_FILE

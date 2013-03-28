@@ -42,10 +42,15 @@ void GUIManager::Clear( void )
 
 void GUIManager::Update( float elpsTime )
 {
-	const matrix& view = g_engine->m_device3D->GetMatrix( MM_VIEW );
-	const matrix& proj = g_engine->m_device3D->GetMatrix( MM_PROJECTION );
+	const float width  = sx_vp_width;
+	const float height = sx_vp_height;
+	matrix proj = sx_orthographic( width, height, -200.0f, 200.0f );
+	matrix view = sx_lookat( float3(0, 0, 1), float3( 0, 0, 0), float3( 0, 1, 0) );
 	matrix viewproj = sx_mul( view, proj );
 	matrix viewinvr = sx_inverse( view );
+
+	m_view = view;
+	m_proj = proj;
 
 	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
@@ -55,21 +60,47 @@ void GUIManager::Update( float elpsTime )
 
 void GUIManager::ProcessInput( struct InputReport* inputReport )
 {
-	for ( sint i=0; i<m_controls.m_count; ++i )
+	// collect necessary data
+	uint pid = inputReport->playerID;
+
+	//	fill input report structure
+	uiInputReport ioreport;
+
+	//	fill mouse structure
+	ioreport.ray = sx_ray( sx_mouse_absx(pid), sx_mouse_absy(pid), sx_vp_width, sx_vp_height, m_view, m_proj );
+	switch ( g_engine->m_input->GetKeys( pid )->mouse_left )
 	{
-	//	m_controls[i]->Update( elpsTime );
+	case IS_NORMAL:		ioreport.mouseLeft = MS_NORMAL;		break;
+	case IS_DOWN:
+	case IS_HOLD:		ioreport.mouseLeft = MS_DOWN;		break;
+	case IS_UP:			ioreport.mouseLeft = MS_UP;			break;
+	}
+
+	//	fill keyboard structure
+
+
+
+	//	traverse through controls
+	for ( sint i=m_controls.m_count-1; i >= 0; --i )
+	{
+		m_controls.m_item[i]->ProcessInput( &ioreport );
 	}
 }
 
 void GUIManager::Draw( const dword flag )
 {
+	matrix mat; mat.Identity();
+	g_engine->m_device3D->SetMatrix( MM_WORLD, mat );
+	g_engine->m_device3D->SetMatrix( MM_VIEW, m_view );
+	g_engine->m_device3D->SetMatrix( MM_PROJECTION, m_proj );
+
 	g_engine->m_device3D->SetRenderState( RS_FILL, false );
 
 	//	extract all elements that should be draw
 	m_elements.Clear();
 	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
-		g_engine->m_deviceUI->GetElements( m_controls[i], &m_elements );
+		m_controls[i]->GetElements( &m_elements );
 	}
 
 	//	batch elements and draw them

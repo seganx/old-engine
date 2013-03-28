@@ -193,20 +193,20 @@ uiDevice::~uiDevice( void )
 
 uiControl* uiDevice::CreateContorl( const uiType type )
 {
-#if 0
 	switch ( type )
 	{
-	case GUI_PANEL:			return sx_new( uiPanel );
-//	case GUI_BUTTON:		return sx_new( uiButton );
-//	case GUI_CHECKBOX:		return sx_new( uiCheckBox );
-//	case GUI_TRACKBAR:		return sx_new( uiScroll );
-//	case GUI_PROGRESSBAR:	return sx_new( uiProgress );
-//	case GUI_LABEL:			return sx_new( uiLabel );
-//	case GUI_EDITBOX:		return sx_new( uiEditBox );
-//	case GUI_PANELEX:		return sx_new( uiPanelEx );
-//	case GUI_LISTBOX:		return sx_new( uiListBox );
-	}
+	case UT_PANEL:			return sx_new( uiPanel );
+#if 0
+	case GUI_BUTTON:		return sx_new( uiButton );
+	case GUI_CHECKBOX:		return sx_new( uiCheckBox );
+	case GUI_TRACKBAR:		return sx_new( uiScroll );
+	case GUI_PROGRESSBAR:	return sx_new( uiProgress );
+	case GUI_LABEL:			return sx_new( uiLabel );
+	case GUI_EDITBOX:		return sx_new( uiEditBox );
+	case GUI_PANELEX:		return sx_new( uiPanelEx );
+	case GUI_LISTBOX:		return sx_new( uiListBox );
 #endif
+	}
 	return null;
 }
 
@@ -253,7 +253,7 @@ void uiDevice::Copy( uiElement* dest, uint& index, const uiElement* src )
 	}
 }
 
-void uiDevice::BeginBatch( const uint count )
+SEGAN_INLINE void uiDevice::BeginBatch( const uint count )
 {
 	if ( count )
 		m_batches.SetSize( count );
@@ -293,7 +293,7 @@ SEGAN_INLINE uint uiDevice::GetBatchVertexCount( void )
 	return sumVertices;
 }
 
-void uiDevice::EndBatch( uiElement* dest )
+SEGAN_INLINE void uiDevice::EndBatch( uiElement* dest )
 {
 	//	get number of vertices needed to batch them
 	uint sumVertices = GetBatchVertexCount();
@@ -313,22 +313,59 @@ void uiDevice::EndBatch( uiElement* dest )
 	m_batches.Clear();
 }
 
-void uiDevice::GetElements( const uiControl* control, Array<uiElement*> * elementArray )
-{
-	// extract current elements
-	for ( uint i=0; i<SX_GUI_MAX_ELEMENT; ++i )
-	{
-		uiElement* element = (uiElement*)&control->m_element[i];
-		if ( element->m_numVertices )
-		{
-			elementArray->PushBack( element );
-		}
-		else break;
-	}
 
-	// extract elements of children
-	for ( sint i=0; i<control->m_child.m_count; ++i )
+SEGAN_INLINE bool sx_intersect( const Ray* ray, const uiElement* element, OUT float2* uv /*= null */ )
+{
+	bool res = false;
+	if ( element->m_numVertices )
 	{
-		GetElements( control->m_child[i], elementArray );
+		switch ( element->m_type )
+		{
+		case ET_QUADS:
+			{
+				float2 outuv;
+				for ( uint i=0; i<element->m_numVertices; i += 4 )
+				{
+					//	test first triangle
+					res = sx_intersect( *ray, element->m_pos[i], element->m_pos[i+1], element->m_pos[i+2], outuv, true );
+					
+					//	test second triangle
+					if ( !res )
+					{
+						res = sx_intersect( *ray, element->m_pos[i], element->m_pos[i+2], element->m_pos[i+3], outuv, true );
+					}
+
+					//	fill out the result and break the loop
+					if ( res )
+					{
+						if ( uv )
+							*uv = outuv;
+						res = true;
+						break;
+					}
+				}
+			}
+			break;
+
+		case ET_TRIANGLES:
+			{
+				float2 outuv;
+				for ( uint i=0; i<element->m_numVertices; i += 3 )
+				{
+					//	test the triangle
+					if ( sx_intersect( *ray, element->m_pos[i], element->m_pos[i+1], element->m_pos[i+2], outuv, true ) )
+					{
+						//	fill out the result and break the loop
+						if ( uv )
+							*uv = outuv;
+						res = true;
+						break;
+					}
+				}
+			}
+			break;
+		}
 	}
+	return res;
 }
+

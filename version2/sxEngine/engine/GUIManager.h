@@ -50,6 +50,8 @@ public:
 
 public:
 
+	matrix				m_view;			//	view matrix used for controls
+	matrix				m_proj;			//	protection matrix used for controls
 	Array<uiControl*>	m_controls;		//	array of all controls
 	Array<uiElement*>	m_elements;		//	array of elements
 	uiElement*			m_drawable;		//	final drawable element

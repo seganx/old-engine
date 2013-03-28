@@ -3,12 +3,14 @@
 
 uiControl::uiControl( void )
 : m_type(UT_NONE)
+, m_id( sx_id_generate() )
 , m_option(SX_GUI_VISIBLE | SX_GUI_ENABLE)
 , m_size(0,0)
 , m_position_offset(0,0,0)
 , m_rotation_offset(0,0,0)
 , m_scale_offset(1,1,1)
 , m_parent(null)
+, m_mouseState(MS_NORMAL)
 {
 
 }
@@ -190,14 +192,142 @@ void uiControl::ProcessInput( uiInputReport* inputReport )
 	if ( sx_set_has( m_option, _SX_GUI_NOT_VISIBLE_ ) || sx_set_has( m_option, _SX_GUI_NOT_ENABLE_ ) )
 		return;
 
+	bool captured = false;
+
+	// check the children
 	if ( !inputReport->mouseLocked )
+	{
+		Ray ray = sx_transform( inputReport->ray, m_matrix );
+		captured = ( IntersectRay( &ray ) >= 0 );
+
+		//  check the clip space
+		if ( m_option & SX_GUI_CLIPCHILDS )
+		{
+			// verify that mouse is in clip space
+			if ( captured )
+			{
+				for ( sint i = m_child.m_count - 1; i >= 0; --i )
+				{
+					m_child[i]->ProcessInput( inputReport );
+				}
+			}
+		}
+		else
+		{
+			// traverse through children
+			for ( sint i = m_child.m_count - 1; i >= 0; --i )
+			{
+				m_child[i]->ProcessInput( inputReport );
+			}
+		}
+	}
+
+	//	perform mouse actions for current control
+	if ( !inputReport->mouseLocked )
+	{
+		if ( captured )
+		{
+			switch ( m_mouseState )
+			{
+			case MS_NORMAL:
+				if ( inputReport->mouseLeft == MS_NORMAL )	//	verify that mouse entered on control
+				{
+					m_mouseState = MS_ENTERED;
+					m_onEnter( this );
+				}
+				break;
+
+			case MS_ENTERED:
+				if ( inputReport->mouseLeft == MS_DOWN )
+				{
+					m_mouseState = MS_DOWN;
+				}
+				break;
+
+			case MS_DOWN:
+				if ( inputReport->mouseLeft == MS_UP )
+				{
+					m_mouseState = MS_UP;
+					m_onClick( this );
+				}
+				break;
+
+			case MS_UP:
+				{
+					m_mouseState = MS_NORMAL;
+				}
+				break;
+			}
+
+			//	call move callback
+			m_onMove( this );
+
+			// lock the mouse report
+			inputReport->mouseLocked = m_id;
+		}
+	}
+	else
 	{
 
 	}
 
-	if ( !inputReport->mouseLocked )
+	//	when do we call Exit callback
+	if ( !captured && m_mouseState != MS_NORMAL && inputReport->mouseLeft == MS_NORMAL )
+	{
+		m_onExit( this );	//  mouse exited ...
+		m_mouseState = inputReport->mouseLeft;
+	}
+
+	if ( !inputReport->keyboardLocked )
 	{
 
 	}
 
+}
+
+void uiControl::GetElements( Array<uiElement*> * elementArray, const bool traversChilds /*= true*/ )
+{
+	// extract current elements
+	for ( uint i=0; i<SX_GUI_MAX_ELEMENT; ++i )
+	{
+		uiElement* element = (uiElement*)&m_element[i];
+		if ( element->m_numVertices )
+		{
+			elementArray->PushBack( element );
+		}
+		else break;
+	}
+
+	// extract elements of children
+	for ( sint i=0; i<m_child.m_count; ++i )
+	{
+		m_child[i]->GetElements( elementArray, traversChilds );
+	}
+}
+
+sint uiControl::IntersectRay( const Ray* ray, const sint element /*= -1*/, OUT float2* uv /*= null */ )
+{
+	sint res = -1;
+
+	if ( element < 0 )
+	{
+		for ( sint i = SX_GUI_MAX_ELEMENT-1; i >= 0; --i )
+		{
+			if ( m_element[i].m_numVertices && sx_intersect( ray, &m_element[i], uv ) )
+			{
+				res = i;
+				break;
+			}
+		}
+	}
+	else
+	{
+		sx_assert( element < SX_GUI_MAX_ELEMENT );
+		if ( sx_intersect( ray, &m_element[element], uv ) )
+		{
+			res = element;
+		}
+	}
+	
+	return res;
 }
