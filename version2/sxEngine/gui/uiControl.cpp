@@ -189,21 +189,19 @@ void uiControl::Update( float elpsTime, const matrix& viewInverse, const matrix&
 
 void uiControl::ProcessInput( uiInputReport* inputReport )
 {
-	if ( sx_set_has( m_option, _SX_GUI_NOT_VISIBLE_ ) || sx_set_has( m_option, _SX_GUI_NOT_ENABLE_ ) )
-		return;
+	if ( sx_set_has( m_option, _SX_GUI_NOT_VISIBLE_ ) || sx_set_has( m_option, _SX_GUI_NOT_ENABLE_ ) ) return;
 
 	bool captured = false;
 
-	// check the children
+	// check the children for clipped space
 	if ( !inputReport->mouseLocked )
 	{
 		Ray ray = sx_transform( inputReport->ray, m_matrix );
 		captured = ( IntersectRay( &ray ) >= 0 );
-
-		//  check the clip space
+	
 		if ( m_option & SX_GUI_CLIPCHILDS )
 		{
-			// verify that mouse is in clip space
+			//	verify that mouse cursor is on clip space
 			if ( captured )
 			{
 				for ( sint i = m_child.m_count - 1; i >= 0; --i )
@@ -211,73 +209,80 @@ void uiControl::ProcessInput( uiInputReport* inputReport )
 					m_child[i]->ProcessInput( inputReport );
 				}
 			}
-		}
-		else
-		{
-			// traverse through children
-			for ( sint i = m_child.m_count - 1; i >= 0; --i )
+			else
 			{
-				m_child[i]->ProcessInput( inputReport );
+				//	prevent children from intersection and handle input report
+				inputReport->mouseLocked = m_id;
+				for ( sint i = m_child.m_count - 1; i >= 0; --i )
+				{
+					m_child[i]->ProcessInput( inputReport );
+				}
+				inputReport->mouseLocked = 0;
 			}
-		}
-	}
-
-	//	perform mouse actions for current control
-	if ( !inputReport->mouseLocked )
-	{
-		if ( captured )
-		{
-			switch ( m_mouseState )
-			{
-			case MS_NORMAL:
-				if ( inputReport->mouseLeft == MS_NORMAL )	//	verify that mouse entered on control
-				{
-					m_mouseState = MS_ENTERED;
-					m_onEnter( this );
-				}
-				break;
-
-			case MS_ENTERED:
-				if ( inputReport->mouseLeft == MS_DOWN )
-				{
-					m_mouseState = MS_DOWN;
-				}
-				break;
-
-			case MS_DOWN:
-				if ( inputReport->mouseLeft == MS_UP )
-				{
-					m_mouseState = MS_UP;
-					m_onClick( this );
-				}
-				break;
-
-			case MS_UP:
-				{
-					m_mouseState = MS_NORMAL;
-				}
-				break;
-			}
-
-			//	call move callback
-			m_onMove( this );
-
-			// lock the mouse report
-			inputReport->mouseLocked = m_id;
 		}
 	}
 	else
 	{
+		// traverse through children
+		for ( sint i = m_child.m_count - 1; i >= 0; --i )
+		{
+			m_child[i]->ProcessInput( inputReport );
+		}
+	}
 
+
+	//////////////////////////////////////////////////////////////////////////
+	//	perform mouse actions for current control
+	if ( !inputReport->mouseLocked && captured )
+	{
+		switch ( m_mouseState )
+		{
+		case MS_NORMAL:
+			if ( inputReport->mouseLeft == MS_NORMAL )	//	verify that mouse entered on control
+			{
+				m_mouseState = MS_ENTERED;
+				m_onEnter( this );
+			}
+			break;
+
+		case MS_ENTERED:
+			if ( inputReport->mouseLeft == MS_DOWN )
+			{
+				m_mouseState = MS_DOWN;
+			}
+			break;
+
+		case MS_DOWN:
+			if ( inputReport->mouseLeft == MS_UP )	//	verify that mouse clicked on control
+			{
+				m_mouseState = MS_UP;
+				m_onClick( this );
+			}
+			break;
+
+		case MS_UP:
+			{
+
+			}
+			break;
+		}
+
+		//	call move callback
+		m_onMove( this );
+
+		// lock the mouse report
+		inputReport->mouseLocked = m_id;
 	}
 
 	//	when do we call Exit callback
 	if ( !captured && m_mouseState != MS_NORMAL && inputReport->mouseLeft == MS_NORMAL )
 	{
-		m_onExit( this );	//  mouse exited ...
-		m_mouseState = inputReport->mouseLeft;
+		m_onExit( this );
+		m_mouseState = MS_NORMAL;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	//	handle keyboard
 	if ( !inputReport->keyboardLocked )
 	{
 

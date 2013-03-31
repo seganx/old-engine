@@ -256,7 +256,7 @@ public:
 	uint			m_numVertices;		//	number of vertices
 	float3*			m_pos;				//	positions
 	float2*			m_uv;				//	UV coordinates
-	Color*			m_color;			//	colors
+	Color2*			m_color;			//	colors
 	float3*			m_posfinal;			//	use temporary positions to transform elements from local space to the world space
 };
 

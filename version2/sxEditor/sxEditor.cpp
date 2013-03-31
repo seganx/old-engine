@@ -43,17 +43,33 @@ public:
 	void OnEnter( uiControl* sender )
 	{
 		if ( sender == &m_panel1 )
+		{
+			m_panel1.m_element[0].m_color[0].c0 = 0xffff0000;
+			m_panel1.m_element[0].m_color[1].c0 = 0xffff0000;
 			g_engine->m_window->SetTitle( L"OnEnter : Panel 1" );
+		}
 		else
+		{
+			m_panel2.m_element[0].m_color[0].c0 = 0xffff0000;
+			m_panel2.m_element[0].m_color[1].c0 = 0xffff0000;
 			g_engine->m_window->SetTitle( L"OnEnter : Panel 2" );
+		}
 	}
 
 	void OnExit( uiControl* sender )
 	{
 		if ( sender == &m_panel1 )
+		{
+			m_panel1.m_element[0].m_color[0].c0 = 0xffffffff;
+			m_panel1.m_element[0].m_color[1].c0 = 0xffffffff;
 			g_engine->m_window->SetTitle( L"OnExit : Panel 1" );
+		}
 		else
+		{
+			m_panel2.m_element[0].m_color[0].c0 = 0xffffffff;
+			m_panel2.m_element[0].m_color[1].c0 = 0xffffffff;
 			g_engine->m_window->SetTitle( L"OnExit : Panel 2" );
+		}
 	}
 
 	void OnClick( uiControl* sender )
@@ -380,7 +396,6 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		g_engine->m_device3D->DestroyVertexBuffer( vbo_tx0 );
 		g_engine->m_device3D->DestroyVertexBuffer( vbo_pos );
 		
-		sx_d3d_destroy_device( g_engine->m_device3D );
 	}
 #else
 	sx_engine_start( &app_main_loop );

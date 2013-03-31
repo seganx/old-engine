@@ -213,6 +213,15 @@ SEGAN_LIB_INLINE sint sx_clamp_i( const sint value, const sint imin, const sint 
 }
 
 //! clamp value between min and max
+SEGAN_LIB_INLINE uint sx_clamp_u( const uint value, const uint umin, const uint umax )
+{
+	uint result = value;
+	if ( result < umin ) result = umin;
+	if ( result > umax ) result = umax;
+	return result;
+}
+
+//! clamp value between min and max
 SEGAN_LIB_INLINE float sx_clamp_f( const float value, const float fmin, const float fmax )
 {
 	float result = value;

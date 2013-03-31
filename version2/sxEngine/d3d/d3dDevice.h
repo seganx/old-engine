@@ -18,7 +18,18 @@
 #define SX_D3D_CREATE_GL				0x00000002		//	create openGL device
 #define	SX_D3D_VSYNC					0x00000004		//  init device with vertical synchronization
 #define	SX_D3D_FULLSCREEN				0x00000008		//	init device in full screen mode
-#define SX_D3D_RESOURCE_DYNAMIC			0x00000010		//	create dynamic resource
+#define SX_D3D_RESOURCE_DYNAMIC			0x00000010		//	create hardware dynamic resource
+#define SX_D3D_RESOURCE_MANAGED			0x00000020		//	hold a copy of data in system memory and use it at lock/unlock calls
+
+//!	flags may used for multi streaming
+#define SX_VERTEX_POSITION				0
+#define SX_VERTEX_NORMAL				1
+#define SX_VERTEX_UV0					2
+#define SX_VERTEX_TANGENT				3
+#define SX_VERTEX_UV1					4
+#define SX_VERTEX_COLORS				5
+#define SX_VERTEX_BLENDINDICES			6
+#define SX_VERTEX_BLENDWEIGHT			7
 
 //! flags of alpha blending mode
 #define SX_ALPHA_OFF					0		//	turn alpha blending off
@@ -168,6 +179,9 @@ struct d3dDebugInfo
 	uint		setIndices;		//! number of index buffer changes
 	float		frameTime;		//! frame time in milliseconds
 };
+
+//! color struct
+typedef Color2 d3dColor;
 
 //! view port structure
 struct d3dViewport
@@ -394,7 +408,7 @@ public:
 	virtual void DrawIndexedPrimitive( const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount ) = 0;
 
 	//! draw primitive by given vertices
-	virtual void DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const dword color ) = 0;
+	virtual void DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const Color& color ) = 0;
 
 	//! begin to draw shapes
 	virtual bool BeginScene( void )= 0;
@@ -406,10 +420,10 @@ public:
 	virtual void Present( void ) = 0;
 
 	//! clear depth buffer and back buffer with specified color
-	virtual void ClearScreen( const dword bgcolor ) = 0;
+	virtual void ClearScreen( const Color& bgcolor ) = 0;
 
 	//! clear back buffer with specified color
-	virtual void ClearTarget( const dword bgcolor ) = 0;
+	virtual void ClearTarget( const Color& bgcolor ) = 0;
 
 	//! clear back buffer
 	virtual void ClearZBuffer( void ) = 0;

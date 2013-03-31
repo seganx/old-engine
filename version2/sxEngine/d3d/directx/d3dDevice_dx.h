@@ -71,7 +71,7 @@ public:
 
 	virtual void DrawIndexedPrimitive(const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount);
 
-	virtual void DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const dword color );
+	virtual void DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const Color& color );
 
 	virtual bool BeginScene( void );
 
@@ -79,9 +79,9 @@ public:
 
 	virtual void Present( void );
 
-	virtual void ClearScreen( const dword bgcolor );
+	virtual void ClearScreen( const Color& bgcolor );
 
-	virtual void ClearTarget( const dword bgcolor );
+	virtual void ClearTarget( const Color& bgcolor );
 
 	virtual void ClearZBuffer( void );
  

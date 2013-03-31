@@ -1100,7 +1100,15 @@ SEGAN_INLINE void sx_convert_quat_triangle( float2* dest, const float2* src )
 
 SEGAN_INLINE void sx_convert_quat_triangle( Color* dest, const Color* src )
 {
+	sx_assert(0);
 	sx_mem_copy( &dest[0], &src[0], sizeof(Color) * 3);
 	sx_mem_copy( &dest[3], &src[0], sizeof(Color) );
 	sx_mem_copy( &dest[4], &src[2], sizeof(Color) * 2);
+}
+
+SEGAN_ENG_API void sx_convert_quat_triangle( Color2* dest, const Color2* src )
+{
+	sx_mem_copy( &dest[0], &src[0], sizeof(Color2) * 3);
+	sx_mem_copy( &dest[3], &src[0], sizeof(Color2) );
+	sx_mem_copy( &dest[4], &src[2], sizeof(Color2) * 2);
 }

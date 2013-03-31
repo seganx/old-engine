@@ -24,14 +24,10 @@ void d3dIndexBuffer_gl::SetDesc( d3dIndexBufferDesc& desc, void* data /*= null *
 		glGenBuffers( 1, &m_ibo );
 
 	sx_glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_ibo );
-	if ( desc.flag & SX_D3D_RESOURCE_DYNAMIC )
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, desc.size, data, GL_DYNAMIC_DRAW );
-	else
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, desc.size, data, GL_STATIC_DRAW );
-	sx_glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, desc.size, data, ( desc.flag & SX_D3D_RESOURCE_DYNAMIC ) ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW );
 
 	sx_mem_free( m_data );
-	if( desc.size && desc.flag & SX_D3D_RESOURCE_DYNAMIC )
+	if( desc.size && ( desc.flag & SX_D3D_RESOURCE_MANAGED ) )
 	{
 		m_data = sx_mem_alloc( desc.size );
 		memcpy( m_data, data, desc.size );
@@ -41,13 +37,12 @@ void d3dIndexBuffer_gl::SetDesc( d3dIndexBufferDesc& desc, void* data /*= null *
 
 void* d3dIndexBuffer_gl::Lock( void )
 {
-	if ( m_desc.flag && SX_D3D_RESOURCE_DYNAMIC )
+	if ( m_desc.flag & SX_D3D_RESOURCE_MANAGED )
 	{
 		return m_data;
 	}
 	else
 	{
-		g_logger->Log( L"WARNING : try to lock static index buffer !" );
 		sx_glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_ibo );
 		return glMapBufferARB( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE_ARB );
 	}
@@ -55,18 +50,14 @@ void* d3dIndexBuffer_gl::Lock( void )
 
 void d3dIndexBuffer_gl::Unlock( void )
 {
-	if ( m_desc.flag && SX_D3D_RESOURCE_DYNAMIC )
+	if ( m_desc.flag & SX_D3D_RESOURCE_MANAGED )
 	{
 		sx_glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_ibo );
-		if ( m_desc.flag & SX_D3D_RESOURCE_DYNAMIC )
-			glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_desc.size, m_data, GL_DYNAMIC_DRAW );
-		else
-			glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_desc.size, m_data, GL_STATIC_DRAW );
-		sx_glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, m_desc.size, m_data, ( m_desc.flag & SX_D3D_RESOURCE_DYNAMIC ) ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW );
 	}
 	else
 	{
-		g_logger->Log( L"WARNING : try to unlock static index buffer !" );
+		sx_glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_ibo );
 		glUnmapBufferARB( GL_ELEMENT_ARRAY_BUFFER );
 	}
 }

@@ -14,68 +14,46 @@
 //////////////////////////////////////////////////////////////////////////
 //	COLOR
 //////////////////////////////////////////////////////////////////////////
-SEGAN_ALIGN_16 class Color
+class Color
 {
 public:
 	SEGAN_INLINE Color() {}
-	SEGAN_INLINE Color( const dword c ) { Set( c ); }
-	SEGAN_INLINE Color( const Color& c ): r(c.r), g(c.g), b(c.b), a(c.a) {}
-	SEGAN_INLINE Color( const float* p ): r(p[0]), g(p[1]), b(p[2]), a(p[3]) {}
-	SEGAN_INLINE Color( const float _r, const float _g, const float _b, const float _a ): r(_r), g(_g), b(_b), a(_a) {}
+	SEGAN_INLINE Color( const dword c ): code(c) {}
+	SEGAN_INLINE Color( const Color& c ): code(c.code) {}
+	SEGAN_INLINE Color( const float* p ) { Set( p[0], p[1], p[2], p[3] ); }
+	SEGAN_INLINE Color( const byte _r, const byte _g, const byte _b, const byte _a ): r(_r), g(_g), b(_b), a(_a) { /*return ( ca << 24 ) | ( cr << 16 ) | ( cg << 8 ) | cb;*/ }
+	SEGAN_INLINE Color( const float _r, const float _g, const float _b, const float _a ) { Set( _r, _g, _b, _a ); }
 
 	// assignment operators
-	SEGAN_INLINE Color& operator += ( const Color& c )	{ r += c.r; g += c.g; b += c.b; a += c.a; return *this; }
-	SEGAN_INLINE Color& operator -= ( const Color& c )	{ r -= c.r; g -= c.g; b -= c.b; a -= c.a; return *this; }
-	SEGAN_INLINE Color& operator *= ( const float f )	{ r *= f; g *= f; b *= f; a *= f; return *this; }
-	SEGAN_INLINE Color& operator /= ( const float f )	{ r /= f; g /= f; b /= f; a /= f; return *this; }
+	SEGAN_INLINE Color& operator += ( const Color& c )	{ code = sx_clamp_u( code + c.code, 0, 0xffffffff ); return *this; }
+	SEGAN_INLINE Color& operator -= ( const Color& c )	{ code = sx_clamp_u( code - c.code, 0, 0xffffffff ); return *this; }
 
 	// binary operators
-	SEGAN_INLINE Color operator + ( const Color& c ) const	{ return Color( r + c.r, g + c.g, b + c.b, a + c.a ); }
-	SEGAN_INLINE Color operator - ( const Color& c ) const	{ return Color( r - c.r, g - c.g, b + c.b, a - c.a ); }
-	SEGAN_INLINE Color operator * ( const float f ) const	{ return Color( r * f, g * f, b * f, a * f ); }
-	SEGAN_INLINE Color operator / ( const float f ) const	{ return Color( r / f, g / f, b / f, a / f ); }
-	SEGAN_INLINE bool operator == ( const Color& c ) const	{ return ( r == c.r ) && ( g == c.g ) && ( b == c.b ) && ( a == c.a ); }
-	SEGAN_INLINE bool operator != ( const Color& c ) const	{ return ( r != c.r ) || ( g != c.g ) || ( b != c.b ) || ( a == c.a ); }
+	SEGAN_INLINE Color operator + ( const Color& c ) const	{ return sx_clamp_u( code + c.code, 0, 0xffffffff ); }
+	SEGAN_INLINE Color operator - ( const Color& c ) const	{ return sx_clamp_u( code - c.code, 0, 0xffffffff ); }
+	SEGAN_INLINE bool operator == ( const Color& c ) const	{ return ( code == c.code ); }
+	SEGAN_INLINE bool operator != ( const Color& c ) const	{ return ( code != c.code ); }
 
 	//! conventional operators
-	SEGAN_INLINE operator const float* ( void ) const { return e; }
-	SEGAN_INLINE operator const dword ( void ) const
-	{
-		dword cr = r >= 1.0f ? 0xff : ( r <= 0.0f ? 0x00 : dword( r * 255.0f + 0.5f ) );
-		dword cg = g >= 1.0f ? 0xff : ( g <= 0.0f ? 0x00 : dword( g * 255.0f + 0.5f ) );
-		dword cb = b >= 1.0f ? 0xff : ( b <= 0.0f ? 0x00 : dword( b * 255.0f + 0.5f ) );
-		dword ca = a >= 1.0f ? 0xff : ( a <= 0.0f ? 0x00 : dword( a * 255.0f + 0.5f ) );
-		return ( ca << 24 ) | ( cr << 16 ) | ( cg << 8 ) | cb;
-	}
+	SEGAN_INLINE operator const dword ( void ) const { return code; }
 
 	//! set new value for this color
 	SEGAN_INLINE Color& Set( const float _r, const float _g, const float _b, const float _a )
 	{
-		r = _r;
-		g = _g;
-		b = _b;
-		a = _a;
+		r = _r >= 1.0f ? 0xff : ( _r <= 0.0f ? 0x00 : byte( _r * 255.0f + 0.5f ) );
+		g = _g >= 1.0f ? 0xff : ( _g <= 0.0f ? 0x00 : byte( _g * 255.0f + 0.5f ) );
+		b = _b >= 1.0f ? 0xff : ( _b <= 0.0f ? 0x00 : byte( _b * 255.0f + 0.5f ) );
+		a = _a >= 1.0f ? 0xff : ( _a <= 0.0f ? 0x00 : byte( _a * 255.0f + 0.5f ) );
 		return *this;
 	}
 
-	//! set new value for this color
-	SEGAN_INLINE Color& Set( const dword c )
-	{
-		const float f = 1.0f / 255.0f;
-		r = f * float( (byte)( c >> 16 ) );
-		g = f * float( (byte)( c >>  8 ) );
-		b = f * float( (byte)( c >>  0 ) );
-		a = f * float( (byte)( c >> 24 ) );
-		return *this;
-	}
-
-	//! return interpolated vector of c1 and c2 by weight of t to this
+	//! return interpolated color of c1 and c2 by weight of t to this
 	SEGAN_INLINE Color& Lerp( const Color& c1, const Color& c2, const float t )
 	{
-		x = c1.x + ( c2.x - c1.x ) * t;
-		y = c1.y + ( c2.y - c1.y ) * t;
-		z = c1.z + ( c2.z - c1.z ) * t;
-		w = c1.w + ( c2.w - c1.w ) * t;
+		r = c1.r + byte( float( c2.r - c1.r ) * t );
+		g = c1.g + byte( float( c2.g - c1.g ) * t );
+		b = c1.b + byte( float( c2.b - c1.b ) * t );
+		a = c1.a + byte( float( c2.a - c1.a ) * t );
 		return *this;
 	}
 
@@ -84,21 +62,23 @@ public:
 
 	union {
 		struct {
-			float r;
-			float g;
-			float b;
-			float a;
+			byte r;
+			byte g;
+			byte b;
+			byte a;
 		};
-
-		struct {
-			float x;
-			float y;
-			float z;
-			float w;
-		};
-
-		float e[4];	//	elements of color
+		byte	e[4];	//	elements of color
+		dword	code;	//	32bit color code in ARGB8 mode
 	};
+};
+
+//////////////////////////////////////////////////////////////////////////
+//	COLOR VECTOR 2
+//////////////////////////////////////////////////////////////////////////
+struct Color2
+{
+	Color c0;
+	Color c1;
 };
 
 //////////////////////////////////////////////////////////////////////////

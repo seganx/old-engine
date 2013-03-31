@@ -470,7 +470,7 @@ void d3dDevice_dx::DrawIndexedPrimitive( const d3dPrimitiveType primType, const 
 	//m_device3D->DrawIndexedPrimitive()
 }
 
-void d3dDevice_dx::DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const dword color )
+void d3dDevice_dx::DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const Color& color )
 {
 	D3DMATERIAL9 mtl; ZeroMemory( &mtl, sizeof(mtl) );
 	mtl.Ambient = D3DXCOLOR(color);
@@ -552,14 +552,14 @@ void d3dDevice_dx::Present( void )
 	m_debugInfo.frameTime = (float)elpTime;
 }
 
-void d3dDevice_dx::ClearScreen( const dword bgcolor )
+void d3dDevice_dx::ClearScreen( const Color& bgcolor )
 {
 	sx_assert( m_device3D );
 
 	m_device3D->Clear( 0, null, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, bgcolor, 1.0f, 0 );
 }
 
-void d3dDevice_dx::ClearTarget( const dword bgcolor )
+void d3dDevice_dx::ClearTarget( const Color& bgcolor )
 {
 	sx_assert( m_device3D );
 

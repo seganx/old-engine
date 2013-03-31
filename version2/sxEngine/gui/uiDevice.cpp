@@ -149,14 +149,14 @@ void uiElement::CreateVertices( const uint count )
 
 			const uint size_pos			= count * sizeof(float3);
 			const uint size_uv			= count * sizeof(float2);
-			const uint size_color		= count * sizeof(Color);
+			const uint size_color		= count * sizeof(Color2);
 			const uint size_posfinal	= count * sizeof(float3);
 
 			byte* buffer = (byte*)sx_mem_alloc( size_pos + size_uv + size_color + size_posfinal );
 
 			m_pos		= (float3*)( buffer );
 			m_uv		= (float2*)( buffer + ( size_pos ) );
-			m_color		= (Color*) ( buffer + ( size_pos + size_uv ) );
+			m_color		= (Color2*)( buffer + ( size_pos + size_uv ) );
 			m_posfinal	= (float3*)( buffer + ( size_pos + size_uv + size_color ) );
 		}
 		m_numVertices = count;
@@ -233,7 +233,7 @@ void uiDevice::Copy( uiElement* dest, uint& index, const uiElement* src )
 			{
 				sx_mem_copy( &dest->m_posfinal[index],	src->m_posfinal,	srcvertcount * sizeof(float3) );
 				sx_mem_copy( &dest->m_uv[index],		src->m_uv,			srcvertcount * sizeof(float2) );
-				sx_mem_copy( &dest->m_color[index],		src->m_color,		srcvertcount * sizeof(float4) );
+				sx_mem_copy( &dest->m_color[index],		src->m_color,		srcvertcount * sizeof(Color2) );
 				index += srcvertcount;
 			}
 		}

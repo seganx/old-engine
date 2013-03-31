@@ -6,13 +6,13 @@
 
 
 
-SEGAN_INLINE void sx_debug_draw_line( const float3& v1, const float3& v2, const dword color )
+SEGAN_INLINE void sx_debug_draw_line( const float3& v1, const float3& v2, const Color& color )
 {
 	const float3 v[2] = { v1, v2 };
 	g_engine->m_device3D->DrawDebug( PT_LINE_LIST, 2, &v->x, color );
 }
 
-SEGAN_ENG_API void sx_debug_draw_grid( const uint size, const dword color )
+SEGAN_ENG_API void sx_debug_draw_grid( const uint size, const Color& color )
 {
 	const uint lines = size < 50 ? size : 50;
 	const uint xpoints = lines * 4 + 4;
@@ -128,7 +128,7 @@ SEGAN_ENG_API void sx_debug_draw_compass( void )
 	g_engine->m_device3D->SetMatrix( MM_PROJECTION, currproj );
 }
 
-SEGAN_INLINE void sx_debug_draw_circle( const float3& center, const float radius, const dword color )
+SEGAN_INLINE void sx_debug_draw_circle( const float3& center, const float radius, const Color& color )
 {
 	const uint	vcount	= 36 + 1;
 	const float vphi	= DEG_TO_RAD * 10.0f;
@@ -143,14 +143,14 @@ SEGAN_INLINE void sx_debug_draw_circle( const float3& center, const float radius
 	g_engine->m_device3D->DrawDebug( PT_LINE_STRIP, vcount, &v->x, color );
 }
 
-SEGAN_INLINE void sx_debug_draw_box( const AABox& box, const dword color )
+SEGAN_INLINE void sx_debug_draw_box( const AABox& box, const Color& color )
 {
 	OBBox obbox;
 	obbox.SetAABox( box );
 	sx_debug_draw_box( obbox, color );
 }
 
-SEGAN_INLINE void sx_debug_draw_box( const OBBox& box, const dword color )
+SEGAN_INLINE void sx_debug_draw_box( const OBBox& box, const Color& color )
 {
 	float3 box_v[8];
 	sx_get_points( box_v, box );
@@ -161,7 +161,7 @@ SEGAN_INLINE void sx_debug_draw_box( const OBBox& box, const dword color )
 	g_engine->m_device3D->DrawDebug( PT_LINE_LIST, 24, &v->x, color );
 }
 
-SEGAN_ENG_API void sx_debug_draw_sphere( const Sphere& sphere, const dword color, const uint stacks_ /*= 17*/, const uint slices_ /*= 20 */ )
+SEGAN_ENG_API void sx_debug_draw_sphere( const Sphere& sphere, const Color& color, const uint stacks_ /*= 17*/, const uint slices_ /*= 20 */ )
 {
 	float3 v[2400];
 

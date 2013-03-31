@@ -638,6 +638,9 @@ SEGAN_ENG_API void sx_convert_quat_triangle( float2* dest, const float2* src );
 //! convert colors of a quad to two triangles. the dest buffer must have 6 color at least
 SEGAN_ENG_API void sx_convert_quat_triangle( Color* dest, const Color* src );
 
+//! convert data of a quad to two triangles. the dest buffer must have 6 double word value at least
+SEGAN_ENG_API void sx_convert_quat_triangle( Color2* dest, const Color2* src );
+
 //! compute view parameter used to set level of detail for the object
 SEGAN_INLINE float sx_view_distance( const Frustum& frustun, const float cameraFov, const float3& position, const float obj_radius )
 {

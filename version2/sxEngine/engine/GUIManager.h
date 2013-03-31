@@ -16,6 +16,7 @@
 //! forward declarations
 class uiControl;
 class uiElement;
+class d3dVertexBuffer;
 
 /*! this class draw controls on the screen and manage events */
 class SEGAN_ENG_API GUIManager
@@ -55,6 +56,9 @@ public:
 	Array<uiControl*>	m_controls;		//	array of all controls
 	Array<uiElement*>	m_elements;		//	array of elements
 	uiElement*			m_drawable;		//	final drawable element
+	d3dVertexBuffer*	m_vb_pos;		//	hardware vertex buffer contain positions
+	d3dVertexBuffer*	m_vb_uv;		//	hardware vertex buffer contain texture coordinates
+	d3dVertexBuffer*	m_vb_color;		//	hardware vertex buffer contain colors
 };
 
 #endif	//	GUARD_GUIManager_HEADER_FILE

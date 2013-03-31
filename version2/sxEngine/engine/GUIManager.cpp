@@ -6,12 +6,27 @@ GUIManager::GUIManager( void )
 : m_controls(128)
 , m_elements(128)
 {
+	sx_assert(g_engine);
+	sx_assert(g_engine->m_device3D);
+
+	//	create drawable element
 	m_drawable = sx_new( uiElement );
 	m_drawable->m_type = ET_TRIANGLES;
+
+	//	create vertex buffers
+	g_engine->m_device3D->CreateVertexBuffer( m_vb_pos );
+	g_engine->m_device3D->CreateVertexBuffer( m_vb_uv );
+	g_engine->m_device3D->CreateVertexBuffer( m_vb_color );
 }
 
 GUIManager::~GUIManager( void )
 {
+	//	destroy vertex buffers
+	g_engine->m_device3D->DestroyVertexBuffer( m_vb_pos );
+	g_engine->m_device3D->DestroyVertexBuffer( m_vb_uv );
+	g_engine->m_device3D->DestroyVertexBuffer( m_vb_color );
+
+	//	destroy drawable element
 	sx_delete_and_null( m_drawable );
 }
 
@@ -65,6 +80,8 @@ void GUIManager::ProcessInput( struct InputReport* inputReport )
 
 	//	fill input report structure
 	uiInputReport ioreport;
+	ioreport.mouseLocked	= inputReport->locked;
+	ioreport.keyboardLocked = inputReport->locked;
 
 	//	fill mouse structure
 	ioreport.ray = sx_ray( sx_mouse_absx(pid), sx_mouse_absy(pid), sx_vp_width, sx_vp_height, m_view, m_proj );
@@ -89,6 +106,16 @@ void GUIManager::ProcessInput( struct InputReport* inputReport )
 
 void GUIManager::Draw( const dword flag )
 {
+	//	prepare description
+	d3dVertexBufferDesc vbdestPos;
+	d3dVertexBufferDesc vbdestUV;
+	d3dVertexBufferDesc vbdestColor;
+
+	vbdestPos.flag	 = SX_D3D_RESOURCE_DYNAMIC;
+	vbdestUV.flag	 = SX_D3D_RESOURCE_DYNAMIC;
+	vbdestColor.flag = SX_D3D_RESOURCE_DYNAMIC;
+
+	//	prepare rendering device
 	matrix mat; mat.Identity();
 	g_engine->m_device3D->SetMatrix( MM_WORLD, mat );
 	g_engine->m_device3D->SetMatrix( MM_VIEW, m_view );
@@ -124,7 +151,20 @@ void GUIManager::Draw( const dword flag )
 		g_engine->m_deviceUI->EndBatch( m_drawable );
 
 		//	draw the final element
-		sx_debug_draw_gui_element( m_drawable );
+		//sx_debug_draw_gui_element( m_drawable );
+		vbdestPos.size = m_drawable->m_numVertices * sizeof(float3);
+		vbdestUV.size = m_drawable->m_numVertices * sizeof(float2);
+		vbdestColor.size = m_drawable->m_numVertices * sizeof(Color2);
+
+		m_vb_pos->SetDesc( vbdestPos, m_drawable->m_posfinal );
+		m_vb_uv->SetDesc( vbdestUV, m_drawable->m_uv );
+		m_vb_color->SetDesc( vbdestColor, m_drawable->m_color );
+
+		g_engine->m_device3D->SetVertexBuffer( m_vb_pos,	SX_VERTEX_POSITION );
+		g_engine->m_device3D->SetVertexBuffer( m_vb_uv,		SX_VERTEX_UV0 );
+		g_engine->m_device3D->SetVertexBuffer( m_vb_color,	SX_VERTEX_COLORS );
+
+		g_engine->m_device3D->DrawPrimitive( PT_TRIANGLE_LIST, 0, m_drawable->m_numVertices );
 	}
 
 	g_engine->m_device3D->SetRenderState( RS_FILL, true );

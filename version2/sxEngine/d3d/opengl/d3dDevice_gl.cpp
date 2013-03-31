@@ -536,7 +536,7 @@ SEGAN_INLINE void d3dDevice_gl::DrawIndexedPrimitive(const d3dPrimitiveType prim
 }
 
 
-void d3dDevice_gl::DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const dword color )
+void d3dDevice_gl::DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const Color& color )
 {
 	ApplyTextureBuffer();
 
@@ -552,8 +552,8 @@ void d3dDevice_gl::DrawDebug( const d3dPrimitiveType primType, const uint vertxc
 	default: return;
 	}
 
-	Color c( color );
-	glColor4f( c.r, c.g, c.b, c.a );
+	//Color c( color );
+	glColor4ub( color.b, color.g, color.r, color.a );
 	const float* pos = vertices;
 	for ( uint i=0; i<vertxcount; ++i )
 	{
@@ -609,12 +609,15 @@ void d3dDevice_gl::Present( void )
 	m_debugInfo.frameTime = (float)elpTime;
 }
 
-void d3dDevice_gl::ClearScreen( const dword bgcolor )
+void d3dDevice_gl::ClearScreen( const Color& bgcolor )
 {
 	GLbitfield clearBits = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
 
-	Color color( bgcolor );
-	glClearColor( color.r, color.g, color.b, color.a );
+	float r = bgcolor.r / 255.0f;
+	float g = bgcolor.g / 255.0f;
+	float b = bgcolor.b / 255.0f;
+	float a = bgcolor.a / 255.0f;
+	glClearColor( r, g, b, a );
 
 	if ( m_driverDisplayMode.depthFormat == FMT_D24S8 )
 		clearBits |= GL_STENCIL_BUFFER_BIT;
@@ -625,12 +628,12 @@ void d3dDevice_gl::ClearScreen( const dword bgcolor )
 	glClear( clearBits );
 }
 
-void d3dDevice_gl::ClearTarget( const dword bgcolor )
+void d3dDevice_gl::ClearTarget( const Color& bgcolor )
 {
-	float r = sx_2th_byte_of(bgcolor) / 255.0f;
-	float g = sx_3th_byte_of(bgcolor) / 255.0f;
-	float b = sx_4th_byte_of(bgcolor) / 255.0f;
-	float a = sx_1th_byte_of(bgcolor) / 255.0f;
+	float r = bgcolor.r / 255.0f;
+	float g = bgcolor.g / 255.0f;
+	float b = bgcolor.b / 255.0f;
+	float a = bgcolor.a / 255.0f;
 	glClearColor( r, g, b, a );
 
 	glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
@@ -674,7 +677,7 @@ SEGAN_INLINE void d3dDevice_gl::ApplyVertexBuffer( void )
 
 		switch ( streamIndex )
 		{
-		case 0:		//	position
+		case SX_VERTEX_POSITION:		//	position
 			if ( vb->current )
 			{
 				if ( !vb->lastOne )
@@ -691,7 +694,7 @@ SEGAN_INLINE void d3dDevice_gl::ApplyVertexBuffer( void )
 			
 			break;
 
-		case 1:		//	normal
+		case SX_VERTEX_NORMAL:		//	normal
 			if ( vb->current )
 			{
 				if ( !vb->lastOne )
@@ -707,7 +710,7 @@ SEGAN_INLINE void d3dDevice_gl::ApplyVertexBuffer( void )
 			}
 			break;
 
-		case 2:		//	texture 0
+		case SX_VERTEX_UV0:		//	texture 0
 			if ( vb->current )
 			{
 				if ( !vb->lastOne )
@@ -724,14 +727,14 @@ SEGAN_INLINE void d3dDevice_gl::ApplyVertexBuffer( void )
 			}
 			break;
 
-		case 3:		//	tangent
+		case SX_VERTEX_TANGENT:		//	tangent
 			if ( vb->current )
 			{
 				if ( !vb->lastOne )
 					glEnableVertexAttribArray( 0 );
 
 				sx_glBindBuffer( GL_ARRAY_BUFFER, vb->current );
-				glVertexAttribPointer( 3, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+				glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 			}
 			else
 			{
@@ -740,14 +743,14 @@ SEGAN_INLINE void d3dDevice_gl::ApplyVertexBuffer( void )
 			}
 			break;
 
-		case 4:		//	texture 1
+		case SX_VERTEX_UV1:		//	texture 1
 			if ( vb->current )
 			{
 				if ( !vb->lastOne )
 					glEnableVertexAttribArray( 1 );
 
 				sx_glBindBuffer( GL_ARRAY_BUFFER, vb->current );
-				glVertexAttribPointer( 4, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+				glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 			}
 			else
 			{
@@ -756,7 +759,7 @@ SEGAN_INLINE void d3dDevice_gl::ApplyVertexBuffer( void )
 			}
 			break;
 
-		case 5:		//	color
+		case SX_VERTEX_COLORS:		//	color
 			if ( vb->current )
 			{
 				if ( !vb->lastOne )
@@ -766,11 +769,12 @@ SEGAN_INLINE void d3dDevice_gl::ApplyVertexBuffer( void )
 				}
 
 				sx_glBindBuffer( GL_ARRAY_BUFFER, vb->current );
-				glVertexAttribPointer( 5, 4, GL_UNSIGNED_BYTE, GL_FALSE, 8, BUFFER_OFFSET(0) );			//	color 0
-				glVertexAttribPointer( 5, 4, GL_UNSIGNED_BYTE, GL_FALSE, 8, BUFFER_OFFSET(4) );			//	color 1
+				glVertexAttribPointer( 2, GL_BGRA, GL_UNSIGNED_BYTE, GL_FALSE, 8, BUFFER_OFFSET(0) );			//	color 0
+				//glVertexAttribPointer( 2, GL_BGRA, GL_UNSIGNED_BYTE, GL_FALSE, 8, BUFFER_OFFSET(4) );			//	color 1
 
 				//	enable fixed function pipeline
-				glColorPointer( 4, GL_UNSIGNED_BYTE, 8, BUFFER_OFFSET(0) );
+				glColorPointer( GL_BGRA, GL_UNSIGNED_BYTE, 8, BUFFER_OFFSET(0) );					//	color 0
+				//glSecondaryColorPointer( GL_BGRA, GL_UNSIGNED_BYTE, 8, BUFFER_OFFSET(4) );			//	color 1
 			}
 			else
 			{
@@ -782,14 +786,14 @@ SEGAN_INLINE void d3dDevice_gl::ApplyVertexBuffer( void )
 			}
 			break;
 
-		case 6:		//	blend indices
+		case SX_VERTEX_BLENDINDICES:		//	blend indices
 			if ( vb->current )
 			{
 				if ( !vb->lastOne )
 					glEnableVertexAttribArray( 3 );
 
 				sx_glBindBuffer( GL_ARRAY_BUFFER, vb->current );
-				glVertexAttribPointer( 6, 4, GL_UNSIGNED_BYTE, GL_FALSE, 0, BUFFER_OFFSET(0) );
+				glVertexAttribPointer( 3, 4, GL_UNSIGNED_BYTE, GL_FALSE, 0, BUFFER_OFFSET(0) );
 			}
 			else
 			{
@@ -798,14 +802,14 @@ SEGAN_INLINE void d3dDevice_gl::ApplyVertexBuffer( void )
 			}
 			break;
 
-		case 7:		//	blend weights
+		case SX_VERTEX_BLENDWEIGHT:		//	blend weights
 			if ( vb->current )
 			{
 				if ( !vb->lastOne )
 					glEnableVertexAttribArray( 4 );
 
 				sx_glBindBuffer( GL_ARRAY_BUFFER, vb->current );
-				glVertexAttribPointer( 7, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+				glVertexAttribPointer( 4, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 			}
 			else
 			{
