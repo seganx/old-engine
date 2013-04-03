@@ -1,0 +1,343 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{1f9b844f-9a82-4996-8e3e-0e73e61e33da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entity">
+      <UniqueIdentifier>{3402318f-965d-46f3-a99e-e2b13ea6eee0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="AI">
+      <UniqueIdentifier>{7f073db1-23d0-4858-b6d5-c575fb06e49f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Projectile">
+      <UniqueIdentifier>{5304775e-2001-4ef0-9fec-23869d44af08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mechanic">
+      <UniqueIdentifier>{fdd6afe7-2207-4823-af94-119b755f85d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component">
+      <UniqueIdentifier>{2b299dd4-2111-4065-829e-16ed3966de03}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Game.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GameConfig.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GameGUI.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMenus.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GamePlay.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GameUtils.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripter.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityManager.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Brain.cpp">
+      <Filter>AI</Filter>
+    </ClCompile>
+    <ClCompile Include="PathFinder.cpp">
+      <Filter>AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Task.cpp">
+      <Filter>AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Task_attack_weapon.cpp">
+      <Filter>AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Task_goto_node.cpp">
+      <Filter>AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Task_goto_pos.cpp">
+      <Filter>AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="projectile_Bomb.cpp">
+      <Filter>Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="projectile_Bullet.cpp">
+      <Filter>Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="projectile_ClusterBomb.cpp">
+      <Filter>Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="projectile_Missile.cpp">
+      <Filter>Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectileManager.cpp">
+      <Filter>Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic_EnemyWave.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic_Music.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic_PA_BomberMan.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic_PA_DeathRain.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic_PA_GoldenTowers.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic_PA_Predator.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic_PA_Repair.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic_PA_Stunner.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic_PA_Trap.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic_TowerCreate.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="Mechanic_TowerEdit.cpp">
+      <Filter>Mechanic</Filter>
+    </ClCompile>
+    <ClCompile Include="com_GoldenTower.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="com_HealthModifier.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="com_HUD.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="com_ParamModifier.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="com_ShowRange.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="com_Turbo.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="com_weapon_Cannon.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="com_weapon_Flighter.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="com_weapon_GroundLava.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="com_weapon_Luncher.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="com_weapon_machineGun.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="com_weapon_Snower.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentManager.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="cnep.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Game.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameConfig.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameGUI.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMenus.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GamePlay.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTypes.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameUtils.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripter.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityManager.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Brain.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="PathFinder.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Task.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_attack_weapon.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_goto_node.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_goto_pos.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.h">
+      <Filter>Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="projectile_Bomb.h">
+      <Filter>Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="projectile_Bullet.h">
+      <Filter>Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="projectile_ClusterBomb.h">
+      <Filter>Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="projectile_Missile.h">
+      <Filter>Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectileManager.h">
+      <Filter>Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic_EnemyWave.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic_Music.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic_PA_BomberMan.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic_PA_DeathRain.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic_PA_GoldenTowers.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic_PA_Predator.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic_PA_Repair.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic_PA_Stunner.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic_PA_Trap.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic_TowerCreate.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="Mechanic_TowerEdit.h">
+      <Filter>Mechanic</Filter>
+    </ClInclude>
+    <ClInclude Include="com_GoldenTower.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="com_HealthModifier.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="com_HUD.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="com_ParamModifier.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="com_ShowRange.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="com_Turbo.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="com_weapon_Cannon.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="com_weapon_Flighter.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="com_weapon_GroundLava.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="com_weapon_Luncher.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="com_weapon_machineGun.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="com_weapon_Snower.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentManager.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportEngine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cnep.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="cursor_empty.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="small.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="cnep.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
