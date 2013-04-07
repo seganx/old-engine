@@ -340,6 +340,7 @@ bool ImportXToLibrary( const WCHAR* fileName, sx::core::PNode& node )
 			str.ExtractFileName();
 			str1024	 txFile = fileName;
 			txFile.ExtractFilePath();
+			txFile.MakePathStyle();
 			txFile << str;
 
 			ImportTexture( txFile );

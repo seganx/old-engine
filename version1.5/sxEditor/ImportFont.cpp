@@ -105,12 +105,13 @@ public:
 
 		//  import textures
 		str1024 texfile = textureFile;
-		texfile.ExtractFileExtension();
+		texfile.ExcludeFileExtension();
 		texfile << L".txr";
 		sx::d3d::Texture::Manager::Create(m_Texture, texfile);
 		
 		texfile = FileName;
 		texfile.ExtractFilePath();
+		texfile.MakePathStyle();
 		texfile << textureFile;
 		m_Texture->LoadFromImageFile( texfile, D3DFMT_A8R8G8B8 );
 

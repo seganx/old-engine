@@ -36,7 +36,7 @@ namespace sx { namespace gui {
 		int GetNumCharToBuffer(PFont textFont);
 
 	public:
-		String		text;
+		str1024		text;
 		int			width;
 	};
 	typedef GUITextLine *PGUITextLine;

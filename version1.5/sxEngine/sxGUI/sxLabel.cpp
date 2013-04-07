@@ -48,7 +48,8 @@ namespace sx { namespace gui {
 		width = 0;
 		if (!textFont) return 0;
 
-		for ( int i=0; i<text.Length(); i++ )
+		int len = text.Length();
+		for ( int i=0; i<len; i++ )
 		{
 			if ( IsColorCode( &text[i] ) )
 			{
@@ -58,6 +59,9 @@ namespace sx { namespace gui {
 			PGUIFontChar pfnch = NULL;
 			if (textFont->GetChar(text, i, pfnch, reversed))
 			{
+				if ( i == 0 || i == len )
+					width += pfnch->width;
+
 				width += pfnch->xAdvance;
 			}
 		}
@@ -741,7 +745,7 @@ namespace sx { namespace gui {
 		GUIFontDesc fontDesc = m_Font->GetDesc();
 		TextureDesc	txurDesc;
 		m_Font->m_Texture->GetDesc(txurDesc);
-		if (txurDesc.Width<2 || m_Size.y < fontDesc.LineHeight || m_Size.x < fontDesc.Size)
+		if ( txurDesc.Width<2 || m_Size.y < fontDesc.LineHeight || m_Size.x < fontDesc.Size )
 		{
 			ReleaseBuffer();
 			return;
@@ -781,21 +785,21 @@ namespace sx { namespace gui {
 				PDWORD indx;
 				if ( SUCCEEDED ( m_IB->Lock(0, 0, (void**)&indx, 0) ) )
 				{
-					str1024 text; int textwidth = 0, j = 0;
+					int j = 0;
 					for (int iline=lineTop; iline<lineBottom; iline++)
 					{
-						text		= m_Lines[iline]->text;
-						textwidth	= m_Lines[iline]->width;
-						ReverseRTLText(text);
+						GUITextLine line = *m_Lines[iline];
+						ReverseRTLText(line.text);
+						line.UpdateWidth( m_Font, true );
 
 						//  setup buffer by list of characters
 						float h = m_Size.y;
 						float w = m_Size.x;
-						float x = rect.x1 + 2.0f;
+						float x = rect.x1;
 						switch (m_Align)
 						{
-						case GTA_CENTER:	x += (w - textwidth) * 0.5f;	break;
-						case GTA_RIGHT:		x += (w - textwidth);			break;
+						case GTA_CENTER:	x += (w - line.width) * 0.5f;	break;
+						case GTA_RIGHT:		x += (w - line.width);			break;
 						}
 						x = (float)int(x);
 						float y = rect.y1 - fontDesc.LineHeight * (iline - lineTop);
@@ -804,27 +808,27 @@ namespace sx { namespace gui {
 						PGUIFontChar ch = NULL;
 						int curLine = 0;
 
-						for (int i = 0; i<(int)text.Length(); i++)
+						for (int i = 0; i<(int)line.text.Length(); i++)
 						{
 							//	extract color
-							if ( text[i] == '`' && i+9<text.Length() && text[i+9] == '`' && text[i+1] == '0' &&  String::LowerChar(text[i+2]) == 'x' )
+							if ( line.text[i] == '`' && i+9<line.text.Length() && line.text[i+9] == '`' && line.text[i+1] == '0' &&  String::LowerChar(line.text[i+2]) == 'x' )
 							{
 								WCHAR strtmp[7] = {0,0,0,0,0,0,0,};
-								strtmp[0] = ( text[i+3] );
-								strtmp[1] = ( text[i+4] );
-								strtmp[2] = ( text[i+5] );
-								strtmp[3] = ( text[i+6] );
-								strtmp[4] = ( text[i+7] );
-								strtmp[5] = ( text[i+8] );
+								strtmp[0] = ( line.text[i+3] );
+								strtmp[1] = ( line.text[i+4] );
+								strtmp[2] = ( line.text[i+5] );
+								strtmp[3] = ( line.text[i+6] );
+								strtmp[4] = ( line.text[i+7] );
+								strtmp[5] = ( line.text[i+8] );
 
 								DWORD ccode = 0;
 								swscanf_s( strtmp , L"%x", &ccode);
 								charColor =  ccode;
 
-								text.Delete(i, 10);
+								line.text.Delete(i, 10);
 							}
 
-							if ( !m_Font->GetChar(text, i, ch, true) ) continue;
+							if ( !m_Font->GetChar(line.text, i, ch, true) ) continue;
 
 							//  ignore space and return characters from buffer
 							if (ch->ID==' ' || ch->ID=='\t' || ch->ID=='\n' || ch->ID=='\r')

@@ -727,7 +727,7 @@ namespace sx { namespace gui {
 
 	void TextEdit::UpdateLine( int LineIndex )
 	{
-		String extraText;
+		str1024 extraText;
 		PGUITextLine pline	= m_Lines[LineIndex];
 
 		pline->width = 0;
