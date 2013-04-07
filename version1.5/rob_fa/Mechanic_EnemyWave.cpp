@@ -72,10 +72,10 @@ namespace GM
 
 		m_label = sx_new( sx::gui::Label );
 		m_label->SetParent( m_back );
+		m_label->SetAlign(GTA_RIGHT);
 		m_label->SetFont( L"Font_rob_twedit_info.fnt" );
 		m_label->SetSize( float2( 100.0f, 20.0f ) );
 		m_label->Position().Set( -45.0f, -103.0f, 0.0f );
-		m_label->SetAlign( GTA_LEFT );
 		m_label->GetElement(0)->Color() = D3DColor( 0, 0, 0, 0 );
 		m_label->GetElement(1)->Color() = 0xaaaaaaaa;
 

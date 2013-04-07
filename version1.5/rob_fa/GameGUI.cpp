@@ -237,6 +237,7 @@ public:
 			str.Replace( L"\\n", L"\n" );
 
 			m_label = sx_new( sx::gui::Label );
+			m_label->SetAlign(GTA_RIGHT);
 			m_label->SetFont( L"Font_Tips.fnt" );
 			m_label->SetSize( float2(100.0f, GAMETIPS_ICON_SIZE_div2) );
 			m_label->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
@@ -308,6 +309,7 @@ public:
 		m_lblTitle->SetParent( m_panelEx );
 		m_lblTitle->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 		m_lblTitle->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
+		m_lblTitle->SetAlign(GTA_RIGHT);
 		m_lblTitle->SetFont( L"Font_hint_title.fnt" );
 		m_lblTitle->GetElement(0)->Color() = D3DColor(0,0,0,0);
 		m_lblTitle->GetElement(1)->Color() = D3DColor(1,1,0.2f,1);
@@ -317,6 +319,7 @@ public:
 		m_lblDesc->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 		m_lblDesc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 		m_lblDesc->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
+		m_lblDesc->SetAlign(GTA_RIGHT);
 		m_lblDesc->SetFont( L"Font_hint_desc.fnt" );
 		m_lblDesc->GetElement(0)->Color() = D3DColor(0,0,0,0);
 

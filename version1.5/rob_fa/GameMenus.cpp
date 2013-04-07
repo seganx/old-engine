@@ -1385,8 +1385,8 @@ void MenuAchievements::Initialize( void )
 	m_name->GetElement(0)->Color() = 0x00010000;
 	m_name->GetElement(1)->Color() = 0xffffff00;
 	m_name->SetSize( float2( 270, 30 ) );
+	m_name->SetAlign( GTA_RIGHT );
 	m_name->SetFont( L"font_achievements_name.fnt" );
-	m_name->SetAlign( GTA_LEFT );
 	m_name->Position().Set( 50.0f, -5.0f, 0.0f );
 
 	//	create label for the desc
@@ -1394,8 +1394,8 @@ void MenuAchievements::Initialize( void )
 	m_desc->SetParent( m_back );
 	m_desc->GetElement(0)->Color() = 0x00010000;
 	m_desc->SetSize( float2( 290, 50 ) );
+	m_desc->SetAlign( GTA_RIGHT );
 	m_desc->SetFont( L"font_achievements_desc.fnt" );
-	m_desc->SetAlign( GTA_LEFT );
 	m_desc->Position().Set( 60.0f, -40.0f, 0.0f );
 	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 	m_desc->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
@@ -2206,6 +2206,7 @@ void MenuVictory::Initialize( void )
 	//	create label to show golds
 	m_goldLabel = (sx::gui::Label*)m_peopleLabel->Clone();
 	m_goldLabel->SetParent( m_back );
+	m_goldLabel->SetAlign(GTA_RIGHT);
 	m_goldLabel->Position().Set( -152.0f, 110.0f, 0.0f );
 
 	//	create buttons
@@ -3152,7 +3153,7 @@ void MenuUpgrade::Initialize( void )
 		lb->SetUserTag( i );
 		lb->SetParent( ch );
 		lb->SetSize( float2( 160, 26 ) );
-		lb->SetAlign(GTA_LEFT);
+		lb->SetAlign(GTA_RIGHT);
 		lb->SetFont( L"font_upgrade_name.fnt" );
 		lb->Position().Set( 40.0f, -2.0f, 0.0f );
 		lb->GetElement(0)->Color().a = 0.0f;
@@ -3198,7 +3199,7 @@ void MenuUpgrade::Initialize( void )
 	m_stars->SetParent( m_back );
 	m_stars->SetSize( float2(128, 32) );
 	m_stars->SetFont( L"font_upgrade_stars.fnt" );
-	m_stars->SetAlign( GTA_LEFT );
+	m_stars->SetAlign( GTA_RIGHT );
 	m_stars->GetElement(0)->Color() = 0x00010000;
 	m_stars->GetElement(1)->Color() = 0xFFFFFF00;
 	m_stars->Position().Set( -130.0f, -256.0f, 0.0f );
@@ -3220,7 +3221,7 @@ void MenuUpgrade::Initialize( void )
 	m_desc = sx_new( sx::gui::Label );
 	m_desc->SetParent( m_back );
 	m_desc->SetSize( float2( 430, 100 ) );
-	m_desc->SetAlign( GTA_LEFT );
+	m_desc->SetAlign( GTA_RIGHT );
 	m_desc->SetFont( L"font_upgrade_desc.fnt" );
 	m_desc->Position().Set( 220.0f, -250.0f, 0.0f );
 	m_desc->GetElement(0)->Color() = 0x00000001;

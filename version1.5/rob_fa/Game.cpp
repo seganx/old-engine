@@ -132,6 +132,7 @@ Game::Game( void )
 	label->GetElement(1)->Color() = 0xffffffff;
 	label->SetSize( float2(500, 50) );
 	label->SetParent( m_panel_Loading );
+	label->SetAlign(GTA_RIGHT);
 	label->Position().x = ringPos.x + 250 + ringSize.x * 0.5f;
 	label->Position().y = ringPos.y - 10;
 	
@@ -140,6 +141,7 @@ Game::Game( void )
 	label->GetElement(1)->Color() = 0xffffffff;
 	label->SetSize( float2(500, 50) );
 	label->SetParent( m_panel_Loading );
+	label->SetAlign(GTA_RIGHT);
 	label->Position().x = ringPos.x + 250 + ringSize.x * 0.5f;
 	label->Position().y = ringPos.y - 20;
 
