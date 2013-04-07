@@ -837,6 +837,8 @@ namespace sx { namespace gui {
 								continue;
 							}
 
+							if ( i == 0 ) x -= ch->xOffset;
+
 							u =		((float)ch->x+0.5f) / (float)txurDesc.Width;
 							v =		((float)ch->y+0.5f) / (float)txurDesc.Width;
 							u2 = u + (float)ch->width   / (float)txurDesc.Width;

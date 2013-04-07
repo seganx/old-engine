@@ -40,7 +40,8 @@ namespace sx { namespace gui {
 			//  write all of the character information to the stream
 			for (GUICharacterMap::Iterator it = m_Chars.First(); !it.IsLast(); it++)
 			{
-				stream.Write(&(*it), sizeof(GUIFontChar));
+				GUIFontChar *ch = *it;
+				stream.Write( ch, sizeof(GUIFontChar) );
 			}
 		}
 	}
@@ -184,7 +185,8 @@ namespace sx { namespace gui {
 	{
 		for ( GUICharacterMap::Iterator it = m_Chars.First(); !it.IsLast(); it++ )
 		{
-			sx_delete( *it );
+			GUIFontChar *ch = *it;
+			sx_delete( ch );
 		}
 		m_Chars.Clear();
 		if(m_Texture)
