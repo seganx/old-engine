@@ -453,7 +453,6 @@ void MenuMap::Initialize( void )
 		guil->m_area->SetUserTag( i );
 		guil->m_area->SetParent( m_back );
 		guil->m_area->SetSize( float2(32, 32) );
-		guil->m_area->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 		guil->m_area->GetElement(0)->SetTextureSrc( L"gui_menu_map_level.txr" );
 		switch ( i )
 		{
@@ -471,9 +470,6 @@ void MenuMap::Initialize( void )
 		guil->m_area->State_Add();
 		guil->m_area->State_GetByIndex(1).Color.Set( 1.0f, 0.0f, 0.0f, 1.0f );
 		guil->m_area->State_GetByIndex(1).Blender.Set( 0.1f, 0.7f );
-		SEGAN_GUI_SET_ONENTER( guil->m_area, Menu::OnEnter );
-		SEGAN_GUI_SET_ONEXIT( guil->m_area, Menu::OnExit );
-		SEGAN_GUI_SET_ONCLICK( guil->m_area, MenuMap::OnClick );
 		guil->m_area->State_Add();
 		guil->m_area->State_GetByIndex(2).Scale.Set( 0.0f, 0.0f, 0.0f );
 		guil->m_area->State_GetByIndex(2).Blender.Set( 0.1f, 0.7f );
@@ -502,6 +498,18 @@ void MenuMap::Initialize( void )
 			guil->m_star[s]->State_Add();
 			guil->m_star[s]->State_GetByIndex(0).Scale.Set( 0.0f, 0.0f, 0.0f );
 		}
+
+		guil->m_button = sx_new( sx::gui::Button );
+		guil->m_button->SetUserTag( i );
+		guil->m_button->SetParent( guil->m_area );
+		guil->m_button->SetSize( float2(48, 90) );
+		guil->m_button->Position().y = 16.0f;
+		guil->m_button->GetElement(0)->Color().a = 0.0f;
+		guil->m_button->GetElement(1)->Color().a = 0.0f;
+		guil->m_button->GetElement(2)->Color().a = 0.0f;
+		SEGAN_GUI_SET_ONENTER( guil->m_button, MenuMap::OnEnter_ );
+		SEGAN_GUI_SET_ONEXIT( guil->m_button, MenuMap::OnExit_ );
+		SEGAN_GUI_SET_ONCLICK( guil->m_button, MenuMap::OnClick );
 
 		m_chooser->State_Add();
 		m_chooser->State_GetByIndex(i+1).Position = guil->m_area->State_GetByIndex(0).Position;
@@ -914,6 +922,20 @@ void MenuMap::OnScroll( sx::gui::PControl sender )
 		g_game->m_difficultyLevel = 2;
 		break;
 	}
+}
+
+
+void MenuMap::OnEnter_( sx::gui::PControl sender )
+{
+	m_levels[sender->GetUserTag()].m_area->State_SetIndex(1);
+
+	msg_SoundPlay msg( true, 0, 0, L"mouseHover" );
+	m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+}
+
+void MenuMap::OnExit_( sx::gui::PControl sender )
+{
+	m_levels[sender->GetUserTag()].m_area->State_SetIndex(0);
 }
 
 
