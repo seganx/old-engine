@@ -171,7 +171,7 @@ namespace GM
 
 		m_lblXP = sx_new( sx::gui::Label );
 		m_lblXP->SetParent( m_back );
-		m_lblXP->SetSize( float2(75, 25) );
+		m_lblXP->SetSize( float2(75, 26) );
 		m_lblXP->Position().Set( -265.0f, -45.0f, 0.0f );
 		m_lblXP->GetElement(0)->Color().a = 0.0f;
 		m_lblXP->GetElement(1)->Color().a = 0.85f;
@@ -180,7 +180,7 @@ namespace GM
 
 		m_lblDamage = sx_new( sx::gui::Label );
 		m_lblDamage->SetParent( m_back );
-		m_lblDamage->SetSize( float2(70, 25) );
+		m_lblDamage->SetSize( float2(70, 26) );
 		m_lblDamage->Position().Set( -153.0f, -45.0f, 0.0f );
 		m_lblDamage->GetElement(0)->Color().a = 0.0f;
 		m_lblDamage->GetElement(1)->Color().a = 0.85f;
@@ -189,7 +189,7 @@ namespace GM
 
 		m_lblFireRate = sx_new( sx::gui::Label );
 		m_lblFireRate->SetParent( m_back );
-		m_lblFireRate->SetSize( float2(70, 25) );
+		m_lblFireRate->SetSize( float2(70, 26) );
 		m_lblFireRate->Position().Set( -52.0f, -45.0f, 0.0f );
 		m_lblFireRate->GetElement(0)->Color().a = 0.0f;
 		m_lblFireRate->GetElement(1)->Color().a = 0.85f;
