@@ -3174,8 +3174,8 @@ void MenuUpgrade::Initialize( void )
 		sx::gui::Label* lb = sx_new( sx::gui::Label );
 		lb->SetUserTag( i );
 		lb->SetParent( ch );
-		lb->SetSize( float2( 160, 26 ) );
-		lb->SetAlign(GTA_RIGHT);
+		lb->SetSize( float2( 160, 28 ) );
+		lb->SetAlign( GTA_RIGHT );
 		lb->SetFont( L"font_upgrade_name.fnt" );
 		lb->Position().Set( 40.0f, -2.0f, 0.0f );
 		lb->GetElement(0)->Color().a = 0.0f;
