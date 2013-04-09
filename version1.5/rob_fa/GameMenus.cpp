@@ -2228,7 +2228,7 @@ void MenuVictory::Initialize( void )
 	//	create label to show golds
 	m_goldLabel = (sx::gui::Label*)m_peopleLabel->Clone();
 	m_goldLabel->SetParent( m_back );
-	m_goldLabel->SetAlign(GTA_RIGHT);
+	//m_goldLabel->SetAlign( GTA_RIGHT );
 	m_goldLabel->Position().Set( -152.0f, 110.0f, 0.0f );
 
 	//	create buttons
