@@ -3175,7 +3175,7 @@ void MenuUpgrade::Initialize( void )
 		lb->SetUserTag( i );
 		lb->SetParent( ch );
 		lb->SetSize( float2( 160, 28 ) );
-		lb->SetAlign( GTA_RIGHT );
+		//lb->SetAlign( GTA_RIGHT );
 		lb->SetFont( L"font_upgrade_name.fnt" );
 		lb->Position().Set( 40.0f, -2.0f, 0.0f );
 		lb->GetElement(0)->Color().a = 0.0f;
@@ -3243,7 +3243,7 @@ void MenuUpgrade::Initialize( void )
 	m_desc = sx_new( sx::gui::Label );
 	m_desc->SetParent( m_back );
 	m_desc->SetSize( float2( 430, 100 ) );
-	m_desc->SetAlign( GTA_RIGHT );
+	//m_desc->SetAlign( GTA_RIGHT );
 	m_desc->SetFont( L"font_upgrade_desc.fnt" );
 	m_desc->Position().Set( 220.0f, -250.0f, 0.0f );
 	m_desc->GetElement(0)->Color() = 0x00000001;
