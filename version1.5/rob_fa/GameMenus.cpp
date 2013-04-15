@@ -2896,9 +2896,13 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 						if ( !script.GetString( i, L"image", image	) )
 							continue;
 
+						int showNow = 0;
+						if ( !script.GetInteger( i, L"showNow", showNow	) )
+							continue;
+
 						if ( g_game->m_player->m_profile.level_played < g_game->m_game_currentLevel )
 						{
-							AddTutorial( title, desc, image, true, false );
+							AddTutorial( title, desc, image, true, showNow > 0 );
 						}
 						else
 						{

@@ -374,8 +374,11 @@ namespace GM
 				msg_SoundPlay msgSound(true);
 				pWave->tipsStartNode->MsgProc( MT_SOUND_PLAY, &msgSound );
 
-				msg_Particle msgPrtcl(SX_PARTICLE_SPRAY);
-				pWave->tipsStartNode->MsgProc( MT_PARTICLE, &msgPrtcl );
+				msg_Particle msgPrtcl_1(SX_PARTICLE_SPRAY);
+				pWave->tipsStartNode->MsgProc( MT_PARTICLE, &msgPrtcl_1 );
+
+				msg_Particle msgPrtcl_2(0, SX_PARTICLE_SPRAY, L"entry_path");
+				pWave->tipsStartNode->MsgProc( MT_PARTICLE, &msgPrtcl_2 );
 			}
 
 			String sre;
