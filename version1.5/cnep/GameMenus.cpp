@@ -453,7 +453,7 @@ void MenuMap::Initialize( void )
 		guil->m_area->SetUserTag( i );
 		guil->m_area->SetParent( m_back );
 		guil->m_area->SetSize( float2(32, 32) );
-		guil->m_area->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+		//guil->m_area->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 		guil->m_area->GetElement(0)->SetTextureSrc( L"gui_menu_map_level.txr" );
 		switch ( i )
 		{
@@ -471,9 +471,9 @@ void MenuMap::Initialize( void )
 		guil->m_area->State_Add();
 		guil->m_area->State_GetByIndex(1).Color.Set( 1.0f, 0.0f, 0.0f, 1.0f );
 		guil->m_area->State_GetByIndex(1).Blender.Set( 0.1f, 0.7f );
-		SEGAN_GUI_SET_ONENTER( guil->m_area, Menu::OnEnter );
-		SEGAN_GUI_SET_ONEXIT( guil->m_area, Menu::OnExit );
-		SEGAN_GUI_SET_ONCLICK( guil->m_area, MenuMap::OnClick );
+		//SEGAN_GUI_SET_ONENTER( guil->m_area, Menu::OnEnter );
+		//SEGAN_GUI_SET_ONEXIT( guil->m_area, Menu::OnExit );
+		//SEGAN_GUI_SET_ONCLICK( guil->m_area, MenuMap::OnClick );
 		guil->m_area->State_Add();
 		guil->m_area->State_GetByIndex(2).Scale.Set( 0.0f, 0.0f, 0.0f );
 		guil->m_area->State_GetByIndex(2).Blender.Set( 0.1f, 0.7f );
