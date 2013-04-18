@@ -94,6 +94,9 @@ public:
 	void OnClick(sx::gui::PControl sender);
 	void OnScroll(sx::gui::PControl sender);
 
+	void OnEnter_( sx::gui::PControl sender );
+	void OnExit_( sx::gui::PControl sender );
+
 public:
 
 	struct Level_GUI
@@ -102,6 +105,7 @@ public:
 		sx::gui::PanelEx*	m_area;
 		sx::gui::PanelEx*	m_flag;
 		sx::gui::PanelEx*	m_star[3];
+		sx::gui::Button*	m_button;
 	};
 	Level_GUI			m_levels[10];
 	sx::gui::PanelEx*	m_playGame;
