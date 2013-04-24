@@ -61,7 +61,7 @@ namespace GU
 		
 		sx_callstack();
 
-#if 0
+#if 1
 		if ( SEGAN_KEYUP(0, SX_INPUT_KEY_F) )
 		{
 			m_freeMode = !m_freeMode;

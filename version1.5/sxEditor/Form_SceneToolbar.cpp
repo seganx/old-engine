@@ -377,6 +377,29 @@ void Form_SceneToolbar::ImportModel( sx::gui::PControl Sender )
 			Editor::SetLabelTips(str, sx::sys::GetSysTime() - timeElapsed + 10000.0f);
 
 		}
+		else if (str == L"x")
+		{
+			if ( ImportXToLibrary( FileName, node ) )
+			{
+				core::Scene::AddNode( node );
+				EditorScene::selectedNodes.Clear();
+				EditorScene::selectedNodes.PushBack( node );
+				EditorScene::selectedMember = NULL;
+				EditorScene::mng_UndoManager.AddAction( UAT_CREATE, &node, 1);
+
+				str1024 tmp = FileName; tmp.ExtractFileName();
+				str1024 str = L"'";
+				str << tmp << L"' loaded to editor .";
+				Editor::SetLabelTips(str, sx::sys::GetSysTime() - timeElapsed + 10000.0f);
+			}
+			else
+			{
+				str1024 tmp = Editor::frm_Explorer->GetPath(); tmp.ExtractFileName();
+				str1024 str = L"It seems that loading '";
+				str << tmp << L"' has been failed !";
+				Editor::SetLabelTips(str, sx::sys::GetSysTime() - timeElapsed + 10000.0f);
+			}			
+		}
 		else if (str == L"obj")
 		{
 			Editor::frm_importModel->Import( FileName, this, (GUICallbackEvent)&Form_SceneToolbar::ImportModel, CALL_MODEL_IMPORTER );

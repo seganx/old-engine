@@ -59,16 +59,19 @@ namespace sx { namespace core {
 		static PCamera GetCamera(void);
 
 		/*! 
-		set sun light information of the scene. these information packed to the matrix include
+		return sun light information of the scene. these information packed to the matrix include
 		sunLight[0].xyz : sun light direction
 		sunLight[1].xyz : sun light diffuse color
 		sunLight[2].xyz : sun light ambient color
 		sunLight[3].xyz : reserved
 		*/
-		static void SetSunLight( PMatrix sunLight );
+		static PMatrix GetSunLight( void );
 
-		//! return sun light matrix
-		static PMatrix GetSunLight(void);
+		//! return reference to sun light diffuse. use w as intensity
+		static float4& SunLightColor( void );
+
+		//! return reference to sun light ambient. use w as intensity
+		static float4& AmbientColor( void );
 
 		//! return pointer to current rendering pipeline
 		static PPipeline GetRenderingPipeline(void);

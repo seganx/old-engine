@@ -1012,15 +1012,16 @@ SEGAN_INLINE const wchar* sx_str_extract_filepath( const wchar* filename )
 {
 	if ( !filename ) return null;
 	wchar* res = str_pop();
-	int len=0;
-	for ( int i=0; filename[i]; ++i )
+	sint p = 0;
+	for ( sint i=0; filename[i]; ++i )
 	{
 		if ( filename[i] == '\\' || filename[i] == '/' )
-			len = i + 1;
+			p = i + 1;
 	}
-	for ( int i=0; i<len; i++ )
+	sint i = 0;
+	for ( ; i < p; i++ )
 		res[i] = filename[i];
-	res[len] = 0;
+	res[i] = 0;
 	return res;
 }
 
@@ -1028,15 +1029,16 @@ SEGAN_INLINE const wchar* sx_str_extract_filename( const wchar* filename )
 {
 	if ( !filename ) return null;
 	wchar* res = str_pop();
-	int len=0;
-	for ( int i=0; filename[i]; ++i )
+	sint p = 0;
+	for ( sint i=0; filename[i]; ++i )
 	{
 		if ( filename[i] == '\\' || filename[i] == '/' )
-			len = i + 1;
+			p = i + 1;
 	}
-	for ( int i=0; filename[len]; ++i, ++len )
-		res[i] = filename[len];
-	res[len] = 0;
+	sint i = 0;
+	for ( ; filename[p]; ++i, ++p )
+		res[i] = filename[p];
+	res[i] = 0;
 	return res;
 }
 
@@ -1044,15 +1046,16 @@ SEGAN_INLINE const wchar* sx_str_extract_extension( const wchar* filename )
 {
 	if ( !filename ) return null;
 	wchar* res = str_pop();
-	int len=0;
-	for ( int i=0; filename[i]; ++i )
+	sint p = 0;
+	for ( sint i=0; filename[i]; ++i )
 	{
 		if ( filename[i] == '.' )
-			len = i + 1;
+			p = i + 1;
 	}
-	for ( int i=0; filename[len]; ++i, ++len )
-		res[i] = filename[len];
-	res[len] = 0;
+	sint i = 0;
+	for ( ; filename[p]; ++i, ++p )
+		res[i] = filename[p];
+	res[i] = 0;
 	return res;
 }
 
@@ -1060,15 +1063,16 @@ SEGAN_INLINE const wchar* sx_str_exclude_extension( const wchar* filename )
 {
 	if ( !filename ) return null;
 	wchar* res = str_pop();
-	int len=0;
-	for ( int i=0; filename[i]; ++i )
+	sint p = 0;
+	for ( sint i=0; filename[i]; ++i )
 	{
 		if ( filename[i] == '.' )
-			len = i;
+			p = i;
 	}
-	for ( int i=0; i<len; ++i )
+	sint i = 0;
+	for ( ; i < p; ++i )
 		res[i] = filename[i];
-	res[len] = 0;
+	res[i] = 0;
 	return res;
 }
 

@@ -60,6 +60,7 @@ bool xmesh_LoadFile( OUT XMesh& _mesh, const WCHAR* fileName )
 		return false;
 	}
 
+#if 0
 	D3DXWELDEPSILONS epsilones; ZeroMemory(&epsilones, sizeof(epsilones));
 	for (int i=0; i<sizeof(epsilones)/4; i++) ((float*)&epsilones)[i] = 0.01f;
 	D3DXWeldVertices( 
@@ -69,9 +70,10 @@ bool xmesh_LoadFile( OUT XMesh& _mesh, const WCHAR* fileName )
 		(DWORD*)mesh->buffAdjacency->GetBufferPointer(),
 		(DWORD*)mesh->buffAdjacency->GetBufferPointer(),
 		NULL, NULL);
-	
-	mesh->mtrls = (D3DXMATERIAL*)mesh->buffMaterial->GetBufferPointer();
 	mesh->adjacency = (DWORD*)mesh->buffAdjacency->GetBufferPointer();
+#endif
+
+	mesh->mtrls = (D3DXMATERIAL*)mesh->buffMaterial->GetBufferPointer();
 
 	//  retrieve mesh specification
 	D3DVERTEXELEMENT9 elem[64]; ZeroMemory(elem, sizeof(elem));
@@ -287,7 +289,7 @@ bool ImportXToLibrary( const WCHAR* fileName, sx::core::PNode& node )
 	xMesh* mesh = NULL;
 	if ( !xmesh_LoadFile((XMesh&)mesh, fileName) )	FAILEDIMPORT();
 	if ( !xmesh_Filter(mesh) )						FAILEDIMPORT();
-	if ( !xmesh_ComputeNormal(mesh) )				FAILEDIMPORT();
+//	if ( !xmesh_ComputeNormal(mesh) )				FAILEDIMPORT();
 	if ( !xmesh_ComputeTangent(mesh) )				FAILEDIMPORT();
 	xmesh_Optimize(mesh);
 
@@ -347,6 +349,7 @@ bool ImportXToLibrary( const WCHAR* fileName, sx::core::PNode& node )
 
 			txFile.ExtractFileName();
 			txFile.ExcludeFileExtension();
+//			txFile.MakePathStyle();
 			txFile << L".txr";
 			meshMember->GetMaterial(0)->SetTexture(0, txFile);
 		} 

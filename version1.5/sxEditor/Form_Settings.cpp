@@ -29,20 +29,31 @@ Form_Settings::Form_Settings( void ): BaseForm()
 	m_pSunLightPanel = sx_new( sx::gui::Panel );
 	m_pSunLightPanel->SetParent(m_pBack);
 	m_pSunLightPanel->GetElement(0)->Color() = EditorUI::GetListBackColor();
-	m_pSunLightPanel->SetSize( float2(200.0f, 200.0f) );
-	m_pSunLightPanel->Position().Set( FORM_SETTINGS_WIDTH/2 - 110.0f, FORM_SETTINGS_HEIGHT/2 - 120.0f, 0.0f );
+	m_pSunLightPanel->SetSize( float2(200.0f, 250.0f) );
+	m_pSunLightPanel->Position().Set( FORM_SETTINGS_WIDTH/2 - 110.0f, FORM_SETTINGS_HEIGHT/2 - 145.0f, 0.0f );
 	lbl = EditorUI::CreateLabel(m_pSunLightPanel, 190.0f, 8, L"Sun light :");
-	lbl->Position().y = 100.0f;
+	lbl->Position().y = 125.0f;
 	lbl = EditorUI::CreateLabel(m_pSunLightPanel, 190.0f, 8, L"Theta :");
 	m_pSunTheta = EditorUI::CreateTrackbar(m_pSunLightPanel, 190.0f, -sx::math::PIDIV2+0.01f, sx::math::PIDIV2-0.01f);
 	m_pSunTheta->SetValue( sx::core::Settings::GetSunLightPosition().x );
-	lbl->Position().y = 75.0f;
-	m_pSunTheta->Position().y = 60.0f;
+	lbl->Position().y = 100.0f;
+	m_pSunTheta->Position().y = 85.0f;
 	lbl = EditorUI::CreateLabel(m_pSunLightPanel, 190.0f, 8, L"Phi :");
 	m_pSunPhi = EditorUI::CreateTrackbar(m_pSunLightPanel, 190.0f, 0.0f, sx::math::PIMUL2);
 	m_pSunPhi->SetValue( sx::core::Settings::GetSunLightPosition().y );
-	lbl->Position().y = 40.0f;
-	m_pSunPhi->Position().y = 25.0f;
+	lbl->Position().y = 65.0f;
+	m_pSunPhi->Position().y = 50.0f;
+
+	lbl = EditorUI::CreateLabel(m_pSunLightPanel, 190.0f, 8, L"Diffuse :");	lbl->Position().y = 15.0f;
+	lbl = EditorUI::CreateLabel(m_pSunLightPanel, 190.0f, 8, L"Ambient :");	lbl->Position().y = -5.0f;
+	for ( int i=0; i<4; i++ )
+	{
+		m_pSunDiffuse[i] = EditorUI::CreateEditBox( m_pSunLightPanel, -30.0f + i * 35.0f, 30.0f );
+		m_pSunDiffuse[i]->Position().y = 15.0f;
+
+		m_pSunAmbient[i] = EditorUI::CreateEditBox( m_pSunLightPanel, -30.0f + i * 35.0f, 30.0f );
+		m_pSunAmbient[i]->Position().y = -5.0f;
+	}
 
 	//  shadow
 	lbl = EditorUI::CreateLabel(m_pSunLightPanel, 190.0f, 8, L"Shadow size :");
@@ -57,8 +68,8 @@ Form_Settings::Form_Settings( void ): BaseForm()
 	m_pShadowSize->SetSize(190, 75.0f, 18.0f, false);
 	m_pShadowSize->SetItemIndex( sx::core::Settings::GetOption_Shadow()->GetLevel() );
 	m_pShadowSize->SetOnSelect( this, (GUICallbackEvent)&Form_Settings::OnShadowSizeChange );
-	lbl->Position().y = -5.0f;
-	m_pShadowSize->Position().y = -50.0f;
+	lbl->Position().y = -30.0f;
+	m_pShadowSize->Position().y = -75.0f;
 
 	//  reflection shader quality
 	sx::gui::PPanel panel = sx_new( sx::gui::Panel );
@@ -272,6 +283,15 @@ void Form_Settings::Update( float elpsTime )
 	//  update light position
 	sx::core::Settings::SetSunLightPosition( m_pSunTheta->GetBlendingValue(), m_pSunPhi->GetBlendingValue() );
 
+	if ( applySettings )
+	{
+		for ( int i=0; i<4; i++ )
+		{
+			sx::core::Renderer::SunLightColor()[i] = str64::StrToFloat( m_pSunDiffuse[i]->GetText() );
+			sx::core::Renderer::AmbientColor()[i] = str64::StrToFloat( m_pSunAmbient[i]->GetText() );
+		}
+	}
+
 	m_ColorBox.Update(elpsTime);
 	OnFogChange(NULL);
 }
@@ -410,6 +430,12 @@ void Form_Settings::Show( void )
 
 	if ( !sx::core::Settings::GetOption_Shadow()->HasPermission() )
 		m_pShadowSize->SetItemIndex( 4 );
+
+	for ( int i=0; i<4; i++ )
+	{
+		m_pSunDiffuse[i]->SetText( FloatToStr( sx::core::Renderer::SunLightColor()[i], 2 ) );
+		m_pSunAmbient[i]->SetText( FloatToStr( sx::core::Renderer::AmbientColor()[i], 2 ) );
+	}
 
 	applySettings = true;
 

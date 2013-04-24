@@ -677,7 +677,8 @@ Entity* Entity::Clone( void )
 	Entity* pe = sx_new( Entity );
 	if (pe)
 	{
-		pe->m_typeName = m_typeName;
+		pe->m_typeName		= m_typeName;
+		pe->m_displayName	= m_displayName;
 
 		pe->SetPosition( float3(5000, 5000, 5000) );
 		pe->SetDirection( GetDirection() );

@@ -159,17 +159,18 @@ void app_main_loop( float elpsTime )
 		state->align.Set( -0.5f, 0.5f );
 		state->center.Set( -0.5f, 0.5f, 0.0f );
 		state->position.Set( 100.0f, -50.0f, 0.0f );
-		
-// 		panel2.SetParent( &panel1 );
+
  		gtest.m_panel2.SetSize( 100.0f, 30.0f );
  		state = gtest.m_panel2.m_state.GetCurrent();
  		state->align.Set( -0.5f, 0.5f );
  		state->center.Set( -0.5f, 0.5f, 0.0f );
+		state->position.Set( 50.0f, -30.0f, 0.0f );
 
 		g_engine->m_gui->Add( &gtest.m_panel1 );
 		g_engine->m_gui->Add( &gtest.m_panel2 );
- 		g_engine->m_gui->Update( elpsTime );
+ 		g_engine->m_gui->Update( elpsTime, sx_vp_width, sx_vp_height );
 		g_engine->m_gui->ProcessInput( &inputReport );
+		g_engine->m_device3D->SetTexture( tex_001 );
  		g_engine->m_gui->Draw( 0 );
 		g_engine->m_gui->Remove( &gtest.m_panel2 );
 		g_engine->m_gui->Remove( &gtest.m_panel1 );
@@ -245,8 +246,8 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	config.d3d_flag = SX_D3D_CREATE_GL | SX_D3D_VSYNC;// | SX_D3D_FULLSCREEN;
 	config.input_device[0] = &ioMouse;
 
-
 	sx_engine_get_singleton( &config );
+
 
 	//////////////////////////////////////////////////////////////////////////
 	//	connect to console

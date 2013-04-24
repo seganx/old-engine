@@ -85,6 +85,8 @@ private:
 	sx::gui::PButton		m_playSound;		// play all sounds
 	sx::gui::PButton		m_sprayParticle;	// spray all particles
 
+	sx::gui::PCheckBox		m_groupChange;		// change as local or group
+
 	NodeExplorer			m_nodeExplorer;		// use to explore the node
 	UndoManager	*			m_undoManager;		// pointer to undo manager of editor
 

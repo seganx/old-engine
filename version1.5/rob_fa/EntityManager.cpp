@@ -96,6 +96,15 @@ void EntityManager::LoadTypes( Callback_Draw_Loading drawLoading )
 			pe->m_typeDesc.Replace(L"\\n", L"\n");
 		}
 
+		if ( script.GetString(i, L"displayName", tmpStr) )
+		{
+			pe->m_displayName = tmpStr;
+		}
+		else
+		{
+			pe->m_displayName = pe->m_typeName;
+		}
+
 		if ( script.GetString(i, L"Type", tmpStr) )
 		{
 			if ( tmpStr == L"Tower" )

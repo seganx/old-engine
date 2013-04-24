@@ -91,8 +91,9 @@ public:
 	bool					m_initialized;						//  verify that this entity has been initialized
 	bool					m_upgradeReady;						//	upgrade is ready
 	UINT					m_ID;								//  unique ID
-	String			m_typeName;							//  sub type name of the entity
-	String			m_typeDesc;							//  sub type name of the entity
+	String					m_typeName;							//  sub type name of the entity
+	String					m_typeDesc;							//  sub type name of the entity
+	String					m_displayName;						//  name will display in hints
 	UINT					m_partyCurrent;						//  describe entity party
 	UINT					m_partyEnemies;						//  this entity can kill some body in some party
 	UINT					m_state;							//  state of this entity

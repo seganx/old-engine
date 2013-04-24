@@ -37,18 +37,18 @@ public:
 	void ClearMechanincs( void );
 public:
 	
-	GU::Camera_Mobile			m_camera_MBL;
-	GU::Camera_RTS				m_camera_RTS;
-	GU::Camera_RTS				m_camera_Pause;
-	GM::arrayPMechanic			m_Mechanics;
+	GU::Camera_Mobile	m_camera_MBL;
+	GU::Camera_RTS		m_camera_RTS;
+	GU::Camera_RTS		m_camera_Pause;
+	GM::arrayPMechanic	m_Mechanics;
 
 public:
 
 	String				m_name;				//	name of player
-	int							m_gold;				//  gold
-	int							m_people;			//	current people
+	int					m_gold;				//  gold
+	int					m_people;			//	current people
 
-	PlayerProfile				m_profile;
+	PlayerProfile		m_profile;
 };
 
 #endif	//	GUARD_Player_HEADER_FILE

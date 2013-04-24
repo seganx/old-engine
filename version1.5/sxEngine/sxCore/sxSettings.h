@@ -69,11 +69,11 @@ namespace sx { namespace core {
 		//! set current sun light theta and phi
 		static void SetSunLightPosition(float theta, float phi);
 
-		//! return reference to sun light diffuse
-		static float4& SunLightDiffuse(void);
+		//! return reference to sun light diffuse. use w as intensity
+		static float4& SunLightColor(void);
 
-		//! return reference to sun light ambient
-		static float4& SunLightAmbient(void);
+		//! return reference to sun light ambient. use w as intensity
+		static float4& AmbientColor(void);
 
 	};
 

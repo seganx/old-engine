@@ -296,14 +296,13 @@ SEGAN_INLINE uint uiDevice::GetBatchVertexCount( void )
 SEGAN_INLINE void uiDevice::EndBatch( uiElement* dest )
 {
 	//	get number of vertices needed to batch them
-	uint sumVertices = GetBatchVertexCount();
+	const uint sumVertices = GetBatchVertexCount();
 
 	//	prepare destination element
-	uint destVertices = dest->m_numVertices;
-	dest->CreateVertices( destVertices + sumVertices );
+	dest->CreateVertices( sumVertices );
 
 	//	copy batches to dest element
-	uint index = destVertices;
+	uint index = 0;
 	for ( sint i=0; i<m_batches.m_count; ++i )
 	{
 		Copy( dest, index, m_batches.m_item[i] );

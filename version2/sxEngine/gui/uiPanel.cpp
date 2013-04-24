@@ -7,6 +7,11 @@ uiPanel::uiPanel( void ): uiControl()
 
 	m_element[0].CreateVertices( 4 );
 	
+	m_element[0].m_uv[0].Set( 0.0f, 0.0f );
+	m_element[0].m_uv[1].Set( 0.0f, 1.0f );
+	m_element[0].m_uv[2].Set( 1.0f, 1.0f );
+	m_element[0].m_uv[3].Set( 1.0f, 0.0f );
+
 	for ( sint i=0; i<4; ++i )
 	{
 		m_element[0].m_color[i].c0 = 0xffffffff;

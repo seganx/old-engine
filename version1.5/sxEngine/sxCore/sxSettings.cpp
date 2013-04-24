@@ -99,43 +99,46 @@ namespace sx { namespace core {
 		Renderer::GetSunLight()->_12 = - cosf(theta);
 		Renderer::GetSunLight()->_13 = - sinf(phi) * sinf(theta);
 
-		float4 light;
-		float f_0_1 = 0.5f + sinf(theta) * 0.5f;
-		float f_1_0 = 1.0f - f_0_1;
-		float f_1_08 = 1.0f - f_0_1*0.8f;
-		float f_0_1_0 = cosf(theta);
 
-		//  set diffuse color
-		const float4 dawn_Diffuse(		0.69f, 0.73f, 0.97f, 1.0f	);
-		const float4 sunset_Diffuse(	1.00f, 0.90f, 0.70f, 1.0f	);
+		if ( 0 )
+		{
+			float4 light;
+			float f_0_1 = 0.5f + sinf(theta) * 0.5f;
+			float f_1_0 = 1.0f - f_0_1;
+			float f_1_08 = 1.0f - f_0_1*0.8f;
+			float f_0_1_0 = cosf(theta);
 
-		light.Lerp( dawn_Diffuse, sunset_Diffuse, f_0_1 );
-		light.x *= sqrt(f_0_1_0) * 3.0f;
-		light.y *= sqrt(f_0_1_0) * 3.0f;
-		light.z *= sqrt(f_0_1_0) * 3.0f;
-		SunLightDiffuse().Set(light.x, light.y, light.z, light.w);
-  
-		//  set ambient color
-		const float4 down_Ambient(		0.36f, 0.38f, 0.52f, 1.0f	);
-		const float4 sunset_Ambient(	0.53f, 0.47f, 0.30f, 1.0f	);
+			//  set diffuse color
+			const float4 dawn_Diffuse(		0.69f, 0.73f, 0.97f, 1.0f	);
+			const float4 sunset_Diffuse(	1.00f, 0.90f, 0.70f, 1.0f	);
 
-		light.Lerp( down_Ambient, sunset_Ambient, f_0_1 );
- 		light.x *= f_1_08 * 0.5f + f_0_1_0;
- 		light.y *= f_1_08 * 0.5f + f_0_1_0;
- 		light.z *= f_1_08 * 0.5f + f_0_1_0;
-		SunLightAmbient().Set(light.x, light.y, light.z, light.w);
+			light.Lerp( dawn_Diffuse, sunset_Diffuse, f_0_1 );
+			light.x *= sqrt(f_0_1_0) * 3.0f;
+			light.y *= sqrt(f_0_1_0) * 3.0f;
+			light.z *= sqrt(f_0_1_0) * 3.0f;
+			SunLightColor().Set(light.x, light.y, light.z, light.w);
+
+			//  set ambient color
+			const float4 down_Ambient(		0.36f, 0.38f, 0.52f, 1.0f	);
+			const float4 sunset_Ambient(	0.53f, 0.47f, 0.30f, 1.0f	);
+
+			light.Lerp( down_Ambient, sunset_Ambient, f_0_1 );
+			light.x *= f_1_08 * 0.5f + f_0_1_0;
+			light.y *= f_1_08 * 0.5f + f_0_1_0;
+			light.z *= f_1_08 * 0.5f + f_0_1_0;
+			AmbientColor().Set(light.x, light.y, light.z, light.w);
+		}
 	}
 
-	FORCEINLINE float4& Settings::SunLightDiffuse( void )
+	FORCEINLINE float4& Settings::SunLightColor( void )
 	{
-		return (float4&)Renderer::GetSunLight()->_21;
+		return Renderer::SunLightColor();
 	}
 
-	FORCEINLINE float4& Settings::SunLightAmbient( void )
+	FORCEINLINE float4& Settings::AmbientColor( void )
 	{
-		return (float4&)Renderer::GetSunLight()->_31;
+		return Renderer::AmbientColor();
 	}
-
 
 }} // namespace sx { namespace core {
 

@@ -55,11 +55,10 @@ void GUIManager::Clear( void )
 	m_controls.Clear();
 }
 
-void GUIManager::Update( float elpsTime )
+
+void GUIManager::Update( float elpsTime, const float vpwidth, const float vpheight )
 {
-	const float width  = sx_vp_width;
-	const float height = sx_vp_height;
-	matrix proj = sx_orthographic( width, height, -200.0f, 200.0f );
+	matrix proj = sx_orthographic( vpwidth, vpheight, -200.0f, 200.0f );
 	matrix view = sx_lookat( float3(0, 0, 1), float3( 0, 0, 0), float3( 0, 1, 0) );
 	matrix viewproj = sx_mul( view, proj );
 	matrix viewinvr = sx_inverse( view );
@@ -96,7 +95,6 @@ void GUIManager::ProcessInput( struct InputReport* inputReport )
 	//	fill keyboard structure
 
 
-
 	//	traverse through controls
 	for ( sint i=m_controls.m_count-1; i >= 0; --i )
 	{
@@ -107,13 +105,13 @@ void GUIManager::ProcessInput( struct InputReport* inputReport )
 void GUIManager::Draw( const dword flag )
 {
 	//	prepare description
-	d3dVertexBufferDesc vbdestPos;
-	d3dVertexBufferDesc vbdestUV;
-	d3dVertexBufferDesc vbdestColor;
+	d3dVertexBufferDesc vbdescPos;
+	d3dVertexBufferDesc vbdescUV;
+	d3dVertexBufferDesc vbdescColor;
 
-	vbdestPos.flag	 = SX_D3D_RESOURCE_DYNAMIC;
-	vbdestUV.flag	 = SX_D3D_RESOURCE_DYNAMIC;
-	vbdestColor.flag = SX_D3D_RESOURCE_DYNAMIC;
+	vbdescPos.flag	 = SX_D3D_RESOURCE_DYNAMIC;
+	vbdescUV.flag	 = SX_D3D_RESOURCE_DYNAMIC;
+	vbdescColor.flag = SX_D3D_RESOURCE_DYNAMIC;
 
 	//	prepare rendering device
 	matrix mat; mat.Identity();
@@ -121,7 +119,7 @@ void GUIManager::Draw( const dword flag )
 	g_engine->m_device3D->SetMatrix( MM_VIEW, m_view );
 	g_engine->m_device3D->SetMatrix( MM_PROJECTION, m_proj );
 
-	g_engine->m_device3D->SetRenderState( RS_FILL, false );
+	//g_engine->m_device3D->SetRenderState( RS_FILL, false );
 
 	//	extract all elements that should be draw
 	m_elements.Clear();
@@ -133,8 +131,6 @@ void GUIManager::Draw( const dword flag )
 	//	batch elements and draw them
 	while ( m_elements.m_count )
 	{
-		m_drawable->m_numVertices = 0;
-
 		g_engine->m_deviceUI->BeginBatch( 0 );
 		for ( sint i=0; i<m_elements.m_count; ++i )
 		{
@@ -151,14 +147,13 @@ void GUIManager::Draw( const dword flag )
 		g_engine->m_deviceUI->EndBatch( m_drawable );
 
 		//	draw the final element
-		//sx_debug_draw_gui_element( m_drawable );
-		vbdestPos.size = m_drawable->m_numVertices * sizeof(float3);
-		vbdestUV.size = m_drawable->m_numVertices * sizeof(float2);
-		vbdestColor.size = m_drawable->m_numVertices * sizeof(Color2);
+		vbdescPos.size = m_drawable->m_numVertices * sizeof(float3);
+		vbdescUV.size = m_drawable->m_numVertices * sizeof(float2);
+		vbdescColor.size = m_drawable->m_numVertices * sizeof(Color2);
 
-		m_vb_pos->SetDesc( vbdestPos, m_drawable->m_posfinal );
-		m_vb_uv->SetDesc( vbdestUV, m_drawable->m_uv );
-		m_vb_color->SetDesc( vbdestColor, m_drawable->m_color );
+		m_vb_pos->SetDesc( vbdescPos, m_drawable->m_posfinal );
+		m_vb_uv->SetDesc( vbdescUV, m_drawable->m_uv );
+		m_vb_color->SetDesc( vbdescColor, m_drawable->m_color );
 
 		g_engine->m_device3D->SetVertexBuffer( m_vb_pos,	SX_VERTEX_POSITION );
 		g_engine->m_device3D->SetVertexBuffer( m_vb_uv,		SX_VERTEX_UV0 );
@@ -167,7 +162,7 @@ void GUIManager::Draw( const dword flag )
 		g_engine->m_device3D->DrawPrimitive( PT_TRIANGLE_LIST, 0, m_drawable->m_numVertices );
 	}
 
-	g_engine->m_device3D->SetRenderState( RS_FILL, true );
+	//g_engine->m_device3D->SetRenderState( RS_FILL, true );
 
 }
 

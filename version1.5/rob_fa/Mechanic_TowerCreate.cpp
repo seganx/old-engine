@@ -322,7 +322,7 @@ namespace GM
 					if ( towerType )
 					{
 						str1024 hint, tmp;
-						tmp.Format( L" %s \n %s ", towerType->m_typeName.Text(), towerType->m_typeDesc.Text() );
+						tmp.Format( L" %s \n %s ", towerType->m_displayName.Text(), towerType->m_typeDesc.Text() );
 						hint.Format( tmp, towerType->m_cost[0], g_game->m_player->m_gold );
 						m_btnCreate[i]->SetHint( hint );
 					}
@@ -582,11 +582,6 @@ namespace GM
 
 				//  decrease player gold by cost of this created tower
 				g_game->m_player->m_gold -= tower->m_cost[0];
-
-// 				str1024 str = L"Tower '";
-// 				str << tower->m_typeName.Text() << "' Created !";
-// 				g_game->m_gui->ShowTips( str, 0xffffff55, m_btnCreate[m_towerIndex]->GetElement(0)->GetTexture() );
-
 
 				//	achievement
 				g_game->m_achievements[4].AddValue();

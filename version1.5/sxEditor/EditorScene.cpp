@@ -288,6 +288,11 @@ void EditorScene::Update( float elpsTime, bool& inputHandled )
 			mng_UndoManager.Undo();
 			inputHandled = true;
 		}
+		else if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_R) )
+		{
+			ResetCamera();
+			inputHandled = true;
+		}
 	}
 
 	if ( !inputHandled && SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_RIGHT) ) 	//  show the popup menu

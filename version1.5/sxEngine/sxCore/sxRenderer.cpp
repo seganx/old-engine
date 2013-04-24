@@ -132,7 +132,9 @@ static	sx::core::PPipeline		s_Pipeline	= NULL;
 static	Matrix					s_sunLight( -0.4f,-0.7f, 0.2f, 1.0f,
 											 1.0f, 0.9f, 0.8f, 1.0f,
 											 0.3f, 0.3f, 0.4f, 1.0f,
-											 0.0f, 0.0f, 0.0f, 0.0f);
+											 0.0f, 0.0f, 0.0f, 0.0f );
+static	float4					s_sunlight_color( 1, 1, 1, 1 );
+static	float4					s_ambient_color(  1, 1, 1, 1 );
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -271,14 +273,16 @@ namespace sx { namespace core {
 		return &s_Camera;
 	}
 
-	void Renderer::SetSunLight( PMatrix sunLight )
-	{
-		if (sunLight)
-			s_sunLight = *sunLight;
-	}
-
 	PMatrix Renderer::GetSunLight( void )
 	{
+		s_sunLight._21 = s_sunlight_color.x * s_sunlight_color.w;
+		s_sunLight._22 = s_sunlight_color.y * s_sunlight_color.w;
+		s_sunLight._23 = s_sunlight_color.z * s_sunlight_color.w;
+
+		s_sunLight._31 = s_ambient_color.x * s_ambient_color.w;
+		s_sunLight._32 = s_ambient_color.y * s_ambient_color.w;
+		s_sunLight._33 = s_ambient_color.z * s_ambient_color.w;
+
 		return &s_sunLight;
 	}
 
@@ -290,6 +294,14 @@ namespace sx { namespace core {
 	//  collect objects and validate them
 	void Renderer::Update( float elpTime )
 	{
+		s_sunLight._21 = s_sunlight_color.x * s_sunlight_color.w;
+		s_sunLight._22 = s_sunlight_color.y * s_sunlight_color.w;
+		s_sunLight._23 = s_sunlight_color.z * s_sunlight_color.w;
+
+		s_sunLight._31 = s_ambient_color.x * s_ambient_color.w;
+		s_sunLight._32 = s_ambient_color.y * s_ambient_color.w;
+		s_sunLight._33 = s_ambient_color.z * s_ambient_color.w;
+
 		sx::d3d::ShaderPool::Update(elpTime);
 
 		static int curPos = 0;
@@ -545,7 +557,7 @@ namespace sx { namespace core {
 	{
 		SEGAN_STREAM_WRITE(stream, renderFileID);
 
-		int version = 4;
+		int version = 5;
 		SEGAN_STREAM_WRITE(stream, version);
 
 		//  save camera
@@ -554,6 +566,12 @@ namespace sx { namespace core {
 		//  save light properties
 		float2 l = Settings::GetSunLightPosition();
 		SEGAN_STREAM_WRITE(stream, l);
+
+		//	save sunlight color
+		SEGAN_STREAM_WRITE(stream, s_sunlight_color);
+
+		//	save ambient color
+		SEGAN_STREAM_WRITE(stream, s_ambient_color);
 
 		//  save fog properties
 		FogDesc fog;
@@ -584,15 +602,16 @@ namespace sx { namespace core {
 		int version = 0;
 		SEGAN_STREAM_READ(stream, version);
 
+		float2 lightPos = Settings::GetSunLightPosition();
+
 		if ( version == 1 )
 		{
 			//  load camera
 			s_Camera.Load( stream );
 
 			//  load light properties
-			float2 l = Settings::GetSunLightPosition();
-			SEGAN_STREAM_READ(stream, l);
-			Settings::SetSunLightPosition( l.x, l.y );
+			SEGAN_STREAM_READ(stream, lightPos);
+			Settings::SetSunLightPosition( lightPos.x, lightPos.y );
 		}
 
 		else if ( version == 2 )
@@ -601,9 +620,8 @@ namespace sx { namespace core {
 			s_Camera.Load( stream );
 
 			//  load light properties
-			float2 l = Settings::GetSunLightPosition();
-			SEGAN_STREAM_READ(stream, l);
-			Settings::SetSunLightPosition( l.x, l.y );
+			SEGAN_STREAM_READ(stream, lightPos);
+			Settings::SetSunLightPosition( lightPos.x, lightPos.y );
 
 			//  save fog properties
 			FogDesc fog;
@@ -617,9 +635,8 @@ namespace sx { namespace core {
 			s_Camera.Load( stream );
 
 			//  load light properties
-			float2 l = Settings::GetSunLightPosition();
-			SEGAN_STREAM_READ(stream, l);
-			Settings::SetSunLightPosition( l.x, l.y );
+			SEGAN_STREAM_READ(stream, lightPos);
+			Settings::SetSunLightPosition( lightPos.x, lightPos.y );
 
 			//  save fog properties
 			FogDesc fog;
@@ -641,9 +658,8 @@ namespace sx { namespace core {
 			s_Camera.Load( stream );
 
 			//  load light properties
-			float2 l = Settings::GetSunLightPosition();
-			SEGAN_STREAM_READ(stream, l);
-			Settings::SetSunLightPosition( l.x, l.y );
+			SEGAN_STREAM_READ(stream, lightPos);
+			Settings::SetSunLightPosition( lightPos.x, lightPos.y );
 
 			//  save fog properties
 			FogDesc fog;
@@ -666,11 +682,88 @@ namespace sx { namespace core {
 			else
 				Settings::GetOption_Shadow()->RemPermission( OPT_BY_ARTIST );
 		}
+
+		else if ( version == 5 )
+		{
+			//  load camera
+			s_Camera.Load( stream );
+
+			//  load light properties
+			SEGAN_STREAM_READ(stream, lightPos);
+			Settings::SetSunLightPosition( lightPos.x, lightPos.y );
+
+			//	save sunlight color
+			SEGAN_STREAM_READ(stream, s_sunlight_color);
+
+			//	save ambient color
+			SEGAN_STREAM_READ(stream, s_ambient_color);
+
+			//  save fog properties
+			FogDesc fog;
+			SEGAN_STREAM_READ(stream, fog);
+			d3d::Device3D::SetFogDesc( fog );
+
+			//	load reflection settings
+			DWORD refOption = 0;
+			SEGAN_STREAM_READ(stream, refOption);
+			if ( refOption & OPT_BY_ARTIST )
+				Settings::GetOption_Reflection()->AddPermission( OPT_BY_ARTIST );
+			else
+				Settings::GetOption_Reflection()->RemPermission( OPT_BY_ARTIST );
+
+			//	load shadow settings
+			DWORD shdOption = 0;
+			SEGAN_STREAM_READ(stream, shdOption);
+			if ( shdOption & OPT_BY_ARTIST )
+				Settings::GetOption_Shadow()->AddPermission( OPT_BY_ARTIST );
+			else
+				Settings::GetOption_Shadow()->RemPermission( OPT_BY_ARTIST );
+		}
+
+		//	correct light color for older versions
+		if ( version < 5 )
+		{
+			float4 light;
+			float f_0_1 = 0.5f + sinf(lightPos.x) * 0.5f;
+			float f_1_0 = 1.0f - f_0_1;
+			float f_1_08 = 1.0f - f_0_1*0.8f;
+			float f_0_1_0 = cosf(lightPos.x);
+
+			//  set diffuse color
+			const float4 dawn_Diffuse(		0.69f, 0.73f, 0.97f, 1.0f	);
+			const float4 sunset_Diffuse(	1.00f, 0.90f, 0.70f, 1.0f	);
+
+			light.Lerp( dawn_Diffuse, sunset_Diffuse, f_0_1 );
+			light.x *= sqrt(f_0_1_0) * 3.0f;
+			light.y *= sqrt(f_0_1_0) * 3.0f;
+			light.z *= sqrt(f_0_1_0) * 3.0f;
+			s_sunlight_color.Set(light.x, light.y, light.z, light.w);
+
+			//  set ambient color
+			const float4 down_Ambient(		0.36f, 0.38f, 0.52f, 1.0f	);
+			const float4 sunset_Ambient(	0.53f, 0.47f, 0.30f, 1.0f	);
+
+			light.Lerp( down_Ambient, sunset_Ambient, f_0_1 );
+			light.x *= f_1_08 * 0.5f + f_0_1_0;
+			light.y *= f_1_08 * 0.5f + f_0_1_0;
+			light.z *= f_1_08 * 0.5f + f_0_1_0;
+			s_ambient_color.Set(light.x, light.y, light.z, light.w);
+		}
 	}
 
 	Renderer::ValidationParam* Renderer::ValidationParameters( void )
 	{
 		return &s_validationParam;
+	}
+
+	float4& Renderer::SunLightColor( void )
+	{
+		return s_sunlight_color;
+	}
+
+	float4& Renderer::AmbientColor( void )
+	{
+		return s_ambient_color;
 	}
 
 }} // namespace sx { namespace core {

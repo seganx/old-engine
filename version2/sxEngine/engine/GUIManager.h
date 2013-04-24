@@ -40,8 +40,8 @@ public:
 	//! clear and delete all GUI in the manager
 	void Clear( void );
 
-	//! update all controls
-	void Update( float elpsTime );
+	//! update all controls depend on view port width and view port height
+	void Update( float elpsTime, const float vpwidth, const float vpheight );
 
 	//! handle process input
 	void ProcessInput( struct InputReport* inputReport );

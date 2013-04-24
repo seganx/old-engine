@@ -831,7 +831,7 @@ namespace sx { namespace gui {
 							if ( !m_Font->GetChar(line.text, i, ch, true) ) continue;
 
 							//  ignore space and return characters from buffer
-							if (ch->ID==' ' || ch->ID=='\t' || ch->ID=='\n' || ch->ID=='\r')
+							if ( ch->ID==' ' || ch->ID=='\t' || ch->ID=='\n' || ch->ID=='\r' )
 							{
 								x += ch->xAdvance;
 								continue;

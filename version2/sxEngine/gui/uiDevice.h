@@ -377,7 +377,7 @@ public:
 	//! return number of vertices need to batch all added elements
 	uint GetBatchVertexCount( void );
 
-	//! end patch and append them to the end of dest element
+	//! end patch and insert them to dest element. the last data in dest will be lost
 	void EndBatch( uiElement* dest );
 
 public:

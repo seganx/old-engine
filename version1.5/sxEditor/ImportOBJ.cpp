@@ -759,90 +759,101 @@ void ExportOBJFile( const WCHAR* FileName, OUT sx::core::ArrayPNode& nodeList )
 
 			//////////////////////////////////////////////////////////////////////////
 			//  export material
-			str128	mtlName = member->GetName();
-			if ( !mtlName.Text() ) mtlName = L"Default";
-			
-			srcOBJ << L"usemtl " << mtlName.Text() << NEWLINE;
 
-			srcMTL << NEWLINE << L"newmtl " << mtlName << NEWLINE;
-			srcMTL << L"\tKa 1.0000 1.0000 1.0000" << NEWLINE;
-			srcMTL << L"\tKd 1.0000 1.0000 1.0000" << NEWLINE;
-			srcMTL << L"\tKs 0.0000 0.0000 0.0000" << NEWLINE;
-			srcMTL << L"\tKe 0.0000 0.0000 0.0000" << NEWLINE;
-
-			FLUSHTOFILE();
-
-			sx::d3d::PMaterial pMtrl = NULL;
+			// get number of materials
+			int mtlcount = 0;
 			if ( member->GetType() == NMT_MESH )
-				pMtrl = sx::core::PMesh(member)->GetActiveMaterial();
+				mtlcount = sx::core::PMesh(member)->GetMaterialCount();
 			else
-				pMtrl = sx::core::Terrain::Manager::GetMaterial(0)->GetActiveMaterial();
+				mtlcount = 1;
 
-			if ( pMtrl->GetTexture(0) )
+			for ( int m=0; m < mtlcount; m++ )
 			{
-				sx::d3d::PTexture texture = NULL;
-				if ( sx::d3d::Texture::Manager::Exist(texture, pMtrl->GetTexture(0)) )
-				{
-					str1024	 textureName;
-					int iobj = textureCount.IndexOfObject(texture);
-					if ( iobj < 0 )
-					{
-						str1024 fileName = FileName;
-						fileName.ExtractFilePath();
-						fileName.MakePathStyle();
-						fileName << pMtrl->GetTexture(0);
-						fileName.ExcludeFileExtension();
-						textureName = texture->SaveToImageFile( fileName, NULL );
-						textureCount.PushBack( textureName, texture );
-					}
-					else
-					{
-						textureName = textureCount[iobj].text.Text();
-					}
-					
-					if ( textureName.Text() )
-					{
-						textureName.ExtractFileName();
-						srcMTL << L"\tmap_Ka " << textureName.Text() << NEWLINE;
-						srcMTL << L"\tmap_Kd " << textureName.Text() << NEWLINE;
+				str128	mtlName = member->GetName();
+				if ( !mtlName.Text() ) mtlName = L"Default";
 
-						FLUSHTOFILE();
+				srcOBJ << L"usemtl " << mtlName.Text() << m << NEWLINE;
+
+				srcMTL << NEWLINE << L"newmtl " << mtlName.Text() << m << NEWLINE;
+				srcMTL << L"\tKa 1.0000 1.0000 1.0000" << NEWLINE;
+				srcMTL << L"\tKd 1.0000 1.0000 1.0000" << NEWLINE;
+				srcMTL << L"\tKs 0.0000 0.0000 0.0000" << NEWLINE;
+				srcMTL << L"\tKe 0.0000 0.0000 0.0000" << NEWLINE;
+
+				FLUSHTOFILE();
+
+				sx::d3d::PMaterial pMtrl = NULL;
+				if ( member->GetType() == NMT_MESH )
+					pMtrl = sx::core::PMesh(member)->GetMaterial( m );
+				else
+					pMtrl = sx::core::Terrain::Manager::GetMaterial( m )->GetActiveMaterial();
+
+				if ( pMtrl->GetTexture(0) )
+				{
+					sx::d3d::PTexture texture = NULL;
+					if ( sx::d3d::Texture::Manager::Exist(texture, pMtrl->GetTexture(0)) )
+					{
+						str1024	 textureName;
+						int iobj = textureCount.IndexOfObject(texture);
+						if ( iobj < 0 )
+						{
+							str1024 fileName = FileName;
+							fileName.ExtractFilePath();
+							fileName.MakePathStyle();
+							fileName << pMtrl->GetTexture(0);
+							fileName.ExcludeFileExtension();
+							textureName = texture->SaveToImageFile( fileName, NULL );
+							textureCount.PushBack( textureName, texture );
+						}
+						else
+						{
+							textureName = textureCount[iobj].text.Text();
+						}
+
+						if ( textureName.Text() )
+						{
+							textureName.ExtractFileName();
+							srcMTL << L"\tmap_Ka " << textureName.Text() << NEWLINE;
+							srcMTL << L"\tmap_Kd " << textureName.Text() << NEWLINE;
+
+							FLUSHTOFILE();
+						}
 					}
 				}
-			}
 
-			if ( pMtrl->GetTexture(1) )
-			{
-				sx::d3d::PTexture texture = NULL;
-				if ( sx::d3d::Texture::Manager::Exist(texture, pMtrl->GetTexture(1)) )
+				if ( pMtrl->GetTexture(1) )
 				{
-					String		 textureName;
-					int iobj = textureCount.IndexOfObject(texture);
-					if ( iobj < 0 )
+					sx::d3d::PTexture texture = NULL;
+					if ( sx::d3d::Texture::Manager::Exist(texture, pMtrl->GetTexture(1)) )
 					{
-						str1024 fileName = FileName;
-						fileName.ExtractFilePath();
-						fileName.MakePathStyle();
-						fileName << pMtrl->GetTexture(1);
-						fileName.ExcludeFileExtension();
-						textureName = texture->SaveToImageFile( fileName, NULL );
-						textureCount.PushBack( textureName, texture );
-					}
-					else
-					{
-						textureName = textureCount[iobj].text.Text();
-					}
+						String		 textureName;
+						int iobj = textureCount.IndexOfObject(texture);
+						if ( iobj < 0 )
+						{
+							str1024 fileName = FileName;
+							fileName.ExtractFilePath();
+							fileName.MakePathStyle();
+							fileName << pMtrl->GetTexture(1);
+							fileName.ExcludeFileExtension();
+							textureName = texture->SaveToImageFile( fileName, NULL );
+							textureCount.PushBack( textureName, texture );
+						}
+						else
+						{
+							textureName = textureCount[iobj].text.Text();
+						}
 
-					if ( textureName.Text() )
-					{
-						textureName.ExtractFileName();
-						srcMTL << L"\tmap_Ks " << textureName.Text() << NEWLINE;
-						srcMTL << L"\tmap_bump " << textureName.Text() << NEWLINE;
+						if ( textureName.Text() )
+						{
+							textureName.ExtractFileName();
+							srcMTL << L"\tmap_Ks " << textureName.Text() << NEWLINE;
+							srcMTL << L"\tmap_bump " << textureName.Text() << NEWLINE;
 
-						FLUSHTOFILE();
+							FLUSHTOFILE();
+						}
 					}
 				}
-			}
+			}	//	for ( int m = 0; 
 
 			//////////////////////////////////////////////////////////////////////////
 			//	export geometry

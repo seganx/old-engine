@@ -47,6 +47,11 @@ Form_EditNode::Form_EditNode( void ): BaseForm(), m_applyChanges(true), m_mouseS
 	//	create additional button
 	m_playSound	= EditorUI::CreateButtonEx( m_pBack, 32, 32, EditorUI::GetTexture( L"ButtonPlay" ) );
 	m_sprayParticle = EditorUI::CreateButtonEx( m_pBack, 32, 32, EditorUI::GetTexture( L"ButtonSpray" ) );
+	SEGAN_GUI_SET_ONCLICK( m_playSound, Form_EditNode::OnParamChange );
+	SEGAN_GUI_SET_ONCLICK( m_sprayParticle, Form_EditNode::OnParamChange );
+
+	// create check box for group change
+	m_groupChange = EditorUI::CreateCheckBox( m_pBack, 50, 50, L"As Group" );
 
 	//  create position text editor
 	for (int i=0; i<3; i++)
@@ -90,10 +95,7 @@ void Form_EditNode::SetSize( float width, float height )
 
 	m_playSound->Position().Set( left + 150.0f, top, 0.0f );
 	m_sprayParticle->Position().Set( left + 200.0f, top, 0.0f );
-	top -= 40.0f;
-
-	SEGAN_GUI_SET_ONCLICK( m_playSound, Form_EditNode::OnParamChange );
-	SEGAN_GUI_SET_ONCLICK( m_sprayParticle, Form_EditNode::OnParamChange );
+	top -= 35.0f;
 
 	float2 editSize(40.0f, 20.0f);
 	m_pLabelPos->Position().Set(left + 50.0f, top, 0.0f);
@@ -103,7 +105,7 @@ void Form_EditNode::SetSize( float width, float height )
 		m_pEditPos[i]->Position().x = left + 80.0f + i*(editSize.x + 20.0f);
 		m_pEditPos[i]->Position().y = top;
 	}
-	top -= 40.0f;
+	top -= 20.0f;
 
 	m_pLabelRot->Position().Set(left + 50.0f, top, 0.0f);
 	for (int i=0; i<3; i++)
@@ -112,8 +114,14 @@ void Form_EditNode::SetSize( float width, float height )
 		m_pEditRot[i]->Position().x = left + 80.0f + i*(editSize.x + 20.0f);
 		m_pEditRot[i]->Position().y = top;
 	}
-	m_nodeExplorer.SetSize(width, height/2 + top - 30.0f );
-	m_nodeExplorer.Position().y = top - (height/2 + top)*0.5f - 12.0f;
+	top -= 20.0f;
+
+	m_groupChange->Position().Set( left + 10.0f, top, 0.0f );
+
+	top += 10.0f;
+
+	m_nodeExplorer.SetSize( width, height / 2.0f + top - 30.0f );
+	m_nodeExplorer.Position().y = top - ( height / 2.0f + top ) * 0.5f - 12.0f;
 
 	BaseForm::SetSize( width, height );
 }
@@ -724,44 +732,69 @@ void Form_EditNode::OnParamChange( sx::gui::PControl Sender )
 			}
 			else
 			{
-				float3 posEdit;
+				float3 editValue;
+				bool asgroup = m_groupChange->Checked();
 				
 				//  position
-				posEdit[0] = str128::StrToFloat( m_pEditPos[0]->GetText() );
-				posEdit[1] = str128::StrToFloat( m_pEditPos[1]->GetText() );
-				posEdit[2] = str128::StrToFloat( m_pEditPos[2]->GetText() );
+				editValue[0] = str128::StrToFloat( m_pEditPos[0]->GetText() );
+				editValue[1] = str128::StrToFloat( m_pEditPos[1]->GetText() );
+				editValue[2] = str128::StrToFloat( m_pEditPos[2]->GetText() );
 				for ( int i=0; i<m_Nodes->Count(); i++ )
 				{
 					float3 pos = m_Nodes->At(i)->GetPosition_local();
-					pos.x += posEdit[0] - s_multi_pos[0];
-					pos.y += posEdit[1] - s_multi_pos[1];
-					pos.z += posEdit[2] - s_multi_pos[2];
+					if ( asgroup )
+					{
+						pos.x += editValue[0] - s_multi_pos[0];
+						pos.y += editValue[1] - s_multi_pos[1];
+						pos.z += editValue[2] - s_multi_pos[2];
+					}
+					else
+					{
+						if ( Sender == m_pEditPos[0] ) pos.x = editValue[0];
+						if ( Sender == m_pEditPos[1] ) pos.y = editValue[1];
+						if ( Sender == m_pEditPos[2] ) pos.z = editValue[2];
+					}
 					m_Nodes->At(i)->SetPosition(pos);
 				}
-				s_multi_pos.x = posEdit.x;
-				s_multi_pos.y = posEdit.y;
-				s_multi_pos.z = posEdit.z;
+
+				if ( asgroup )
+				{
+					s_multi_pos.x = editValue.x;
+					s_multi_pos.y = editValue.y;
+					s_multi_pos.z = editValue.z;
+				}
 
 				//	rotate
-				posEdit[0] = str128::StrToFloat( m_pEditRot[0]->GetText() );
-				posEdit[1] = str128::StrToFloat( m_pEditRot[1]->GetText() );
-				posEdit[2] = str128::StrToFloat( m_pEditRot[2]->GetText() );
+				editValue[0] = str128::StrToFloat( m_pEditRot[0]->GetText() );
+				editValue[1] = str128::StrToFloat( m_pEditRot[1]->GetText() );
+				editValue[2] = str128::StrToFloat( m_pEditRot[2]->GetText() );
 				for ( int i=0; i<m_Nodes->Count(); i++ )
 				{
 					// get rotation of the node
 					float3 rotation;
-					m_Nodes->At(i)->GetMatrix_local().GetRoationXYZ(rotation.x, rotation.y, rotation.z);
+					m_Nodes->At(i)->GetMatrix_local().GetRoationXYZ( rotation.x, rotation.y, rotation.z );
+					if ( asgroup )
+					{
+						rotation.x += sx::math::DegToRad( editValue[0] - s_multi_rot[0] );
+						rotation.y += sx::math::DegToRad( editValue[1] - s_multi_rot[1] );
+						rotation.z += sx::math::DegToRad( editValue[2] - s_multi_rot[2] );
+					}
+					else
+					{
+						if ( Sender == m_pEditRot[0] ) rotation.x = sx::math::DegToRad( editValue[0] );
+						if ( Sender == m_pEditRot[1] ) rotation.y = sx::math::DegToRad( editValue[1] );
+						if ( Sender == m_pEditRot[2] ) rotation.z = sx::math::DegToRad( editValue[2] );
+					}
 
-					rotation.x += sx::math::DegToRad( posEdit[0] - s_multi_pos[0] );
-					rotation.y += sx::math::DegToRad( posEdit[1] - s_multi_pos[1] );
-					rotation.z += sx::math::DegToRad( posEdit[2] - s_multi_pos[2] );
-
-					m_pNode->SetRotation( rotation.x, rotation.y, rotation.z );
+					m_Nodes->At(i)->SetRotation( rotation.x, rotation.y, rotation.z );
 				}
-				s_multi_rot.x = posEdit.x;
-				s_multi_rot.y = posEdit.y;
-				s_multi_rot.z = posEdit.z;
-
+				
+				if ( asgroup )
+				{
+					s_multi_rot.x = editValue.x;
+					s_multi_rot.y = editValue.y;
+					s_multi_rot.z = editValue.z;
+				}
 			}
 		}
 		break;

@@ -1031,22 +1031,22 @@ void MenuProfile::Initialize( void )
 		//	label to show total stars
 		lbl = sx_new( sx::gui::Label );
 		lbl->SetParent( m_profPanel[i] );
-		lbl->SetSize( float2( 50, 32) );
+		lbl->SetSize( float2( 50, 40) );
 		lbl->SetAlign( GTA_LEFT );
 		lbl->GetElement(0)->Color().a = 0.0f;
 		lbl->GetElement(1)->Color().a = 0.8f;
 		lbl->SetFont( L"Font_tob_profileInfo.fnt" );
-		lbl->Position().Set( 120.0f, -17.0f, 0.0f );
+		lbl->Position().Set( 120.0f, -13.0f, 0.0f );
 
 		//	label to show total people
 		lbl = sx_new( sx::gui::Label );
 		lbl->SetParent( m_profPanel[i] );
-		lbl->SetSize( float2( 100, 32) );
+		lbl->SetSize( float2( 100, 40) );
 		lbl->SetAlign( GTA_LEFT );
 		lbl->GetElement(0)->Color().a = 0.0f;
 		lbl->GetElement(1)->Color().a = 0.8f;
 		lbl->SetFont( L"Font_tob_profileInfo.fnt" );
-		lbl->Position().Set( 230.0f, -17.0f, 0.0f );
+		lbl->Position().Set( 230.0f, -13.0f, 0.0f );
 	}
 
 	//	create back button
@@ -1415,10 +1415,10 @@ void MenuAchievements::Initialize( void )
 	m_desc = sx_new( sx::gui::Label );
 	m_desc->SetParent( m_back );
 	m_desc->GetElement(0)->Color() = 0x00010000;
-	m_desc->SetSize( float2( 290, 50 ) );
+	m_desc->SetSize( float2( 300, 50 ) );
 	m_desc->SetAlign( GTA_RIGHT );
 	m_desc->SetFont( L"font_achievements_desc.fnt" );
-	m_desc->Position().Set( 60.0f, -40.0f, 0.0f );
+	m_desc->Position().Set( 65.0f, -40.0f, 0.0f );
 	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 	m_desc->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
 
@@ -2906,7 +2906,7 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 						}
 						else
 						{
-							AddTutorial( title, desc, image, false, false );
+							AddTutorial( title, desc, image, false, showNow > 0 );
 						}
 					}
 				}
@@ -3223,12 +3223,12 @@ void MenuUpgrade::Initialize( void )
 	//	create a label to display number of starts
 	m_stars = sx_new( sx::gui::Label );
 	m_stars->SetParent( m_back );
-	m_stars->SetSize( float2(128, 32) );
+	m_stars->SetSize( float2(128, 40) );
 	m_stars->SetFont( L"font_upgrade_stars.fnt" );
 	m_stars->SetAlign( GTA_RIGHT );
 	m_stars->GetElement(0)->Color() = 0x00010000;
 	m_stars->GetElement(1)->Color() = 0xFFFFFF00;
-	m_stars->Position().Set( -130.0f, -256.0f, 0.0f );
+	m_stars->Position().Set( -130.0f, -250.0f, 0.0f );
 
 	//	create back button
 	m_goback = sx_new( sx::gui::Button );
@@ -3247,7 +3247,7 @@ void MenuUpgrade::Initialize( void )
 	m_desc = sx_new( sx::gui::Label );
 	m_desc->SetParent( m_back );
 	m_desc->SetSize( float2( 430, 100 ) );
-	//m_desc->SetAlign( GTA_RIGHT );
+	m_desc->SetAlign( GTA_RIGHT );
 	m_desc->SetFont( L"font_upgrade_desc.fnt" );
 	m_desc->Position().Set( 220.0f, -250.0f, 0.0f );
 	m_desc->GetElement(0)->Color() = 0x00000001;
