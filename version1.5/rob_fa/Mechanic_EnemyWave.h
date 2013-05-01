@@ -50,6 +50,7 @@ namespace GM
 		SubWave					subWave[WAVE_ENEMY_MAXTYPE];
 
 		WCHAR					name[64];
+		WCHAR					tipsStartNode[64];
 		WCHAR					tipsStart[512];
 		WCHAR					tipsEnd[512];
 		WCHAR					tipsStartIcon[64];
@@ -69,7 +70,6 @@ namespace GM
 		float					goldPerSecond;	//	how many gold per seconds
 		int						enemyCounts;
 		sx::core::Node*			baseNode;
-		sx::core::Node*			tipsStartNode;
 	};
 	typedef Array<EnemyWave*>	arrayPEnemyWave;
 

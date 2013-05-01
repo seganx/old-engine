@@ -432,7 +432,22 @@ namespace GM
 
 		if ( SEGAN_KEYDOWN(0, SX_INPUT_KEY_MOUSE_LEFT) )
 		{
-			bool cancelCreation = true;
+			bool cancelCreation = false;
+
+			// verify trap collision
+			for (int i=0; i<m_traps.Count(); i++)
+			{
+				Trap* trap = m_traps[i];
+
+				if ( m_pos.Distance_sqr( trap->node->GetPosition_world() ) < 4 )
+				{
+					cancelCreation = true;
+					break;
+				}
+			}
+			if ( cancelCreation ) return;
+
+			// extract correct position
 			sx::math::Ray ray( float3( m_pos.x, m_pos.y + 5.0f, m_pos.z), float3( 0.001f, -0.999f, 0.001f ) );
 			msg_IntersectRay msgray( NMT_MESH, ray, msg_IntersectRay::GEOMETRY, NULL );
 			sx::core::Scene::GetNodeByRay( msgray );
@@ -440,7 +455,7 @@ namespace GM
 			{
 				sx::core::Node* node = sx::core::PNode(msgray.results[i].node);
 				while ( node->GetParent() ) node = node->GetParent();
-				if ( node && !node->GetUserData() )
+				if ( node && !node->GetUserData() && !node->GetUserTag() )
 				{
 					cancelCreation = msgray.results[i].position.y < - 5.0f;
 					if ( cancelCreation ) return;
@@ -462,8 +477,7 @@ namespace GM
 					break;
 				}
 			}
-			if ( cancelCreation )
-				return;
+			if ( cancelCreation ) return;
 
 			sx::core::Scene::RemoveNode( m_node );
 			m_Time = 0;

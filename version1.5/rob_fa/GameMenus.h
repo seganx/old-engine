@@ -261,6 +261,7 @@ public:
 	int					m_starAdd;
 	int					m_starCount;
 	sx::gui::PanelEx*	m_stars[3];
+	sx::gui::Panel*		m_stars_back[2];
 
 	int					m_goldCounter;
 	int					m_golds;

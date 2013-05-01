@@ -74,10 +74,10 @@ namespace GM
 		m_label->SetParent( m_back );
 		//m_label->SetAlign( GTA_RIGHT );
 		m_label->SetFont( L"Font_rob_twedit_info.fnt" );
-		m_label->SetSize( float2( 100.0f, 26.0f ) );
-		m_label->Position().Set( -45.0f, -103.0f, 0.0f );
+		m_label->SetSize( float2( 100.0f, 40.0f ) );
+		m_label->Position().Set( -45.0f, -107.0f, 0.0f );
 		m_label->GetElement(0)->Color() = D3DColor( 0, 0, 0, 0 );
-		m_label->GetElement(1)->Color() = 0xaaaaaaaa;
+		m_label->GetElement(1)->Color() = 0xcccccccc;
 
 		// add panel to the game
 		m_back->SetParent( g_game->m_gui->m_goldPeople->m_back );
@@ -369,16 +369,23 @@ namespace GM
 			g_game->m_gui->ShowTips( pWave->tipsStart, 0xffffa947, pWave->tipsStartIcon );
 
 			//  play particle/sound of start wave
-			if ( pWave->tipsStartNode )
+			if ( pWave->tipsStartNode[0] )
 			{
-				msg_SoundPlay msgSound(true);
-				pWave->tipsStartNode->MsgProc( MT_SOUND_PLAY, &msgSound );
+				sx::core::ArrayPNode nodelist;
+				sx::core::Scene::GetNodesByName( pWave->tipsStartNode, nodelist );
+				for ( int i=0; i<nodelist.Count(); ++i )
+				{
+					sx::core::Node* node = nodelist[i];
 
-				msg_Particle msgPrtcl_1(SX_PARTICLE_SPRAY);
-				pWave->tipsStartNode->MsgProc( MT_PARTICLE, &msgPrtcl_1 );
+					msg_SoundPlay msgSound(true);
+					node->MsgProc( MT_SOUND_PLAY, &msgSound );
 
-				msg_Particle msgPrtcl_2(0, SX_PARTICLE_SPRAY, L"entry_path");
-				pWave->tipsStartNode->MsgProc( MT_PARTICLE, &msgPrtcl_2 );
+					msg_Particle msgPrtcl_1(SX_PARTICLE_SPRAY);
+					node->MsgProc( MT_PARTICLE, &msgPrtcl_1 );
+
+					msg_Particle msgPrtcl_2(0, SX_PARTICLE_SPRAY, L"entry_path");
+					node->MsgProc( MT_PARTICLE, &msgPrtcl_2 );
+				}
 			}
 
 			String sre;
@@ -485,12 +492,9 @@ namespace GM
 					}
 
 					if ( script.GetString(i, L"tipsStartNode", tmpStr) )
-					{
-						sx::core::ArrayPNode nodelist;
-						sx::core::Scene::GetNodesByName(tmpStr, nodelist);
-						if ( nodelist.Count()>0 )
-							ew->tipsStartNode = nodelist[0];
-					}
+						CopyString( ew->tipsStartNode, 64, tmpStr );
+					else
+						ew->tipsStartNode[0] = 0;
 
 					script.GetInteger(i, L"addGold",		ew->addGold);
 					script.GetInteger(i, L"addHealth",		ew->addHealth);

@@ -607,19 +607,19 @@ void MenuMap::Initialize( void )
 	panel = sx_new( sx::gui::Panel );
 	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	panel->SetParent( m_diff_scroll );
-	panel->SetSize( float2( 32, 32 ) );
+	panel->SetSize( float2( 64, 32 ) );
 	panel->GetElement(0)->Color().a = 0.01f;
 	panel->SetUserTag( 2 );
-	panel->Position().x = m_diff_scroll->GetSize().x * 0.5f + 16;
+	panel->Position().x = m_diff_scroll->GetSize().x * 0.5f;
 	SEGAN_GUI_SET_ONCLICK( panel, MenuMap::OnScroll );
 
 	panel = sx_new( sx::gui::Panel );
 	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	panel->SetParent( m_diff_scroll );
-	panel->SetSize( float2( 32, 32 ) );
+	panel->SetSize( float2( 64, 32 ) );
 	panel->GetElement(0)->Color().a = 0.01f;
 	panel->SetUserTag( 3 );
-	panel->Position().x = - m_diff_scroll->GetSize().x * 0.5f - 16;
+	panel->Position().x = - m_diff_scroll->GetSize().x * 0.5f;
 	SEGAN_GUI_SET_ONCLICK( panel, MenuMap::OnScroll );
 
 	//	load some default value
@@ -897,11 +897,11 @@ void MenuMap::OnScroll( sx::gui::PControl sender )
 	switch ( sender->GetUserTag() )
 	{
 	case 2:	//	right
-		m_diff_scroll->SetValue(2);
+		m_diff_scroll->SetValue( m_diff_scroll->GetValue() + 1 );
 		break;
 
 	case 3:	//	left
-		m_diff_scroll->SetValue(0);
+		m_diff_scroll->SetValue( m_diff_scroll->GetValue() - 1 );
 		break;
 	}
 
@@ -1247,6 +1247,14 @@ void MenuProfile::OnClick( sx::gui::PControl sender )
 	{
 		if ( sender == m_profPanel[i]->GetChild(0) )
 		{
+			static float clicktime = 0.0f;
+			float nextclicktime = sx::sys::GetSysTime();
+			if ( ( nextclicktime - clicktime ) < 500.0f && m_profIndex == i )
+			{
+				Hide();
+				g_game->m_gui->m_main->Show();
+			}
+			clicktime = nextclicktime;
 			m_profIndex = i;
 		}
 		else
@@ -2196,6 +2204,20 @@ void MenuVictory::Initialize( void )
 	m_back->GetElement(0)->SetTextureSrc( L"gui_victoryBack.txr" );
 	m_back->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 
+	//	create stars background
+	for ( int i=0; i<2; i++ )
+	{
+		m_stars_back[i] = sx_new( sx::gui::Panel );
+		m_stars_back[i]->SetParent( m_back );
+		m_stars_back[i]->SetSize( float2( 64, 64 ) );
+		m_stars_back[i]->GetElement(0)->SetTextureSrc( L"gui_victoryStar_back.txr" );
+		switch ( i )
+		{
+		case 0:	m_stars_back[i]->Position().Set( 6.0f,  125.0f, 0.0f );	break;
+		case 1:	m_stars_back[i]->Position().Set( 126.0f,125.0f, 0.0f );	break;
+		}
+	}
+
 	//	create stars
 	for ( int i=0; i<3; i++ )
 	{
@@ -2220,7 +2242,7 @@ void MenuVictory::Initialize( void )
 	m_peopleLabel->SetParent( m_back );
 	m_peopleLabel->SetSize( float2(100, 50) );
 	m_peopleLabel->SetAlign( GTA_CENTER );
-	m_peopleLabel->Position().Set( -71.0f, 98.0f, 0.0f );
+	m_peopleLabel->Position().Set( -63.0f, 106.0f, 0.0f );
 	m_peopleLabel->GetElement(0)->Color().a = 0.0f;
 	m_peopleLabel->GetElement(1)->Color() = 0xffffffaa;
 	m_peopleLabel->SetFont( L"Font_victory_people.fnt" );
@@ -2229,7 +2251,7 @@ void MenuVictory::Initialize( void )
 	m_goldLabel = (sx::gui::Label*)m_peopleLabel->Clone();
 	m_goldLabel->SetParent( m_back );
 	//m_goldLabel->SetAlign( GTA_RIGHT );
-	m_goldLabel->Position().Set( -152.0f, 110.0f, 0.0f );
+	m_goldLabel->Position().Set( -148.0f, 117.0f, 0.0f );
 
 	//	create buttons
 	for ( int i=0; i<5; i++ )
@@ -2425,6 +2447,17 @@ void MenuVictory::Show( void )
 
 	str64 tmpstr;
 
+	//	visibility of starts background
+	if ( g_game->m_difficultyLevel > 0 )
+		m_stars_back[0]->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+	else
+		m_stars_back[0]->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+
+	if ( g_game->m_difficultyLevel > 1 )
+		m_stars_back[1]->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+	else
+		m_stars_back[1]->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+
 	//	compute golds
 	m_golds = g_game->m_player->m_gold;
 	tmpstr << m_golds;
@@ -2549,6 +2582,8 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 
 			//	go ahead
 			g_game->m_game_nextLevel = usertag ? 0 : g_game->m_game_currentLevel + 1;
+			if ( g_game->m_game_currentLevel > 9 )
+				g_game->m_game_nextLevel = 0;
 
 			Hide();
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
