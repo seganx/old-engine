@@ -12,6 +12,7 @@ String							g_FileName;
 Array<float3>			g_arrVP;		//	array of vertex positions
 Array<float3>			g_arrVN;		//	array of vertex normals
 Array<float2>			g_arrVT;		//  array of vertex texture coordinates
+Array<str512>			g_names;		//	array of names
 
 
 struct objVertex
@@ -277,8 +278,20 @@ void AppendToNode(objNode* obnode, sx::core::PNode node)
 		geometry->GetRes(0)->UpdateBoundingVolume();
 
 		//  save geometry
-		String		 str;
-		if ( mesh->m_Name.Find(L"cameraGuard") )
+		sint repeatedName = -1;
+		for ( int n=0; n<g_names.Count(); ++n )
+		{
+			if ( mesh->m_Name == g_names[n] )
+			{
+				repeatedName = n;
+				break;
+			}
+		}
+		if ( repeatedName == -1 )
+			g_names.PushBack( mesh->m_Name.Text() );
+
+		str512 str;
+		if ( repeatedName > -1 )
 			str << g_Options.prefix << g_FileName << '@' << mesh->GetName() << g_meshCount++ << L".gmt";
 		else
 			str << g_Options.prefix << g_FileName << '@' << mesh->GetName() << L".gmt";
@@ -389,6 +402,7 @@ void ImportOBJFile( const WCHAR* FileName, OUT sx::core::ArrayPNode& nodeList, I
 	g_arrVN.Clear();
 	g_arrVT.Clear();
 	g_arrMTL.Clear();
+	g_names.Clear();
 
 	//  load objects
 	objNode obnode; obnode.pos.Set(0,0,0);

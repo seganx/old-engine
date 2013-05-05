@@ -41,10 +41,14 @@ void Draw_Loading( int count, int index, const WCHAR* state, const WCHAR* name )
 // 	panel->Rotation().z += 0.15f;
 
 	PLabel label = (PLabel)game->m_panel_Loading->GetChild(4);
-	label->SetText( state );
+	
+	if ( state && 0 )
+		label->SetText( state );
+	else
+		label->SetText( NULL );
 
 	label = (PLabel)game->m_panel_Loading->GetChild(5);
-	if ( name )
+	if ( name && 0 )
 	{
 		//str1024 str;
 		//str << L"< " << name << L" >";

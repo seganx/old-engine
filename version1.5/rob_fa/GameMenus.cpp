@@ -342,7 +342,15 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 
 	case 4: // credits
 		{
-			
+			m_slantBack->State_SetIndex(0);
+			for ( int i=0; i<5; i++ )
+			{
+				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
+				m_btn[i]->State_SetIndex(0);
+			}
+
+			m_mainBack->State_SetIndex(0);
+			g_game->m_gui->m_credits->Show();
 		}
 		break;
 	}
@@ -1776,11 +1784,53 @@ void MenuSettings::OnScroll( sx::gui::PControl sender )
 void MenuCredits::Initialize( void )
 {
 	Menu::Initialize();
+
+	m_back->SetSize( float2( 1024, 1024 ) );
+	m_back->GetElement(0)->SetTextureSrc( L"gui_credits.txr" );
+	m_back->State_GetByIndex(0).Blender.Set( 0.2f, 0.3f );
+	m_back->State_GetByIndex(1).Blender.Set( 0.2f, 0.3f );
+
+	//	create back button
+	sx::gui::Button * m_goback = sx_new( sx::gui::Button );
+	m_goback->SetParent( m_back );
+	m_goback->SetSize( float2( 128, 32 ) );
+	m_goback->Position().Set( 300.0f, -255.0f, 0.0f );
+	m_goback->GetElement(0)->SetTextureSrc( L"gui_menu_back.txr" );
+	m_goback->GetElement(0)->Color().a = 0.5f;
+	m_goback->GetElement(1)->SetTextureSrc( L"gui_menu_back.txr" );
+	m_goback->GetElement(1)->Color().a = 1.0f;
+	m_goback->GetElement(2)->SetTextureSrc( L"gui_menu_back.txr" );
+	m_goback->GetElement(2)->Color().a = 0.5f;
+	SEGAN_GUI_SET_ONCLICK( m_goback, MenuCredits::OnClick );
+	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
 }
 
 void MenuCredits::Finalize( void )
 {
 	Menu::Finalize();
+}
+
+void MenuCredits::ProcessInput( bool& inputHandled, float elpsTime )
+{
+	if ( inputHandled ) return;
+	sx_callstack();
+
+	Menu::ProcessInput( inputHandled, elpsTime );
+	if ( !m_back->State_GetIndex() ) return;
+	if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_ESCAPE ) )
+	{
+		Hide();
+		g_game->m_gui->m_main->Show();
+	}
+}
+
+void MenuCredits::OnClick( sx::gui::PControl sender )
+{
+	Hide();
+	g_game->m_gui->m_main->Show();
+
+	msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
+	m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -2850,10 +2900,49 @@ void MenuInfo::Initialize( void )
 	SEGAN_GUI_SET_ONCLICK( m_prev, MenuInfo::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_prev, Menu::OnEnter );
 
+	//////////////////////////////////////////////////////////////////////////
+	//	create additional helper notifier
+	m_helper.showTime = 0;
+	m_helper.back = sx_new( sx::gui::PanelEx );
+	m_helper.back->SetSize( float2( 300.0f, 45.0f ) );
+	m_helper.back->State_GetByIndex(0).Align.Set( -0.5f, 0.5f );
+	m_helper.back->State_GetByIndex(0).Center.Set( 0.5f, -0.5f, 0.0f );
+	m_helper.back->State_GetByIndex(0).Position.Set( 0.0f, 70.0f, 0.0f );
+	m_helper.back->State_GetByIndex(0).Color.Set( 0.0f, 0.0f, 0.0f, 0.5f );
+	m_helper.back->State_GetByIndex(0).Blender.Set( 0.2f, 0.6f );
+	m_helper.back->State_Add();
+	m_helper.back->State_GetByIndex(1).Position.Set( 0.0f, 0.0f, 0.0f );
+
+	m_helper.image = sx_new( sx::gui::Panel );
+	m_helper.image->SetParent( m_helper.back );
+	m_helper.image->SetSize( float2( 64.0f, 64.0f ) );
+	m_helper.image->Position().Set( 120.0f, 2.5f, 0.0f );
+	m_helper.image->GetElement(0)->SetTextureSrc( L"gui_pnlGold_info.txr" );
+
+	m_helper.title = sx_new( sx::gui::Label );
+	m_helper.title->SetParent( m_helper.back );
+	m_helper.title->GetElement(0)->Color() = 0x00001000;
+	m_helper.title->GetElement(1)->Color() = 0xffffff00;
+	m_helper.title->SetSize( float2( 250, 30 ) );
+	m_helper.title->SetFont( L"font_info_title_helper.fnt" );
+	m_helper.title->SetAlign( GTA_RIGHT );
+	m_helper.title->Position().Set( -15.0f, 5.0f, 0.0f );
+
+	m_helper.desc = sx_new( sx::gui::Label );
+	m_helper.desc->SetParent( m_helper.back );
+	m_helper.desc->GetElement(0)->Color() = 0x00001000;
+	m_helper.desc->SetSize( float2( 250, 25 ) );
+	m_helper.desc->SetFont( L"font_info_desc_helper.fnt" );
+	m_helper.desc->SetAlign( GTA_RIGHT );
+	m_helper.desc->Position().Set( -15.0f, -10.0f, 0.0f );
+	m_helper.desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
+	m_helper.desc->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
 }
 
 void MenuInfo::Finalize( void )
 {
+	sx_delete( m_helper.back );
+
 	ClearTutorial();
 
 	Menu::Finalize();
@@ -2891,15 +2980,20 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 		if ( g_game->m_player->m_profile.level_played < g_game->m_game_currentLevel )
 			g_game->m_player->m_profile.level_played = g_game->m_game_currentLevel;
 
+		m_helper.showTime = 0;
+
 	case GMT_GAME_RESETING:
 	case GMT_LEVEL_CLEAR:
 		ClearTutorial();
+		m_helper.showTime = 0;
 		m_time = 0;
 		break;
 
 	case GMT_GAME_RESET:
 	case GMT_GAME_START:
 		{
+			m_helper.showTime = 0;
+
 			//	reset button of information
 			g_game->m_gui->m_goldPeople->m_info->State_SetIndex(0);
 
@@ -2980,13 +3074,22 @@ void MenuInfo::Update( float elpsTime )
 	}
 	
 	m_back->Update( elpsTime );
+
+	//////////////////////////////////////////////////////////////////////////
+	//	helper
+	m_helper.showTime -= elpsTime;
+	if ( m_helper.showTime < 0 )
+		m_helper.back->State_SetIndex( 0 );
+	else
+		m_helper.back->State_SetIndex( 1 );
+	m_helper.back->Update( elpsTime );
 }
 
 void MenuInfo::Draw( DWORD flag )
 {
 	sx_callstack();
-
 	m_back->Draw( flag );
+	m_helper.back->Draw( flag );
 }
 
 void MenuInfo::Show( void )
@@ -3157,6 +3260,41 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 	{
 		msg_SoundPlay msg( false, 0, 0, L"info" );
 		m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+	}
+
+	if ( settoCurrent )
+	{
+// 		uint cc = 0;
+// 		GUITextLine tmp;
+// 		tmp.text = tutor->desc;
+// 		WCHAR* c = tmp.text.Text();
+// 
+// 		while ( c )
+// 		{
+// 		}
+// 
+// 		int cc = 0;
+// 		for (int i=0; i<text.Length(); i++)
+// 		{
+// 			if ( IsColorCode( &text[i] ) )
+// 			{
+// 				i += 10;
+// 			}
+// 
+// 			PGUIFontChar fch = NULL;
+// 			WCHAR ch = text[i];
+// 			if ( ch==' ' || ch=='\t' || ch=='\n' || !textFont->GetChar(ch, fch) )
+// 				continue;
+// 			cc++;
+// 		}
+// 
+// 		if ( tmp.GetNumCharToBuffer( m_helper.desc->m_Font ) > 70.0f )
+// 		{
+// 			
+// 		}
+		m_helper.title->SetText( title );
+		m_helper.desc->SetText( tutor->desc );
+ 		m_helper.showTime = 7000.0f;
 	}
 }
 

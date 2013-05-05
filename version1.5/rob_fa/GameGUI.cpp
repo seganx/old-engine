@@ -494,6 +494,7 @@ void GameGUI::Initialize( void )
 	m_profile = sx_new( MenuProfile );
 	m_achivements = sx_new( MenuAchievements );
 	m_settings = sx_new( MenuSettings );
+	m_credits = sx_new( MenuCredits );
 	m_confirmExit = sx_new( MenuConfirmExit );
 	m_pause = sx_new( MenuPause );
 	m_victory = sx_new( MenuVictory );
@@ -508,6 +509,7 @@ void GameGUI::Initialize( void )
 	m_profile->Initialize();
 	m_achivements->Initialize();
 	m_settings->Initialize();
+	m_credits->Initialize();
 	m_confirmExit->Initialize();
 	m_pause->Initialize();
 	m_victory->Initialize();
@@ -527,6 +529,7 @@ void GameGUI::Finalize( void )
 	m_confirmExit->Finalize();
 	m_achivements->Finalize();
 	m_settings->Finalize();
+	m_credits->Finalize();
 	m_profile->Finalize();
 	m_map->Finalize();
 	m_main->Finalize();
@@ -545,6 +548,7 @@ void GameGUI::Finalize( void )
 	sx_delete_and_null( m_confirmExit );
 	sx_delete_and_null( m_achivements );
 	sx_delete_and_null( m_settings );
+	sx_delete_and_null( m_credits );
 	sx_delete_and_null( m_profile );
 	sx_delete_and_null( m_map );
 	sx_delete_and_null( m_main );
@@ -567,6 +571,7 @@ void GameGUI::ProcessInput( bool& inputHandled, float elpsTime )
 	m_settings->ProcessInput( inputHandled, elpsTime );
 	m_pause->ProcessInput( inputHandled, elpsTime );
 	m_achivements->ProcessInput( inputHandled, elpsTime );
+	m_credits->ProcessInput( inputHandled, elpsTime );
 	m_profile->ProcessInput( inputHandled, elpsTime );
 	m_map->ProcessInput( inputHandled, elpsTime );
 	m_main->ProcessInput( inputHandled, elpsTime );
@@ -608,6 +613,7 @@ void GameGUI::Update( float elpsTime )
 	m_confirmExit->Update( elpsTime );
 	m_achivements->Update( elpsTime );
 	m_settings->Update( elpsTime );
+	m_credits->Update( elpsTime );
 	m_map->Update( elpsTime );
 	m_pause->Update( elpsTime );
 	m_powerAttaks->Update( elpsTime );
@@ -656,6 +662,7 @@ void GameGUI::Draw( DWORD flag )
 	m_profile->Draw( flag );
 	m_achivements->Draw( flag );
 	m_settings->Draw( flag );
+	m_credits->Draw( flag );
 	m_upgradePanel->Draw(flag);
 	m_status->Draw( flag );
 	m_confirmExit->Draw( flag );
@@ -729,6 +736,7 @@ void GameGUI::MsgProc( UINT recieverID, UINT msg, void* data )
 	m_map->MsgProc( recieverID, msg, data );
 	m_achivements->MsgProc( recieverID, msg, data );
 	m_settings->MsgProc( recieverID, msg, data );
+	m_credits->MsgProc( recieverID, msg, data );
 	m_profile->MsgProc( recieverID, msg, data );
 	m_info->MsgProc( recieverID, msg, data );
 }

@@ -195,8 +195,12 @@ public:
 
 class MenuCredits: public Menu
 {
+public:
 	virtual void Initialize(void);
 	virtual void Finalize(void);
+	virtual void ProcessInput(bool& inputHandled, float elpsTime);
+
+	void OnClick(sx::gui::PControl sender);
 };
 
 class MenuConfirmExit: public Menu
@@ -322,12 +326,12 @@ public:
 
 	struct Tutorial
 	{
-		String		title;
-		String		desc;
+		String				title;
+		String				desc;
 		sx::gui::PPanel		image;
 	};
 	Array<Tutorial*>	m_tutorial;
-	int							m_Index;
+	int					m_Index;
 	
 	sx::gui::PLabel		m_indicator;
 	sx::gui::PLabel		m_title;
@@ -336,6 +340,19 @@ public:
 	sx::gui::PButton	m_prev;
 	float				m_time;
 	float				m_delayTime;
+
+
+	struct Helper
+	{
+		sx::gui::PLabel		title;
+		sx::gui::PLabel		desc;
+		sx::gui::PPanel		image;
+		sx::gui::PPanelEx	back;
+		float				showTime;
+	};
+	Helper				m_helper;
+
+
 };
 
 #endif	//	GUARD_GameMenus_HEADER_FILE

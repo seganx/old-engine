@@ -274,8 +274,9 @@ namespace GM
 			pWave->enemyCounts--;
 
 			//	add info to gui
+			bool shownow = pSubWave->infoShowNow > 0;
 			if ( g_game->m_player->m_profile.level_played < g_game->m_game_currentLevel )
-				g_game->m_gui->m_info->AddTutorial( pSubWave->infoTitle, pSubWave->infoDesc, pSubWave->infoImage, pSubWave->infoShowNow > 0 );
+				g_game->m_gui->m_info->AddTutorial( pSubWave->infoTitle, pSubWave->infoDesc, pSubWave->infoImage, shownow );
 			else
 				g_game->m_gui->m_info->AddTutorial( pSubWave->infoTitle, pSubWave->infoDesc, pSubWave->infoImage, false );
 

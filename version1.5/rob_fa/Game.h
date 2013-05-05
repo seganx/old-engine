@@ -12,7 +12,7 @@
 #include "ImportEngine.h"
 #include "GameTypes.h"
 
-#define GAME_TITLE	L"Cnep ver 0.1"
+#define GAME_TITLE	L"Roads of Battle ver 0.1"
 
 
 class Player;
