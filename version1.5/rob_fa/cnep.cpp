@@ -21,7 +21,7 @@ static sx::sys::Window		s_window;			//	main application window
 class FirstPresents
 {
 public:
-	FirstPresents( void ): m_index(0), m_time(0)
+	FirstPresents( void ): m_index(0), m_time(0), m_maxtime(5000.0f)
 	{
 	
 	}
@@ -39,18 +39,28 @@ public:
 		sx::gui::Panel* panel = (sx::gui::Panel*)sx::gui::Create( GUI_PANEL );
 		panel->SetSize( float2( size, size ) );
 		panel->GetElement(0)->SetTextureSrc( texture );
-		panel->GetElement(0)->Color().a = 0;
+		panel->GetElement(0)->Color().a = 0.0f;
 
 		m_list.PushBack( panel );
 	}
 
 	void Update( float elpstime )
 	{
-		
 		if ( m_index > m_list.Count() ) return;
 
+		sx::io::Input::Update( elpstime );
+		if (SEGAN_KEYUP(0, SX_INPUT_KEY_SPACE) || 
+			SEGAN_KEYUP(0, SX_INPUT_KEY_ESCAPE) || 
+			SEGAN_KEYUP(0, SX_INPUT_KEY_RETURN) || 
+			SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_LEFT) || 
+			SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_RIGHT) )
+		{
+			m_index = m_list.Count() + 1;
+			return;
+		}
+
 		m_time += elpstime;
-		if ( m_time > 3000 )
+		if ( m_time > m_maxtime )
 		{
 			m_time = 0;
 			m_index++;
@@ -62,9 +72,12 @@ public:
 
 			if ( m_index == i )
 			{
-				pc->GetElement(0)->Color().a += elpstime * 0.001f;
-				if ( pc->GetElement(0)->Color().a > 1.0f )
-					pc->GetElement(0)->Color().a = 1.0f;
+				if ( m_time > 1000 )
+				{
+					pc->GetElement(0)->Color().a += elpstime * 0.001f;
+					if ( pc->GetElement(0)->Color().a > 1.0f )
+						pc->GetElement(0)->Color().a = 1.0f;
+				}
 			}
 			else
 			{
@@ -96,7 +109,7 @@ public:
 
 	bool Presenting( void )
 	{
-		return ( m_index <= m_list.Count() && m_time < 3000 );
+		return ( m_index <= m_list.Count() && m_time < m_maxtime );
 	}
 
 
@@ -104,6 +117,7 @@ public:
 	Array<sx::gui::Control*>	m_list;
 	int							m_index;
 	float						m_time;
+	float						m_maxtime;
 };
 
 void clientCallback( Client* client, const byte* buffer, const uint size )
@@ -265,6 +279,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	s_window.SetCursor( LoadCursor(hInstance, MAKEINTRESOURCE(IDC_CURSOR_EMPTY)) );
 	s_window.SetVisible( true );
 	sx::sys::Application::Create_Window(&s_window);
+	ShowCursor( FALSE );
 
 	//  initialize scene manager
 	sx::core::Scene::Initialize( sx_new( sx::core::SceneManager_SBVH ) );
@@ -305,24 +320,25 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 
 	//	show presents
-#if 0
-	float present_size = (float)min( Config::GetData()->display_Size.x, Config::GetData()->display_Size.y );
-	FirstPresents *presents = sx_new( FirstPresents );
-	presents->AddPresents( L"gui_loading_level_0.txr", present_size );
-	presents->AddPresents( L"gui_loading_level_1.txr", present_size );
-	presents->AddPresents( L"gui_loading_level_2.txr", present_size );
-
-	float initTime = sx::sys::GetSysTime();
-	float elpsTime = 0;
-	while ( presents->Presenting() )
+#if 1
 	{
-		// calculate elapsed time
-		elpsTime = sx::sys::GetSysTime() - initTime;
-		initTime = sx::sys::GetSysTime();
-		presents->Update( elpsTime );
-		presents->Draw();
+		float present_size = (float)sx_min_i( Config::GetData()->display_Size.x, Config::GetData()->display_Size.y );
+		FirstPresents *presents = sx_new( FirstPresents );
+		presents->AddPresents( L"gui_esra.txr", 1024 );
+		presents->AddPresents( L"gui_mainBack.txr", 1024 );
+
+		float initTime = sx::sys::GetSysTime();
+		float elpsTime = 0;
+		while ( presents->Presenting() )
+		{
+			// calculate elapsed time
+			elpsTime = sx::sys::GetSysTime() - initTime;
+			initTime = sx::sys::GetSysTime();
+			presents->Update( elpsTime );
+			presents->Draw();
+		}
+		sx_delete_and_null( presents );
 	}
-	sx_delete_and_null( presents );
 #endif
 
 
