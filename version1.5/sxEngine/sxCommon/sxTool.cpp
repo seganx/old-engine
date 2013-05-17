@@ -270,7 +270,10 @@ namespace sx { namespace cmn
 	void StringList::Clear( void )
 	{
 		for (int i=0; i<m_sList.Count(); i++)
-			sx_delete(m_sList[i]);
+		{
+			String* str = m_sList[i];
+			sx_delete(str);
+		}
 		m_sList.Clear();
 	}
 
@@ -288,7 +291,8 @@ namespace sx { namespace cmn
 	{
 		for (int i=0; i<m_sList.Count(); i++)
 		{
-			if ( *(m_sList[i]) == str )
+			String* pstr = m_sList[i];
+			if ( *pstr == str )
 				return i;
 		}
 		return -1;
@@ -314,27 +318,36 @@ namespace sx { namespace cmn
 	{
 		if ( !m_sList.Count() ) return;
 		int index = m_sList.Count() - 1;
-		sx_delete(m_sList[index]);
+		String* pstr = m_sList[index];
 		m_sList.RemoveByIndex(index);
+		sx_delete(pstr);
 	}
 
 	void StringList::Delete( int Index )
 	{
 		if ( Index < 0 || Index >= m_sList.Count() ) return;
-		sx_delete(m_sList[Index]);
+		String* pstr = m_sList[Index];
 		m_sList.RemoveByIndex(Index);
+		sx_delete(pstr);
 	}
 
-	String& StringList::Top( void )
+	String* StringList::Top( void )
 	{
+		sx_assert( m_sList.Count() );
 		int index = Count() - 1;
-		return *m_sList[index];
+		if ( index >=0 )
+			return m_sList[index];
+		else
+			return NULL;
 	}
 
-	String& StringList::At( int Index )
+	String* StringList::At( int Index )
 	{
 		sx_assert(Index>=0 && Index<m_sList.Count());
-		return *m_sList.At(Index);
+		if ( Index>=0 && Index<m_sList.Count() )
+			return m_sList[Index];
+		else
+			return NULL;
 	}
 
 	void StringList::SaveToFile( const WCHAR* FileName )
@@ -348,7 +361,7 @@ namespace sx { namespace cmn
 		WCHAR c[2] = {'\r', '\n'};	
 		for (int i=0; i<Count(); i++)
 		{
-			MyFile.Write(At(i).Text(), At(i).Length() * sizeof(WCHAR));
+			MyFile.Write(At(i)->Text(), At(i)->Length() * sizeof(WCHAR));
 			MyFile.Write(c, 2 * sizeof(WCHAR));
 		}
 	}
@@ -429,10 +442,13 @@ namespace sx { namespace cmn
 		sx_mem_free(tmp);
 	}
 
-	String& StringList::operator[]( int index )
+	String* StringList::operator[]( int index )
 	{
 		sx_assert(index>=0 && index<m_sList.Count());
-		return *m_sList[index];
+		if ( index>=0 && index<m_sList.Count() )
+			return m_sList[index];
+		else
+			return NULL;
 	}
 
 	void StringList::Swap( int index1, int index2 )

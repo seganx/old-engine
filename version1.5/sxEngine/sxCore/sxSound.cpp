@@ -114,6 +114,7 @@ void ReleaseSoundPlayer( sx::core::PSound sound )
 		if ( curplayer->owner == sound )
 		{
 			sound->m_player = NULL;
+			curplayer->player.Pause();
 			curplayer->player.Stop();
 			curplayer->player.SetSoundData( NULL );
 			curplayer->owner = NULL;
@@ -217,6 +218,7 @@ namespace sx { namespace core {
 		if ( elpsTime > 0 && m_player->GetStatus() != SS_PLAYING )
 		{
 			ReleaseSoundPlayer( this );
+			SEGAN_SET_REM( m_Option, SX_SOUND_PLAYING );
 			return;
 		}
 
@@ -391,7 +393,7 @@ namespace sx { namespace core {
 		int n = m_resources.Count();
 		SEGAN_STREAM_WRITE(stream, n);
 		for ( int i=0; i<n; i++ )
-			cmn::String_Save( m_resources.At(i), &stream );
+			cmn::String_Save( *m_resources.At(i), &stream );
 
 		// write player description
 		SEGAN_STREAM_WRITE(stream, m_desc);
@@ -539,15 +541,17 @@ namespace sx { namespace core {
 	void Sound::Play( bool reset, bool force /*= false */ )
 	{
 		if ( m_index<0 || m_index >= m_resources.Count() ) return;
+		String* strSrc = m_resources.At(m_index);
+		if ( !strSrc ) return;
 
-		String& strSrc = m_resources.At(m_index);
-		if ( !m_player || strSrc != m_player->GetSoundData() )
+		if ( !m_player || *strSrc != m_player->GetSoundData() )
 		{
 			m_player = GetSoundPlayer( this, force );
 			if ( m_player )
 			{
-				const WCHAR* resource = strSrc.Text();
+				const WCHAR* resource = strSrc->Text();
 
+				m_player->Pause();
 				m_player->Stop();
 				m_player->SetSoundData( resource );
 
@@ -584,6 +588,7 @@ namespace sx { namespace core {
 	{
 		if ( m_player )
 		{
+			m_player->SetTimePosition(0.0f);
 			ReleaseSoundPlayer( this );
 		}
 

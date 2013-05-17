@@ -40,7 +40,7 @@ extern void sx_lib_initialize( void );
 extern void sx_lib_finalize( void );
 
 
-#if ( defined(_DEBUG) || SEGAN_CALLSTACK )
+#if ( defined(_DEBUG) || SEGAN_LIB_ASSERT )
 
 
 SEGAN_INLINE sint lib_assert( const wchar* expression, const wchar* file, const sint line )
@@ -53,7 +53,11 @@ SEGAN_INLINE sint lib_assert( const wchar* expression, const wchar* file, const 
 #if defined(_DEBUG)
 	__debugbreak();	//	just move your eyes down and look at the call stack list in IDE to find out what happened !
 #else
+
+#if ( SEGAN_CALLSTACK == 1 )
 	callstack_report_to_file( L"sx_assertion", L"assertion failed !" );
+#endif
+
 #endif
 
 	return 0;
@@ -588,8 +592,10 @@ SEGAN_INLINE void mem_realloc_dbg( void*& p, const uint newsizeinbyte, const wch
 			str64 memreportfile = L"sx_mem_report_"; memreportfile << s_mem_corruptions; memreportfile << L".txt";
 			mem_report_debug_to_file( memreportfile, -1 );
 
+#if ( defined(_DEBUG) || SEGAN_LIB_ASSERT )
 			//	report call stack
 			lib_assert( L"memory block has been corrupted !", memreport.mb->file, memreport.mb->line );
+#endif
 		}
 		else
 		{
@@ -665,8 +671,10 @@ SEGAN_INLINE void mem_free_dbg( const void* p )
 			str64 memreportfile = L"sx_mem_report_"; memreportfile << s_mem_corruptions; memreportfile << L".txt";
 			mem_report_debug_to_file( memreportfile, -1 );
 
+#if ( defined(_DEBUG) || SEGAN_LIB_ASSERT )
 			//	report call stack
 			lib_assert( L"memory block has been corrupted !", memreport.mb->file, memreport.mb->line );
+#endif
 		}
 		else
 		{

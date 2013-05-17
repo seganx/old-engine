@@ -194,7 +194,7 @@ namespace sx { namespace core {
 		PSector							m_Sector;			//  usable in scene manager
 
 	private:
-		String					m_Name;				//  the name of this node
+		String							m_Name;				//  the name of this node
 		PNode							m_Parent;			//  parent of this node
 		DWORD							m_Option;			//	I just feel that it will be useful
 		DWORD							m_RegTypes;			//  registry types used to verify existing member types in the list
@@ -210,8 +210,8 @@ namespace sx { namespace core {
 		OBBox							m_obBox;			//  world bounding box of the node
 		Sphere							m_Sphere;			//  bounding sphere of the node
 
-		Array<PNode>			m_Child;			//	the array of node child
-		Array<PNodeMember>		m_Member;			//	the array of the members
+		Array<PNode>					m_Child;			//	the array of node child
+		Array<PNodeMember>				m_Member;			//	the array of the members
 
 		UINT							m_UserTag;			//  user tag
 		void*							m_UserData;			//  user data

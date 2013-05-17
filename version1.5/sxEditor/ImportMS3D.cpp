@@ -364,8 +364,8 @@ void ImportMS3DFile( const WCHAR* FileName, const UINT flag, OUT sx::core::PNode
 		{
 			for (int l=0; l<strList.Count(); l++)
 			{
-				if ( !strList[l].Text() ) continue;
-				str = strList[l];
+				if ( !strList[l]->Text() ) continue;
+				str = strList[l]->Text();
 
 				int i=0;
 				for ( ; i<str.Length() && ( str[i]==' ' || str[i]=='\t' ); i++ );

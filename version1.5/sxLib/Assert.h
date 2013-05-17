@@ -10,7 +10,7 @@
 #define GUARD_Assert_HEADER_FILE
 
 // assertion
-#if ( defined(_DEBUG) || SEGAN_CALLSTACK )
+#if ( defined(_DEBUG) || SEGAN_LIB_ASSERT )
 
 #define sx_assert(expression)	((!!(expression)) || lib_assert(_CRT_WIDE(#expression), _CRT_WIDE(__FILE__), __LINE__))
 

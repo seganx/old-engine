@@ -68,12 +68,12 @@ namespace sx { namespace cmn
 		void PushFront(const WCHAR* str);
 		void Pop(void);
 		void Delete(int Index);
-		String& Top(void);
-		String& At(int Index);
+		String* Top(void);
+		String* At(int Index);
 		void SaveToFile(const WCHAR* FileName);
 		void LoadFromFile(const WCHAR* FileName);
 
-		String& operator[] (int index);
+		String* operator[] (int index);
 	private:
 		Array<String*> m_sList;		//  list of pointers of strings
 	};

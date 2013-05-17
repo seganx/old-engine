@@ -39,65 +39,65 @@ public:
 		{
 			//  extract font information
 			String		 tmp;
-			if (slist[i].Length() > 5)
+			if (slist[i]->Length() > 5)
 			{
-				if ( isFirstWord(slist[i], L"char") )
+				if ( isFirstWord(slist[i]->Text(), L"char") )
 				{
 
 					PGUIFontChar pCharInfo = sx_new( GUIFontChar );
 
-					sx::cmn::String_GetValue(slist[i], L"id", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"id", tmp);
 					pCharInfo->ID = tmp.StrToInt(tmp);
 
-					sx::cmn::String_GetValue(slist[i], L"x", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"x", tmp);
 					pCharInfo->x = tmp.StrToInt(tmp);
 
-					sx::cmn::String_GetValue(slist[i], L"y", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"y", tmp);
 					pCharInfo->y = tmp.StrToInt(tmp);
 
-					sx::cmn::String_GetValue(slist[i], L"width", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"width", tmp);
 					pCharInfo->width = tmp.StrToInt(tmp);
 
-					sx::cmn::String_GetValue(slist[i], L"height", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"height", tmp);
 					pCharInfo->height = tmp.StrToInt(tmp);
 
-					sx::cmn::String_GetValue(slist[i], L"xoffset", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"xoffset", tmp);
 					pCharInfo->xOffset = tmp.StrToInt(tmp);
 
-					sx::cmn::String_GetValue(slist[i], L"yoffset", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"yoffset", tmp);
 					pCharInfo->yOffset = tmp.StrToInt(tmp);
 
-					sx::cmn::String_GetValue(slist[i], L"xadvance", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"xadvance", tmp);
 					pCharInfo->xAdvance = tmp.StrToInt(tmp);
 
-					sx::cmn::String_GetValue(slist[i], L"page", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"page", tmp);
 					pCharInfo->page = tmp.StrToInt(tmp);
 
 					m_Chars.Insert(pCharInfo->ID, pCharInfo);
 				} 
-				else if ( isFirstWord(slist[i], L"page") )
+				else if ( isFirstWord(slist[i]->Text(), L"page") )
 				{
-					sx::cmn::String_GetValue(slist[i], L"file", textureFile);
+					sx::cmn::String_GetValue(*slist[i], L"file", textureFile);
 				} 
-				else if ( isFirstWord(slist[i], L"info") )
+				else if ( isFirstWord(slist[i]->Text(), L"info") )
 				{
-					sx::cmn::String_GetValue(slist[i], L"size", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"size", tmp);
 					m_FontDesc.Size = tmp.StrToInt(tmp);
 
-					sx::cmn::String_GetValue(slist[i], L"outline", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"outline", tmp);
 					m_FontDesc.Outline = tmp.StrToInt(tmp);
 				} 
-				else if ( isFirstWord(slist[i], L"common") )
+				else if ( isFirstWord(slist[i]->Text(), L"common") )
 				{
-					sx::cmn::String_GetValue(slist[i], L"lineHeight", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"lineHeight", tmp);
 					m_FontDesc.LineHeight = tmp.StrToInt(tmp);
 
-					sx::cmn::String_GetValue(slist[i], L"base", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"base", tmp);
 					m_FontDesc.Base = tmp.StrToInt(tmp);
 				} 
-				else if ( isFirstWord(slist[i], L"chars") )
+				else if ( isFirstWord(slist[i]->Text(), L"chars") )
 				{
-					sx::cmn::String_GetValue(slist[i], L"count", tmp);
+					sx::cmn::String_GetValue(*slist[i], L"count", tmp);
 					m_FontDesc.CharCount = tmp.StrToInt(tmp);
 				}
 			}

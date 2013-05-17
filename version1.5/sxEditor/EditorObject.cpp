@@ -470,8 +470,8 @@ void EditorObject::Paste( sx::core::PNode& node )
 				node = sx_new( sx::core::Node );
 
 			sx::core::PNodeMember pMember = sx::core::NodeMember::Create(nmt);
-			pMember->Load(copyStream);
 			pMember->SetOwner(node);
+			pMember->Load(copyStream);
 
 			float f = 0;
 			node->MsgProc(MT_ACTIVATE, &f);

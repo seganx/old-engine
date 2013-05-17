@@ -373,14 +373,14 @@ public:
 
 public:
 	String				m_Src;				//  Address of resource file
-	DWORD						m_ID;				//  I just feel that it will be useful for fast search :)
-	DWORD						m_Option;			//  I just feel that it will be useful :)
+	DWORD				m_ID;				//  I just feel that it will be useful for fast search :)
+	DWORD				m_Option;			//  I just feel that it will be useful :)
 
-	DWORD						m_Handle;			//	handle of the sound data in API
-	SoundDataDesc				m_Desc;				//	description of the sound file
+	DWORD				m_Handle;			//	handle of the sound data in API
+	SoundDataDesc		m_Desc;				//	description of the sound file
 	String				m_StreamFile;		//  name of stream file to delete on cleanup
 
-	int							m_RefCount;			//  number of references to objects
+	int					m_RefCount;			//  number of references to objects
 };
 
 

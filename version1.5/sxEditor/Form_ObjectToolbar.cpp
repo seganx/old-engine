@@ -214,14 +214,14 @@ void Form_ObjectToolbar::OnButtonClick( sx::gui::PControl Sender )
 			if ( EditorObject::selectedMember && (EditorObject::selectedNode->GetMemberCount() || EditorObject::selectedNode->GetChildCount()) )
 			{
 				//  just remove member
-				sx_delete( EditorObject::selectedMember );
+				sx_delete_and_null( EditorObject::selectedMember );
 			}
 			else if ( !EditorObject::selectedNode->HasProperty(SX_NODE_ABSOLUTE ) )
 			{
 				//  remove node
 				if ( EditorObject::selectedNode == EditorObject::node_Root )
 					EditorObject::node_Root = NULL;
-				sx_delete( EditorObject::selectedNode );
+				sx_delete_and_null( EditorObject::selectedNode );
 				EditorObject::selectedMember = NULL;
 			}
 		}

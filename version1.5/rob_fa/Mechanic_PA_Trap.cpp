@@ -38,7 +38,7 @@ namespace GM
 		, m_Cost(100)
 		, m_Time(0)
 		, m_coolTime(10)
-		, m_Index( powerAttack_count++ )
+		, m_index( powerAttack_count++ )
 		, m_node(0)
 		, m_pos(0,0,0)
 	{
@@ -135,7 +135,7 @@ namespace GM
 		else
 		{
 			sx::core::Scene::RemoveNode( m_node );
-			int key = SX_INPUT_KEY_1 + m_Index;
+			int key = SX_INPUT_KEY_1 + m_index;
 			if ( SEGAN_KEYDOWN(0, key) || SEGAN_KEYHOLD(0, key) )
 			{
 				OnGUIClick( m_progBar );
@@ -348,14 +348,14 @@ namespace GM
 				m_Time = m_coolTime;
 
 				float left, top = -11.0f;
-				switch ( m_Index )
+				switch ( m_index )
 				{
 				case 0:		left = -30.0f;	break;
 				case 1:		left = 27.0f;	break;
 				case 2:		left = 84.0f;	break;
 				case 3:		left = 140.0f;	break;
 				case 4:		left = 198.0f;	break;
-				default:	left = -30 + m_Index * 80.0f;
+				default:	left = -30 + m_index * 80.0f;
 				}
 				m_panelEx->State_GetByIndex(0).Position.Set( left, top, 0.0f );
 				m_panelEx->State_GetByIndex(1).Position.Set( left, top, 0.0f );
@@ -390,12 +390,20 @@ namespace GM
 	{
 		if ( !m_node ) return;
 
+		static float lasttime = 0;
+		const float  newtime = sx::sys::GetSysTime();
+		if ( newtime > lasttime && newtime - lasttime < 1000 ) return;
+		lasttime = newtime;
+
 		sx_callstack();
 
 		if ( m_Time >= m_coolTime && g_game->m_player->m_gold >= m_Cost )
 		{
 			g_game->m_mouseMode = MS_CreateTrap;
 			m_node->SetRotation( 0, sx::cmn::Random(6.12f), 0 );
+
+			msg_SoundPlay msg( false, 0, 0, L"powerAttack", m_index + 1 );
+			g_game->m_gui->m_main->m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 		}
 		else
 		{
@@ -453,10 +461,19 @@ namespace GM
 			sx::core::Scene::GetNodeByRay( msgray );
 			for ( int i=0; i<32; i++ )
 			{
+				if ( msgray.results[i].member )
+				{
+					str512 memberName = sx::core::PNodeMember(msgray.results[i].member)->GetName();
+					if ( memberName == L"cameraGuard" ) continue;
+				}
+
 				sx::core::Node* node = sx::core::PNode(msgray.results[i].node);
 				while ( node->GetParent() ) node = node->GetParent();
 				if ( node && !node->GetUserData() && !node->GetUserTag() )
 				{
+					str512 nodeName = node->GetName();
+					if ( nodeName == L"cameraGuard" ) continue;
+
 					cancelCreation = msgray.results[i].position.y < - 5.0f;
 					if ( cancelCreation ) return;
 

@@ -435,7 +435,7 @@ void Form_EditSound::ShowSoundInfo( bool applyToEditor )
 
 	applyChanges = false;
 
-	if ( sx::snd::SoundData::Manager::Get( m_soundData, m_sound->m_resources[index] ) )
+	if ( sx::snd::SoundData::Manager::Get( m_soundData, m_sound->m_resources[index]->Text() ) )
 	{
 		str1024 str = L"Type : ";
 		switch ( m_soundData->GetDesc()->type )
@@ -563,7 +563,7 @@ void Form_EditSound::ReloadList( void )
 	str1024 str;
 	for ( int i=0; i<m_sound->m_resources.Count(); i++ )
 	{
-		str.Format( L"%d : %s", i, m_sound->m_resources[i].Text() );
+		str.Format( L"%d : %s", i, m_sound->m_resources[i]->Text() );
 		m_sndList->Add( str, NULL, NULL );
 	}
 	m_sndList->SetItemIndex( m_sound->m_index );

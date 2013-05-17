@@ -198,14 +198,14 @@ namespace sx { namespace snd {
 	{
 		if ( m_Handle )
 		{
-
+			SetTimePosition(0.0f);
 #if SND_LOG_GET_STOP_CHANNEL
 		if ( BASS_ChannelStop( m_Handle ) == FALSE )
 			sxLog::Log( L"ERROR: The sound channel can't be stopped ! Handle : %u , Bass error code : %d", m_Handle, BASS_ErrorGetCode() );
 		else
 			sxLog::Log( L"INFO: Handle %u stopped successfully for %s", m_Handle, m_SoundData->GetSource() );
 #else
-		BASS_ChannelStop( m_Handle );
+			BASS_ChannelStop( m_Handle );
 #endif
 
 		}

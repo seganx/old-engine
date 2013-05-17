@@ -34,6 +34,7 @@ namespace GM
 		, m_back(0)
 		, m_nextWave(0)
 		, m_startProgr(0)
+		, m_musicNode(0)
 	{
 	}
 
@@ -110,6 +111,8 @@ namespace GM
 
 	void Mechanic_EnemyWaves::Update( float elpsTime )
 	{
+		UpdateMusic( elpsTime );
+
 		if ( m_wavesSrc.IsEmpty() || g_game->m_game_paused || !g_game->m_game_currentLevel || m_waveIndex >= m_wavesSrc.Count()+1 )
 		{
 			m_back->State_SetIndex(0);
@@ -367,7 +370,7 @@ namespace GM
 			EnemyWave* pWave = m_wavesSrc[ m_waveIndex ];
 
 			//  show tips of start wave
-			g_game->m_gui->ShowTips( pWave->tipsStart, 0xffffa947, pWave->tipsStartIcon );
+			g_game->m_gui->ShowTips( pWave->tipsStart, 0xffffbfa8, pWave->tipsStartIcon );
 
 			//  play particle/sound of start wave
 			if ( pWave->tipsStartNode[0] )
@@ -421,6 +424,19 @@ namespace GM
 
 	void Mechanic_EnemyWaves::ClearWaves( void )
 	{
+		//	clear the musics of waves
+		{
+			if ( m_musicNode )
+			{
+				msg_SoundStop msgsnd( false );
+				m_musicNode->MsgProc( MT_SOUND_STOP, &msgsnd );
+			}
+			m_musicNode = NULL;
+			m_musicCurrSound = NULL;
+			m_musicLastSound = NULL;
+			m_musicLastIndex = -1;
+		}
+
 		if ( Config::GetData()->display_Debug == 3 )
 		{
 			sxLog::Log( L"Clearing waves !" );
@@ -439,6 +455,25 @@ namespace GM
 	void Mechanic_EnemyWaves::LoadWaves( void )
 	{
 		//ClearWaves();
+
+		//	load the musics of waves
+		{
+			if ( m_musicNode )
+			{
+				msg_SoundStop msgsnd( false );
+				m_musicNode->MsgProc( MT_SOUND_STOP, &msgsnd );
+			}
+			sx::core::ArrayPNode nodes;
+			sx::core::Scene::GetNodesByName( L"music", nodes );
+			if ( nodes.Count() )
+				m_musicNode = nodes[0];
+			else
+				m_musicNode = NULL;
+
+			m_musicLastIndex = -1;
+			m_musicCurrSound = NULL;
+			m_musicLastSound = NULL;
+		}
 
 		if ( Config::GetData()->display_Debug == 3 )
 		{
@@ -711,6 +746,80 @@ namespace GM
 		m_label->SetText( str );
 
 		SetNextWaveImage();
+	}
+
+	void Mechanic_EnemyWaves::UpdateMusic( float elpsTime )
+	{
+		if ( m_wavesSrc.IsEmpty() || g_game->m_game_paused || !g_game->m_game_currentLevel || m_waveIndex >= m_wavesSrc.Count()+1 )
+		{
+			if ( m_musicNode )
+			{
+				msg_SoundStop msgsnd( true );
+				//m_musicNode->MsgProc( MT_SOUND_STOP, msgsnd );
+			}
+			return;
+		}
+
+		int musicIndex = -1;
+		if ( m_waveIndex == -1 )
+			musicIndex = 0;
+		else if ( m_waveIndex < 4 )
+			musicIndex = 1;
+		else
+			musicIndex = 2;
+		
+		if ( m_musicLastIndex != musicIndex )
+		{
+			// get the current music index
+			m_musicCurrSound = (sx::core::Sound*)m_musicNode->GetMemberByIndex( musicIndex );
+
+			// indicate the last music to make volume down
+			m_musicLastSound = (sx::core::Sound*)m_musicNode->GetMemberByIndex( m_musicLastIndex );
+			
+			m_musicLastIndex = musicIndex;
+		}
+
+		if ( m_musicCurrSound )
+		{
+			if ( m_musicCurrSound->GetStatus() != SS_PLAYING )
+			{
+				static int counter = 0;
+				if ( ( ++counter % 245 ) == 0 )
+				{
+					// update music index
+					int curindex = m_musicCurrSound->m_index + 1;
+					if ( curindex >= m_musicCurrSound->m_resources.Count() )
+						curindex = 0;
+
+					// play the music
+					msg_SoundPlay sndplay( false, 0, 0, 0, curindex );
+					m_musicCurrSound->MsgProc( MT_SOUND_PLAY, &sndplay );
+				}
+			}
+
+			SoundPlayerDesc desc = *m_musicCurrSound->GetDesc();
+			if ( desc.volume < 0.3f )
+			{
+				desc.volume += elpsTime * 0.0001f;
+				m_musicCurrSound->SetDesc( desc );
+			}
+		}
+
+		if ( m_musicLastSound )
+		{
+			SoundPlayerDesc desc = *m_musicLastSound->GetDesc();
+			desc.volume -= elpsTime * 0.0001f;
+			if ( desc.volume < 0 )
+			{
+				// stop the music
+				msg_SoundStop sndstop( false );
+				m_musicLastSound->MsgProc( MT_SOUND_STOP, &sndstop );
+				m_musicLastSound = NULL;
+			}
+			else m_musicLastSound->SetDesc( desc );
+
+		}
+
 	}
 
 

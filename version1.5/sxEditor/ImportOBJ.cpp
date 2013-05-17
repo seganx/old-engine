@@ -408,7 +408,7 @@ void ImportOBJFile( const WCHAR* FileName, OUT sx::core::ArrayPNode& nodeList, I
 	objNode obnode; obnode.pos.Set(0,0,0);
 	for (int lineIndex = 0; lineIndex<srcOBJ.Count(); lineIndex++)
 	{
-		toker.SetString( srcOBJ[lineIndex].Text() );
+		toker.SetString( srcOBJ[lineIndex]->Text() );
 		str1024 tmp;
 		do 
 		{

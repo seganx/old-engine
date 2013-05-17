@@ -490,7 +490,7 @@ void Game::Render( DWORD flag )
 
 	FogDesc fog;
 	sx::d3d::Device3D::GetFogDesc(fog);
-	sx::d3d::Device3D::Clear_Screen( (m_game_currentLevel==0 || flag) ? 0xff000000 : fog.Color );
+	sx::d3d::Device3D::Clear_Screen( (m_game_currentLevel==0 || flag || m_app_Loading ) ? 0xff000000 : fog.Color );
 
 	//  render the meshes in the scene
 	if ( !m_app_Loading )

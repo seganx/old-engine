@@ -221,6 +221,11 @@ namespace GM
 
 	void Mechanic_PA_Repair::OnGUIClick( sx::gui::PControl Sender )
 	{
+		static float lasttime = 0;
+		const float  newtime = sx::sys::GetSysTime();
+		if ( newtime > lasttime && newtime - lasttime < 1000 ) return;
+		lasttime = newtime;
+
 		sx_callstack();
 
 		if ( m_Time >= m_coolTime && g_game->m_player->m_gold >= m_Cost )
@@ -238,6 +243,9 @@ namespace GM
 					pen->MsgProc( GMT_DAMAGE, NULL );
 				}
 			}
+
+			msg_SoundPlay msg( false, 0, 0, L"powerAttack", m_index + 1 );
+			g_game->m_gui->m_main->m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 		}
 		else
 		{

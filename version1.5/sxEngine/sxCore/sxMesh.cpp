@@ -770,7 +770,8 @@ namespace sx { namespace core {
 		m_Box.Min.z *= z;
 		m_Sphere.radius *= sx_max_3f( x, y, z );
 
-		m_Owner->UpdateBoundingVolumes();
+		if ( m_Owner )
+			m_Owner->UpdateBoundingVolumes();
 	}
 
 

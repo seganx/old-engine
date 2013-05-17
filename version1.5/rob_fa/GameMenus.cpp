@@ -139,6 +139,24 @@ void MenuMain::Initialize( void )
 	pnl->Position().Set( 380.0f, 0.0f, 0.0f );
 	pnl->GetElement(0)->Color() = D3DColor( 0, 0, 0, 0 );
 
+	m_mainSparks = sx_new( sx::gui::PanelEx );
+	m_mainSparks->SetParent( m_mainBack );
+	m_mainSparks->SetSize( float2( 512.0f, 512.0f ) );
+	m_mainSparks->GetElement(0)->SetTextureSrc( L"gui_fireSparks.txr" );
+	m_mainSparks->State_GetByIndex(0).Blender.Set( 0.01f, 0.3f );
+	m_mainSparks->State_GetByIndex(0).Position.Set( 21.0f, 6.0f, 0.0f );
+	m_mainSparks->State_Add();
+	m_mainSparks->State_GetByIndex(0).Color.w = 0.0f;
+
+	WCHAR* shadercode = 
+		L"float2 alpha = tex2D( samp0, tex0 ).ba;"
+		L"float c1 = tex2D( samp0, float2( tex0.x + time * 0.03f, tex0.y ) ).r;"
+		L"float c2 = tex2D( samp0, float2( tex0.x - time * 0.02f, tex0.y ) ).g;"
+		L"float4 c = ( c1 + ( 1.0f - alpha.y ) * c1 * 0.4f ) * alpha.x + c2 * alpha.y * ( 1.0f - c1 );"
+		L"return c * color;";
+	m_mainSparks->Shader_Set( shadercode );
+	m_mainSparks->Shader_Compile();
+
 	m_slantBack = sx_new( sx::gui::PanelEx );
 	m_slantBack->SetParent( m_back );
 	m_slantBack->SetSize( float2( 1024, 1024) );
@@ -263,8 +281,8 @@ void MenuMain::Update( float elpsTime )
 				m_btn[i]->GetChild(0)->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 
 			sx::gui::PPanel( m_mainBack->GetChild(0) )->GetElement(0)->Color().a = 1;
+			m_mainSparks->State_SetIndex(1);
 		}
-		
 	}
 	else
 	{
@@ -272,6 +290,7 @@ void MenuMain::Update( float elpsTime )
 		m_slantBack->State_SetIndex(0);
 		for ( int i=0; i<5; i++ )
 			m_btn[i]->State_SetIndex(0);
+		m_mainSparks->State_SetIndex(0);
 	}
 
 	Menu::Update( elpsTime );
@@ -351,6 +370,7 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 
 			m_mainBack->State_SetIndex(0);
 			g_game->m_gui->m_credits->Show();
+			g_game->m_gui->m_status->Hide();
 		}
 		break;
 	}
@@ -822,6 +842,18 @@ void MenuMap::OnClick( sx::gui::PControl sender )
 	{
 	case 0:	case 1:	case 2:	case 3:	case 4:	case 5:	case 6:	case 7:	case 8:	case 9:
 		{
+			static float clicktime = 0.0f;
+			float nextclicktime = sx::sys::GetSysTime();
+			if ( ( nextclicktime - clicktime ) < 500.0f && m_selectedLevel == ( sender->GetUserTag() + 1 ) )
+			{
+				g_game->m_miniGame = false;
+				g_game->m_game_nextLevel = m_selectedLevel;
+
+				Hide();
+				g_game->m_gui->m_main->Hide();
+			}
+			clicktime = nextclicktime;
+
 			m_levels[ m_selectedLevel-1 ].m_area->State_SetIndex(0);
 
 			g_game->m_player->m_profile.level_selected = m_selectedLevel = sender->GetUserTag() + 1;
@@ -1794,7 +1826,7 @@ void MenuCredits::Initialize( void )
 	sx::gui::Button * m_goback = sx_new( sx::gui::Button );
 	m_goback->SetParent( m_back );
 	m_goback->SetSize( float2( 128, 32 ) );
-	m_goback->Position().Set( 300.0f, -255.0f, 0.0f );
+	m_goback->Position().Set( -360.0f, -255.0f, 0.0f );
 	m_goback->GetElement(0)->SetTextureSrc( L"gui_menu_back.txr" );
 	m_goback->GetElement(0)->Color().a = 0.5f;
 	m_goback->GetElement(1)->SetTextureSrc( L"gui_menu_back.txr" );

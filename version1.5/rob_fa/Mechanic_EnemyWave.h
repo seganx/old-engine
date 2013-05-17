@@ -104,6 +104,9 @@ namespace GM
 		//! load waves
 		void LoadWaves(void);
 
+		//! update music
+		void UpdateMusic( float elpsTime );
+
 	private:
 		void SetNextWaveImage(void);
 		void StartWave(void);
@@ -118,6 +121,11 @@ namespace GM
 		sx::gui::PLabel			m_label;			//	label to show number of waves
 		sx::gui::PPanelEx		m_nextWave;			//	gui to show next wave info
 		sx::gui::PProgressBar	m_startProgr;		//	progress bar to show the time
+	
+		sx::core::Node*			m_musicNode;			//	music node of the waves
+		sx::core::Sound*		m_musicCurrSound;		//	current sound object
+		sx::core::Sound*		m_musicLastSound;		//	last sound object
+		int						m_musicLastIndex;		//	last music index
 	};
 
 

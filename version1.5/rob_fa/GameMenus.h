@@ -50,6 +50,7 @@ public:
 
 public:
 	sx::gui::PanelEx*		m_mainBack;
+	sx::gui::PanelEx*		m_mainSparks;
 	sx::gui::PanelEx*		m_slantBack;
 	sx::gui::PanelEx*		m_btn[5];
 	float					m_time;
