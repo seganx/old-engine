@@ -368,6 +368,7 @@ void Game::LoadLevel( void )
 	//  finish loading
 	m_app_Loading = 1;
 
+	PostMessage(0, GMT_LEVEL_LOADED, NULL);
 }
 
 void Game::ClearLevel( void )

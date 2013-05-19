@@ -411,19 +411,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Mechanic_Cinematic.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Mechanic_Cinematic.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Mechanic_EnemyWave.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Mechanic_EnemyWave.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Mechanic_Music.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Mechanic_Music.h"
 				>
 			</File>
 			<File

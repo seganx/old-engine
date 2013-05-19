@@ -320,7 +320,7 @@ public:
 	void Hide(void);
 	void OnClick(sx::gui::PControl sender);
 
-	void AddTutorial(const WCHAR* title, const WCHAR* desc, const WCHAR* image, bool showNow = false, bool settoCurrent = true);
+	void AddTutorial(const WCHAR* title, const WCHAR* desc, const WCHAR* image, int showNow = 0, bool settoCurrent = true);
 	void ClearTutorial(void);
 
 public:

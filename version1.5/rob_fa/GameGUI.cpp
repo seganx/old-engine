@@ -739,6 +739,7 @@ void GameGUI::MsgProc( UINT recieverID, UINT msg, void* data )
 	m_credits->MsgProc( recieverID, msg, data );
 	m_profile->MsgProc( recieverID, msg, data );
 	m_info->MsgProc( recieverID, msg, data );
+	m_upgradePanel->MsgProc( recieverID, msg, data );
 }
 
 void GameGUI::ShowTips( const WCHAR* tipText, const DWORD tipColor /*= 0xffffffff*/, const WCHAR* tipIcon /*= NULL*/ )

@@ -2,8 +2,7 @@
 #include "GameTypes.h"
 #include "Game.h"
 #include "GameConfig.h"
-
-
+#include "Mechanic_Cinematic.h"
 
 #define NET_ACTIVATE	0
 #define NET_DELAY_TIME	60
@@ -18,107 +17,6 @@ Client* client = null;
 static sx::sys::Window		s_window;			//	main application window
 //////////////////////////////////////////////////////////////////////////
 
-class FirstPresents
-{
-public:
-	FirstPresents( void ): m_index(0), m_time(0), m_maxtime(5000.0f)
-	{
-	
-	}
-
-	~FirstPresents()
-	{
-		for ( int i=0; i<m_list.Count(); i++ )
-		{
-			sx::gui::Destroy( m_list[i] );
-		}
-	}
-
-	void AddPresents( const WCHAR* texture, const float size )
-	{
-		sx::gui::Panel* panel = (sx::gui::Panel*)sx::gui::Create( GUI_PANEL );
-		panel->SetSize( float2( size, size ) );
-		panel->GetElement(0)->SetTextureSrc( texture );
-		panel->GetElement(0)->Color().a = 0.0f;
-
-		m_list.PushBack( panel );
-	}
-
-	void Update( float elpstime )
-	{
-		if ( m_index > m_list.Count() ) return;
-
-		sx::io::Input::Update( elpstime );
-		if (SEGAN_KEYUP(0, SX_INPUT_KEY_SPACE) || 
-			SEGAN_KEYUP(0, SX_INPUT_KEY_ESCAPE) || 
-			SEGAN_KEYUP(0, SX_INPUT_KEY_RETURN) || 
-			SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_LEFT) || 
-			SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_RIGHT) )
-		{
-			m_index = m_list.Count() + 1;
-			return;
-		}
-
-		m_time += elpstime;
-		if ( m_time > m_maxtime )
-		{
-			m_time = 0;
-			m_index++;
-		}
-
-		for ( int i=0; i<m_list.Count(); i++ )
-		{
-			sx::gui::Control* pc = m_list[i];
-
-			if ( m_index == i )
-			{
-				if ( m_time > 1000 )
-				{
-					pc->GetElement(0)->Color().a += elpstime * 0.001f;
-					if ( pc->GetElement(0)->Color().a > 1.0f )
-						pc->GetElement(0)->Color().a = 1.0f;
-				}
-			}
-			else
-			{
-				pc->GetElement(0)->Color().a -= elpstime * 0.001f;
-				if ( pc->GetElement(0)->Color().a < 0.0f )
-					pc->GetElement(0)->Color().a = 0.0f;
-			}
-
-			pc->Update( elpstime );
-		}
-	}
-
-	void Draw( void )
-	{
-		if ( !sx::core::Renderer::CanRender() ) return;
-		sx::core::Renderer::Begin();
-
-		sx::d3d::UI3D::ReadyToDebug( D3DColor(0,0,0,0) );
-		sx::d3d::Device3D::Clear_Target(0);
-		sx::d3d::Device3D::RS_Alpha( SX_MATERIAL_ALPHABLEND );
-
-		for ( int i=0; i<m_list.Count(); i++ )
-		{
-			m_list[i]->Draw(0);
-		}
-
-		sx::core::Renderer::End();
-	}
-
-	bool Presenting( void )
-	{
-		return ( m_index <= m_list.Count() && m_time < m_maxtime );
-	}
-
-
-public:
-	Array<sx::gui::Control*>	m_list;
-	int							m_index;
-	float						m_time;
-	float						m_maxtime;
-};
 
 void clientCallback( Client* client, const byte* buffer, const uint size )
 {

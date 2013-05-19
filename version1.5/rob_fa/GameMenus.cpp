@@ -705,10 +705,10 @@ void MenuMap::Update( float elpsTime )
 {
 	if ( g_game->m_game_currentLevel == 0 )
 	{
-		static float rotatez = 0;
+		static float rotatez = 0.0f;
 		rotatez += elpsTime * 0.002f;
-		m_chooser->Scale().x = 1 + 0.05f * sin( rotatez );
-		m_chooser->Scale().y = 1 + 0.05f * sin( rotatez );
+		m_chooser->Scale().x = 1.0f + 0.07f * sin( rotatez );
+		m_chooser->Scale().y = 1.0f + 0.07f * sin( rotatez );
 
 		m_levels[ m_selectedLevel-1 ].m_area->State_SetIndex(1);
 
@@ -768,6 +768,19 @@ void MenuMap::Update( float elpsTime )
 		m_diff_scroll->GetElement(1)->Matrix().GetTranslation(x, y, z);
 		sx::gui::Panel* panel = (sx::gui::PPanel)m_diff_scroll->GetChild(0);
 		panel->Position().Set( x, y, z );
+
+		panel = (sx::gui::PPanel)m_diff_scroll->GetChild(1);
+		if ( g_game->m_player->m_profile.curDifficulty == 2 )
+			panel->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
+		else
+			panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+
+		panel = (sx::gui::PPanel)m_diff_scroll->GetChild(2);
+		if ( g_game->m_player->m_profile.curDifficulty == 0 )
+			panel->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
+		else
+			panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+
 	}
 
 	Menu::Update(elpsTime);
@@ -3063,11 +3076,11 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 
 						if ( g_game->m_player->m_profile.level_played < g_game->m_game_currentLevel )
 						{
-							AddTutorial( title, desc, image, true, showNow > 0 );
+							AddTutorial( title, desc, image, showNow , ( showNow > 0 ) );
 						}
 						else
 						{
-							AddTutorial( title, desc, image, false, showNow > 0 );
+							AddTutorial( title, desc, image, g_game->m_miniGame, showNow > 0 );
 						}
 					}
 				}
@@ -3210,7 +3223,7 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 }
 
 
-void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* image, bool showNow /*= false*/, bool settoCurrent /*= true*/ )
+void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* image, int showNow /*= 0*/, bool settoCurrent /*= true*/ )
 {
 	if ( !title || !desc || !image ) return;
 	if ( !title[0] || !desc[0] || !image[0] ) return;
@@ -3281,52 +3294,22 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 		m_indicator->SetText( tmp );
 	}
 
-	if ( showNow )
+	if ( showNow == 1 )
 	{
-		m_delayTime = 500;
+		m_delayTime = 1500;
 		m_time = 0;
 	}
-	else m_time = 60000;
-
-	if ( m_delayTime <= 0 )
+	else
 	{
-		msg_SoundPlay msg( false, 0, 0, L"info" );
-		m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+		m_delayTime = 0;
+		m_time = 60000;
 	}
 
 	if ( settoCurrent )
 	{
-// 		uint cc = 0;
-// 		GUITextLine tmp;
-// 		tmp.text = tutor->desc;
-// 		WCHAR* c = tmp.text.Text();
-// 
-// 		while ( c )
-// 		{
-// 		}
-// 
-// 		int cc = 0;
-// 		for (int i=0; i<text.Length(); i++)
-// 		{
-// 			if ( IsColorCode( &text[i] ) )
-// 			{
-// 				i += 10;
-// 			}
-// 
-// 			PGUIFontChar fch = NULL;
-// 			WCHAR ch = text[i];
-// 			if ( ch==' ' || ch=='\t' || ch=='\n' || !textFont->GetChar(ch, fch) )
-// 				continue;
-// 			cc++;
-// 		}
-// 
-// 		if ( tmp.GetNumCharToBuffer( m_helper.desc->m_Font ) > 70.0f )
-// 		{
-// 			
-// 		}
 		m_helper.title->SetText( title );
 		m_helper.desc->SetText( tutor->desc );
- 		m_helper.showTime = 7000.0f;
+		m_helper.showTime = ( showNow != 2 ) ? 7000.0f : 0.0f;
 	}
 }
 
@@ -3482,7 +3465,17 @@ void MenuUpgrade::ProcessInput( bool& inputHandled, float elpsTime )
 
 void MenuUpgrade::MsgProc( UINT recieverID, UINT msg, void* data )
 {
-
+	switch (msg)
+	{
+	case GMT_LEVEL_LOADED:		/////////////////////////////////////////////////    LOAD LEVEL
+		{	
+			g_game->m_gui->m_upgradePanel->SetData( 
+				g_game->m_game_currentLevel + 1,
+				g_game->m_player->m_profile.GetNumStars(),
+				g_game->m_player->m_profile.upgrades
+				);
+		}
+	}
 }
 
 void MenuUpgrade::Update( float elpsTime )

@@ -92,6 +92,7 @@ enum GameMessageType
 {
 	GMT_BLANK = 0,			//  no message
 	GMT_LEVEL_LOAD,			//	say to all objects that level is loading
+	GMT_LEVEL_LOADED,		//	say to all objects that level has been loaded
 	GMT_LEVEL_CLEAR,		//	say to all objects that level is clearing
 	GMT_GAME_START,			//  say to all objects that game is starting
 	GMT_GAME_END,			//  say to all objects that game is ending
