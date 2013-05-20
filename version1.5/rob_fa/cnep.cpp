@@ -220,10 +220,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	//	show presents
 #if 1
 	{
-		float present_size = (float)sx_min_i( Config::GetData()->display_Size.x, Config::GetData()->display_Size.y );
 		FirstPresents *presents = sx_new( FirstPresents );
+		presents->AddPresents( L"gui_parseh.txr", 512 );
 		presents->AddPresents( L"gui_esra.txr", 1024 );
-		presents->AddPresents( L"gui_mainBack.txr", 1024 );
 
 		float initTime = sx::sys::GetSysTime();
 		float elpsTime = 0;

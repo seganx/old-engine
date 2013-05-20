@@ -1315,6 +1315,7 @@ void MenuProfile::OnClick( sx::gui::PControl sender )
 	}
 
 	SyncProfileAndPlayer( true );
+	g_game->m_player->SyncPlayerAndGame( true );
 
 	msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 	m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
@@ -3037,6 +3038,7 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 	case GMT_GAME_RESET:
 	case GMT_GAME_START:
 		{
+			m_delayTime = 0;
 			m_helper.showTime = 0;
 
 			//	reset button of information
@@ -3296,12 +3298,12 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 
 	if ( showNow == 1 )
 	{
-		m_delayTime = 1500;
+		m_delayTime = 1000;
 		m_time = 0;
 	}
 	else
 	{
-		m_delayTime = 0;
+		//m_delayTime = 0;
 		m_time = 60000;
 	}
 

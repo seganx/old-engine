@@ -271,7 +271,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			}
 
 			tryToConnect++;
-			sx_os_sleep(2);
+			sx_os_sleep(50);
 		}
 	}
 #endif
