@@ -822,7 +822,7 @@ void MenuMap::Hide( void )
 	if ( IsVisible() )
 	{
 		//	get updates
-		g_game->m_gui->m_upgradePanel->GetData( g_game->m_player->m_profile.upgrades );
+//		g_game->m_gui->m_upgradePanel->GetData( g_game->m_player->m_profile.upgrades );
 
 		//	apply player to profile
 		g_game->m_gui->m_profile->SyncProfileAndPlayer( false );
@@ -1381,9 +1381,7 @@ void MenuProfile::SyncProfileAndPlayer( bool profileToPlayer )
 
 	for ( int i=0; i<4; i++ )
 	{
-		int totalStars = 0;
-		for ( int j=0; j<10; j++ )
-			totalStars += m_profiles[i].stars[j];
+		int totalStars = m_profiles[i].GetNumStars();
 
 		sx::gui::PLabel( m_profPanel[i]->GetChild(0) )->SetText( m_profiles[i].name );
 
@@ -2293,7 +2291,6 @@ void MenuVictory::Initialize( void )
 	m_shakeTime = 0;
 	m_starTime = 0;
 	m_goldTime = 0;
-	m_setDataToUpgrade = 0;
 	Menu::Initialize();
 
 	m_back->SetSize( float2( 1024, 1024 ) );
@@ -2605,8 +2602,6 @@ void MenuVictory::Show( void )
 
 	m_time = 800;
 	Menu::Show();
-
-	m_setDataToUpgrade = true;
 }
 
 void MenuVictory::Hide( void )
@@ -2708,11 +2703,7 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 					stars += g_game->m_player->m_profile.stars[i];
 			}
 
-			if ( m_setDataToUpgrade )
-			{
-				g_game->m_gui->m_upgradePanel->SetData( g_game->m_game_currentLevel+1, stars, g_game->m_player->m_profile.upgrades );
-				m_setDataToUpgrade = false;
-			}
+			g_game->m_gui->m_upgradePanel->SetData( g_game->m_game_currentLevel+1, stars, g_game->m_player->m_profile.upgrades );
 			g_game->m_gui->m_upgradePanel->Show();
 
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );

@@ -53,6 +53,8 @@ namespace sx { namespace snd {
 
 		void Stop(void);
 
+		void Fadeout( float fadetime );
+
 	public:
 
 		float3			m_Position;		//  position of the sound

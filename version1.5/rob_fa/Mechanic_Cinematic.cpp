@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////
 //	implementation of presenter
 //////////////////////////////////////////////////////////////////////////
-FirstPresents::FirstPresents( void ) : m_index(0), m_time(0), m_maxtime(5000.0f)
+FirstPresents::FirstPresents( void ) : m_index(0), m_time(0), m_maxtime(5000.0f), m_soundNode(0), m_soundVolume(0)
 {
 
 }
@@ -37,7 +37,45 @@ void FirstPresents::AddPresents( const WCHAR* texture, const float size )
 
 void FirstPresents::Update( float elpstime )
 {
-	if ( m_index > m_list.Count() ) return;
+	Sleep(10);
+
+	if ( m_index < -5 )
+	{
+		if ( m_index == -10 )
+		{
+			m_time = 0;
+			m_index = -9;
+		}
+		m_time += elpstime;
+
+		for ( int i=0; i<m_list.Count(); i++ )
+		{
+			sx::gui::Control* pc = m_list[i];
+			pc->GetElement(0)->Color().a -= elpstime * 0.001f;
+			if ( pc->GetElement(0)->Color().a < 0.0f )
+				pc->GetElement(0)->Color().a = 0.0f;
+
+			pc->Update( elpstime );
+		}
+
+		if ( m_soundNode )
+		{
+			m_soundVolume -= elpstime * 0.001f;
+			msg_SoundPlay sndplayfade( false, 0, 0, L"intro", 0, m_soundVolume );
+			m_soundNode->MsgProc( MT_SOUND_PLAY, &sndplayfade );
+		}
+
+		if ( m_time > 1000 )
+			m_index = m_list.Count() + 1;
+
+		return;
+	}
+
+	if ( m_index > m_list.Count() )
+	{
+		m_index = -10;
+		return;
+	}
 
 	sx::io::Input::Update( elpstime );
 	if (SEGAN_KEYUP(0, SX_INPUT_KEY_SPACE) || 
@@ -46,7 +84,7 @@ void FirstPresents::Update( float elpstime )
 		SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_LEFT) || 
 		SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_RIGHT) )
 	{
-		m_index = m_list.Count() + 1;
+		m_index = -10;
 		return;
 	}
 
@@ -77,6 +115,10 @@ void FirstPresents::Update( float elpstime )
 				if ( pc->GetElement(0)->Color().a > 1.0f )
 					pc->GetElement(0)->Color().a = 1.0f;
 			}
+		}
+		else if ( m_index == m_list.Count() - 1 && m_time > ( m_maxtime - 1000) )
+		{
+			m_index = -10;
 		}
 		else
 		{
@@ -152,14 +194,16 @@ namespace GM
 
 				if ( g_game->m_game_currentLevel == 1 && g_game->m_player->m_profile.level_played < 1 )
 				{
+					msg_SoundPlay sndplay( true, 0, 0, L"intro", 0 );
+					m_soundNode->MsgProc( MT_SOUND_PLAY, &sndplay );
+
 					FirstPresents *presents = sx_new( FirstPresents );
-					presents->m_maxtime = 10000.0f;
 					presents->AddPresents( L"gui_intro_level1_0.txr", SEGAN_VP_WIDTH );
 					presents->AddPresents( L"gui_intro_level1_1.txr", SEGAN_VP_WIDTH );
 					presents->AddPresents( L"gui_intro_level1_2.txr", SEGAN_VP_WIDTH );
-
-					msg_SoundPlay sndplay( true, 0, 0, L"intro", 0 );
-					m_soundNode->MsgProc( MT_SOUND_PLAY, &sndplay );
+					presents->m_maxtime = 10000.0f;
+					presents->m_soundNode = m_soundNode;
+					presents->m_soundVolume = sndplay.volume;
 
 					float initTime = sx::sys::GetSysTime();
 					float elpsTime = 0;
@@ -196,13 +240,15 @@ namespace GM
 			{						//////////////////////////////////////////////////////////////////////////
 				if ( g_game->m_game_currentLevel == 10 )
 				{
-					FirstPresents *presents = sx_new( FirstPresents );
-					presents->m_maxtime = 10000.0f;
-					presents->AddPresents( L"gui_intro_level10_0.txr", SEGAN_VP_WIDTH );
-					presents->AddPresents( L"gui_intro_level10_1.txr", SEGAN_VP_WIDTH );
-
 					msg_SoundPlay sndplay( true, 0, 0, L"intro", 0 );
 					m_soundNode->MsgProc( MT_SOUND_PLAY, &sndplay );
+
+					FirstPresents *presents = sx_new( FirstPresents );
+					presents->AddPresents( L"gui_intro_level10_0.txr", SEGAN_VP_WIDTH );
+					presents->AddPresents( L"gui_intro_level10_1.txr", SEGAN_VP_WIDTH );
+					presents->m_maxtime = 10000.0f;
+					presents->m_soundNode = m_soundNode;
+					presents->m_soundVolume = sndplay.volume;
 
 					float initTime = sx::sys::GetSysTime();
 					float elpsTime = 0;

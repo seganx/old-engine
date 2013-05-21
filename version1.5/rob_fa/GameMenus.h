@@ -287,8 +287,6 @@ public:
 		float				age;
 	};
 	Array<APL*> m_apl;
-
-	bool				m_setDataToUpgrade;
 };
 
 class MenuGameOver: public Menu

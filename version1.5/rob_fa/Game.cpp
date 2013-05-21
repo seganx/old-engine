@@ -60,6 +60,8 @@ void Draw_Loading( int count, int index, const WCHAR* state, const WCHAR* name )
 		game->Update( 16 );
 
 	game->Render( 1 );
+
+	Sleep(5);
 }
 
 Game::Game( void )
@@ -275,6 +277,7 @@ void Game::LoadLevel( void )
 	m_panel_Loading->GetElement(0)->SetTextureSrc( str );
 
 	//  load the scene
+	Sleep(5);
 	str = GetLevelPath();
 	str << L"scene.scene";
 	sx::sys::FileStream file;

@@ -260,19 +260,20 @@ struct msg_SoundPlay
 	int				addFreq;		//  additional frequency to play a sound with different style
 	bool			restart;		//  play sound from beginning
 	int				index;			//	index of sound to play. pass -1 to leave it to current
+	float			volume;			//	sound volume to play. pass < 0 to leave it to current
 
-	msg_SoundPlay(bool _restart, int _addFreq=0, DWORD _option=0, const WCHAR* _name=0, const int _index = -1)
-		: restart(_restart), addFreq(_addFreq), option(_option), name(_name), index(_index) {}
+	msg_SoundPlay(bool _restart, int _addFreq=0, DWORD _option=0, const WCHAR* _name=0, const int _index = -1, const float _volume = -1 )
+		: restart(_restart), addFreq(_addFreq), option(_option), name(_name), index(_index), volume(_volume) {}
 };
 
 struct msg_SoundStop
 {
 	const WCHAR*	name;		//  use sound name to stop/pause special sound member in the node
 	DWORD			option;		//	use sound option to stop/pause special sound member in the node which has this option
+	float			fadeout;	//	the time of fade out effect. pass < 0 to ignore fade
 	bool			pause;		//  just pause the sound and do not stop it
-
-	msg_SoundStop(bool _pause, DWORD _option=0, const WCHAR* _name=0)
-		: pause(_pause), option(_option), name(_name) {}
+	msg_SoundStop(bool _pause, DWORD _option=0, const WCHAR* _name=0, const float fade = -1 )
+		: pause(_pause), option(_option), name(_name), fadeout(fade) {}
 };
 
 struct msg_Mesh

@@ -29,6 +29,8 @@ public:
 	int							m_index;
 	float						m_time;
 	float						m_maxtime;
+	sx::core::Node*				m_soundNode;
+	float						m_soundVolume;
 };
 
 

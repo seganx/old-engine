@@ -339,6 +339,13 @@ namespace sx { namespace core {
 					if ( msgSound->option && !HasOption( msgSound->option ) ) return msgType;
 					if ( msgSound->name && m_Name != msgSound->name )	return msgType;
 
+					if ( msgSound->volume >= 0 )
+					{
+						m_desc.volume = msgSound->volume;
+						CommitDesc();
+					}
+					else msgSound->volume = m_desc.volume;
+
 					if ( msgSound->index > -1 )
 					{
 						if ( msgSound->index < m_resources.Count() )
@@ -365,10 +372,20 @@ namespace sx { namespace core {
 					if ( msgSound->option && !HasOption( msgSound->option ) ) return msgType;
 					if ( msgSound->name && m_Name != msgSound->name )	return msgType;
 
-					if ( msgSound->pause )
-						Pause();
+					if ( msgSound->fadeout > 0 )
+					{
+						if ( m_player )
+							m_player->Fadeout( msgSound->fadeout );
+
+					}
 					else
-						Stop();
+					{
+						if ( msgSound->pause )
+							Pause();
+						else
+							Stop();
+					}
+
 				}
 				else Stop();
 			}

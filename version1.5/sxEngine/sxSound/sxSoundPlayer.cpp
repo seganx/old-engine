@@ -213,4 +213,9 @@ namespace sx { namespace snd {
 		m_Handle = 0;
 	}
 
+	void SoundPlayer::Fadeout( float fadetime )
+	{
+		BASS_ChannelSlideAttribute( m_Handle, BASS_ATTRIB_VOL, 0, int( fadetime * 1000 ) );
+	}
+
 } }	//	namespace sx { namespace snd {
