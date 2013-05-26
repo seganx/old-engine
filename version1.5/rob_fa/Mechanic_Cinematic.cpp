@@ -37,7 +37,27 @@ void FirstPresents::AddPresents( const WCHAR* texture, const float size )
 
 void FirstPresents::Update( float elpstime )
 {
-	Sleep(10);
+	{
+		MSG msg;
+		if ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+		{
+			TranslateMessage( &msg );
+			DispatchMessage( &msg );
+		}
+	}
+
+	if ( m_index > m_list.Count() ) return;
+
+	sx::io::Input::Update( elpstime );
+	if (SEGAN_KEYUP(0, SX_INPUT_KEY_SPACE) || 
+		SEGAN_KEYUP(0, SX_INPUT_KEY_ESCAPE) || 
+		SEGAN_KEYUP(0, SX_INPUT_KEY_RETURN) || 
+		SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_LEFT) || 
+		SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_RIGHT) )
+	{
+		m_index = -10;
+		return;
+	}
 
 	if ( m_index < -5 )
 	{
@@ -71,23 +91,6 @@ void FirstPresents::Update( float elpstime )
 		return;
 	}
 
-	if ( m_index > m_list.Count() )
-	{
-		m_index = -10;
-		return;
-	}
-
-	sx::io::Input::Update( elpstime );
-	if (SEGAN_KEYUP(0, SX_INPUT_KEY_SPACE) || 
-		SEGAN_KEYUP(0, SX_INPUT_KEY_ESCAPE) || 
-		SEGAN_KEYUP(0, SX_INPUT_KEY_RETURN) || 
-		SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_LEFT) || 
-		SEGAN_KEYUP(0, SX_INPUT_KEY_MOUSE_RIGHT) )
-	{
-		m_index = -10;
-		return;
-	}
-
 	m_time += elpstime;
 	if ( m_time > m_maxtime )
 	{
@@ -95,12 +98,10 @@ void FirstPresents::Update( float elpstime )
 		++m_index;
 	}
 
-	if ( m_index == m_list.Count() )
+	if ( m_index == ( m_list.Count() - 1 ) )
 	{
-		if ( m_time > 2000.0f )
-		{
-			++m_index;
-		}
+		if ( m_time > ( m_maxtime - 1000.0f ) )
+			m_index = -10;
 	}
 
 	for ( int i=0; i<m_list.Count(); i++ )
@@ -115,11 +116,7 @@ void FirstPresents::Update( float elpstime )
 				if ( pc->GetElement(0)->Color().a > 1.0f )
 					pc->GetElement(0)->Color().a = 1.0f;
 			}
-		}
-		else if ( m_index == m_list.Count() - 1 && m_time > ( m_maxtime - 1000) )
-		{
-			m_index = -10;
-		}
+ 		}
 		else
 		{
 			pc->GetElement(0)->Color().a -= elpstime * 0.001f;
@@ -129,6 +126,8 @@ void FirstPresents::Update( float elpstime )
 
 		pc->Update( elpstime );
 	}
+
+
 }
 
 void FirstPresents::Draw( void )
