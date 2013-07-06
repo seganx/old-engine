@@ -11,6 +11,7 @@
 
 #include "ImportEngine.h"
 #include "GameTypes.h"
+#include "gameup_import.h"
 
 #define GAME_TITLE	L"Roads of Battle ver 0.1"
 
@@ -69,8 +70,8 @@ public:
 	Achievement				m_achievements[15];			// achievements
 	MouseState				m_mouseMode;				// state mode of mouse
 
-	float					m_difficultyValue;				//	difficulty value
-	int						m_difficultyLevel;			//	difficulty level
+	float					m_difficultyValue;			//	difficulty value
+	int						m_difficultyLevel;			//	difficulty level 0 = norm , 1 = hard , 2 = insane
 	int						m_game_currentLevel;		//  index of current level. 0 = GUI mode
 	int						m_game_nextLevel;			//  index of current level. 0 = GUI mode
 	bool					m_game_paused;				//  game paused
@@ -86,5 +87,8 @@ public:
 
 //	global game pointer
 extern Game* g_game;
+extern GameUp* g_gameup;
+
+void gameup_add_score( const uint reason );
 
 #endif	//	GUARD_Game_HEADER_FILE

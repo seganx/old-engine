@@ -26,6 +26,15 @@ void Draw_Loading( int count, int index, const WCHAR* state, const WCHAR* name )
 {
 	using namespace sx::gui;
 
+	{
+		MSG msg;
+		if ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+		{
+			TranslateMessage( &msg );
+			DispatchMessage( &msg );
+		}
+	}
+
 	Game* game = g_game;
 
 	PPanel panel = (PPanel)game->m_panel_Loading->GetChild(0);
@@ -656,8 +665,11 @@ void Game::PostMessage( UINT RecieverID, UINT msg, void* data )
 			{
 				g_game->m_upgrades.LoadDefaults();
 			}
+
 		}
-		break;
+	case GMT_GAME_START:
+			g_gameup->begin_score();
+			break;
 	}
 
 
@@ -679,6 +691,16 @@ void textcopy( WCHAR* dest, const WCHAR* src )
 		*dest = *c;
 		c++;
 		dest++;
+	}
+}
+
+void gameup_add_score( const uint reason )
+{
+	switch ( g_game->m_difficultyLevel )
+	{
+	case 0: g_gameup->add_score( reason, GAME_SCORE_EASY ); break;
+	case 1: g_gameup->add_score( reason, GAME_SCORE_NORM ); break;
+	case 2: g_gameup->add_score( reason, GAME_SCORE_HARD ); break;
 	}
 }
 
@@ -715,6 +737,8 @@ void Achievement::AddValue( int val /*= 1 */ )
 
 	msg_SoundPlay msg( true, 0, 0, L"achievement" );
 	g_game->m_gui->m_main->m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+
+	gameup_add_score( GAME_SCORE_ACHIV );
 }
 
 

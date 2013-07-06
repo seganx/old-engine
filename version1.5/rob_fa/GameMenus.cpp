@@ -1193,6 +1193,24 @@ void MenuProfile::Initialize( void )
 	}
 	else m_profIndex = -1;
 
+	//	looking for GameUp data
+	{
+		//	verify that user has been logged in
+		if ( g_gameup->get_info(0) >= 0 )
+		{
+			//	read data from GameUp
+			for ( uint i=0; i<15; ++i )
+			{
+				int val = g_gameup->get_data_i( i );
+				if ( m_profiles[0].achievements[i] < val ) m_profiles[0].achievements[i] = val;
+				if ( m_profiles[1].achievements[i] < val ) m_profiles[1].achievements[i] = val;
+				if ( m_profiles[2].achievements[i] < val ) m_profiles[2].achievements[i] = val;
+				if ( m_profiles[3].achievements[i] < val ) m_profiles[3].achievements[i] = val;
+			}
+		}
+	}
+
+
 	SyncProfileAndPlayer( true );
 }
 
@@ -1263,6 +1281,8 @@ void MenuProfile::Hide( void )
 
 void MenuProfile::OnClick( sx::gui::PControl sender )
 {
+	SyncAchievements();
+
 	if ( sender == m_goback )
 	{
 		Hide();
@@ -1363,10 +1383,37 @@ void MenuProfile::OnKey( sx::gui::PControl sender )
 	m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 }
 
+void MenuProfile::SyncAchievements( void )
+{
+	//	make achievement accessible for all profiles
+	int achievements[15];
+	memcpy( achievements, m_profiles[m_profIndex].achievements, sizeof(achievements) );
+	memcpy( m_profiles[0].achievements, achievements, sizeof(achievements) );
+	memcpy( m_profiles[1].achievements, achievements, sizeof(achievements) );
+	memcpy( m_profiles[2].achievements, achievements, sizeof(achievements) );
+	memcpy( m_profiles[3].achievements, achievements, sizeof(achievements) );
+
+	//	verify that user has been logged in
+	if ( g_gameup->get_info(0) >= 0 )
+	{
+		for ( uint i=0; i<15; ++i )
+		{
+			g_gameup->set_data_i( i, achievements[i] );
+			float curval = (float)achievements[i];
+			float maxval = (float)g_game->m_achievements[i].range;
+			float factor = 200.0f / maxval;
+			uint val = uint( curval * factor );
+			g_gameup->set_info( i, val );
+		}
+	}
+}
+
 void MenuProfile::SyncProfileAndPlayer( bool profileToPlayer )
 {
 	if ( m_profIndex < 0 )
 		m_profIndex = 0;
+
+	SyncAchievements();
 
 	//	sync player and profiler
 	if ( profileToPlayer )
@@ -1403,6 +1450,8 @@ void MenuProfile::SaveProfile( void )
 	fileName << L"RoadsOfBattle";
 	sx::sys::MakeFolder( fileName );
 	fileName << L"/profiles.dat";
+
+	SyncAchievements();
 
 	sx::sys::FileStream	file;
 	if ( file.Open( fileName, FM_CREATE ) )
@@ -2606,19 +2655,24 @@ void MenuVictory::Show( void )
 
 void MenuVictory::Hide( void )
 {
-	Menu::Hide();
-	
-	for ( int i=0; i<3; i++ )
-		m_stars[i]->State_SetIndex(0);
-
-	for ( int i=0; i<m_apl.Count(); i++ )
+	if ( m_back->State_GetIndex() != 0 )
 	{
-		APL* apl = m_apl[i];
-		apl->label->SetParent( NULL );
-		sx_delete( apl->label );
-		sx_delete( apl );
+		Menu::Hide();
+
+		for ( int i=0; i<3; i++ )
+			m_stars[i]->State_SetIndex(0);
+
+		for ( int i=0; i<m_apl.Count(); i++ )
+		{
+			APL* apl = m_apl[i];
+			apl->label->SetParent( NULL );
+			sx_delete( apl->label );
+			sx_delete( apl );
+		}
+		m_apl.Clear();
+
+		g_gameup->end_score();
 	}
-	m_apl.Clear();
 }
 
 void MenuVictory::ApplyChangesToProfile( void )
@@ -2640,7 +2694,8 @@ void MenuVictory::ApplyChangesToProfile( void )
 
 	//	unlock next level
 	if ( nextLevel > g_game->m_player->m_profile.level )
-		g_game->m_player->m_profile.level = nextLevel;
+		g_game->m_player->m_profile.level = nextLevel;	
+	gameup_add_score( GAME_SCORE_LEVEL );
 
 	//	update profile
 	g_game->m_gui->m_upgradePanel->GetData( g_game->m_player->m_profile.upgrades );
@@ -2676,17 +2731,19 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 			if ( g_game->m_game_currentLevel > 9 )
 				g_game->m_game_nextLevel = 0;
 
-			Hide();
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+
+			Hide();
 		}
 		break;
 
 	case 1:		//	restart
 		{
-			Hide();
 			g_game->Reset();
-		
+			g_gameup->begin_score();
+			Hide();
+
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 		}

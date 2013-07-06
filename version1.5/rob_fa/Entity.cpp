@@ -399,6 +399,11 @@ void Entity::SetState( UINT state )
 					m_node->MsgProc( MT_SOUND_PLAY, &msgSound );
 				}
 			}
+
+			if ( m_typeName.Find( L"boss" )>-1 || m_typeName.Find( L"Boss" )>-1 )
+			{
+				gameup_add_score( GAME_SCORE_BOSS );
+			}
 		}
 
 		//  set maximum dead time

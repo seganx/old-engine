@@ -615,6 +615,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Gameup"
+			>
+			<File
+				RelativePath=".\gameup_import.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\gameup_import.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\cnep.cpp"
 			>

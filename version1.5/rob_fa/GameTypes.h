@@ -263,11 +263,15 @@ struct PlayerProfile
 	int				difficulty[10];
 
 	PlayerProfile( void ){
+		ZeroMemory( this, sizeof(PlayerProfile) );
 		Reset();
 	}
 
 	void Reset( void ){
+		int	achs[15];
+		memcpy( achs, achievements, sizeof(achs) );
 		ZeroMemory( this, sizeof(PlayerProfile) );
+		memcpy( achievements, achs, sizeof(achs) );
 		level = 1;
 		level_selected = 1;
 		people = 100;

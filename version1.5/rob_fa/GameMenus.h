@@ -139,6 +139,7 @@ public:
 	void OnExit( sx::gui::PControl sender );
 	void OnKey(sx::gui::PControl sender);
 
+	void SyncAchievements( void );
 	void SyncProfileAndPlayer( bool profileToPlayer );
 	void SaveProfile(void);
 

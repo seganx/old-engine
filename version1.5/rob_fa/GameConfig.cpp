@@ -43,8 +43,22 @@ Config::GameConfig::GameConfig( void )
 void Config::LoadConfig( void )
 {
 	//  load settings
-	String confgFile = sx::sys::GetAppFolder();
-	confgFile << L"/game.config";
+	String confgFile = sx::sys::GetDocumentsFolder();
+	confgFile.MakePathStyle();
+	confgFile << L"RoadsOfBattle/game.config";
+
+	if ( sx::sys::FileExist( confgFile ) == false )
+	{
+		String fileName = sx::sys::GetDocumentsFolder();
+		fileName.MakePathStyle();
+		fileName << L"RoadsOfBattle";
+		sx::sys::MakeFolder( fileName );
+
+		String curfile = sx::sys::GetAppFolder();
+		curfile << L"/game.config";
+
+		sx::sys::CopyFile( curfile, confgFile );
+	}
 	
 	sx::cmn::StringList configList;
 	configList.LoadFromFile(confgFile);
@@ -196,8 +210,9 @@ void Config::LoadConfig( void )
 void Config::SaveConfig( void )
 {
 	//  save settings
-	String confgFile = sx::sys::GetAppFolder();
-	confgFile << L"/game.config";
+	String confgFile = sx::sys::GetDocumentsFolder();
+	confgFile.MakePathStyle();
+	confgFile << L"RoadsOfBattle/game.config";
 
 	sx::cmn::StringList configList;
 	configList.LoadFromFile( confgFile );
