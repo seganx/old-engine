@@ -162,34 +162,38 @@ namespace GM
 		//	create labels
 		m_lblHealth = sx_new( sx::gui::Label );
 		m_lblHealth->SetParent( m_back );
-		m_lblHealth->SetSize( float2(95, 30) );
+		m_lblHealth->SetSize( float2(120, 50) );
 		m_lblHealth->Position().Set( -60.0f, -10.0f, 0.0f );
 		m_lblHealth->GetElement(0)->Color().a = 0.0f;
 		m_lblHealth->GetElement(1)->Color().a = 0.85f;
+		m_lblHealth->SetAlign( GTA_CENTER );
 		m_lblHealth->SetFont( L"Font_rob_twedit_health.fnt" );
 
 		m_lblXP = sx_new( sx::gui::Label );
 		m_lblXP->SetParent( m_back );
-		m_lblXP->SetSize( float2(75, 25) );
-		m_lblXP->Position().Set( -265.0f, -45.0f, 0.0f );
+		m_lblXP->SetSize( float2(75, 40) );
+		m_lblXP->Position().Set( -265.0f, -40.0f, 0.0f );
 		m_lblXP->GetElement(0)->Color().a = 0.0f;
 		m_lblXP->GetElement(1)->Color().a = 0.85f;
+		//m_lblXP->SetAlign( GTA_RIGHT );
 		m_lblXP->SetFont( L"Font_rob_twedit_info.fnt" );
 
 		m_lblDamage = sx_new( sx::gui::Label );
 		m_lblDamage->SetParent( m_back );
-		m_lblDamage->SetSize( float2(70, 25) );
-		m_lblDamage->Position().Set( -153.0f, -45.0f, 0.0f );
+		m_lblDamage->SetSize( float2(70, 40) );
+		m_lblDamage->Position().Set( -153.0f, -40.0f, 0.0f );
 		m_lblDamage->GetElement(0)->Color().a = 0.0f;
 		m_lblDamage->GetElement(1)->Color().a = 0.85f;
+		//m_lblDamage->SetAlign( GTA_RIGHT );
 		m_lblDamage->SetFont( L"Font_rob_twedit_info.fnt" );
 
 		m_lblFireRate = sx_new( sx::gui::Label );
 		m_lblFireRate->SetParent( m_back );
-		m_lblFireRate->SetSize( float2(70, 25) );
-		m_lblFireRate->Position().Set( -52.0f, -45.0f, 0.0f );
+		m_lblFireRate->SetSize( float2(70, 40) );
+		m_lblFireRate->Position().Set( -52.0f, -40.0f, 0.0f );
 		m_lblFireRate->GetElement(0)->Color().a = 0.0f;
 		m_lblFireRate->GetElement(1)->Color().a = 0.85f;
+		//m_lblFireRate->SetAlign( GTA_RIGHT );
 		m_lblFireRate->SetFont( L"Font_rob_twedit_info.fnt" );
 
 

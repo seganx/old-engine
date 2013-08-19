@@ -4,13 +4,15 @@
 #include "GameConfig.h"
 
 
-#define NET_ACTIVATE	1
+#define NET_ACTIVATE	0
 #define NET_DELAY_TIME	60
 #define NET_TIMEOUT		60000
 
 //////////////////////////////////////////////////////////////////////////
 //  SOME GLOBAL VARIABLES
-Client* client = null;
+#if NET_ACTIVATE
+	Client* client = null;
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //		static internal variables and objects
@@ -157,7 +159,10 @@ UINT MainMsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 void MainLoop(float elpsTime)
 {
 	sx_callstack();
+
+#if NET_ACTIVATE
 	client->Update( elpsTime, NET_DELAY_TIME, NET_TIMEOUT );
+#endif
 
 	if ( elpsTime > 1000 ) return;
 
@@ -267,7 +272,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	sx::core::Renderer::SetSize( s_window.GetHandle(), 0, 0, Config::GetData()->device_CreationFlag );
 
 	//  initialize sounds and music
-	sx::snd::Device::Create( s_window.GetHandle(), SX_SND_3D /*| SX_SND_SYNC*/ );
+	sx::snd::Device::Create( s_window.GetHandle(), SX_SND_3D | SX_SND_SYNC );
 
 	//  at first connect keyboard
 	sx::io::PInputDeviceBase newDevice = sx_new( sx::io::Keyboard(0) );

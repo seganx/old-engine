@@ -36,7 +36,7 @@ void Scripter::Load( const WCHAR* scriptFile )
 	sx::cmn::StringToker toker;
 	for (int i=0; i<strList.Count(); i++)
 	{
-		toker.SetString( strList[i] );
+		toker.SetString( strList[i]->Text() );
 		
 		if ( beginBlock )
 		{

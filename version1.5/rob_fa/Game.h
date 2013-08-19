@@ -13,7 +13,19 @@
 #include "GameTypes.h"
 #include "gameup_import.h"
 
-#define GAME_TITLE	L"Roads of Battle ver 0.1"
+
+#define VER_EXHIBITION	0
+
+#if VER_EXHIBITION
+	#define GAME_TITLE		L"Roads of Battle - exhibition version"
+#else
+	#define GAME_TITLE		L"Roads of Battle"
+#endif
+
+#define USE_RTL			1
+
+#define USE_GAMEUP		0
+#define USE_GAMEUP_CD	0
 
 
 class Player;
@@ -87,8 +99,11 @@ public:
 
 //	global game pointer
 extern Game* g_game;
+
+#if USE_GAMEUP
 extern GameUp* g_gameup;
 
 void gameup_add_score( const uint reason );
+#endif
 
 #endif	//	GUARD_Game_HEADER_FILE

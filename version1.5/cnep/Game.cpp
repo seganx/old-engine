@@ -26,6 +26,15 @@ void Draw_Loading( int count, int index, const WCHAR* state, const WCHAR* name )
 {
 	using namespace sx::gui;
 
+	{
+		MSG msg;
+		if ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+		{
+			TranslateMessage( &msg );
+			DispatchMessage( &msg );
+		}
+	}
+
 	Game* game = g_game;
 
 	PPanel panel = (PPanel)game->m_panel_Loading->GetChild(0);
@@ -41,10 +50,14 @@ void Draw_Loading( int count, int index, const WCHAR* state, const WCHAR* name )
 // 	panel->Rotation().z += 0.15f;
 
 	PLabel label = (PLabel)game->m_panel_Loading->GetChild(4);
-	label->SetText( state );
+	
+	if ( state && 0 )
+		label->SetText( state );
+	else
+		label->SetText( NULL );
 
 	label = (PLabel)game->m_panel_Loading->GetChild(5);
-	if ( name )
+	if ( name && 0 )
 	{
 		//str1024 str;
 		//str << L"< " << name << L" >";
@@ -56,6 +69,8 @@ void Draw_Loading( int count, int index, const WCHAR* state, const WCHAR* name )
 		game->Update( 16 );
 
 	game->Render( 1 );
+
+	Sleep(5);
 }
 
 Game::Game( void )
@@ -132,6 +147,7 @@ Game::Game( void )
 	label->GetElement(1)->Color() = 0xffffffff;
 	label->SetSize( float2(500, 50) );
 	label->SetParent( m_panel_Loading );
+	label->SetAlign( GTA_LEFT );
 	label->Position().x = ringPos.x + 250 + ringSize.x * 0.5f;
 	label->Position().y = ringPos.y - 10;
 	
@@ -140,6 +156,7 @@ Game::Game( void )
 	label->GetElement(1)->Color() = 0xffffffff;
 	label->SetSize( float2(500, 50) );
 	label->SetParent( m_panel_Loading );
+	label->SetAlign( GTA_LEFT );
 	label->Position().x = ringPos.x + 250 + ringSize.x * 0.5f;
 	label->Position().y = ringPos.y - 20;
 
@@ -269,6 +286,7 @@ void Game::LoadLevel( void )
 	m_panel_Loading->GetElement(0)->SetTextureSrc( str );
 
 	//  load the scene
+	Sleep(5);
 	str = GetLevelPath();
 	str << L"scene.scene";
 	sx::sys::FileStream file;
@@ -362,6 +380,7 @@ void Game::LoadLevel( void )
 	//  finish loading
 	m_app_Loading = 1;
 
+	PostMessage(0, GMT_LEVEL_LOADED, NULL);
 }
 
 void Game::ClearLevel( void )
@@ -394,6 +413,16 @@ void Game::Update( float elpsTime )
 
 	if ( m_game_currentLevel != m_game_nextLevel )
 	{
+
+#if VER_EXHIBITION
+		//	exhibition version only shows 3 levels
+		if ( g_game->m_game_nextLevel > 1 && g_game->m_game_nextLevel < 4 )
+			g_game->m_game_nextLevel = 4;
+		else if ( g_game->m_game_nextLevel > 4 && g_game->m_game_nextLevel < 8 )
+			g_game->m_game_nextLevel = 8;
+		else if ( g_game->m_game_nextLevel > 8 )
+			g_game->m_game_nextLevel = 1;
+#endif
 		m_game_currentLevel = m_game_nextLevel;
 		LoadLevel();
 	}
@@ -484,7 +513,7 @@ void Game::Render( DWORD flag )
 
 	FogDesc fog;
 	sx::d3d::Device3D::GetFogDesc(fog);
-	sx::d3d::Device3D::Clear_Screen( (m_game_currentLevel==0 || flag) ? 0xff000000 : fog.Color );
+	sx::d3d::Device3D::Clear_Screen( (m_game_currentLevel==0 || flag || m_app_Loading ) ? 0xff000000 : fog.Color );
 
 	//  render the meshes in the scene
 	if ( !m_app_Loading )
@@ -646,8 +675,13 @@ void Game::PostMessage( UINT RecieverID, UINT msg, void* data )
 			{
 				g_game->m_upgrades.LoadDefaults();
 			}
+
 		}
-		break;
+	case GMT_GAME_START:
+#if USE_GAMEUP
+			g_gameup->begin_score();
+#endif
+			break;
 	}
 
 
@@ -671,6 +705,18 @@ void textcopy( WCHAR* dest, const WCHAR* src )
 		dest++;
 	}
 }
+
+#if USE_GAMEUP
+void gameup_add_score( const uint reason )
+{
+	switch ( g_game->m_difficultyLevel )
+	{
+	case 0: g_gameup->add_score( reason, GAME_SCORE_EASY ); break;
+	case 1: g_gameup->add_score( reason, GAME_SCORE_NORM ); break;
+	case 2: g_gameup->add_score( reason, GAME_SCORE_HARD ); break;
+	}
+}
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //	achievements implementation
@@ -705,6 +751,10 @@ void Achievement::AddValue( int val /*= 1 */ )
 
 	msg_SoundPlay msg( true, 0, 0, L"achievement" );
 	g_game->m_gui->m_main->m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+
+#if USE_GAMEUP
+	gameup_add_score( GAME_SCORE_ACHIV );
+#endif
 }
 
 

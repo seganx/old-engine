@@ -400,10 +400,12 @@ void Entity::SetState( UINT state )
 				}
 			}
 
+#if USE_GAMEUP
 			if ( m_typeName.Find( L"boss" )>-1 || m_typeName.Find( L"Boss" )>-1 )
 			{
 				gameup_add_score( GAME_SCORE_BOSS );
 			}
+#endif
 		}
 
 		//  set maximum dead time

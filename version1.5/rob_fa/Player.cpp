@@ -96,9 +96,13 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_L) )
 	{
 		inputHandled = true;
+		m_profile.Reset();
 		m_profile.level = 10;
 		for ( int i=0; i<10; i++ )
-			m_profile.stars[i] = 3;
+		{
+			m_profile.stars[i] = sx::cmn::Random(3);
+			m_profile.difficulty[i] = sx::cmn::Random(2);
+		}
 	}
 
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_P) )

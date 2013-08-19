@@ -399,6 +399,13 @@ void Entity::SetState( UINT state )
 					m_node->MsgProc( MT_SOUND_PLAY, &msgSound );
 				}
 			}
+
+#if USE_GAMEUP
+			if ( m_typeName.Find( L"boss" )>-1 || m_typeName.Find( L"Boss" )>-1 )
+			{
+				gameup_add_score( GAME_SCORE_BOSS );
+			}
+#endif
 		}
 
 		//  set maximum dead time
@@ -677,7 +684,8 @@ Entity* Entity::Clone( void )
 	Entity* pe = sx_new( Entity );
 	if (pe)
 	{
-		pe->m_typeName = m_typeName;
+		pe->m_typeName		= m_typeName;
+		pe->m_displayName	= m_displayName;
 
 		pe->SetPosition( float3(5000, 5000, 5000) );
 		pe->SetDirection( GetDirection() );

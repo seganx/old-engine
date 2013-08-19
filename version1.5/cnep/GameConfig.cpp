@@ -7,11 +7,11 @@ int ConfigSearch( sx::cmn::StringList& configList, const WCHAR* name )
 {
 	for (int i=0; i<configList.Count(); i++)
 	{
-		int index = configList.At(i).Find( L"=" );
+		int index = configList.At(i)->Find( L"=" );
 		if ( index > -1 )
 		{
 			String strname;
-			configList.At(i).CopyTo(strname, 0, index);
+			configList.At(i)->CopyTo(strname, 0, index);
 			strname.Trim();
 
 			if ( strname == name )
@@ -43,20 +43,34 @@ Config::GameConfig::GameConfig( void )
 void Config::LoadConfig( void )
 {
 	//  load settings
-	String confgFile = sx::sys::GetAppFolder();
-	confgFile << L"/game.config";
+	String confgFile = sx::sys::GetDocumentsFolder();
+	confgFile.MakePathStyle();
+	confgFile << L"RoadsOfBattle/game.config";
+
+	if ( sx::sys::FileExist( confgFile ) == false )
+	{
+		String fileName = sx::sys::GetDocumentsFolder();
+		fileName.MakePathStyle();
+		fileName << L"RoadsOfBattle";
+		sx::sys::MakeFolder( fileName );
+
+		String curfile = sx::sys::GetAppFolder();
+		curfile << L"/game.config";
+
+		sx::sys::CopyFile( curfile, confgFile );
+	}
 	
 	sx::cmn::StringList configList;
 	configList.LoadFromFile(confgFile);
 
 	for (int i=0; i<configList.Count(); i++)
 	{
-		int index = configList.At(i).Find( L"=" );
+		int index = configList.At(i)->Find( L"=" );
 		if ( index > -1 )
 		{
 			String name, value;
-			configList.At(i).CopyTo(name, 0, index);
-			configList.At(i).CopyTo(value, index+1, 255);
+			configList.At(i)->CopyTo(name, 0, index);
+			configList.At(i)->CopyTo(value, index+1, 255);
 			name.Trim();
 			value.Trim();
 
@@ -196,8 +210,9 @@ void Config::LoadConfig( void )
 void Config::SaveConfig( void )
 {
 	//  save settings
-	String confgFile = sx::sys::GetAppFolder();
-	confgFile << L"/game.config";
+	String confgFile = sx::sys::GetDocumentsFolder();
+	confgFile.MakePathStyle();
+	confgFile << L"RoadsOfBattle/game.config";
 
 	sx::cmn::StringList configList;
 	configList.LoadFromFile( confgFile );
@@ -208,42 +223,42 @@ void Config::SaveConfig( void )
 	tmpstr.Format( L"shader_level=%d				// shader quality 		0=High			1=Midd		2=Low" , s_configData.shaderLevel );
 	i = ConfigSearch( configList, L"shader_level" );
 	if ( i >= 0 )
-		configList.At(i) = tmpstr;
+		configList.At(i)->SetText( tmpstr );
 	else
 		configList.PushBack( tmpstr );
 
 	tmpstr.Format( L"shadow_level=%d	 			// level of shadow size 0=2048 			1=1024	 	2=512	 	3=OFF" , s_configData.shadowLevel );
 	i = ConfigSearch( configList, L"shadow_level" );
 	if ( i >= 0 )
-		configList.At(i) = tmpstr;
+		configList.At(i)->SetText( tmpstr );
 	else
 		configList.PushBack( tmpstr );
 
 	tmpstr.Format( L"reflection_level=%d	 		// level of reflection 	0=Very High		1=High		2=Midd		3=Low		4=OFF" , s_configData.reflectionLevel );
 	i = ConfigSearch( configList, L"reflection_level" );
 	if ( i >= 0 )
-		configList.At(i) = tmpstr;
+		configList.At(i)->SetText( tmpstr );
 	else
 		configList.PushBack( tmpstr );
 
 	tmpstr.Format( L"music_volume=%d" , int(s_configData.musicVolume * 100 + 0.5f) );
 	i = ConfigSearch( configList, L"music_volume" );
 	if ( i >= 0 )
-		configList.At(i) = tmpstr;
+		configList.At(i)->SetText( tmpstr );
 	else
 		configList.PushBack( tmpstr );
 
 	tmpstr.Format( L"sound_volume=%d" , int(s_configData.soundVolume * 100 + 0.5f) );
 	i = ConfigSearch( configList, L"sound_volume" );
 	if ( i >= 0 )
-		configList.At(i) = tmpstr;
+		configList.At(i)->SetText( tmpstr );
 	else
 		configList.PushBack( tmpstr );
 
 	tmpstr.Format( L"mouse_speed=%d" , int(s_configData.mouseSpeed * 100 + 0.5f) );
 	i = ConfigSearch( configList, L"mouse_speed" );
 	if ( i >= 0 )
-		configList.At(i) = tmpstr;
+		configList.At(i)->SetText( tmpstr );
 	else
 		configList.PushBack( tmpstr );
 
@@ -251,7 +266,7 @@ void Config::SaveConfig( void )
 	tmpstr.Format( L"fullscreen=%d" , l );
 	i = ConfigSearch( configList, L"fullscreen" );
 	if ( i >= 0 )
-		configList.At(i) = tmpstr;
+		configList.At(i)->SetText( tmpstr );
 	else
 		configList.PushBack( tmpstr );
 

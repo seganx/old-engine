@@ -2,8 +2,9 @@
 #include "GameTypes.h"
 #include "Game.h"
 #include "GameConfig.h"
-
-
+#include "Mechanic_Cinematic.h"
+#include "gameup_import.h"
+#include <stdio.h>
 
 #define NET_ACTIVATE	0
 #define NET_DELAY_TIME	60
@@ -16,95 +17,12 @@ Client* client = null;
 //////////////////////////////////////////////////////////////////////////
 //		static internal variables and objects
 static sx::sys::Window		s_window;			//	main application window
+
+#if USE_GAMEUP
+extern GameUp*				g_gameup = null;
+#endif
 //////////////////////////////////////////////////////////////////////////
 
-class FirstPresents
-{
-public:
-	FirstPresents( void ): m_index(0), m_time(0)
-	{
-	
-	}
-
-	~FirstPresents()
-	{
-		for ( int i=0; i<m_list.Count(); i++ )
-		{
-			sx::gui::Destroy( m_list[i] );
-		}
-	}
-
-	void AddPresents( const WCHAR* texture, const float size )
-	{
-		sx::gui::Panel* panel = (sx::gui::Panel*)sx::gui::Create( GUI_PANEL );
-		panel->SetSize( float2( size, size ) );
-		panel->GetElement(0)->SetTextureSrc( texture );
-		panel->GetElement(0)->Color().a = 0;
-
-		m_list.PushBack( panel );
-	}
-
-	void Update( float elpstime )
-	{
-		
-		if ( m_index > m_list.Count() ) return;
-
-		m_time += elpstime;
-		if ( m_time > 3000 )
-		{
-			m_time = 0;
-			m_index++;
-		}
-
-		for ( int i=0; i<m_list.Count(); i++ )
-		{
-			sx::gui::Control* pc = m_list[i];
-
-			if ( m_index == i )
-			{
-				pc->GetElement(0)->Color().a += elpstime * 0.001f;
-				if ( pc->GetElement(0)->Color().a > 1.0f )
-					pc->GetElement(0)->Color().a = 1.0f;
-			}
-			else
-			{
-				pc->GetElement(0)->Color().a -= elpstime * 0.001f;
-				if ( pc->GetElement(0)->Color().a < 0.0f )
-					pc->GetElement(0)->Color().a = 0.0f;
-			}
-
-			pc->Update( elpstime );
-		}
-	}
-
-	void Draw( void )
-	{
-		if ( !sx::core::Renderer::CanRender() ) return;
-		sx::core::Renderer::Begin();
-
-		sx::d3d::UI3D::ReadyToDebug( D3DColor(0,0,0,0) );
-		sx::d3d::Device3D::Clear_Target(0);
-		sx::d3d::Device3D::RS_Alpha( SX_MATERIAL_ALPHABLEND );
-
-		for ( int i=0; i<m_list.Count(); i++ )
-		{
-			m_list[i]->Draw(0);
-		}
-
-		sx::core::Renderer::End();
-	}
-
-	bool Presenting( void )
-	{
-		return ( m_index <= m_list.Count() && m_time < 3000 );
-	}
-
-
-public:
-	Array<sx::gui::Control*>	m_list;
-	int							m_index;
-	float						m_time;
-};
 
 void clientCallback( Client* client, const byte* buffer, const uint size )
 {
@@ -205,12 +123,19 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 {
 	sx_callstack();
 
+#if USE_GAMEUP
+	GameUp localgameup;
+	g_gameup = &localgameup;
+	if ( !gameup_init( g_gameup ) ) return 0;
+#endif
+
 	//  make single application
 	String mutexName = L"SeganX Game :: "; mutexName << GAME_TITLE;
 	HANDLE mutex = CreateMutex(NULL, TRUE, *mutexName);
 	if ( !mutex || GetLastError() == ERROR_ALREADY_EXISTS )
 		return 0;
 	sx::cmn::Randomize();
+	
 
 	//////////////////////////////////////////////////////////////////////////
 	//	connect to console
@@ -244,13 +169,21 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 #endif
 
 	//  load configuration
-	Config::LoadConfig();
+#if USE_GAMEUP
+	bool b1 = ( g_gameup->get_lock_code(0) == g_gameup->get_lock_code(5) );
+	if ( b1 )
+#endif
+		Config::LoadConfig();
 
 	// TEST
 	String str = sx::sys::GetAppFolder();
 	str.MakePathStyle();
-	str << L"project1";
+#if USE_GAMEUP
+	if ( g_gameup->get_lock_code(1) == g_gameup->get_lock_code(2) )
+#endif
+		str << L"project1";
 	sx::sys::FileManager::Project_Open(str, FMM_ARCHIVE);
+
 
 	//  create application window
 	WindowRect wr;
@@ -264,7 +197,12 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	s_window.SetIcon( LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GAME)) );
 	s_window.SetCursor( LoadCursor(hInstance, MAKEINTRESOURCE(IDC_CURSOR_EMPTY)) );
 	s_window.SetVisible( true );
-	sx::sys::Application::Create_Window(&s_window);
+#if USE_GAMEUP
+	if ( g_gameup->get_lock_code(6) == g_gameup->get_lock_code(3) )
+#endif
+		sx::sys::Application::Create_Window(&s_window);
+	ShowCursor( FALSE );
+
 
 	//  initialize scene manager
 	sx::core::Scene::Initialize( sx_new( sx::core::SceneManager_SBVH ) );
@@ -280,13 +218,19 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 	//  at first connect keyboard
 	sx::io::PInputDeviceBase newDevice = sx_new( sx::io::Keyboard(0) );
-	sx::io::Input::Attach( newDevice );
+
+#if USE_GAMEUP
+	if ( g_gameup->get_lock_code(0) == g_gameup->get_lock_code(7) )
+#endif
+		sx::io::Input::Attach( newDevice );
 
 	//  connect mouse
-	newDevice = sx_new( sx::io::Mouse(0) );
+	if ( newDevice )
+		newDevice = sx_new( sx::io::Mouse(0) );
 	sx::io::Input::Attach( newDevice );
 
 	//  initialize IO services
+	if ( s_window.GetHandle())
 	sx::io::Input::Initialize( s_window.GetHandle() );
 
 	//  turn screen saver off
@@ -296,7 +240,17 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	sx::sys::KeepSystemWakeful();
 
 	//  initialize game object to create necessary resources
+#if USE_GAMEUP
+	{
+		int a = g_gameup->get_lock_code(4);
+		int b = g_gameup->get_lock_code(1) * 3;
+		Game::Initialize( (a == (b * 3)) ? &s_window : null );
+
+		if ( !b1 ) return 0;
+	}
+#else
 	Game::Initialize( &s_window );
+#endif
 
 	//  TEST 
 	g_game->m_game_nextLevel = 0;	//  set level to first test
@@ -305,24 +259,25 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 
 	//	show presents
-#if 0
-	float present_size = (float)min( Config::GetData()->display_Size.x, Config::GetData()->display_Size.y );
-	FirstPresents *presents = sx_new( FirstPresents );
-	presents->AddPresents( L"gui_loading_level_0.txr", present_size );
-	presents->AddPresents( L"gui_loading_level_1.txr", present_size );
-	presents->AddPresents( L"gui_loading_level_2.txr", present_size );
-
-	float initTime = sx::sys::GetSysTime();
-	float elpsTime = 0;
-	while ( presents->Presenting() )
+#if 1
 	{
-		// calculate elapsed time
-		elpsTime = sx::sys::GetSysTime() - initTime;
-		initTime = sx::sys::GetSysTime();
-		presents->Update( elpsTime );
-		presents->Draw();
+		FirstPresents *presents;
+		presents = sx_new( FirstPresents );
+		presents->AddPresents( L"gui_parseh.txr", 512 );
+		presents->AddPresents( L"gui_esra.txr", 1024 );
+
+		float initTime = sx::sys::GetSysTime();
+		float elpsTime = 0;
+		while ( presents->Presenting() )
+		{
+			// calculate elapsed time
+			elpsTime = sx::sys::GetSysTime() - initTime;
+			initTime = sx::sys::GetSysTime();
+			presents->Update( elpsTime );
+			presents->Draw();
+		}
+		sx_delete_and_null( presents );
 	}
-	sx_delete_and_null( presents );
 #endif
 
 
@@ -345,6 +300,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 	//  turn screen saver off
 	sx::sys::ScreenSaverSetDefault();
+
+#if USE_GAMEUP
+	gameup_finit( g_gameup );
+#endif
 
 	//  close handles
 	CloseHandle( mutex );

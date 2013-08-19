@@ -92,6 +92,7 @@ enum GameMessageType
 {
 	GMT_BLANK = 0,			//  no message
 	GMT_LEVEL_LOAD,			//	say to all objects that level is loading
+	GMT_LEVEL_LOADED,		//	say to all objects that level has been loaded
 	GMT_LEVEL_CLEAR,		//	say to all objects that level is clearing
 	GMT_GAME_START,			//  say to all objects that game is starting
 	GMT_GAME_END,			//  say to all objects that game is ending
@@ -262,11 +263,15 @@ struct PlayerProfile
 	int				difficulty[10];
 
 	PlayerProfile( void ){
+		ZeroMemory( this, sizeof(PlayerProfile) );
 		Reset();
 	}
 
 	void Reset( void ){
+		int	achs[15];
+		memcpy( achs, achievements, sizeof(achs) );
 		ZeroMemory( this, sizeof(PlayerProfile) );
+		memcpy( achievements, achs, sizeof(achs) );
 		level = 1;
 		level_selected = 1;
 		people = 100;

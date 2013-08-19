@@ -413,6 +413,16 @@ void Game::Update( float elpsTime )
 
 	if ( m_game_currentLevel != m_game_nextLevel )
 	{
+
+#if VER_EXHIBITION
+		//	exhibition version only shows 3 levels
+		if ( g_game->m_game_nextLevel > 1 && g_game->m_game_nextLevel < 4 )
+			g_game->m_game_nextLevel = 4;
+		else if ( g_game->m_game_nextLevel > 4 && g_game->m_game_nextLevel < 8 )
+			g_game->m_game_nextLevel = 8;
+		else if ( g_game->m_game_nextLevel > 8 )
+			g_game->m_game_nextLevel = 1;
+#endif
 		m_game_currentLevel = m_game_nextLevel;
 		LoadLevel();
 	}
@@ -668,7 +678,9 @@ void Game::PostMessage( UINT RecieverID, UINT msg, void* data )
 
 		}
 	case GMT_GAME_START:
+#if USE_GAMEUP
 			g_gameup->begin_score();
+#endif
 			break;
 	}
 
@@ -694,6 +706,7 @@ void textcopy( WCHAR* dest, const WCHAR* src )
 	}
 }
 
+#if USE_GAMEUP
 void gameup_add_score( const uint reason )
 {
 	switch ( g_game->m_difficultyLevel )
@@ -703,6 +716,7 @@ void gameup_add_score( const uint reason )
 	case 2: g_gameup->add_score( reason, GAME_SCORE_HARD ); break;
 	}
 }
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //	achievements implementation
@@ -738,7 +752,9 @@ void Achievement::AddValue( int val /*= 1 */ )
 	msg_SoundPlay msg( true, 0, 0, L"achievement" );
 	g_game->m_gui->m_main->m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 
+#if USE_GAMEUP
 	gameup_add_score( GAME_SCORE_ACHIV );
+#endif
 }
 
 

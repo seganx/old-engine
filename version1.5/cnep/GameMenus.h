@@ -50,6 +50,7 @@ public:
 
 public:
 	sx::gui::PanelEx*		m_mainBack;
+	sx::gui::PanelEx*		m_mainSparks;
 	sx::gui::PanelEx*		m_slantBack;
 	sx::gui::PanelEx*		m_btn[5];
 	float					m_time;
@@ -138,6 +139,7 @@ public:
 	void OnExit( sx::gui::PControl sender );
 	void OnKey(sx::gui::PControl sender);
 
+	void SyncAchievements( void );
 	void SyncProfileAndPlayer( bool profileToPlayer );
 	void SaveProfile(void);
 
@@ -195,8 +197,12 @@ public:
 
 class MenuCredits: public Menu
 {
+public:
 	virtual void Initialize(void);
 	virtual void Finalize(void);
+	virtual void ProcessInput(bool& inputHandled, float elpsTime);
+
+	void OnClick(sx::gui::PControl sender);
 };
 
 class MenuConfirmExit: public Menu
@@ -261,6 +267,7 @@ public:
 	int					m_starAdd;
 	int					m_starCount;
 	sx::gui::PanelEx*	m_stars[3];
+	sx::gui::Panel*		m_stars_back[2];
 
 	int					m_goldCounter;
 	int					m_golds;
@@ -281,8 +288,6 @@ public:
 		float				age;
 	};
 	Array<APL*> m_apl;
-
-	bool				m_setDataToUpgrade;
 };
 
 class MenuGameOver: public Menu
@@ -314,19 +319,19 @@ public:
 	void Hide(void);
 	void OnClick(sx::gui::PControl sender);
 
-	void AddTutorial(const WCHAR* title, const WCHAR* desc, const WCHAR* image, bool showNow = false, bool settoCurrent = true);
+	void AddTutorial(const WCHAR* title, const WCHAR* desc, const WCHAR* image, int showNow = 0, bool settoCurrent = true);
 	void ClearTutorial(void);
 
 public:
 
 	struct Tutorial
 	{
-		String		title;
-		String		desc;
+		String				title;
+		String				desc;
 		sx::gui::PPanel		image;
 	};
 	Array<Tutorial*>	m_tutorial;
-	int							m_Index;
+	int					m_Index;
 	
 	sx::gui::PLabel		m_indicator;
 	sx::gui::PLabel		m_title;
@@ -335,6 +340,19 @@ public:
 	sx::gui::PButton	m_prev;
 	float				m_time;
 	float				m_delayTime;
+
+
+	struct Helper
+	{
+		sx::gui::PLabel		title;
+		sx::gui::PLabel		desc;
+		sx::gui::PPanel		image;
+		sx::gui::PPanelEx	back;
+		float				showTime;
+	};
+	Helper				m_helper;
+
+
 };
 
 #endif	//	GUARD_GameMenus_HEADER_FILE

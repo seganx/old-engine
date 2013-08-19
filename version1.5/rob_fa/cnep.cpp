@@ -17,7 +17,10 @@ Client* client = null;
 //////////////////////////////////////////////////////////////////////////
 //		static internal variables and objects
 static sx::sys::Window		s_window;			//	main application window
+
+#if USE_GAMEUP
 extern GameUp*				g_gameup = null;
+#endif
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -120,9 +123,11 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 {
 	sx_callstack();
 
+#if USE_GAMEUP
 	GameUp localgameup;
 	g_gameup = &localgameup;
 	if ( !gameup_init( g_gameup ) ) return 0;
+#endif
 
 	//  make single application
 	String mutexName = L"SeganX Game :: "; mutexName << GAME_TITLE;
@@ -164,14 +169,18 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 #endif
 
 	//  load configuration
+#if USE_GAMEUP
 	bool b1 = ( g_gameup->get_lock_code(0) == g_gameup->get_lock_code(5) );
 	if ( b1 )
+#endif
 		Config::LoadConfig();
 
 	// TEST
 	String str = sx::sys::GetAppFolder();
 	str.MakePathStyle();
+#if USE_GAMEUP
 	if ( g_gameup->get_lock_code(1) == g_gameup->get_lock_code(2) )
+#endif
 		str << L"project1";
 	sx::sys::FileManager::Project_Open(str, FMM_ARCHIVE);
 
@@ -188,7 +197,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	s_window.SetIcon( LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GAME)) );
 	s_window.SetCursor( LoadCursor(hInstance, MAKEINTRESOURCE(IDC_CURSOR_EMPTY)) );
 	s_window.SetVisible( true );
+#if USE_GAMEUP
 	if ( g_gameup->get_lock_code(6) == g_gameup->get_lock_code(3) )
+#endif
 		sx::sys::Application::Create_Window(&s_window);
 	ShowCursor( FALSE );
 
@@ -208,7 +219,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	//  at first connect keyboard
 	sx::io::PInputDeviceBase newDevice = sx_new( sx::io::Keyboard(0) );
 
+#if USE_GAMEUP
 	if ( g_gameup->get_lock_code(0) == g_gameup->get_lock_code(7) )
+#endif
 		sx::io::Input::Attach( newDevice );
 
 	//  connect mouse
@@ -227,19 +240,23 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	sx::sys::KeepSystemWakeful();
 
 	//  initialize game object to create necessary resources
+#if USE_GAMEUP
 	{
 		int a = g_gameup->get_lock_code(4);
 		int b = g_gameup->get_lock_code(1) * 3;
 		Game::Initialize( (a == (b * 3)) ? &s_window : null );
+
+		if ( !b1 ) return 0;
 	}
+#else
+	Game::Initialize( &s_window );
+#endif
 
 	//  TEST 
 	g_game->m_game_nextLevel = 0;	//  set level to first test
 	//g_game->m_upgrades.trap_cooltime = 8.0f;
 	//g_game->m_upgrades.trap_count = 5;
 
-	//	apply pattern
-	if ( !b1 ) return 0;
 
 	//	show presents
 #if 1
@@ -284,7 +301,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	//  turn screen saver off
 	sx::sys::ScreenSaverSetDefault();
 
+#if USE_GAMEUP
 	gameup_finit( g_gameup );
+#endif
 
 	//  close handles
 	CloseHandle( mutex );

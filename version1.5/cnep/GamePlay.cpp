@@ -6,11 +6,12 @@
 #include "com_weapon_MachineGun.h"
 #include "ProjectileManager.h"
 #include "Mechanic_EnemyWave.h"
-
+#include "Mechanic_Cinematic.h"
 
 GamePlay::GamePlay( void )
 {
 	m_Mechanics.PushBack( sx_new( GM::Mechanic_EnemyWaves ) );
+	m_Mechanics.PushBack( sx_new( GM::Mechanic_Cinematic ) );
 }
 
 GamePlay::~GamePlay( void )

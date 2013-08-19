@@ -237,6 +237,7 @@ public:
 			str.Replace( L"\\n", L"\n" );
 
 			m_label = sx_new( sx::gui::Label );
+			m_label->SetAlign(GTA_RIGHT);
 			m_label->SetFont( L"Font_Tips.fnt" );
 			m_label->SetSize( float2(100.0f, GAMETIPS_ICON_SIZE_div2) );
 			m_label->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
@@ -308,6 +309,7 @@ public:
 		m_lblTitle->SetParent( m_panelEx );
 		m_lblTitle->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 		m_lblTitle->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
+		m_lblTitle->SetAlign(GTA_RIGHT);
 		m_lblTitle->SetFont( L"Font_hint_title.fnt" );
 		m_lblTitle->GetElement(0)->Color() = D3DColor(0,0,0,0);
 		m_lblTitle->GetElement(1)->Color() = D3DColor(1,1,0.2f,1);
@@ -317,6 +319,7 @@ public:
 		m_lblDesc->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 		m_lblDesc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 		m_lblDesc->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
+		m_lblDesc->SetAlign(GTA_RIGHT);
 		m_lblDesc->SetFont( L"Font_hint_desc.fnt" );
 		m_lblDesc->GetElement(0)->Color() = D3DColor(0,0,0,0);
 
@@ -491,6 +494,7 @@ void GameGUI::Initialize( void )
 	m_profile = sx_new( MenuProfile );
 	m_achivements = sx_new( MenuAchievements );
 	m_settings = sx_new( MenuSettings );
+	m_credits = sx_new( MenuCredits );
 	m_confirmExit = sx_new( MenuConfirmExit );
 	m_pause = sx_new( MenuPause );
 	m_victory = sx_new( MenuVictory );
@@ -505,6 +509,7 @@ void GameGUI::Initialize( void )
 	m_profile->Initialize();
 	m_achivements->Initialize();
 	m_settings->Initialize();
+	m_credits->Initialize();
 	m_confirmExit->Initialize();
 	m_pause->Initialize();
 	m_victory->Initialize();
@@ -524,6 +529,7 @@ void GameGUI::Finalize( void )
 	m_confirmExit->Finalize();
 	m_achivements->Finalize();
 	m_settings->Finalize();
+	m_credits->Finalize();
 	m_profile->Finalize();
 	m_map->Finalize();
 	m_main->Finalize();
@@ -542,6 +548,7 @@ void GameGUI::Finalize( void )
 	sx_delete_and_null( m_confirmExit );
 	sx_delete_and_null( m_achivements );
 	sx_delete_and_null( m_settings );
+	sx_delete_and_null( m_credits );
 	sx_delete_and_null( m_profile );
 	sx_delete_and_null( m_map );
 	sx_delete_and_null( m_main );
@@ -564,6 +571,7 @@ void GameGUI::ProcessInput( bool& inputHandled, float elpsTime )
 	m_settings->ProcessInput( inputHandled, elpsTime );
 	m_pause->ProcessInput( inputHandled, elpsTime );
 	m_achivements->ProcessInput( inputHandled, elpsTime );
+	m_credits->ProcessInput( inputHandled, elpsTime );
 	m_profile->ProcessInput( inputHandled, elpsTime );
 	m_map->ProcessInput( inputHandled, elpsTime );
 	m_main->ProcessInput( inputHandled, elpsTime );
@@ -605,6 +613,7 @@ void GameGUI::Update( float elpsTime )
 	m_confirmExit->Update( elpsTime );
 	m_achivements->Update( elpsTime );
 	m_settings->Update( elpsTime );
+	m_credits->Update( elpsTime );
 	m_map->Update( elpsTime );
 	m_pause->Update( elpsTime );
 	m_powerAttaks->Update( elpsTime );
@@ -653,6 +662,7 @@ void GameGUI::Draw( DWORD flag )
 	m_profile->Draw( flag );
 	m_achivements->Draw( flag );
 	m_settings->Draw( flag );
+	m_credits->Draw( flag );
 	m_upgradePanel->Draw(flag);
 	m_status->Draw( flag );
 	m_confirmExit->Draw( flag );
@@ -726,8 +736,10 @@ void GameGUI::MsgProc( UINT recieverID, UINT msg, void* data )
 	m_map->MsgProc( recieverID, msg, data );
 	m_achivements->MsgProc( recieverID, msg, data );
 	m_settings->MsgProc( recieverID, msg, data );
+	m_credits->MsgProc( recieverID, msg, data );
 	m_profile->MsgProc( recieverID, msg, data );
 	m_info->MsgProc( recieverID, msg, data );
+	m_upgradePanel->MsgProc( recieverID, msg, data );
 }
 
 void GameGUI::ShowTips( const WCHAR* tipText, const DWORD tipColor /*= 0xffffffff*/, const WCHAR* tipIcon /*= NULL*/ )

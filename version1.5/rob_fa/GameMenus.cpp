@@ -794,6 +794,12 @@ void MenuMap::Draw( DWORD flag )
 
 void MenuMap::Show( void )
 {
+#if VER_EXHIBITION
+	g_game->m_player->m_profile.level = 10;
+	for ( int i=0; i<10; i++ )
+		g_game->m_player->m_profile.stars[i] = 3;
+#endif
+
 	for ( int i=0; i<10; i++ )
 	{
 		m_levels[i].m_area->State_SetIndex(2);
@@ -1194,6 +1200,7 @@ void MenuProfile::Initialize( void )
 	else m_profIndex = -1;
 
 	//	looking for GameUp data
+#if USE_GAMEUP
 	{
 		//	verify that user has been logged in
 		if ( g_gameup->get_info(0) >= 0 )
@@ -1209,7 +1216,7 @@ void MenuProfile::Initialize( void )
 			}
 		}
 	}
-
+#endif
 
 	SyncProfileAndPlayer( true );
 }
@@ -1394,6 +1401,7 @@ void MenuProfile::SyncAchievements( void )
 	memcpy( m_profiles[3].achievements, achievements, sizeof(achievements) );
 
 	//	verify that user has been logged in
+#if USE_GAMEUP
 	if ( g_gameup->get_info(0) >= 0 )
 	{
 		for ( uint i=0; i<15; ++i )
@@ -1406,6 +1414,7 @@ void MenuProfile::SyncAchievements( void )
 			g_gameup->set_info( i, val );
 		}
 	}
+#endif
 }
 
 void MenuProfile::SyncProfileAndPlayer( bool profileToPlayer )
@@ -2671,7 +2680,9 @@ void MenuVictory::Hide( void )
 		}
 		m_apl.Clear();
 
+#if USE_GAMEUP
 		g_gameup->end_score();
+#endif
 	}
 }
 
@@ -2695,7 +2706,9 @@ void MenuVictory::ApplyChangesToProfile( void )
 	//	unlock next level
 	if ( nextLevel > g_game->m_player->m_profile.level )
 		g_game->m_player->m_profile.level = nextLevel;	
+#if USE_GAMEUP
 	gameup_add_score( GAME_SCORE_LEVEL );
+#endif
 
 	//	update profile
 	g_game->m_gui->m_upgradePanel->GetData( g_game->m_player->m_profile.upgrades );
@@ -2741,7 +2754,9 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 	case 1:		//	restart
 		{
 			g_game->Reset();
+#if USE_GAMEUP
 			g_gameup->begin_score();
+#endif
 			Hide();
 
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
