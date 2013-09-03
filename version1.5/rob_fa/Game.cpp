@@ -377,6 +377,23 @@ void Game::LoadLevel( void )
 
 	}
 
+
+	//	check the lock node
+#ifdef USE_LOCK_NAME
+	if ( !g_game->m_game_currentLevel )
+	{
+		sx::core::PNode node = null;
+		sx::core::ArrayPNode locknode;
+		sx::core::Scene::GetNodesByName( USE_LOCK_NAME, locknode );
+		if ( locknode.Count() < 1 )
+		{
+			node = locknode.At(0);
+			float f = 0.0f;
+			node->MsgProc( MT_ACTIVATE, &f );
+		}
+	}
+#endif
+
 	//  finish loading
 	m_app_Loading = 1;
 
@@ -414,15 +431,22 @@ void Game::Update( float elpsTime )
 	if ( m_game_currentLevel != m_game_nextLevel )
 	{
 
-#if VER_EXHIBITION
-		//	exhibition version only shows 3 levels
-		if ( g_game->m_game_nextLevel > 1 && g_game->m_game_nextLevel < 4 )
+#if VER_USERDEMO
+		//	exhibition version only shows 1, 4, 5, 8 levels
+		if ( g_game->m_game_nextLevel = 2 || g_game->m_game_nextLevel = 3 )
 			g_game->m_game_nextLevel = 4;
-		else if ( g_game->m_game_nextLevel > 4 && g_game->m_game_nextLevel < 8 )
+		else if ( g_game->m_game_nextLevel = 6 || g_game->m_game_nextLevel = 7 )
 			g_game->m_game_nextLevel = 8;
-		else if ( g_game->m_game_nextLevel > 8 )
+		else if ( g_game->m_game_nextLevel = 9 || g_game->m_game_nextLevel = 10 )
 			g_game->m_game_nextLevel = 1;
 #endif
+// #if VER_PREVIEW
+// 		//	preview version contain all levels except in 'insane' difficulty mode
+// 		if ( g_game->m_difficultyLevel == 2 )
+// 		{
+// 			g_game->m_difficultyLevel = 1;
+// 		}
+// #endif
 		m_game_currentLevel = m_game_nextLevel;
 		LoadLevel();
 	}

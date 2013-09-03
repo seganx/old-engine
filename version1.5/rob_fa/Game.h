@@ -14,19 +14,24 @@
 #include "gameup_import.h"
 
 
-#define VER_EXHIBITION	0
+#define VER_USERDEMO		0
+#define VER_PREVIEW			1
+#define VER_PREVIEW_NAME	L"Christian Sauerteig"
+#define USE_RTL				0
+#define USE_GAMEUP			0
+#define USE_LOCK_NAME		L"christiansauerteig"
 
-#if VER_EXHIBITION
-	#define GAME_TITLE		L"Roads of Battle - exhibition version"
+
+#if VER_USERDEMO
+#define GAME_TITLE		L"Roads of Battle - demo version"
 #else
-	#define GAME_TITLE		L"Roads of Battle"
+#define GAME_TITLE		L"Roads of Battle"
 #endif
 
-#define USE_RTL			1
-
-#define USE_GAMEUP		0
-#define USE_GAMEUP_CD	0
-
+#if VER_PREVIEW
+#undef GAME_TITLE
+#define GAME_TITLE		L"Roads of Battle - preview version for " VER_PREVIEW_NAME L" - not for sale"
+#endif
 
 class Player;
 class GamePlay;

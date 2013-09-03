@@ -168,6 +168,19 @@ void MenuMain::Initialize( void )
 	m_slantBack->State_GetByIndex(1).Blender.Set( 0.13f, 0.5f );
 	m_slantBack->State_GetByIndex(1).Position.Set( 185.0f, 0.0f, 0.0f );
 
+	// text for preview version
+#if VER_PREVIEW
+	sx::gui::PLabel pretext = sx_new( sx::gui::Label );
+	pretext->AddProperty( SX_GUI_PROPERTY_MULTILINE | SX_GUI_PROPERTY_WORDWRAP );
+	pretext->SetSize( float2( 500.0f, 60.0f ) );
+	pretext->SetAlign( GTA_LEFT );
+	pretext->SetParent( m_slantBack );
+	pretext->SetFont( L"Font_Tips.fnt" );
+	pretext->SetText( L"`0xffff22`preview version for\n " VER_PREVIEW_NAME L"\n  NOT FOR SALE" );
+	pretext->GetElement(0)->Color().a = 0;
+	pretext->Position().Set( 40.0f, -180.0f, 0.0f );
+#endif
+
 	for ( int i=0; i<5; i++ )
 	{
 		m_btn[i] = sx_new( sx::gui::PanelEx );
@@ -624,13 +637,14 @@ void MenuMap::Initialize( void )
 	//	create label to show people
 	m_diff_label = sx_new( sx::gui::Label );
 	m_diff_label->SetParent( panel );
-	m_diff_label->SetSize( float2(80, 20) );
+	m_diff_label->SetSize( float2(80, 32) );
 	m_diff_label->SetAlign( GTA_CENTER );
 	m_diff_label->GetElement(0)->Color().a = 0.0f;
 	m_diff_label->GetElement(1)->Color() = 0xaaffffff;
 	m_diff_label->SetFont( L"Font_map_diff.fnt" );
 	m_diff_label->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 	m_diff_label->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
+	m_diff_label->Position().y = -5.0f;
 
 	panel = sx_new( sx::gui::Panel );
 	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
@@ -794,12 +808,6 @@ void MenuMap::Draw( DWORD flag )
 
 void MenuMap::Show( void )
 {
-#if VER_EXHIBITION
-	g_game->m_player->m_profile.level = 10;
-	for ( int i=0; i<10; i++ )
-		g_game->m_player->m_profile.stars[i] = 3;
-#endif
-
 	for ( int i=0; i<10; i++ )
 	{
 		m_levels[i].m_area->State_SetIndex(2);
@@ -964,6 +972,11 @@ void MenuMap::OnScroll( sx::gui::PControl sender )
 		break;
 	}
 
+// #if VER_PREVIEW
+// 	if ( m_diff_scroll->GetValue() > 1 )
+// 		m_diff_scroll->SetValue( 1 );
+// #endif
+
 	g_game->m_player->m_profile.curDifficulty = int( m_diff_scroll->GetValue() + 0.5f );
 
 	switch ( g_game->m_player->m_profile.curDifficulty )
@@ -1095,7 +1108,7 @@ void MenuProfile::Initialize( void )
 		lbl->GetElement(0)->Color().a = 0.0f;
 		lbl->GetElement(1)->Color().a = 0.8f;
 		lbl->SetFont( L"Font_tob_profileInfo.fnt" );
-		lbl->Position().Set( 120.0f, -13.0f, 0.0f );
+		lbl->Position().Set( 120.0f, -18.0f, 0.0f );
 
 		//	label to show total people
 		lbl = sx_new( sx::gui::Label );
@@ -1105,7 +1118,7 @@ void MenuProfile::Initialize( void )
 		lbl->GetElement(0)->Color().a = 0.0f;
 		lbl->GetElement(1)->Color().a = 0.8f;
 		lbl->SetFont( L"Font_tob_profileInfo.fnt" );
-		lbl->Position().Set( 230.0f, -13.0f, 0.0f );
+		lbl->Position().Set( 230.0f, -18.0f, 0.0f );
 	}
 
 	//	create back button
@@ -1525,7 +1538,11 @@ void MenuAchievements::Initialize( void )
 	m_name->GetElement(0)->Color() = 0x00010000;
 	m_name->GetElement(1)->Color() = 0xffffff00;
 	m_name->SetSize( float2( 270, 30 ) );
+#if USE_RTL
 	m_name->SetAlign( GTA_RIGHT );
+#else
+	m_name->SetAlign( GTA_LEFT );
+#endif
 	m_name->SetFont( L"font_achievements_name.fnt" );
 	m_name->Position().Set( 50.0f, -5.0f, 0.0f );
 
@@ -1534,7 +1551,11 @@ void MenuAchievements::Initialize( void )
 	m_desc->SetParent( m_back );
 	m_desc->GetElement(0)->Color() = 0x00010000;
 	m_desc->SetSize( float2( 300, 50 ) );
-	m_desc->SetAlign( GTA_RIGHT );
+#if USE_RTL
+	m_name->SetAlign( GTA_RIGHT );
+#else
+	m_name->SetAlign( GTA_LEFT );
+#endif
 	m_desc->SetFont( L"font_achievements_desc.fnt" );
 	m_desc->Position().Set( 65.0f, -40.0f, 0.0f );
 	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
@@ -2401,8 +2422,11 @@ void MenuVictory::Initialize( void )
 	//	create label to show golds
 	m_goldLabel = (sx::gui::Label*)m_peopleLabel->Clone();
 	m_goldLabel->SetParent( m_back );
-	//m_goldLabel->SetAlign( GTA_RIGHT );
+#if USE_RTL
 	m_goldLabel->Position().Set( -148.0f, 117.0f, 0.0f );
+#else
+	m_goldLabel->Position().Set( -143.0f, 110.0f, 0.0f );
+#endif
 
 	//	create buttons
 	for ( int i=0; i<5; i++ )
@@ -3034,15 +3058,24 @@ void MenuInfo::Initialize( void )
 	m_helper.title->GetElement(1)->Color() = 0xffffff00;
 	m_helper.title->SetSize( float2( 250, 30 ) );
 	m_helper.title->SetFont( L"font_info_title_helper.fnt" );
+#if USE_RTL
 	m_helper.title->SetAlign( GTA_RIGHT );
 	m_helper.title->Position().Set( -15.0f, 5.0f, 0.0f );
+#else
+	m_helper.title->SetAlign( GTA_LEFT );
+	m_helper.title->Position().Set( -15.0f, 0.0f, 0.0f );
+#endif
 
 	m_helper.desc = sx_new( sx::gui::Label );
 	m_helper.desc->SetParent( m_helper.back );
 	m_helper.desc->GetElement(0)->Color() = 0x00001000;
 	m_helper.desc->SetSize( float2( 250, 25 ) );
 	m_helper.desc->SetFont( L"font_info_desc_helper.fnt" );
-	m_helper.desc->SetAlign( GTA_RIGHT );
+#if USE_RTL
+	m_helper.title->SetAlign( GTA_RIGHT );
+#else
+	m_helper.title->SetAlign( GTA_LEFT );
+#endif
 	m_helper.desc->Position().Set( -15.0f, -10.0f, 0.0f );
 	m_helper.desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 	m_helper.desc->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
@@ -3478,10 +3511,15 @@ void MenuUpgrade::Initialize( void )
 	m_stars->SetParent( m_back );
 	m_stars->SetSize( float2(128, 40) );
 	m_stars->SetFont( L"font_upgrade_stars.fnt" );
+#if USE_RTL
 	m_stars->SetAlign( GTA_RIGHT );
+	m_stars->Position().Set( -130.0f, -250.0f, 0.0f );
+#else
+	m_stars->SetAlign( GTA_LEFT );
+	m_stars->Position().Set( -130.0f, -260.0f, 0.0f );
+#endif
 	m_stars->GetElement(0)->Color() = 0x00010000;
 	m_stars->GetElement(1)->Color() = 0xFFFFFF00;
-	m_stars->Position().Set( -130.0f, -250.0f, 0.0f );
 
 	//	create back button
 	m_goback = sx_new( sx::gui::Button );
@@ -3500,7 +3538,11 @@ void MenuUpgrade::Initialize( void )
 	m_desc = sx_new( sx::gui::Label );
 	m_desc->SetParent( m_back );
 	m_desc->SetSize( float2( 430, 100 ) );
+#if USE_RTL
 	m_desc->SetAlign( GTA_RIGHT );
+#else
+	m_desc->SetAlign( GTA_LEFT );
+#endif
 	m_desc->SetFont( L"font_upgrade_desc.fnt" );
 	m_desc->Position().Set( 220.0f, -250.0f, 0.0f );
 	m_desc->GetElement(0)->Color() = 0x00000001;

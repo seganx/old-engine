@@ -163,7 +163,11 @@ namespace GM
 		m_lblHealth = sx_new( sx::gui::Label );
 		m_lblHealth->SetParent( m_back );
 		m_lblHealth->SetSize( float2(120, 50) );
+#if USE_RTL
 		m_lblHealth->Position().Set( -60.0f, -10.0f, 0.0f );
+#else
+		m_lblHealth->Position().Set( -60.0f, -20.0f, 0.0f );
+#endif
 		m_lblHealth->GetElement(0)->Color().a = 0.0f;
 		m_lblHealth->GetElement(1)->Color().a = 0.85f;
 		m_lblHealth->SetAlign( GTA_CENTER );
@@ -172,28 +176,37 @@ namespace GM
 		m_lblXP = sx_new( sx::gui::Label );
 		m_lblXP->SetParent( m_back );
 		m_lblXP->SetSize( float2(75, 40) );
+#if USE_RTL
 		m_lblXP->Position().Set( -265.0f, -40.0f, 0.0f );
+#else
+		m_lblXP->Position().Set( -265.0f, -50.0f, 0.0f );
+#endif
 		m_lblXP->GetElement(0)->Color().a = 0.0f;
 		m_lblXP->GetElement(1)->Color().a = 0.85f;
-		//m_lblXP->SetAlign( GTA_RIGHT );
 		m_lblXP->SetFont( L"Font_rob_twedit_info.fnt" );
 
 		m_lblDamage = sx_new( sx::gui::Label );
 		m_lblDamage->SetParent( m_back );
 		m_lblDamage->SetSize( float2(70, 40) );
+#if USE_RTL
 		m_lblDamage->Position().Set( -153.0f, -40.0f, 0.0f );
+#else
+		m_lblDamage->Position().Set( -153.0f, -50.0f, 0.0f );
+#endif
 		m_lblDamage->GetElement(0)->Color().a = 0.0f;
 		m_lblDamage->GetElement(1)->Color().a = 0.85f;
-		//m_lblDamage->SetAlign( GTA_RIGHT );
 		m_lblDamage->SetFont( L"Font_rob_twedit_info.fnt" );
 
 		m_lblFireRate = sx_new( sx::gui::Label );
 		m_lblFireRate->SetParent( m_back );
 		m_lblFireRate->SetSize( float2(70, 40) );
+#if USE_RTL
 		m_lblFireRate->Position().Set( -52.0f, -40.0f, 0.0f );
+#else
+		m_lblFireRate->Position().Set( -52.0f, -50.0f, 0.0f );
+#endif
 		m_lblFireRate->GetElement(0)->Color().a = 0.0f;
 		m_lblFireRate->GetElement(1)->Color().a = 0.85f;
-		//m_lblFireRate->SetAlign( GTA_RIGHT );
 		m_lblFireRate->SetFont( L"Font_rob_twedit_info.fnt" );
 
 
@@ -202,30 +215,39 @@ namespace GM
 		pnl->SetParent( m_lblHealth );
 		pnl->SetSize( float2(32, 32) );
 		pnl->GetElement(0)->SetTextureSrc( L"gui_iconHeart.txr" );
-		//pnl->GetElement(0)->Color() = 0xFFF2C795;
+#if USE_RTL
 		pnl->Position().Set( -60.0f, 2.0f, 0.0f );
+#else
+		pnl->Position().Set( -60.0f, 12.0f, 0.0f );
+#endif
 
 		pnl = sx_new( sx::gui::Panel );
 		pnl->SetParent( m_lblXP );
 		pnl->SetSize( float2(32, 32) );
 		pnl->GetElement(0)->SetTextureSrc( L"gui_iconXP.txr" );
-		//pnl->GetElement(0)->Color() = 0xFFF2C795;
+#if USE_RTL
 		pnl->Position().Set( -50.0f, 2.0f, 0.0f );
-
+#else
+		pnl->Position().Set( -50.0f, 12.0f, 0.0f );
+#endif
 		pnl = sx_new( sx::gui::Panel );
 		pnl->SetParent( m_lblDamage );
 		pnl->SetSize( float2(32, 32) );
 		pnl->GetElement(0)->SetTextureSrc( L"gui_iconDamage.txr" );
-		//pnl->GetElement(0)->Color() = 0xFFF2C795;
+#if USE_RTL
 		pnl->Position().Set( -50.0f, 2.0f, 0.0f );
-
+#else
+		pnl->Position().Set( -50.0f, 12.0f, 0.0f );
+#endif
 		pnl = sx_new( sx::gui::Panel );
 		pnl->SetParent( m_lblFireRate );
 		pnl->SetSize( float2(32, 32) );
 		pnl->GetElement(0)->SetTextureSrc( L"gui_iconFireRate.txr" );
-		//pnl->GetElement(0)->Color() = 0xFFF2C795;
+#if USE_RTL
 		pnl->Position().Set( -50.0f, 2.0f, 0.0f );
-
+#else
+		pnl->Position().Set( -50.0f, 12.0f, 0.0f );
+#endif
 		// add editor panel to the game
 		g_game->m_gui->Add_Front( m_back );
 	}
