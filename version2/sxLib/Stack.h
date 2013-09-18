@@ -34,56 +34,46 @@ public:
 		mem_free( m_item );
 	}
 
-	SEGAN_LIB_INLINE void Clear( void )
+	SEGAN_LIB_INLINE void clear( void )
 	{
 		mem_free( m_item );
 		m_item = null;
 		m_count = 0;
 	}
 
-	SEGAN_LIB_INLINE void SetCount( sint newCount )
+	SEGAN_LIB_INLINE void set_count( const sint newCount )
 	{
 		m_count = newCount;
-		_Realloc( m_count );
+		_realloc( m_count );
 	}
 
-	SEGAN_LIB_INLINE void SetSize( sint newSize )
+	SEGAN_LIB_INLINE void set_size( const sint newSize )
 	{
 		m_sampler = newSize;
-		_Realloc( newSize-1 );
+		_realloc( newSize-1 );
 	}
 
-	SEGAN_LIB_INLINE sint Count( void ) const
+	SEGAN_LIB_INLINE void push( const T& newItem )
 	{
-		return m_count;
-	}
-
-	SEGAN_LIB_INLINE bool IsEmpty( void ) const
-	{
-		return ( m_count == 0 );
-	}
-
-	SEGAN_LIB_INLINE void Push( const T& newItem )
-	{
-		_Realloc( ++m_count );
+		_realloc( ++m_count );
 		m_item[m_count-1] = newItem;
 	}
 
-	SEGAN_LIB_INLINE void Pop( void )
+	SEGAN_LIB_INLINE void pop( void )
 	{
 		if ( !m_count ) return;
-		_Realloc( --m_count );
+		_realloc( --m_count );
 	}
 
-	SEGAN_LIB_INLINE bool Pop( OUT T& Item )
+	SEGAN_LIB_INLINE bool pop( OUT T& Item )
 	{
 		if ( !m_count ) return false;
 		Item = m_item[--m_count];
-		_Realloc( m_count );
+		_realloc( m_count );
 		return true;
 	}
 
-	SEGAN_LIB_INLINE T& Top( void )
+	SEGAN_LIB_INLINE T& top( void )
 	{
 		sx_assert(m_count>0);
 		return m_item[m_count-1];
@@ -91,7 +81,7 @@ public:
 
 
 private:
-	SEGAN_LIB_INLINE void _Realloc( sint newSize )
+	SEGAN_LIB_INLINE void _realloc( sint newSize )
 	{
 		if ( m_sampler ) {
 			if ( newSize > m_size || ( m_size - newSize ) > m_sampler ) {
@@ -135,7 +125,7 @@ public:
 	{
 	}
 
-	SEGAN_LIB_INLINE void Clear( void )
+	SEGAN_LIB_INLINE void clear( void )
 	{
 		m_count = 0;
 #if _DEBUG
@@ -143,35 +133,25 @@ public:
 #endif
 	}
 
-	SEGAN_LIB_INLINE void SetCount( sint newCount )
+	SEGAN_LIB_INLINE void set_count( sint newCount )
 	{
 		if ( newCount >= count ) return;
 		m_count = newCount;
 	}
 
-	SEGAN_LIB_INLINE sint Count( void ) const
-	{
-		return m_count;
-	}
-
-	SEGAN_LIB_INLINE bool IsEmpty( void ) const
-	{
-		return ( m_count == 0 );
-	}
-
-	SEGAN_LIB_INLINE void Push( const T& newItem )
+	SEGAN_LIB_INLINE void push( const T& newItem )
 	{
 		if ( m_count >= count ) return;
 		m_item[m_count++] = newItem;
 	}
 
-	SEGAN_LIB_INLINE void Pop( void )
+	SEGAN_LIB_INLINE void pop( void )
 	{
 		if ( !m_count ) return;
 		m_count--;
 	}
 
-	SEGAN_LIB_INLINE bool Pop( OUT T& Item )
+	SEGAN_LIB_INLINE bool pop( OUT T& Item )
 	{
 		if ( !m_count ) return false;
 		sx_assert(m_count);
@@ -179,7 +159,7 @@ public:
 		return true;
 	}
 
-	SEGAN_LIB_INLINE T& Top( void )
+	SEGAN_LIB_INLINE T& top( void )
 	{
 		sx_assert(m_count>0);
 		return m_item[m_count-1];

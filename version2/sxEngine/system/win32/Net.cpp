@@ -100,11 +100,11 @@ SEGAN_INLINE sint net_copy_name( NetPacket* packet, const wchar* name )
 
 SEGAN_INLINE bool net_array_pop_front( Array<NetMessage*>& msgarray, OUT NetMessage*& pmsg )
 {
-	sint h = msgarray.Count() - 1;
+	sint h = msgarray.m_count - 1;
 	if ( h >= 0 )
 	{
 		pmsg = msgarray[h];
-		msgarray.RemoveByIndex( h );
+		msgarray.remove_index( h );
 	}
 	return ( h >= 0 );
 }
@@ -137,19 +137,19 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 	if ( currpacket->header.type != NPT_ZIP )
 	{
 		//	set number of packet in the data
-		data.WriteByte(2);
+		data.write_byte(2);
 
 		//	copy the first packet to the data
-		data.WriteUInt32( currsize );
-		data.Write( currpacket, currsize );
+		data.write_uint32( currsize );
+		data.write( currpacket, currsize );
 
 		//	copy the second packet to the data
-		data.WriteUInt32( packetsize );
-		data.Write( packet, packetsize );
+		data.write_uint32( packetsize );
+		data.write( packet, packetsize );
 
 		//	compress data to pack
-		data.SetPos(0);
-		res = zlib_compress( currpacket->data, NET_MAX_PACKET_SIZE, data, data.Size(), 9 );
+		data.set_pos(0);
+		res = zlib_compress( currpacket->data, NET_MAX_PACKET_SIZE, data, data.size(), 9 );
 		if ( res )
 		{
 			res += sizeof(NetPacketHeader);
@@ -172,15 +172,15 @@ SEGAN_INLINE uint net_merge_packet( NetPacket* currpacket, const uint currsize, 
 			dcdata[0] += 1;
 
 			//	copy packet data to the data container
-			data.Write( dcdata, dcsize );
+			data.write( dcdata, dcsize );
 
 			//	copy the new packet to the data
-			data.WriteUInt32( packetsize );
-			data.Write( packet, packetsize );
+			data.write_uint32( packetsize );
+			data.write( packet, packetsize );
 
 			//	compress data to pack
-			data.SetPos(0);
-			res = zlib_compress( currpacket->data, NET_MAX_PACKET_SIZE, data, data.Size() );
+			data.set_pos(0);
+			res = zlib_compress( currpacket->data, NET_MAX_PACKET_SIZE, data, data.size() );
 			if ( res )
 			{
 				res += sizeof(NetPacketHeader);
@@ -216,7 +216,7 @@ SEGAN_INLINE bool net_con_msg_is_ack_request( Connection* con, NetMessage* netms
 	bool result = false;
 
 	//	verify that there is any item in the sent list
-	const uint csent = con->m_sent.Count();
+	const uint csent = con->m_sent.m_count;
 	if ( csent )
 	{
 		// messages are placed in the sent list consecutively. so we can simple compute the index of an ack
@@ -250,35 +250,35 @@ SEGAN_INLINE bool net_con_msg_is_ack_request( Connection* con, NetMessage* netms
 
 SEGAN_INLINE void net_con_clear_all_list( Connection* con )
 {
-	for ( int i=0; i<con->m_unreliable.Count(); i++ )
+	for ( int i=0; i<con->m_unreliable.m_count; i++ )
 	{
 		NetMessage* pbuf = con->m_unreliable[i];
-		s_netInternal->msgPool.Push( pbuf );
+		s_netInternal->msgPool.push( pbuf );
 	}
-	con->m_unreliable.Clear();
+	con->m_unreliable.clear();
 
-	for ( int i=0; i<con->m_sent.Count(); i++ )
+	for ( int i=0; i<con->m_sent.m_count; i++ )
 	{
 		NetMessage* pbuf = con->m_sent[i];
-		s_netInternal->msgPool.Push( pbuf );
+		s_netInternal->msgPool.push( pbuf );
 	}
-	con->m_sent.Clear();
+	con->m_sent.clear();
 
-	for ( int i=0; i<con->m_sending.Count(); i++ )
+	for ( int i=0; i<con->m_sending.m_count; i++ )
 	{
 		NetMessage* pbuf = con->m_sending[i];
-		s_netInternal->msgPool.Push( pbuf );
+		s_netInternal->msgPool.push( pbuf );
 	}
-	con->m_sending.Clear();
+	con->m_sending.clear();
 }
 
 SEGAN_INLINE void net_con_flush_unreliablelist( Connection* con )
 {
-	if ( con->m_unreliable.Count() )
+	if ( con->m_unreliable.m_count )
 	{
-		con->m_unreliable.Sort( net_compare_ack );
+		con->m_unreliable.sort( net_compare_ack );
 
-		for ( int i=0; i<con->m_unreliable.Count(); i++ )
+		for ( int i=0; i<con->m_unreliable.m_count; i++ )
 		{
 			NetMessage* pbuf = con->m_unreliable[i];
 			if ( con->m_recAck == pbuf->packet.header.ack )
@@ -289,8 +289,8 @@ SEGAN_INLINE void net_con_flush_unreliablelist( Connection* con )
 					con->m_callBack( con, pbuf->packet.data, pbuf->size );
 				con->m_recAck++;
 
-				s_netInternal->msgPool.Push( pbuf );
-				con->m_unreliable.RemoveByIndex(i);
+				s_netInternal->msgPool.push( pbuf );
+				con->m_unreliable.remove_index(i);
 				i--;
 			}
 		}
@@ -310,18 +310,18 @@ SEGAN_INLINE void net_con_flush_sendinglist( Connection* con )
 		if ( msg->packet.header.crit )
 		{
 			con->m_sntAck++;
-			con->m_sent.PushBack( msg );
+			con->m_sent.push_back( msg );
 
 			//	keep sent items limit
-			if ( con->m_sent.Count() == NET_MAX_SENT_LIST )
+			if ( con->m_sent.m_count == NET_MAX_SENT_LIST )
 			{
-				s_netInternal->msgPool.Push( con->m_sent[0] );
-				con->m_sent.RemoveByIndex( 0 );
+				s_netInternal->msgPool.push( con->m_sent[0] );
+				con->m_sent.remove_index( 0 );
 			}
 		}
 		else 
 		{
-			s_netInternal->msgPool.Push( msg );
+			s_netInternal->msgPool.push( msg );
 		}
 	}
 }
@@ -329,15 +329,15 @@ SEGAN_INLINE void net_con_flush_sendinglist( Connection* con )
 SEGAN_INLINE bool net_con_hold_unreliable( NetMessage* buffer, Connection* con )
 {
 	//  verify that if message queue is going too long may be a message is lost
-	bool res = ( con->m_unreliable.Count() < NET_MAX_UNRELIABLE_LIST );
+	bool res = ( con->m_unreliable.m_count < NET_MAX_UNRELIABLE_LIST );
 
 	if ( res )
 	{
 		//	push the message to the queue
 		NetMessage* netmsg;
-		s_netInternal->msgPool.Pop( netmsg );
+		s_netInternal->msgPool.pop( netmsg );
 		memcpy( netmsg, buffer, sizeof(NetMessage) );
-		con->m_unreliable.PushBack( netmsg );
+		con->m_unreliable.push_back( netmsg );
 	}
 	else con->Disconnect();
 
@@ -804,7 +804,7 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 			uint newsize = 0;
 
 			//	verify that messages are in the queue
-			const uint sndcount = m_sending.Count();
+			const uint sndcount = m_sending.m_count;
 			if ( sndcount )
 			{
 				if ( sndcount > NET_MAX_SENDING_LIST + 5 )
@@ -828,7 +828,7 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 			}
 			
 			//	if message can't be merged just send it normally
-			if ( !newsize && s_netInternal->msgPool.Pop( msg ) )
+			if ( !newsize && s_netInternal->msgPool.pop( msg ) )
 			{
 				msg->packet.header.id = s_netInternal->id;
 				msg->packet.header.type = NPT_USER;
@@ -836,7 +836,7 @@ SEGAN_INLINE bool Connection::Send( const void* buffer, const int sizeinbyte, co
 				msg->size = sizeinbyte + sizeof(NetPacketHeader);
 				memcpy( msg->packet.data, buffer, sizeinbyte );
 
-				m_sending.PushBack( msg );
+				m_sending.push_back( msg );
 				res = true;
 			}
 
@@ -883,7 +883,7 @@ bool Server::Start( const word port, const word clientPort, const uint maxClient
 			con->m_userData = this;
 			con->m_callBack = callback_connection_server;
 			con->Start( &m_socket );
-			m_clients.PushBack( con );
+			m_clients.push_back( con );
 		}
 
 		m_callback = callback;
@@ -905,13 +905,13 @@ void Server::Stop( void )
 		m_socket.Send( broadcast, &packet, sizeof(NetPacketHeader) + net_copy_name( &packet, m_name ) );
 	}
 
-	for ( int i=0; i<m_clients.Count(); i++ )
+	for ( int i=0; i<m_clients.m_count; i++ )
 	{
 		m_clients[i]->Disconnect();
 		m_clients[i]->Stop();
 		sx_delete( m_clients[i] );
 	}
-	m_clients.Clear();
+	m_clients.clear();
 
 	m_socket.Close();
 }
@@ -920,7 +920,7 @@ void Server::Listen( void )
 {
 	if ( m_state == STOPPED ) return;
 
-	for ( int i=0; i<m_clients.Count(); i++ )
+	for ( int i=0; i<m_clients.m_count; i++ )
 		m_clients[i]->Listen();
 
 	m_state = LISTENING;
@@ -937,7 +937,7 @@ void Server::Run( void )
 	NetAddress broadcast; ZeroMemory( &broadcast.ip, sizeof(broadcast.ip) ); broadcast.port = m_clientPort;
 	m_socket.Send( broadcast, &packet, sizeof(NetPacketHeader) + net_copy_name( &packet, m_name ) );
 
-	for ( int i=0; i<m_clients.Count(); i++ )
+	for ( int i=0; i<m_clients.m_count; i++ )
 	{
 		if ( m_clients[i]->m_state == LISTENING )
 			m_clients[i]->Stop();
@@ -964,7 +964,7 @@ void Server::Update( const float elpsTime, const float delayTime, const float ti
 			NetAddress broadcast; ZeroMemory( &broadcast.ip, sizeof(broadcast.ip) ); broadcast.port = m_clientPort;
 			m_socket.Send( broadcast, &packet, sizeof(NetPacketHeader) + net_copy_name( &packet, m_name ) );
 
-			for ( int i=0; i<m_clients.Count(); i++ )
+			for ( int i=0; i<m_clients.m_count; i++ )
 			{
 				if ( m_clients[i]->m_state != CONNECTED )
 				{
@@ -980,7 +980,7 @@ void Server::Update( const float elpsTime, const float delayTime, const float ti
 			NetMessage buffer;
 			buffer.size = m_socket.Receive( &buffer, NET_MAX_PACKET_SIZE, &buffer.address );
 
-			for ( int i=0; i<m_clients.Count(); i++ )
+			for ( int i=0; i<m_clients.m_count; i++ )
 			{
 				Connection* pclient = m_clients[i];
 
@@ -1002,7 +1002,7 @@ void Server::Update( const float elpsTime, const float delayTime, const float ti
 				case STOPPED:
 				case LISTENING:
 				case DISCONNECTED:
-					pclient->m_name.Clear();
+					pclient->m_name.clear();
 					ZeroMemory ( &pclient->m_destination, sizeof(pclient->m_destination) );
 				}
 			}
@@ -1021,7 +1021,7 @@ bool Server::Send( const char* buffer, const int sizeinbyte, const bool critical
 	bool res = true;
 	if ( m_state != STOPPED )
 	{
-		for ( int i=0; res && i<m_clients.Count(); i++ )
+		for ( int i=0; res && i<m_clients.m_count; i++ )
 		{
 			res = m_clients[i]->Send( buffer, sizeinbyte, critical );
 		}
@@ -1037,10 +1037,10 @@ SEGAN_INLINE float Server::GetMaxUpdateTime( void )
 
 	//	find maximum sending queue
 	sint n = 0;
-	sint c = m_clients.Count();
+	sint c = m_clients.m_count;
 	for ( int i=0; i<c; i++ )
 	{
-		sint sc = m_clients[i]->m_sending.Count();
+		sint sc = m_clients[i]->m_sending.m_count;
 		if ( sc > n ) n = sc;
 	}
 	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
@@ -1057,10 +1057,10 @@ SEGAN_INLINE bool Server::CanSend( const float elpsTime )
 
 	//	find maximum sending queue
 	sint n = 0;
-	sint c = m_clients.Count();
+	sint c = m_clients.m_count;
 	for ( int i=0; i<c; i++ )
 	{
-		sint sc = m_clients[i]->m_sending.Count();
+		sint sc = m_clients[i]->m_sending.m_count;
 		if ( sc > n ) n = sc;
 	}
 	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
@@ -1156,7 +1156,7 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 			if ( buffer.packet.header.type == NPT_SERVER_OPEN )
 			{
 				bool itisnew = true;
-				for ( int i=0; i<m_servers.Count(); i++ )
+				for ( int i=0; i<m_servers.m_count; i++ )
 				{
 					if ( memcmp( &m_servers[i].address, &serverInfo.address, sizeof(serverInfo.address) ) == 0 )
 					{
@@ -1169,16 +1169,16 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 				if ( itisnew )
 				{
 					sx_str_copy( serverInfo.name, 32, (wchar*)buffer.packet.data );
-					m_servers.PushBack( serverInfo );
+					m_servers.push_back( serverInfo );
 				}
 			}
 			else	//	if ( buffer.type == NPT_SERVER_CLOSED )
 			{
-				for ( int i=0; i<m_servers.Count(); i++ )
+				for ( int i=0; i<m_servers.m_count; i++ )
 				{
 					if ( memcmp( &m_servers[i].address, &serverInfo.address, sizeof(serverInfo.address) ) == 0 )
 					{
-						m_servers.RemoveByIndex( i );
+						m_servers.remove_index( i );
 						break;
 					}
 				}
@@ -1188,12 +1188,12 @@ void Client::Update( const float elpsTime, const float delayTime, const float ti
 		}
 		else
 		{
-			for ( int i=0; i<m_servers.Count(); i++ )
+			for ( int i=0; i<m_servers.m_count; i++ )
 			{
 				m_servers[i].age -= elpsTime;
 				if ( m_servers[i].age < 0 )
 				{
-					m_servers.RemoveByIndex( i );
+					m_servers.remove_index( i );
 				}
 			}
 		}
@@ -1217,7 +1217,7 @@ SEGAN_INLINE bool Client::Send( const char* buffer, const int sizeinbyte, const 
 SEGAN_INLINE float Client::GetMaxUpdateTime( void )
 {
 	static float res = 0;
-	sint n = m_connection.m_sending.Count();
+	sint n = m_connection.m_sending.m_count;
 	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
 	float p = float(s) + 1;
 	float r = ( p * p ) * 50.0f;
@@ -1230,7 +1230,7 @@ SEGAN_INLINE bool Client::CanSend( const float elpsTime )
 {
 	static float maxTime = 0;
 
-	sint n = m_connection.m_sending.Count();
+	sint n = m_connection.m_sending.m_count;
 	sint s = n > NET_MAX_SENDING_LIST ? n - NET_MAX_SENDING_LIST : -1;
 	float p = float(s) + 1;
 	float r = ( p * p ) * 50.0f;
@@ -1309,7 +1309,7 @@ SEGAN_ENG_API bool sx_net_initialize( const dword netID )
 		s_netInternal->address.port  = 0;
 
 		for (int i=0; i<NET_MAX_NUM_BUFFER; i++)
-			s_netInternal->msgPool.Push( (NetMessage*)mem_alloc( sizeof(NetMessage) ) );
+			s_netInternal->msgPool.push( (NetMessage*)mem_alloc( sizeof(NetMessage) ) );
 
 		g_logger->Log(  L"Network system initialized successfully on Windows." );
 		g_logger->Log_( L"    Name:		%s" , s_netInternal->name );
@@ -1332,11 +1332,11 @@ void sx_net_finalize( void )
 	if ( s_netInternal )
 	{
 		NetMessage* netMsg = null;
-		while ( s_netInternal->msgPool.Pop(netMsg) )
+		while ( s_netInternal->msgPool.pop(netMsg) )
 		{
 			mem_free( netMsg );
 		}
-		s_netInternal->msgPool.Clear();
+		s_netInternal->msgPool.clear();
 
 		sx_delete_and_null( s_netInternal );
 

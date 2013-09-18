@@ -33,7 +33,7 @@ public:
 			m_thread[i] = null;
 			m_event[i] = null;
 			m_runing[i] = false,
-			m_taskList[i].SetSize( 32 );
+			m_taskList[i].set_size( 32 );
 		}
 
 		//  get system info to know there are how many processor core exist in this set
@@ -86,7 +86,7 @@ public:
 			sx_1th_byte_of( newTask->m_flag ) = (byte)m_taskIndex;
 
 			sx_os_enter_critical_section();
-			m_taskList[m_taskIndex].PushBack( newTask );
+			m_taskList[m_taskIndex].push_back( newTask );
 			sx_os_leave_critical_section();
 
 			SetEvent( m_event[m_taskIndex] );
@@ -100,7 +100,7 @@ public:
 
 			//  push task to the specified thread
 			sx_os_enter_critical_section();
-			m_taskList[destThread].PushBack( newTask );
+			m_taskList[destThread].push_back( newTask );
 			sx_os_leave_critical_section();
 
 			if ( destThread )
@@ -115,7 +115,7 @@ public:
 		int index = sx_1th_byte_of( pTask->m_flag );
 
 		sx_os_enter_critical_section();
-		while( m_taskList[index].Remove( pTask ) );
+		while( m_taskList[index].remove( pTask ) );
 		sx_os_leave_critical_section();
 	}
 
@@ -169,11 +169,11 @@ void sx_thread_remove_task( ThreadTask* ptask )
 
 bool sx_thread_isempty( void )
 {
-	return	s_threadMan->m_taskList[0].IsEmpty() &&
-			s_threadMan->m_taskList[1].IsEmpty() &&
-			s_threadMan->m_taskList[2].IsEmpty() &&
-			s_threadMan->m_taskList[3].IsEmpty() &&
-			s_threadMan->m_taskList[4].IsEmpty() &&
+	return	s_threadMan->m_taskList[0].is_empty() &&
+			s_threadMan->m_taskList[1].is_empty() &&
+			s_threadMan->m_taskList[2].is_empty() &&
+			s_threadMan->m_taskList[3].is_empty() &&
+			s_threadMan->m_taskList[4].is_empty() &&
 
 			!s_threadMan->m_runing[0] &&
 			!s_threadMan->m_runing[1] &&
@@ -186,10 +186,10 @@ void sx_thread_clear( void )
 {
 	sx_os_enter_critical_section();
 
-	s_threadMan->m_taskList[1].Clear();
-	s_threadMan->m_taskList[2].Clear();
-	s_threadMan->m_taskList[3].Clear();
-	s_threadMan->m_taskList[4].Clear();
+	s_threadMan->m_taskList[1].clear();
+	s_threadMan->m_taskList[2].clear();
+	s_threadMan->m_taskList[3].clear();
+	s_threadMan->m_taskList[4].clear();
 
 	sx_os_leave_critical_section();
 
@@ -200,30 +200,30 @@ void sx_thread_clear( void )
 int sx_thread_count( void )
 {
 	return	
-		s_threadMan->m_taskList[0].Count() +
-		s_threadMan->m_taskList[1].Count() +
-		s_threadMan->m_taskList[2].Count() +
-		s_threadMan->m_taskList[3].Count() +
-		s_threadMan->m_taskList[4].Count();
+		s_threadMan->m_taskList[0].m_count +
+		s_threadMan->m_taskList[1].m_count +
+		s_threadMan->m_taskList[2].m_count +
+		s_threadMan->m_taskList[3].m_count +
+		s_threadMan->m_taskList[4].m_count;
 }
 
 void sx_thread_update( float elpsTime )
 {
-	uint n = s_threadMan->m_taskList[0].Count();
+	uint n = s_threadMan->m_taskList[0].m_count;
 
 	while ( n )
 	{
 		n--;
 
-		if ( s_threadMan->m_taskList[0].IsEmpty() ) return;
+		if ( s_threadMan->m_taskList[0].is_empty() ) return;
 
 		s_threadMan->m_runing[0] = true;
 
 		//  pop a task from list
 		sx_os_enter_critical_section();
-		ThreadTask* task = s_threadMan->m_taskList[0].At( n );
+		ThreadTask* task = s_threadMan->m_taskList[0].at( n );
 		task->m_flag |= SX_TASKBASE_EXECUTING;
-		s_threadMan->m_taskList[0].RemoveByIndex( n );
+		s_threadMan->m_taskList[0].remove_index( n );
 		sx_os_leave_critical_section();
 
 		//	execute task
@@ -284,7 +284,7 @@ DWORD WINAPI threadProc1( __in  LPVOID lpParameter )
 
 	while( WaitForSingleObject( threadMan->m_event[1], INFINITE ) == WAIT_OBJECT_0 )
 	{
-		if ( threadMan->m_taskList[1].IsEmpty() )
+		if ( threadMan->m_taskList[1].is_empty() )
 		{
 			ResetEvent( threadMan->m_event[1] );
 			continue;
@@ -294,10 +294,10 @@ DWORD WINAPI threadProc1( __in  LPVOID lpParameter )
 
 		//	pop a task from the list
 		sx_os_enter_critical_section();
-		sint h = s_threadMan->m_taskList[1].Count() - 1;
-		ThreadTask* task = s_threadMan->m_taskList[1].At( h );
+		sint h = s_threadMan->m_taskList[1].m_count - 1;
+		ThreadTask* task = s_threadMan->m_taskList[1].at( h );
 		task->m_flag |= SX_TASKBASE_EXECUTING;
-		s_threadMan->m_taskList[1].RemoveByIndex( h );
+		s_threadMan->m_taskList[1].remove_index( h );
 		sx_os_leave_critical_section();
 
 		//  execute the task
@@ -324,7 +324,7 @@ DWORD WINAPI threadProc2( __in  LPVOID lpParameter )
 
 	while( WaitForSingleObject( threadMan->m_event[2], INFINITE ) == WAIT_OBJECT_0 )
 	{
-		if ( threadMan->m_taskList[2].IsEmpty() )
+		if ( threadMan->m_taskList[2].is_empty() )
 		{
 			ResetEvent( threadMan->m_event[2] );
 			continue;
@@ -334,10 +334,10 @@ DWORD WINAPI threadProc2( __in  LPVOID lpParameter )
 
 		//	pop a task from the list
 		sx_os_enter_critical_section();
-		sint h = s_threadMan->m_taskList[2].Count() - 1;
-		ThreadTask* task = s_threadMan->m_taskList[2].At( h );
+		sint h = s_threadMan->m_taskList[2].m_count - 1;
+		ThreadTask* task = s_threadMan->m_taskList[2].at( h );
 		task->m_flag |= SX_TASKBASE_EXECUTING;
-		s_threadMan->m_taskList[2].RemoveByIndex( h );
+		s_threadMan->m_taskList[2].remove_index( h );
 		sx_os_leave_critical_section();
 
 		//  execute the task
@@ -364,7 +364,7 @@ DWORD WINAPI threadProc3( __in  LPVOID lpParameter )
 
 	while( WaitForSingleObject( threadMan->m_event[3], INFINITE ) == WAIT_OBJECT_0 )
 	{
-		if ( threadMan->m_taskList[3].IsEmpty() )
+		if ( threadMan->m_taskList[3].is_empty() )
 		{
 			ResetEvent( threadMan->m_event[3] );
 			continue;
@@ -374,10 +374,10 @@ DWORD WINAPI threadProc3( __in  LPVOID lpParameter )
 
 		//	pop a task from the list
 		sx_os_enter_critical_section();
-		sint h = s_threadMan->m_taskList[3].Count() - 1;
-		ThreadTask* task = s_threadMan->m_taskList[3].At( h );
+		sint h = s_threadMan->m_taskList[3].m_count - 1;
+		ThreadTask* task = s_threadMan->m_taskList[3].at( h );
 		task->m_flag |= SX_TASKBASE_EXECUTING;
-		s_threadMan->m_taskList[3].RemoveByIndex( h );
+		s_threadMan->m_taskList[3].remove_index( h );
 		sx_os_leave_critical_section();
 
 		//  execute the task
@@ -404,7 +404,7 @@ DWORD WINAPI threadProc4( __in  LPVOID lpParameter )
 
 	while( WaitForSingleObject( threadMan->m_event[4], INFINITE ) == WAIT_OBJECT_0 )
 	{
-		if ( threadMan->m_taskList[4].IsEmpty() )
+		if ( threadMan->m_taskList[4].is_empty() )
 		{
 			ResetEvent( threadMan->m_event[4] );
 			continue;
@@ -414,10 +414,10 @@ DWORD WINAPI threadProc4( __in  LPVOID lpParameter )
 
 		//	pop a task from the list
 		sx_os_enter_critical_section();
-		sint h = s_threadMan->m_taskList[4].Count() - 1;
-		ThreadTask* task = s_threadMan->m_taskList[4].At( h );
+		sint h = s_threadMan->m_taskList[4].m_count - 1;
+		ThreadTask* task = s_threadMan->m_taskList[4].at( h );
 		task->m_flag |= SX_TASKBASE_EXECUTING;
-		s_threadMan->m_taskList[4].RemoveByIndex( h );
+		s_threadMan->m_taskList[4].remove_index( h );
 		sx_os_leave_critical_section();
 
 		//  execute the task

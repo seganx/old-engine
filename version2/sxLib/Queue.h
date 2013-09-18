@@ -35,26 +35,16 @@ public:
 
 	~Queue( void )
 	{
-		Clear();
+		clear();
 	}
 
-	SEGAN_LIB_INLINE void Clear( void )
+	SEGAN_LIB_INLINE void clear( void )
 	{
  		while ( m_count )
- 			_DeleteNode( m_back );
+ 			_delete_node( m_back );
 	}
 
-	SEGAN_LIB_INLINE sint Count( void ) const
-	{
-		return m_count;
-	}
-
-	SEGAN_LIB_INLINE bool IsEmpty( void ) const
-	{
-		return ( m_count == 0 );
-	}
-
-	SEGAN_LIB_INLINE void Push( const T& newItem )
+	SEGAN_LIB_INLINE void push( const T& newItem )
 	{
 		Iterator* node = (Iterator*)mem_alloc( sizeof(Iterator) );
 		node->data = newItem;
@@ -66,36 +56,36 @@ public:
 		m_count++;
 	}
 
-	SEGAN_LIB_INLINE void Pop( void )
+	SEGAN_LIB_INLINE void pop( void )
 	{
 		if ( m_front )
-			_DeleteNode( m_front );
+			_delete_node( m_front );
 	}
 
-	SEGAN_LIB_INLINE bool Pop( OUT T& Item )
+	SEGAN_LIB_INLINE bool pop( OUT T& Item )
 	{
 		if ( m_front )
 		{
 			Item = m_front->data;
-			_DeleteNode( m_front );
+			_delete_node( m_front );
 			return true;
 		}
 		return false;
 	}
 
-	SEGAN_LIB_INLINE T& Top( void )
+	SEGAN_LIB_INLINE T& top( void )
 	{
 		sx_assert( m_front );
 		return m_front->data;
 	}
 
-	SEGAN_LIB_INLINE T& Front( void )
+	SEGAN_LIB_INLINE T& front( void )
 	{
 		sx_assert( m_front );
 		return m_front->data;
 	}
 
-	SEGAN_LIB_INLINE T& Back( void )
+	SEGAN_LIB_INLINE T& back( void )
 	{
 		sx_assert( m_back );
 		return m_back->data;
@@ -103,7 +93,7 @@ public:
 
 private:
 
-	SEGAN_LIB_INLINE void _DeleteNode( Iterator* node )
+	SEGAN_LIB_INLINE void _delete_node( Iterator* node )
 	{
 		if ( node->prev )		node->prev->next = node->next;
 		if ( node->next )		node->next->prev = node->prev;

@@ -30,7 +30,7 @@ class Map
 {
 	SEGAN_STERILE_CLASS(Map);
 
-	static sint mapCompFunc_default( const T_key& v1, const T_key& v2 )
+	static sint map_cmpfnc_default( const T_key& v1, const T_key& v2 )
 	{
 		return ( v1 > v2 ? 1 : ( v1 < v2 ? -1 : 0) );
 	}
@@ -79,8 +79,8 @@ public:
 		}
 		~Iterator( void ) {}
 
-		SEGAN_LIB_INLINE bool IsFirst( void )		{ return m_curr == m_first; }
-		SEGAN_LIB_INLINE bool IsLast( void )		{ return m_curr == null; }
+		SEGAN_LIB_INLINE bool is_first( void )		{ return m_curr == m_first; }
+		SEGAN_LIB_INLINE bool is_last( void )		{ return m_curr == null; }
 		SEGAN_LIB_INLINE T_key& operator&( void )	{ return m_curr->key;  }
 		SEGAN_LIB_INLINE T_data& operator*( void )	{ return m_curr->data; }
 		SEGAN_LIB_INLINE void operator++(sint)		{
@@ -107,7 +107,7 @@ public:
 
 public:
 
-	Map( compFunc _compFunc = &mapCompFunc_default )
+	Map( compFunc _compFunc = &map_cmpfnc_default )
 		: m_root(null)
 		, m_count(0)
 		, m_compFunc(_compFunc)
@@ -116,31 +116,21 @@ public:
 
 	~Map( void )
 	{ 
-		Clear();
+		clear();
 	}
 
-	SEGAN_LIB_INLINE void Clear( void )
+	SEGAN_LIB_INLINE void clear( void )
 	{
-		_Clear( m_root );
+		_clear( m_root );
 		m_count = 0;
 	}
 
-	SEGAN_LIB_INLINE sint Count( void ) const
-	{
-		return m_count;
-	}
-
-	SEGAN_LIB_INLINE bool IsEmpty( void ) const 
-	{
-		return ( m_count == 0 );
-	}
-
-	SEGAN_LIB_INLINE Iterator First( void ) const 
+	SEGAN_LIB_INLINE Iterator first( void ) const 
 	{
 		return m_root;		
 	}
 
-	SEGAN_LIB_INLINE bool Insert( const T_key& key, const T_data& item )
+	SEGAN_LIB_INLINE bool insert( const T_key& key, const T_data& item, bool overwrite = false )
 	{
 		if ( m_root == 0 ) {
 			m_root = (Leaf*)mem_alloc( sizeof(Leaf) );
@@ -148,14 +138,14 @@ public:
 			m_count++;
 			return true;
 		}
-		if ( _Insert( key, item, m_root ) ) {
+		if ( _insert( key, item, m_root, overwrite ) ) {
 			m_count++;
 			return true;
 		}
 		return false;
 	}
 
-	SEGAN_LIB_INLINE bool Insert_multi( const T_key& key, const T_data& item )
+	SEGAN_LIB_INLINE bool insert_multi( const T_key& key, const T_data& item )
 	{
 		if ( m_root == 0 ) {
 			m_root = (Leaf*)mem_alloc( sizeof(Leaf) );
@@ -163,44 +153,44 @@ public:
 			m_count++;
 			return true;
 		}
-		if ( _Insert_multi( key, item, m_root ) ) {
+		if ( _insert_multi( key, item, m_root ) ) {
 			m_count++;
 			return true;
 		}
 		return false;
 	}
 
-	SEGAN_LIB_INLINE bool Remove( const T_key& key )
+	SEGAN_LIB_INLINE bool remove( const T_key& key )
 	{
 		bool delOK = false;
-		_Remove( m_root, key, delOK );
+		_remove( m_root, key, delOK );
 		if ( delOK ) m_count--;
 		return delOK;
 	}
 
-	SEGAN_LIB_INLINE bool Find( const T_key& key, T_data& item )
+	SEGAN_LIB_INLINE bool find( const T_key& key, T_data& item )
 	{
-		return _Find( key, item, m_root );
+		return _find( key, item, m_root );
 	}
 
 private:
 
-	SEGAN_LIB_INLINE void _Clear( Leaf*& leaf )
+	SEGAN_LIB_INLINE void _clear( Leaf*& leaf )
 	{
 		if ( !leaf ) return;
-		_Clear( leaf->left );
-		_Clear( leaf->right );
+		_clear( leaf->left );
+		_clear( leaf->right );
 		mem_free( leaf );
 		leaf = null;
 	}
 
-	SEGAN_LIB_INLINE bool _Insert( const T_key& key, const T_data& item, Leaf*& root )
+	SEGAN_LIB_INLINE bool _insert( const T_key& key, const T_data& item, Leaf*& root, bool overwrite )
 	{
 		switch ( m_compFunc( key, root->key ) ) {
 		case +1 :
 			if ( root->right )
 			{
-				if ( !_Insert( key, item, root->right ) ) return false; 
+				if ( !_insert( key, item, root->right, overwrite ) ) return false; 
 			}
 			else
 			{
@@ -211,7 +201,7 @@ private:
 		case -1 :
 			if ( root->left )
 			{
-				if ( !_Insert( key, item, root->left ) ) return false;
+				if ( !_insert( key, item, root->left, overwrite ) ) return false;
 			}
 			else
 			{
@@ -220,22 +210,28 @@ private:
 			}
 			break;
 		default :
-			// error - can't have duplicate keys. if duplicate keys are ok, change key < to key <= above
+			{
+				if ( overwrite )
+				{
+					root->data = item;
+					return true;
+				}
+			}
 			return false;
 		}
-		_ComputeBalance( root );
-		_Balance( root );
+		_compute_balance( root );
+		_balance( root );
 		return true;
 	}
 
-	SEGAN_LIB_INLINE bool _Insert_multi( const T_key& key, const T_data& item, Leaf*& root )
+	SEGAN_LIB_INLINE bool _insert_multi( const T_key& key, const T_data& item, Leaf*& root )
 	{
 		switch ( m_compFunc( key, root->key ) ) {
 		case 0 :
 		case +1 :
 			if ( root->right )
 			{
-				_Insert_multi( key, item, root->right );
+				_insert_multi( key, item, root->right );
 			}
 			else
 			{
@@ -246,7 +242,7 @@ private:
 		case -1 :
 			if ( root->left )
 			{
-				_Insert_multi( key, item, root->left );
+				_insert_multi( key, item, root->left );
 			}
 			else
 			{
@@ -258,12 +254,12 @@ private:
 			sx_assert("map:compareFunction must return -1 or 0 or 1 ! "<0);
 			return false;
 		}
-		_ComputeBalance( root );
-		_Balance( root );
+		_compute_balance( root );
+		_balance( root );
 		return true;
 	}
 
-	SEGAN_LIB_INLINE void _Remove ( Leaf*& root, const T_key& key, bool& delOK )
+	SEGAN_LIB_INLINE void _remove ( Leaf*& root, const T_key& key, bool& delOK )
 	{
 		if ( !root ) {
 			delOK = false;
@@ -272,17 +268,17 @@ private:
 		switch ( m_compFunc( root->key, key ) )
 		{
 		case +1 :		// go to left subtree
-			_Remove( root->left, key, delOK );
+			_remove( root->left, key, delOK );
 			if ( delOK ) {
-				_ComputeBalance( root );
-				_BalanceRight( root );
+				_compute_balance( root );
+				_balance_right( root );
 			}
 			return;
 		case -1 :		// go to right subtree
-			_Remove( root->right, key, delOK );
+			_remove( root->right, key, delOK );
 			if ( delOK ) {
-				_ComputeBalance( root );
-				_BalanceLeft( root );
+				_compute_balance( root );
+				_balance_left( root );
 			}
 			return;
 		default:		// leaf found!
@@ -296,17 +292,17 @@ private:
 				delOK = true;
 				mem_free( leaf );
 			} else {
-				_RemoveBothChildren( root, root->left, delOK );
+				_remove_both_children( root, root->left, delOK );
 				if ( delOK ) {
-					_ComputeBalance( root );
-					_Balance( root );
+					_compute_balance( root );
+					_balance( root );
 				}
 				delOK = true;
 			}
 		}
 	}
 
-	SEGAN_LIB_INLINE void _RemoveBothChildren( Leaf*& root, Leaf*& curr, bool& delOK )
+	SEGAN_LIB_INLINE void _remove_both_children( Leaf*& root, Leaf*& curr, bool& delOK )
 	{
 		if ( !curr->right )
 		{
@@ -317,26 +313,26 @@ private:
 			mem_free( leaf );
 			delOK = true;
 		} else {
-			_RemoveBothChildren( root, curr->right, delOK );
+			_remove_both_children( root, curr->right, delOK );
 			if ( delOK ) {
-				_ComputeBalance( root );
-				_Balance( root );
+				_compute_balance( root );
+				_balance( root );
 			}
 		}
 	}
 
-	SEGAN_LIB_INLINE bool _Find( const T_key& key, T_data& item, Leaf* root )
+	SEGAN_LIB_INLINE bool _find( const T_key& key, T_data& item, Leaf* root )
 	{
 		if ( !root ) return false;
 		switch ( m_compFunc( key, root->key ) )
 		{
-		case +1 : return _Find( key, item, root->right );
-		case -1 : return _Find( key, item, root->left );
+		case +1 : return _find( key, item, root->right );
+		case -1 : return _find( key, item, root->left );
 		default : item = root->data; return true;
 		}	
 	}
 
-	SEGAN_LIB_INLINE void _ComputeBalance( Leaf*  root )
+	SEGAN_LIB_INLINE void _compute_balance( Leaf*  root )
 	{
 		if ( !root ) return;
 		sint leftDepth  = root->left  ? root->left->depth  : 0;
@@ -345,63 +341,65 @@ private:
 		root->balance = rightDepth - leftDepth;
 	}
 
-	SEGAN_LIB_INLINE void _Balance( Leaf*& root )
+	SEGAN_LIB_INLINE void _balance( Leaf*& root )
 	{
 		// AVL trees have the property that no branch is more than 1 longer than its sibling
 		if ( !root ) return;
-		if ( root->balance > 1 )	_BalanceRight( root );
-		if ( root->balance < -1 )	_BalanceLeft( root );
+		if ( root->balance > 1 )	_balance_right( root );
+		if ( root->balance < -1 )	_balance_left( root );
 	}
 
-	SEGAN_LIB_INLINE void _BalanceRight( Leaf*& root )
+	SEGAN_LIB_INLINE void _balance_right( Leaf*& root )
 	{
 		if ( root && root->right ) {
 			if ( root->right->balance > 0 )
-				_RotateLeft( root );
+				_rotate_left( root );
 			else if ( root->right->balance < 0 ) {
-				_RotateRight( root->right );
-				_RotateLeft( root );
+				_rotate_right( root->right );
+				_rotate_left( root );
 			}
 		}
 	}
 
-	SEGAN_LIB_INLINE void _BalanceLeft( Leaf*& root )
+	SEGAN_LIB_INLINE void _balance_left( Leaf*& root )
 	{
 		if ( root && root->left ) {
 			if ( root->left->balance < 0 )
-				_RotateRight( root );
+				_rotate_right( root );
 			else if ( root->left->balance > 0 ) {
-				_RotateLeft( root->left );
-				_RotateRight( root );
+				_rotate_left( root->left );
+				_rotate_right( root );
 			}
 		}
 	}
 
-	SEGAN_LIB_INLINE void _RotateLeft( Leaf*& root )
+	SEGAN_LIB_INLINE void _rotate_left( Leaf*& root )
 	{
 		if ( root->right ) {
-			Leaf* pTemp = root;
+			Leaf* tmp = root;
 			root = root->right;
-			pTemp->right = root->left;
-			root->left = pTemp;
-			_ComputeBalance( root->left );
-			_ComputeBalance( root->right );
-			_ComputeBalance( root );
+			tmp->right = root->left;
+			root->left = tmp;
+			_compute_balance( root->left );
+			_compute_balance( root->right );
+			_compute_balance( root );
 		}
 	}
 
-	SEGAN_LIB_INLINE void _RotateRight( Leaf*& root )
+	SEGAN_LIB_INLINE void _rotate_right( Leaf*& root )
 	{
 		if ( root->left ) {
-			Leaf* pTemp = root;
+			Leaf* tmp = root;
 			root = root->left;
-			pTemp->left = root->right;
-			root->right = pTemp;
-			_ComputeBalance( root->left );
-			_ComputeBalance( root->right );
-			_ComputeBalance( root );
+			tmp->left = root->right;
+			root->right = tmp;
+			_compute_balance( root->left );
+			_compute_balance( root->right );
+			_compute_balance( root );
 		}
 	}
+
+public:
 
 	Leaf*		m_root;		//  root of the map
 	sint		m_count;	//  number of items in map

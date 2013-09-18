@@ -34,10 +34,10 @@ void uiControl::SetParent( uiControl* parent )
 	if ( parent == m_parent ) return;
 
 	if ( m_parent )
-		m_parent->m_child.Remove( this );
+		m_parent->m_child.remove( this );
 
 	if ( parent )
-		parent->m_child.PushBack( this );
+		parent->m_child.push_back( this );
 
 	m_parent = parent;
 }
@@ -298,7 +298,7 @@ void uiControl::GetElements( Array<uiElement*> * elementArray, const bool traver
 		uiElement* element = (uiElement*)&m_element[i];
 		if ( element->m_numVertices )
 		{
-			elementArray->PushBack( element );
+			elementArray->push_back( element );
 		}
 		else break;
 	}

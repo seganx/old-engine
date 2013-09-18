@@ -53,7 +53,7 @@ SEGAN_INLINE sint _sort_fils_by_name( const FileInfo& info1, const FileInfo& inf
 
 	//  make names lower case
 	str256 s1 = info1.name, s2 = info2.name;
-	s1.MakeLower();	s2.MakeLower();
+	s1.make_lower();	s2.make_lower();
 	return ( wcscmp( s1, s2 ) );
 }
 
@@ -66,7 +66,7 @@ SEGAN_INLINE sint _sort_fils_by_type( const FileInfo& info1, const FileInfo& inf
 	
 	//  make type names lower case
 	str32 s1 = info1.type, s2 = info2.type;
-	s1.MakeLower();	s2.MakeLower();
+	s1.make_lower();	s2.make_lower();
 	return ( wcscmp( s1, s2 ) );
 }
 
@@ -108,22 +108,22 @@ void _get_files_in_dir_x( const wchar* root, const wchar* path, const String& ex
 	if ( !root || !sx_os_dir_exist( root ) ) return;
 
 	String filePath = root;
-	filePath.MakePathStyle();
+	filePath.make_path_style();
 	filePath << path;
-	filePath.MakePathStyle();
+	filePath.make_path_style();
 	filePath << L"*.*";
 
-	// Find the first file in the directory.
+	// find the first file in the directory.
 	WIN32_FIND_DATA ffd;
 	HANDLE hFind = FindFirstFile( *filePath, &ffd );
 	if ( hFind == INVALID_HANDLE_VALUE )
 		return;
 	
 	filePath = path;
-	filePath.MakePathStyle();
+	filePath.make_path_style();
 
 	// List all the files in the directory with some info about them.
-	bool checkExten = exten.Length() && exten != L"*.*";
+	bool checkExten = exten.length() && exten != L"*.*";
 	FILETIME		ft;
 	LARGE_INTEGER	filesize;
 	FileInfo		finfo;
@@ -137,21 +137,21 @@ void _get_files_in_dir_x( const wchar* root, const wchar* path, const String& ex
 		if ( checkExten )
 		{
 			str256 ext = ffd.cFileName;
-			ext.ExtractFileExtension();
-			extenAccepted = exten.Find( ext ) > -1;
+			ext.extract_file_extension();
+			extenAccepted = exten.find( ext ) > -1;
 		}
 
 		if ( extenAccepted )
 		{
 			sx_str_copy( finfo.name, 256, filePath );
-			sx_str_copy( finfo.name + filePath.Length(), 256 - filePath.Length(), ffd.cFileName );
+			sx_str_copy( finfo.name + filePath.length(), 256 - filePath.length(), ffd.cFileName );
 
 			if ( ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
 				sx_str_copy( finfo.type, 32, L"<DIR>" );
 			else
 			{
 				str256 ext = ffd.cFileName;
-				ext.ExtractFileExtension().MakeLower();
+				ext.extract_file_extension().make_lower();
 				sx_str_copy( finfo.type, 32, ext );
 			}
 
@@ -171,7 +171,7 @@ void _get_files_in_dir_x( const wchar* root, const wchar* path, const String& ex
 			FileTimeToSystemTime( &ft, &sysTime );
 			_systemtime_to_timestruct( sysTime, finfo.modified );
 
-			fileList.PushBack( finfo );
+			fileList.push_back( finfo );
 		}
 
 		if ( ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
@@ -347,7 +347,7 @@ const wchar* sx_os_paste_text_from_clipboard( void )
 	sx_callstack();
 
 	static String res;
-	res.Clear();
+	res.clear();
 
 	bool isUnicodeText = IsClipboardFormatAvailable(CF_UNICODETEXT) > 0;
 	bool isText = IsClipboardFormatAvailable(CF_TEXT) > 0;
@@ -613,7 +613,7 @@ void sx_os_get_battery_status( BatteryStatus& batteryStatus )
 	if ( sbs.EstimatedTime < 0xFFFFFF )
 	{
 		str32 tmp;
-		tmp.Format( L"%.2d:%.2d", sint(sbs.EstimatedTime / 3600), sint((sbs.EstimatedTime % 3600) / 60) );
+		tmp.format( L"%.2d:%.2d", sint(sbs.EstimatedTime / 3600), sint((sbs.EstimatedTime % 3600) / 60) );
 		sx_str_copy( batteryStatus.estimatedTime, 8, tmp );
 	}
 	else memcpy( batteryStatus.estimatedTime, L"00:00", 12 );
@@ -777,7 +777,7 @@ bool sx_os_get_drives( DriveInfoArray& ddList )
 	DriveInfo dinfo;
 	while ( *szDriveLetters ) {
 		sx_os_get_drive_info( *szDriveLetters, dinfo );
-		ddList.PushBack( dinfo );
+		ddList.push_back( dinfo );
 		szDriveLetters = &szDriveLetters[wcslen(szDriveLetters) + 1];
 	}
 	return true;
@@ -858,13 +858,13 @@ bool sx_os_get_file_info( const wchar* fileName, FileInfo& finfo )
 
 	tmpStr = fileName;
 	if ( sx_str_is_pathstyle( fileName ) )
-		tmpStr.Delete( tmpStr.Length() - 1 );
-	tmpStr.ExtractFileName();
+		tmpStr.remove( tmpStr.length() - 1 );
+	tmpStr.extract_file_name();
 	//tmpStr.ExcludeFileExtension();
 	sx_str_copy( finfo.name, 256, tmpStr );
 
 	tmpStr = fileName;
-	tmpStr.ExtractFileExtension();
+	tmpStr.extract_file_extension();
 	sx_str_copy( finfo.type, 256, tmpStr );
 
 	LARGE_INTEGER filesize;
@@ -891,12 +891,12 @@ void sx_os_get_files( const wchar* path, const wchar* exten, FileInfoArray& file
 
 	str32 strExt = exten;
 	str512 strDir = path;
-	strDir.MakePathStyle();
+	strDir.make_path_style();
 	strDir << L"*.*";
 
-	// Find the first file in the directory.
+	// find the first file in the directory.
 	WIN32_FIND_DATA ffd;
-	HANDLE hFind = FindFirstFile(strDir.Text(), &ffd);
+	HANDLE hFind = FindFirstFile(strDir.text(), &ffd);
 	if (hFind == INVALID_HANDLE_VALUE)
 		return;
 
@@ -905,7 +905,7 @@ void sx_os_get_files( const wchar* path, const wchar* exten, FileInfoArray& file
 	FILETIME		fileTime;
 	LARGE_INTEGER	fileSize;
 	FileInfo		fileInfo;
-	bool			checkExtn = strExt.Length() && strExt != L"*.*";
+	bool			checkExtn = strExt.length() && strExt != L"*.*";
 	ZeroMemory( &fileInfo, sizeof(fileInfo) );
 
 	//  traverse between files
@@ -918,8 +918,8 @@ void sx_os_get_files( const wchar* path, const wchar* exten, FileInfoArray& file
 		if ( checkExtn )
 		{
 			str256 s = ffd.cFileName;
-			s.ExtractFileExtension();
-			extenAccepted = strExt.Find( s ) > -1;
+			s.extract_file_extension();
+			extenAccepted = strExt.find( s ) > -1;
 		}
 
 		if ( extenAccepted )
@@ -931,7 +931,7 @@ void sx_os_get_files( const wchar* path, const wchar* exten, FileInfoArray& file
 			else
 			{
 				str256 ext = ffd.cFileName;
-				ext.ExtractFileExtension().MakeLower();
+				ext.extract_file_extension().make_lower();
 				sx_str_copy( fileInfo.type, 32, ext );
 			}
 
@@ -951,7 +951,7 @@ void sx_os_get_files( const wchar* path, const wchar* exten, FileInfoArray& file
 			FileTimeToSystemTime( &fileTime, &sysTime );
 			_systemtime_to_timestruct( sysTime, fileInfo.modified );
 
-			fileList.PushBack( fileInfo );
+			fileList.push_back( fileInfo );
 		}
 	}
 	while ( FindNextFile( hFind, &ffd ) );
@@ -961,34 +961,34 @@ void sx_os_get_files( const wchar* path, const wchar* exten, FileInfoArray& file
 
 void sx_os_sort_files( SortFilesType SFT_ sftype, FileInfoArray& fileList )
 {
-	if ( fileList.Count() < 2 ) return;
+	if ( fileList.m_count < 2 ) return;
 
 	switch (sftype)
 	{
-	case SFT_BYNAME:	fileList.Sort( _sort_fils_by_name );	break;
-	case SFT_BYTYPE:	fileList.Sort( _sort_fils_by_type );	break;
-	case SFT_BYDATE:	fileList.Sort( _sort_fils_by_date );	break;
-	case SFT_BYSIZE:	fileList.Sort( _sort_fils_by_size );	break;
+	case SFT_BYNAME:	fileList.sort( _sort_fils_by_name );	break;
+	case SFT_BYTYPE:	fileList.sort( _sort_fils_by_type );	break;
+	case SFT_BYDATE:	fileList.sort( _sort_fils_by_date );	break;
+	case SFT_BYSIZE:	fileList.sort( _sort_fils_by_size );	break;
 	}
 
-	const sint n = fileList.Count();
+	const sint n = fileList.m_count;
 	Array<FileInfo> tmpList;
-	tmpList.SetCount( n );
+	tmpList.set_count( n );
 
 	for ( sint i=0; i<n; i++ )
 	{
 		if ( fileList[i].flag & FILE_ATTRIBUTE_DIRECTORY )
-			tmpList.PushBack( fileList[i] );
+			tmpList.push_back( fileList[i] );
 	}
 	for ( sint i=0; i<n; i++ )
 	{
 		if ( (fileList[i].flag & FILE_ATTRIBUTE_DIRECTORY) == 0 )
-			tmpList.PushBack( fileList[i] );
+			tmpList.push_back( fileList[i] );
 	}
 
-	fileList.Clear();
-	for ( sint i=0; i<tmpList.Count(); i++ )
-		fileList.PushBack( tmpList[i] );
+	fileList.clear();
+	for ( sint i=0; i<tmpList.m_count; i++ )
+		fileList.push_back( tmpList[i] );
 }
 
 void sx_os_get_filesX( const wchar* path, const wchar* exten, FileInfoArray& fileList )
@@ -1029,13 +1029,13 @@ SEGAN_ENG_API bool sx_os_remove_dir( const wchar* folderName, CB_RemoveDir callb
 	if ( !sx_os_dir_exist( folderName ) ) return false;
 
 	str1024 dirName = folderName;
-	dirName.MakePathStyle();
+	dirName.make_path_style();
 
 	//  extract list of content of the folder
 	FileInfoArray flist;
 	sx_os_get_filesX( dirName, L"*.*", flist );
 	
-	sint c = flist.Count();
+	sint c = flist.m_count;
 	for ( sint i=c-1; i>=0; i-- )
 	{
 		str1024 path = dirName;
@@ -1071,10 +1071,10 @@ SEGAN_ENG_API bool sx_os_copy_dir( const wchar* srcFolder, const wchar* destFold
 	if ( !sx_os_dir_exist( srcFolder ) ) return false;
 
 	str1024 srcDir = srcFolder;
-	srcDir.MakePathStyle();
+	srcDir.make_path_style();
 
 	str1024 destDir = destFolder;
-	destDir.MakePathStyle();
+	destDir.make_path_style();
 
 	//  extract list of content of the folder
 	FileInfoArray flist;
@@ -1084,7 +1084,7 @@ SEGAN_ENG_API bool sx_os_copy_dir( const wchar* srcFolder, const wchar* destFold
 	if ( !CreateDirectory( destFolder, 0 ) )return false;
 
 	bool result = true;
-	sint c = flist.Count();
+	sint c = flist.m_count;
 	for ( sint i=0; i<c; i++ )
 	{
 		str1024 srcPath; srcPath << *srcDir  << *flist[i].name;
@@ -1151,9 +1151,9 @@ bool sx_os_rename_dir( const wchar* srcFolder, const wchar* newName )
 
 	str1024 fldr = srcFolder;
 	if ( sx_str_is_pathstyle( srcFolder ) )
-		fldr.Delete( fldr.Length() - 1 );
+		fldr.remove( fldr.length() - 1 );
 	
-	fldr.ExtractFilePath();
+	fldr.extract_file_path();
 	fldr << newName;
 	
 	return sx_os_rename_file( srcFolder, fldr );

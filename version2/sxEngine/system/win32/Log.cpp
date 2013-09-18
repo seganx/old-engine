@@ -37,9 +37,9 @@ void Logger::Initialize( LoggerConfig* config /*= null */ )
 	}
 
 
-	if ( (m_mode & LM_FILE) && m_fileName.Text() )
+	if ( (m_mode & LM_FILE) && m_fileName.text() )
 	{
-		m_fileStream = _wfsopen( m_fileName.Text(), L"w+b", _SH_DENYWR );
+		m_fileStream = _wfsopen( m_fileName.text(), L"w+b", _SH_DENYWR );
 		if ( m_fileStream )
 		{
 			// make it Unicode text

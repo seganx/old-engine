@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="windows-1256"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="sxlib"
-	ProjectGUID="{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}"
+	ProjectGUID="{B7C0528D-F9C8-4B2F-B2F8-D56AE8E64DB7}"
 	RootNamespace="sxlib"
 	Keyword="Win32Proj"
 	>
@@ -19,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			CharacterSet="1"
 			>
 			<Tool
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SXLIB_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -59,17 +59,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				LinkIncremental="2"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -81,12 +74,6 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -94,7 +81,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -115,7 +102,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SXLIB_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -132,19 +119,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				LinkIncremental="1"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -156,12 +134,6 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -170,63 +142,123 @@
 	</References>
 	<Files>
 		<Filter
-			Name="lib"
+			Name="system"
 			>
 			<File
-				RelativePath="..\Array.h"
+				RelativePath="..\system\win32\File.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Assert.h"
+				RelativePath="..\system\File.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Callstack.h"
+				RelativePath="..\system\Gameup.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Def.h"
+				RelativePath="..\system\Gameup.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Lib.cpp"
+				RelativePath="..\system\win32\Lock.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Lib.h"
+				RelativePath="..\system\Lock.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Map.h"
+				RelativePath="..\system\win32\OS.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Math.h"
+				RelativePath="..\system\OS.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Memory.h"
+				RelativePath="..\system\System.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Queue.h"
+				RelativePath="..\system\System_def.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Stack.h"
+				RelativePath="..\system\win32\Win6.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Stream.h"
+				RelativePath="..\system\zLib\zconf.h"
 				>
 			</File>
 			<File
-				RelativePath="..\String.h"
+				RelativePath="..\system\Zip.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\system\Zip.h"
+				>
+			</File>
+			<File
+				RelativePath="..\system\zLib\zlib.h"
 				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\sxlib.cpp"
+			RelativePath="..\Array.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Assert.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Callstack.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Def.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Encryption.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Lib.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\Lib.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Map.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Math.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Memory.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Queue.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Stack.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Stream.h"
+			>
+		</File>
+		<File
+			RelativePath="..\String.h"
 			>
 		</File>
 	</Files>

@@ -9,13 +9,15 @@
 #ifndef GUARD_String_HEADER_FILE
 #define GUARD_String_HEADER_FILE
 
-#include "Memory.h"
 #include <wchar.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "Memory.h"
 
 
 #if	defined(_WIN32)
-	#define	PATH_PART	'\\'
+	#define	PATH_PART	'/'
 #elif defined(_MAC)
 	//#define	PATH_PART
 #else
@@ -101,12 +103,12 @@ SEGAN_LIB_INLINE sint sx_str_copy( wchar* dest, const sint dest_size_in_word, co
 	sint res = 0;
 	if ( src )
 	{
-		for ( ; res<dest_size_in_word; ++res )
+		for ( sint m = dest_size_in_word - 1; res < m; ++res )
 		{
 			dest[res] = src[res];
 			if ( dest[res] == 0 ) break;
 		}
-		dest[dest_size_in_word-1] = 0;
+		dest[res] = 0;
 	}
 	return res;
 }
@@ -118,12 +120,46 @@ SEGAN_LIB_INLINE sint sx_str_copy( wchar* dest, const sint dest_size_in_word, co
 	sint res = 0;
 	if ( src )
 	{
-		for ( ; res<dest_size_in_word; ++res )
+		for ( sint m = dest_size_in_word - 1; res < m; ++res )
 		{
 			dest[res] = src[res];
 			if ( dest[res] == 0 ) break;
 		}
-		dest[dest_size_in_word-1] = 0;
+		dest[res] = 0;
+	}
+	return res;
+}
+
+//! copy the src string to the destination string and return number of characters which have copied contain null character
+SEGAN_LIB_INLINE sint sx_str_copy( char* dest, const sint dest_size_in_word, const wchar* src )
+{
+	sx_assert(dest);
+	sint res = 0;
+	if ( src )
+	{
+		for ( sint m = dest_size_in_word - 1; res < m; ++res )
+		{
+			dest[res] = (char)src[res];
+			if ( dest[res] == 0 ) break;
+		}
+		dest[res] = 0;
+	}
+	return res;
+}
+
+//! copy the src string to the destination string and return number of characters which have copied contain null character
+SEGAN_LIB_INLINE sint sx_str_copy( char* dest, const sint dest_size_in_byte, const char* src )
+{
+	sx_assert(dest);
+	sint res = 0;
+	if ( src )
+	{
+		for ( sint m = dest_size_in_byte - 1; res < m; ++res )
+		{
+			dest[res] = src[res];
+			if ( dest[res] == 0 ) break;
+		}
+		dest[res] = 0;
 	}
 	return res;
 }
@@ -142,10 +178,62 @@ SEGAN_LIB_INLINE wchar sx_str_lower( wchar c )
 	return c;
 }
 
+SEGAN_LIB_INLINE char sx_str_upper( char c )
+{
+	if ( 'a' <= c && c <= 'z' )
+		c += 'A' - 'a';
+	return c;
+}
+
+SEGAN_LIB_INLINE char sx_str_lower( char c )
+{
+	if ( 'A' <= c && c <= 'Z' )
+		c += 'a' - 'A';
+	return c;
+}
+
 SEGAN_LIB_INLINE sint sx_str_to_int( const wchar* str )
 {
 	if ( !str ) return 0;
 	return _wtoi( str );
+}
+
+SEGAN_LIB_INLINE sint sx_str_to_int( const char* str )
+{
+	if ( !str ) return 0;
+	return atoi( str );
+}
+
+SEGAN_LIB_INLINE uint sx_str_to_uint( const wchar* str )
+{
+	if ( !str ) return 0;
+	uint res = 0;
+	swscanf_s( str, L"%u", &res, sizeof(res) );
+	return res;
+}
+
+SEGAN_LIB_INLINE uint64 sx_str_to_uint64( const wchar* str )
+{
+	if ( !str ) return 0;
+	uint64 res = 0;
+	swscanf_s( str, L"%llu", &res, sizeof(res) );
+	return res;
+}
+
+SEGAN_LIB_INLINE uint sx_str_to_uint( const char* str )
+{
+	if ( !str ) return 0;
+	uint res = 0;
+	sscanf_s( str, "%u", &res, sizeof(res) );
+	return res;
+}
+
+SEGAN_LIB_INLINE uint64 sx_str_to_uint64( const char* str )
+{
+	if ( !str ) return 0;
+	uint64 res = 0;
+	sscanf_s( str, "%llu", &res, sizeof(res) );
+	return res;
 }
 
 SEGAN_LIB_INLINE float sx_str_to_float( const wchar* str )
@@ -174,12 +262,43 @@ SEGAN_LIB_INLINE const bool sx_str_is_fullpath( const wchar* filepath )
 	return ( filepath[1] == ':' || ( filepath[0] == '\\' && filepath[1] == '\\') || ( filepath[0] == '/' && filepath[1] == '/') );
 }
 
+
+/*! convert one wide char to a UTF-8 character and return the length of the converted UTF-8 character in bytes.*/
+SEGAN_LIB_API uint sx_wchar_to_utf8( char* dest, const uint destsize, const uint ch );
+
+/*! convert wide char string to a UTF-8 character string and return the length of the converted UTF-8 characters in bytes.*/
+SEGAN_LIB_API uint sx_str_to_utf8( char* dest, const uint destsize, const wchar* src );
+
+/*! convert UTF-8 char to a wide character and return the length of the UTF-8 input character in bytes.*/
+SEGAN_LIB_API uint sx_utf8_to_wchar( wchar* dest, const uint destwords, const char* src );
+
+/*! convert UTF-8 string to the wide character string and return the size of the converted string in wide chars.*/
+SEGAN_LIB_API uint sx_utf8_to_str( wchar* dest, const uint destwords, const char* src );
+
+/*! convert UTF-8 string to the wide character string.
+NOTE: maximum length of wide character string is 1024
+NOTE: this function uses string memory pool and the returned string will be deleted in the next calls*/
+SEGAN_LIB_API const wchar* sx_utf8_to_str( const char* src );
+
+/*! convert wide character string to the UTF-8 string
+NOTE: maximum length of UTF-8 character string is less than 2048
+NOTE: this function uses string memory pool and the returned string will be deleted in the next calls*/
+SEGAN_LIB_API const char* sx_str_to_utf8( const wchar* src );
+
 /*! convert integer number to string.
-NOTE: this function uses string memory pool and the returned string will be deleted in the next call*/
+NOTE: this function uses string memory pool and the returned string will be deleted in the next calls*/
 SEGAN_LIB_API const wchar* sx_int_to_str( const sint number );
 
+/*! convert unsigned integer number to string.
+NOTE: this function uses string memory pool and the returned string will be deleted in the next calls*/
+SEGAN_LIB_API const wchar* sx_uint_to_str( const uint number );
+
+/*! convert unsigned integer 64bit number to string.
+NOTE: this function uses string memory pool and the returned string will be deleted in the next calls*/
+SEGAN_LIB_API const wchar* sx_uint64_to_str( const uint64 number );
+
 /*! convert float number to string with specified precision.
-NOTE: this function uses string memory pool and the returned string will be deleted in the next call*/
+NOTE: this function uses string memory pool and the returned string will be deleted in the next calls*/
 SEGAN_LIB_API const wchar* sx_float_to_str( float number, sint precision = 3 );
 
 /*! extract file path from full filename.
@@ -224,7 +343,7 @@ public:
 		, m_sampler(32)
 		, m_tmp(0)
 	{
-		Append( ch );
+		append( ch );
 	}
 
 	String( const char* str )
@@ -234,7 +353,7 @@ public:
 		, m_sampler(32)
 		, m_tmp(0)
 	{
-		Append( str );
+		append( str );
 	}
 
 	String( const wchar* str )
@@ -244,7 +363,7 @@ public:
 		, m_sampler(32)
 		, m_tmp(0)
 	{
-		Append( str );
+		append( str );
 	}
 
 	String( const String& str )
@@ -254,7 +373,7 @@ public:
 		, m_sampler(str.m_sampler)
 		, m_tmp(0)
 	{
-		Append( str );
+		append( str );
 	}
 
 	~String( void )
@@ -262,7 +381,7 @@ public:
 		mem_free( m_text );
 	}
 
-	SEGAN_LIB_INLINE void Clear( bool freemem = false )
+	SEGAN_LIB_INLINE void clear( bool freemem = false )
 	{
 		if ( freemem )
 		{
@@ -276,7 +395,7 @@ public:
 		m_len = 0;
 	}
 
-	SEGAN_LIB_INLINE void SetText( const wchar* str )
+	SEGAN_LIB_INLINE void set_text( const wchar* str )
 	{
 		if ( str != m_text )
 		{
@@ -289,12 +408,12 @@ public:
 			}
 			else
 			{
-				Clear();
+				clear();
 			}
 		}
 	}
 
-	SEGAN_LIB_INLINE void SetText( const char* str )
+	SEGAN_LIB_INLINE void set_text( const char* str )
 	{
 		if ( str )
 		{
@@ -305,11 +424,11 @@ public:
 		}
 		else
 		{
-			Clear();
+			clear();
 		}
 	}
 
-	SEGAN_LIB_INLINE void SetText( const wchar ch )
+	SEGAN_LIB_INLINE void set_text( const wchar ch )
 	{
 		m_len  = 1;
 		_Realloc( 2 );
@@ -317,7 +436,7 @@ public:
 		m_text[1] = 0;
 	}
 
-	SEGAN_LIB_INLINE void Format( const wchar* format, ... )
+	SEGAN_LIB_INLINE void format( const wchar* format, ... )
 	{
 		//	trusted . safe and optimized function
 		if( !format ) return;
@@ -329,12 +448,12 @@ public:
 		va_end(argList);
 	}
 
-	SEGAN_LIB_INLINE const wchar* Text( void ) const
+	SEGAN_LIB_INLINE const wchar* text( void ) const
 	{
 		return m_text;
 	}
 
-	SEGAN_LIB_INLINE void Append( const String& str )
+	SEGAN_LIB_INLINE void append( const String& str )
 	{
 		//	trusted . safe and optimized function
 		sint slen = str.m_len;
@@ -346,7 +465,7 @@ public:
 		}
 	}
 
-	SEGAN_LIB_INLINE void Append( const wchar* str )
+	SEGAN_LIB_INLINE void append( const wchar* str )
 	{
 		//	trusted . safe and optimized function
 		if ( !str ) return;
@@ -357,7 +476,7 @@ public:
 		m_len += slen;
 	}
 
-	SEGAN_LIB_INLINE void Append( const char* str )
+	SEGAN_LIB_INLINE void append( const char* str )
 	{
 		//	trusted . safe and optimized function
 		if ( !str ) return;
@@ -368,7 +487,7 @@ public:
 		m_len += slen;
 	}
 
-	SEGAN_LIB_INLINE void Append( const wchar c )
+	SEGAN_LIB_INLINE void append( const wchar c )
 	{
 		//	trusted . safe and optimized function
 		m_len++;
@@ -377,7 +496,7 @@ public:
 		m_text[m_len] = 0;
 	}
 
-	SEGAN_LIB_INLINE void Insert( const wchar* str, sint _where = 0 )
+	SEGAN_LIB_INLINE void insert( const wchar* str, sint _where = 0 )
 	{	
 		//	trusted . safe and optimized function
 		if ( !str ) return;
@@ -390,7 +509,7 @@ public:
 		m_len += slen;
 	}
 
-	SEGAN_LIB_INLINE void Insert( const char* str, sint _where = 0 )
+	SEGAN_LIB_INLINE void insert( const char* str, sint _where = 0 )
 	{
 		//	trusted . safe and optimized function
 		if ( !str ) return;
@@ -403,7 +522,7 @@ public:
 		m_len += slen;
 	}
 
-	SEGAN_LIB_INLINE void Insert( const wchar ch, sint _where = 0 )
+	SEGAN_LIB_INLINE void insert( const wchar ch, sint _where = 0 )
 	{
 		//	trusted . safe and optimized function
 		if ( _where < 0 ) _where = 0;
@@ -414,7 +533,7 @@ public:
 		m_len++;
 	}
 
-	SEGAN_LIB_INLINE void Delete( sint index, sint count = 1 )
+	SEGAN_LIB_INLINE void remove( sint index, sint count = 1 )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text || count < 1 ) return;
@@ -427,24 +546,24 @@ public:
 		m_text[m_len] = 0;
 	}
 
-	SEGAN_LIB_INLINE sint Length( void ) const
+	SEGAN_LIB_INLINE sint length( void ) const
 	{
 		return m_len;
 	}
 
-	SEGAN_LIB_INLINE void CopyTo( String& Dest, sint index, sint count )
+	SEGAN_LIB_INLINE void copy_to( String& dest, sint index, sint count )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text || count < 1 ) return;
 		if ( index < 0 || index >= m_len ) return;
 		if ( index+count > m_len ) count = m_len-index;
-		Dest._Realloc( Dest.m_len + count + 1 );
-		for ( sint i=0; i<count; Dest.m_text[i+Dest.m_len]=m_text[i+index], i++ );
-		Dest.m_len += count;
-		Dest.m_text[Dest.m_len] = 0;
+		dest._Realloc( dest.m_len + count + 1 );
+		for ( sint i=0; i<count; dest.m_text[i+dest.m_len]=m_text[i+index], i++ );
+		dest.m_len += count;
+		dest.m_text[dest.m_len] = 0;
 	}
 
-	SEGAN_LIB_INLINE sint Find( const wchar* substr, sint from = 0 ) const
+	SEGAN_LIB_INLINE sint find( const wchar* substr, sint from = 0 ) const
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text || !substr ) return -1;
@@ -456,7 +575,7 @@ public:
 			return -1;
 	}
 
-	SEGAN_LIB_INLINE sint FindBack( const wchar* substr, sint from = 0 ) const
+	SEGAN_LIB_INLINE sint find_back( const wchar* substr, sint from = 0 ) const
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text || !substr ) return -1;
@@ -468,22 +587,22 @@ public:
 		return -1;
 	}
 
-	SEGAN_LIB_INLINE void Replace(const wchar* what, const wchar* with)
+	SEGAN_LIB_INLINE void replace(const wchar* what, const wchar* with)
 	{
 		if ( !m_text || !what || !with ) return;
 
 		int lenwhat = (int)sx_str_len(what);
 		int lenwith = (int)sx_str_len(with);
 		int index = 0;
-		while ( ( index = Find(what, index) ) > -1 )
+		while ( ( index = find(what, index) ) > -1 )
 		{
-			Delete(index, lenwhat);
-			Insert(with, index);
+			remove(index, lenwhat);
+			insert(with, index);
 			index += lenwith;
 		}
 	}
 
-	SEGAN_LIB_INLINE void Revers( sint from, sint to )
+	SEGAN_LIB_INLINE void revers( sint from, sint to )
 	{
 		//	trusted . safe and optimized function
 		if ( from < 0 ) from = 0;
@@ -513,7 +632,7 @@ public:
 		}
 	}
 
-	SEGAN_LIB_INLINE void Trim( void )
+	SEGAN_LIB_INLINE void trim( void )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text ) return;
@@ -542,7 +661,7 @@ public:
 		}
 	}
 
-	SEGAN_LIB_INLINE void MakeUpper( void )
+	SEGAN_LIB_INLINE void make_upper( void )
 	{
 		if ( !m_text ) return;	
 		for ( wchar* cp=m_text; *cp; ++cp ) {
@@ -551,7 +670,7 @@ public:
 		}
 	}
 
-	SEGAN_LIB_INLINE void MakeLower( void )
+	SEGAN_LIB_INLINE void make_lower( void )
 	{
 		if ( !m_text ) return;	
 		for ( wchar* cp = m_text; *cp; ++cp ) {
@@ -560,13 +679,13 @@ public:
 		}
 	}
 
-	SEGAN_LIB_INLINE float ToFloat( void ) const
+	SEGAN_LIB_INLINE float to_float( void ) const
 	{
 		if ( !m_text ) return 0.0f;
 		return (float)_wtof( m_text );
 	}
 
-	SEGAN_LIB_INLINE sint ToInt( void ) const
+	SEGAN_LIB_INLINE sint to_int( void ) const
 	{
 		if ( !m_text ) return 0;
 		return _wtoi( m_text );
@@ -588,7 +707,7 @@ public:
 		return m_text[index];
 	}
 
-	SEGAN_LIB_INLINE String& ExtractFilePath( void )
+	SEGAN_LIB_INLINE String& extract_file_path( void )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text ) return *this;
@@ -607,7 +726,7 @@ public:
 		return *this;
 	}
 
-	SEGAN_LIB_INLINE String& ExtractFileName( void )
+	SEGAN_LIB_INLINE String& extract_file_name( void )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text ) return *this;
@@ -631,7 +750,7 @@ public:
 		return *this;
 	}
 
-	SEGAN_LIB_INLINE String& ExtractFileExtension( void )
+	SEGAN_LIB_INLINE String& extract_file_extension( void )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text ) return *this;
@@ -652,11 +771,11 @@ public:
 				return *this;
 			}
 		}
-		Clear();
+		clear();
 		return *this;
 	}
 
-	SEGAN_LIB_INLINE String& ExcludeFileExtension( void )
+	SEGAN_LIB_INLINE String& exclude_file_extension( void )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text ) return *this;
@@ -676,19 +795,19 @@ public:
 		return *this;
 	}
 
-	SEGAN_LIB_INLINE bool IsPathStyle( void )
+	SEGAN_LIB_INLINE bool is_path_style( void )
 	{
 		if ( !m_text ) return false;
 		return ( m_text[m_len-1] == '/' || m_text[m_len-1] == '\\' );
 	}
 
-	SEGAN_LIB_INLINE bool IsFullPath( void )
+	SEGAN_LIB_INLINE bool is_full_path( void )
 	{
 		if ( !m_text ) return false;
 		return ( m_text[1] == ':' || ( m_text[0] == '\\' && m_text[1] == '\\') || ( m_text[0] == '/' && m_text[1] == '/') );
 	}
 
-	SEGAN_LIB_INLINE void MakePathStyle( void )
+	SEGAN_LIB_INLINE void make_path_style( void )
 	{
 		if ( !m_text ) return;
 		if ( m_text[m_len-1] != '/' && m_text[m_len-1] != '\\' ) {
@@ -702,56 +821,56 @@ public:
 	//  operator declarations for = //////////////////////////////////////////////////////////////////////////
 	SEGAN_LIB_INLINE String& operator= ( const String& Str )
 	{
-		SetText( Str.m_text );
+		set_text( Str.m_text );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String& operator= ( const wchar* str )
 	{
-		SetText( str );
+		set_text( str );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String& operator= ( const char* str )
 	{
-		SetText( str );
+		set_text( str );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String& operator= ( const wchar ch )
 	{
-		SetText( ch );
+		set_text( ch );
 		return *this;
 	}
 
 	//  operator declarations for << //////////////////////////////////////////////////////////////////////////
 	SEGAN_LIB_INLINE String& operator<< ( const String& str )
 	{
-		Append( str );
+		append( str );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String& operator<< ( const wchar* str )
 	{
-		Append( str );
+		append( str );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String& operator<< ( const char* str )
 	{
-		Append( str );
+		append( str );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String& operator<< ( const char ch )
 	{
-		Append( ch );
+		append( ch );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String& operator<< ( const wchar ch )
 	{
-		Append( ch );
+		append( ch );
 		return *this;
 	}
 
@@ -759,7 +878,7 @@ public:
 	{
 		wchar tmp[64];
 		_itow_s( (int)number, tmp, 64, 10 );
-		Append( tmp );
+		append( tmp );
 		return *this;
 	}
 
@@ -835,34 +954,34 @@ public:
 	String_fix( const char ch ): m_len(0)
 	{
 		m_text[0] = 0;
-		Append( ch );
+		append( ch );
 	}
 
 	String_fix( const char* str ): m_len(0)
 	{
 		m_text[0] = 0;
-		Append( str );
+		append( str );
 	}
 
 	String_fix( const wchar* str ): m_len(0)
 	{
 		m_text[0] = 0;
-		Append( str );
+		append( str );
 	}
 
 	~String_fix( void )
 	{
 	}
 
-	SEGAN_LIB_INLINE void Clear( void )
+	SEGAN_LIB_INLINE void clear( void )
 	{
 		m_text[0] = 0;
 		m_len = 0;
 	}
 
-	SEGAN_LIB_INLINE void SetText( const wchar* str )
+	SEGAN_LIB_INLINE void set_text( const wchar* str )
 	{
-		if ( str == m_text )
+		if ( str != m_text )
 		{
 			if ( str )
 			{
@@ -873,12 +992,12 @@ public:
 			}
 			else
 			{
-				Clear();
+				clear();
 			}
 		}
 	}
 
-	SEGAN_LIB_INLINE void SetText( const char* str )
+	SEGAN_LIB_INLINE void set_text( const char* str )
 	{
 		if ( str )
 		{
@@ -889,18 +1008,18 @@ public:
 		}
 		else
 		{
-			Clear();
+			clear();
 		}
 	}
 
-	SEGAN_LIB_INLINE void SetText( const wchar ch )
+	SEGAN_LIB_INLINE void set_text( const wchar ch )
 	{
 		m_len  = 1;
 		m_text[0] = ch;
 		m_text[1] = 0;
 	}
 
-	SEGAN_LIB_INLINE void Format( const wchar* format, ... )
+	SEGAN_LIB_INLINE void format( const wchar* format, ... )
 	{
 		//	trusted . safe and optimized function
 		if( !format ) return;
@@ -909,16 +1028,16 @@ public:
 		if ( _vscwprintf(format, argList) < count - 1 )
 			m_len = vswprintf_s( m_text, count - 1, format, argList );
 		else
-			Clear();
+			clear();
 		va_end(argList);
 	}
 
-	SEGAN_LIB_INLINE const wchar* Text( void ) const
+	SEGAN_LIB_INLINE const wchar* text( void ) const
 	{
 		return m_text;
 	}
 
-	SEGAN_LIB_INLINE void Append( const wchar* str )
+	SEGAN_LIB_INLINE void append( const wchar* str )
 	{
 		if ( str )
 		{
@@ -931,7 +1050,7 @@ public:
 		}
 	}
 
-	SEGAN_LIB_INLINE void Append( const char* str )
+	SEGAN_LIB_INLINE void append( const char* str )
 	{
 		if ( str )
 		{
@@ -944,7 +1063,7 @@ public:
 		}
 	}
 
-	SEGAN_LIB_INLINE void Append( const wchar c )
+	SEGAN_LIB_INLINE void append( const wchar c )
 	{
 		//	trusted . safe and optimized function
 		if ( m_len + 1 >= count ) return;
@@ -953,7 +1072,7 @@ public:
 		m_text[m_len] = 0;
 	}
 
-	SEGAN_LIB_INLINE void Insert( const wchar* str, sint _where = 0 )
+	SEGAN_LIB_INLINE void insert( const wchar* str, sint _where = 0 )
 	{	
 		//	trusted . safe and optimized function
 		if ( !str ) return;
@@ -966,7 +1085,7 @@ public:
 		m_len += slen;
 	}
 
-	SEGAN_LIB_INLINE void Insert( const char* str, sint _where = 0 )
+	SEGAN_LIB_INLINE void insert( const char* str, sint _where = 0 )
 	{
 		//	trusted . safe and optimized function
 		if ( !str ) return;
@@ -979,7 +1098,7 @@ public:
 		m_len += slen;
 	}
 
-	SEGAN_LIB_INLINE void Insert( const wchar ch, sint _where = 0 )
+	SEGAN_LIB_INLINE void insert( const wchar ch, sint _where = 0 )
 	{
 		//	trusted . safe and optimized function
 		if ( _where < 0 ) _where = 0;
@@ -990,7 +1109,7 @@ public:
 		m_len++;
 	}
 
-	SEGAN_LIB_INLINE void Delete( sint index, sint charcount = 1 )
+	SEGAN_LIB_INLINE void remove( sint index, sint charcount = 1 )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text[0] || charcount < 1 ) return;
@@ -1002,12 +1121,12 @@ public:
 		m_text[m_len] = 0;
 	}
 
-	SEGAN_LIB_INLINE sint Length( void ) const
+	SEGAN_LIB_INLINE sint length( void ) const
 	{
 		return m_len;
 	}
 
-	SEGAN_LIB_INLINE void CopyTo( String_fix& Dest, sint index, sint charcount )
+	SEGAN_LIB_INLINE void copy_to( String_fix& Dest, sint index, sint charcount )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text[0] || charcount < 1 ) return;
@@ -1019,7 +1138,7 @@ public:
 		Dest.m_text[Dest.m_len] = 0;
 	}
 
-	SEGAN_LIB_INLINE sint Find( const wchar* substr, sint from = 0 ) const
+	SEGAN_LIB_INLINE sint find( const wchar* substr, sint from = 0 ) const
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text[0] || !substr ) return -1;
@@ -1031,7 +1150,7 @@ public:
 			return -1;
 	}
 
-	SEGAN_LIB_INLINE sint FindBack( const wchar* substr, sint from = 0 ) const
+	SEGAN_LIB_INLINE sint find_back( const wchar* substr, sint from = 0 ) const
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text[0] || !substr ) return -1;
@@ -1043,22 +1162,22 @@ public:
 		return -1;
 	}
 
-	SEGAN_LIB_INLINE void Replace(const wchar* what, const wchar* with)
+	SEGAN_LIB_INLINE void replace(const wchar* what, const wchar* with)
 	{
 		if ( !m_text || !what || !with ) return;
 
 		int lenwhat = (int)sx_str_len(what);
 		int lenwith = (int)sx_str_len(with);
 		int index = 0;
-		while ( ( index = Find(what, index) ) > -1 )
+		while ( ( index = find(what, index) ) > -1 )
 		{
-			Delete(index, lenwhat);
-			Insert(with, index);
+			remove(index, lenwhat);
+			insert(with, index);
 			index += lenwith;
 		}
 	}
 
-	SEGAN_LIB_INLINE void Revers( sint from, sint to )
+	SEGAN_LIB_INLINE void revers( sint from, sint to )
 	{
 		//	trusted . safe and optimized function
 		if ( from < 0 ) from = 0;
@@ -1088,7 +1207,7 @@ public:
 		}
 	}
 
-	SEGAN_LIB_INLINE void Trim( void )
+	SEGAN_LIB_INLINE void trim( void )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text[0] ) return;
@@ -1117,7 +1236,7 @@ public:
 		}
 	}
 
-	SEGAN_LIB_INLINE void MakeUpper( void )
+	SEGAN_LIB_INLINE void make_upper( void )
 	{
 		if ( !m_text[0] ) return;	
 		for ( wchar* cp = m_text; *cp; ++cp ) {
@@ -1126,7 +1245,7 @@ public:
 		}
 	}
 
-	SEGAN_LIB_INLINE void MakeLower( void )
+	SEGAN_LIB_INLINE void make_lower( void )
 	{
 		if ( !m_text[0] ) return;	
 		for ( wchar* cp = m_text; *cp; ++cp ) {
@@ -1135,13 +1254,13 @@ public:
 		}
 	}
 
-	SEGAN_LIB_INLINE float ToFloat( void ) const
+	SEGAN_LIB_INLINE float to_float( void ) const
 	{
 		if ( !m_text[0] ) return 0.0f;
 		return (float)_wtof( m_text );
 	}
 
-	SEGAN_LIB_INLINE sint ToInt( void ) const
+	SEGAN_LIB_INLINE sint to_int( void ) const
 	{
 		if ( !m_text[0] ) return 0;
 		return _wtoi( m_text );
@@ -1163,7 +1282,7 @@ public:
 		return m_text[index];
 	}
 
-	SEGAN_LIB_INLINE String_fix& ExtractFilePath( void )
+	SEGAN_LIB_INLINE String_fix& extract_file_path( void )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text[0] ) return *this;
@@ -1182,7 +1301,7 @@ public:
 		return *this;
 	}
 
-	SEGAN_LIB_INLINE String_fix& ExtractFileName( void )
+	SEGAN_LIB_INLINE String_fix& extract_file_name( void )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text[0] ) return *this;
@@ -1206,7 +1325,7 @@ public:
 		return *this;
 	}
 
-	SEGAN_LIB_INLINE String_fix& ExtractFileExtension( void )
+	SEGAN_LIB_INLINE String_fix& extract_file_extension( void )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text[0] ) return *this;
@@ -1227,11 +1346,11 @@ public:
 				return *this;
 			}
 		}
-		Clear();
+		clear();
 		return *this;
 	}
 
-	SEGAN_LIB_INLINE String_fix& ExcludeFileExtension( void )
+	SEGAN_LIB_INLINE String_fix& exclude_file_extension( void )
 	{
 		//	trusted . safe and optimized function
 		if ( !m_text[0] ) return *this;
@@ -1251,19 +1370,19 @@ public:
 		return *this;
 	}
 
-	SEGAN_LIB_INLINE bool IsPathStyle( void )
+	SEGAN_LIB_INLINE bool is_path_style( void )
 	{
 		if ( !m_text[0] ) return false;
 		return ( m_text[m_len-1] == '/' || m_text[m_len-1] == '\\' );
 	}
 
-	SEGAN_LIB_INLINE bool IsFullPath( void )
+	SEGAN_LIB_INLINE bool is_full_path( void )
 	{
 		if ( !m_text[0] ) return false;
-		return ( Find(L":") || Find(L"\\\\") || Find(L"//") );
+		return ( find(L":") || find(L"\\\\") || find(L"//") );
 	}
 
-	SEGAN_LIB_INLINE void MakePathStyle( void )
+	SEGAN_LIB_INLINE void make_path_style( void )
 	{
 		if ( !m_text[0] ) return;
 		if ( m_len + 1 > count ) return;
@@ -1277,50 +1396,50 @@ public:
 	//  operator declarations for = //////////////////////////////////////////////////////////////////////////
 	SEGAN_LIB_INLINE String_fix& operator= ( const wchar* str )
 	{
-		SetText( str );
+		set_text( str );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String_fix& operator= ( const char* str )
 	{
-		SetText( str );
+		set_text( str );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String_fix& operator= ( const wchar ch )
 	{
-		SetText( ch );
+		set_text( ch );
 		return *this;
 	}
 
 	//  operator declarations for << //////////////////////////////////////////////////////////////////////////
 	SEGAN_LIB_INLINE String_fix& operator<< ( const String_fix& Str )
 	{
-		Append( Str.m_text );
+		append( Str.m_text );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String_fix& operator<< ( const wchar* str )
 	{
-		Append( str );
+		append( str );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String_fix& operator<< ( const char* str )
 	{
-		Append( str );
+		append( str );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String_fix& operator<< ( const char ch )
 	{
-		Append( ch );
+		append( ch );
 		return *this;
 	}
 
 	SEGAN_LIB_INLINE String_fix& operator<< ( const wchar ch )
 	{
-		Append( ch );
+		append( ch );
 		return *this;
 	}
 
@@ -1328,7 +1447,7 @@ public:
 	{
 		wchar tmp[64];
 		_itow_s( number, tmp, 64, 10 );
-		Append( tmp );
+		append( tmp );
 		return *this;
 	}
 
@@ -1336,7 +1455,7 @@ public:
 	{
 		wchar tmp[64];
 		_itow_s( (int)number, tmp, 64, 10 );
-		Append( tmp );
+		append( tmp );
 		return *this;
 	}
 
@@ -1376,6 +1495,7 @@ private:
 	wchar			m_text[count];	//	main text
 	sint			m_len;			//  length of String_fix
 };
+
 
 
 

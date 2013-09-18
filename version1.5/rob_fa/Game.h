@@ -16,7 +16,7 @@
 
 #define VER_USERDEMO		0
 #define VER_PREVIEW			1
-#define VER_PREVIEW_NAME	L"Christian Sauerteig"
+#define VER_PREVIEW_NAME	L"Christian Sauerteig's uncle Keywan and his family"
 #define USE_RTL				0
 #define USE_GAMEUP			0
 #define USE_LOCK_NAME		L"christiansauerteig"

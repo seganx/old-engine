@@ -25,24 +25,24 @@ void Input::Attach( const InputDevice* device )
 {
 	if ( !device ) return;
 	InputDevice* dev = (InputDevice*)device;
-	m_devices.PushBack( dev );
+	m_devices.push_back( dev );
 	dev->m_owner = this;
 }
 
 uint Input::GetDeviceCount( void ) const
 {
-	return m_devices.Count();
+	return m_devices.m_count;
 }
 
 InputDevice* Input::GetDevice( sint index )
 {
-	if ( index < 0 || index >= m_devices.Count() ) return null;
+	if ( index < 0 || index >= m_devices.m_count ) return null;
 	return m_devices[index];
 }
 
 void Input::SendSignal( InputSignalType idSignal, void* data, const uint playerID /*= 0 */ )
 {
-	for ( int i=0; i<m_devices.Count(); ++i )
+	for ( int i=0; i<m_devices.m_count; ++i )
 	{
 		m_devices[i]->OnSignal( idSignal, data, playerID );
 	}
@@ -50,7 +50,7 @@ void Input::SendSignal( InputSignalType idSignal, void* data, const uint playerI
 
 void Input::Update( float elpsTime )
 {
-	for ( int i=0; i<m_devices.Count(); ++i )
+	for ( int i=0; i<m_devices.m_count; ++i )
 	{
 		m_devices[i]->Update( elpsTime );
 	}

@@ -303,12 +303,6 @@ SEGAN_LIB_API float sx_cos_fast( const float x );
 //! compute sine and cosine of the angle x in same time. maximum absolute error is 0.001f
 SEGAN_LIB_API void sx_sin_cos_fast( const float IN x, float& OUT s, float& OUT c);
 
-//! fill the random table by external data. data should contain at least 4096 unsigned integer number between 0 and RAND_MAX 
-SEGAN_LIB_API void sx_random_set_data( const uint* data );
-
-//! sync random table counter by other applications
-SEGAN_LIB_API void sx_random_sync( const uint index );
-
 //! return random number from the random table
 SEGAN_LIB_API float sx_random_f( const float range );
 
@@ -329,18 +323,17 @@ SEGAN_LIB_INLINE sint sx_random_i_limit( const sint minRange, const sint maxRang
 	return sx_random_i( len ) + minRange;
 }
 
-
 //! set new counter for the id generator
 SEGAN_LIB_API void sx_id_set_counter( const uint id );
 
 //! return unique id and increase the internal id counter
 SEGAN_LIB_API uint sx_id_generate( void );
 
+//! generate unique id from given string
+SEGAN_LIB_API uint sx_crc32_a( const char* str );
 
-
-#include "math/Math_vec.h"
-#include "math/Math_utils.h"
-#include "math/Math_tools.h"
+//! generate unique id from given string
+SEGAN_LIB_API uint sx_crc32_w( const wchar* str );
 
 #endif	//	GUARD_Math_HEADER_FILE
 

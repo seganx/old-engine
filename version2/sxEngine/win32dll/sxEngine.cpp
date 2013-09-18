@@ -77,7 +77,7 @@ sint window_events( Window* Sender, const WindowEvent* data )
 					g_engine->m_device3D->SetSize( curRect.width, curRect.height, -1 );
 			}
 
-			g_engine->m_logger->Log_( L"Window '%s' has been resized [ %d x %d ]", ( Sender ? Sender->m_name.Text() : L"???" ), curRect.width, curRect.height );
+			g_engine->m_logger->Log_( L"Window '%s' has been resized [ %d x %d ]", ( Sender ? Sender->m_name.text() : L"???" ), curRect.width, curRect.height );
 			return 0;
 		}
 		break;

@@ -17,7 +17,7 @@ struct Package
 bool FindPackage( FileManager* fileMan, const wchar* packName, OUT Package*& package)
 {
 	str128 currName = packName;
-	for ( int i=0; i<fileMan->m_packs.Count(); i++ )
+	for ( int i=0; i<fileMan->m_packs.m_count; i++ )
 	{
 		if ( packName == fileMan->m_packs[i]->name )
 		{
@@ -43,7 +43,7 @@ bool FileManager::Project_Open( const wchar* projectDir, FMM_ FileManMode mode )
 	m_mode = mode;
 	
 	m_root = projectDir;
-	m_root.MakePathStyle();
+	m_root.make_path_style();
 
 	if ( mode == FMM_ARCHIVE )
 	{
@@ -96,7 +96,7 @@ void FileManager::Project_Close( void )
 	//  codes to close the opened packages will be here
 	//  ...
 
-	m_root.Clear();
+	m_root.clear();
 	m_projectIsOpen = false;
 }
 
@@ -120,7 +120,7 @@ bool FileManager::Package_Create( const wchar* packageName )
 
 		newPack = sx_new( Package );
 		sx_str_copy( newPack->name, 128, packageName );
-		m_packs.PushBack( newPack );
+		m_packs.push_back( newPack );
 
 		str1024 path = m_root;
 		path << packageName;
@@ -146,7 +146,7 @@ bool FileManager::Package_Delete( const wchar* packageName )
 			return false;
 		}
 
-		m_packs.Remove( curPack );
+		m_packs.remove( curPack );
 		sx_delete(curPack);
 
 		str1024 path = m_root;
@@ -168,7 +168,7 @@ bool FileManager::Package_GetPath( const wchar* packageName, OUT str1024& outPat
 	{
 		outPath = m_root;
 		outPath << packageName;
-		outPath.MakePathStyle();
+		outPath.make_path_style();
 		return true;
 	}
 
@@ -204,7 +204,7 @@ bool FileManager::File_Exist( const wchar* fileName, const wchar* packageName )
 			path << packageName << PATH_PART << fileName;
 			res = sx_os_file_exist( path );
 			if ( !res )
-				g_logger->Log( L"File manager said : file [%s] is not exist !", path.Text() );
+				g_logger->Log( L"File manager said : file [%s] is not exist !", path.text() );
 		}
 		else
 		{
@@ -228,13 +228,13 @@ bool FileManager::File_Open( const wchar* fileName, const wchar* packageName, St
 		FileStream* sfile = sx_new( FileStream );
 		if ( sfile->Open( path, FM_OPEN_READ | FM_SHARE_READ ) )
 		{
-			sfile->Seek( ST_BEGIN );
+			sfile->seek( ST_BEGIN );
 			outStream = (Stream*)sfile;
 			return true;
 		}
 		else 
 		{
-			g_logger->Log( L"File manager said : the request to open file '%s' failed !", path.Text() );
+			g_logger->Log( L"File manager said : the request to open file '%s' failed !", path.text() );
 			sx_delete( sfile );
 			outStream = NULL;
 			return false;
@@ -252,13 +252,13 @@ bool FileManager::File_Open( const wchar* fileName, const wchar* packageName, St
 		FileStream* sfile = sx_new( FileStream );
 		if ( sfile->Open( path, FM_OPEN_READ | FM_SHARE_READ ) )
 		{
-			sfile->Seek( ST_BEGIN );
+			sfile->seek( ST_BEGIN );
 			outStream = (Stream*)sfile;
 			return true;
 		}
 		else 
 		{
-			g_logger->Log( L"File manager said : the request to open file '%s' failed !", path.Text() );
+			g_logger->Log( L"File manager said : the request to open file '%s' failed !", path.text() );
 			sx_delete( sfile );
 			outStream = NULL;
 			return false;
@@ -293,16 +293,16 @@ bool FileManager::File_Save( const wchar* fileName, const wchar* packageName, St
 		FileStream sfile;
 		if ( sfile.Open( path, FM_CREATE ) )
 		{
-			uint curPos = srcStream.GetPos();
-			srcStream.Seek( ST_BEGIN );
-			sfile.CopyFrom( srcStream );
-			srcStream.SetPos( curPos );
+			uint curPos = srcStream.get_pos();
+			srcStream.seek( ST_BEGIN );
+			sfile.copy_from( srcStream );
+			srcStream.set_pos( curPos );
 			sfile.Close();
 			return true;
 		}
 		else 
 		{
-			g_logger->Log( L"File manager said : the request to save file '%s' failed !", path.Text() );
+			g_logger->Log( L"File manager said : the request to save file '%s' failed !", path.text() );
 			return false;
 		}
 	}

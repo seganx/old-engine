@@ -47,13 +47,13 @@ d3dDevice_gl::d3dDevice_gl( void )
 
 d3dDevice_gl::~d3dDevice_gl( void )
 {
-	if ( m_vertexBufferArray.Count() )
+	if ( m_vertexBufferArray.m_count )
 		g_logger->Log( L"WARNING : all vertex buffers should release before releasing device !" );
-	if ( m_indexBufferArray.Count() )
+	if ( m_indexBufferArray.m_count )
 		g_logger->Log( L"WARNING : all index buffers should release before releasing device !" );
-	if ( m_textureArray.Count() )
+	if ( m_textureArray.m_count )
 		g_logger->Log( L"WARNING : all textures should release before releasing device !" );
-	if ( m_shaderArray.Count() )
+	if ( m_shaderArray.m_count )
 		g_logger->Log( L"WARNING : all shaders should release before releasing device !" );
 }
 
@@ -285,7 +285,7 @@ bool d3dDevice_gl::SetSize( const uint width, const uint height, const dword SX_
 void d3dDevice_gl::CreateVertexBuffer( d3dVertexBuffer*& OUT vertexBuffer )
 {
 	d3dVertexBuffer_gl* vb = sx_new( d3dVertexBuffer_gl );
-	m_vertexBufferArray.PushBack( vb );
+	m_vertexBufferArray.push_back( vb );
 	vb->m_device = this;
 	vertexBuffer = vb;
 }
@@ -293,7 +293,7 @@ void d3dDevice_gl::CreateVertexBuffer( d3dVertexBuffer*& OUT vertexBuffer )
 void d3dDevice_gl::DestroyVertexBuffer( d3dVertexBuffer*& IN_OUT vertexBuffer )
 {
 	if ( !vertexBuffer ) return;
-	m_vertexBufferArray.Remove( vertexBuffer );
+	m_vertexBufferArray.remove( vertexBuffer );
 	sx_delete_and_null( vertexBuffer );
 }
 
@@ -311,7 +311,7 @@ SEGAN_INLINE void d3dDevice_gl::SetVertexBuffer( const d3dVertexBuffer* vertexBu
 void d3dDevice_gl::CreateIndexBuffer( d3dIndexBuffer*& OUT indexBuffer )
 {
 	d3dIndexBuffer_gl* ib = sx_new( d3dIndexBuffer_gl );
-	m_indexBufferArray.PushBack( ib );
+	m_indexBufferArray.push_back( ib );
 	ib->m_device = this;
 	indexBuffer = ib;
 }
@@ -319,7 +319,7 @@ void d3dDevice_gl::CreateIndexBuffer( d3dIndexBuffer*& OUT indexBuffer )
 void d3dDevice_gl::DestroyIndexBuffer( d3dIndexBuffer*& IN_OUT indexBuffer )
 {
 	if ( !indexBuffer ) return;
-	m_indexBufferArray.Remove( indexBuffer );
+	m_indexBufferArray.remove( indexBuffer );
 	sx_delete_and_null( indexBuffer );
 }
 
@@ -337,7 +337,7 @@ void d3dDevice_gl::SetIndexBuffer( const d3dIndexBuffer* indexBuffer )
 void d3dDevice_gl::CreateTexture( d3dTexture*& OUT texture )
 {
 	d3dTexture_gl* tx = sx_new( d3dTexture_gl );
-	m_textureArray.PushBack( tx );
+	m_textureArray.push_back( tx );
 	tx->m_device = this;
 	texture = tx;
 }
@@ -345,7 +345,7 @@ void d3dDevice_gl::CreateTexture( d3dTexture*& OUT texture )
 void d3dDevice_gl::DestroyTexture( d3dTexture*& IN_OUT texture )
 {
 	if ( !texture ) return;
-	m_textureArray.Remove( texture );
+	m_textureArray.remove( texture );
 	sx_delete_and_null( texture );
 }
 

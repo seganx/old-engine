@@ -11,25 +11,25 @@ uiStateController::uiStateController( void ): m_index(0)
 	
 	// add default state
 	uiState one;
-	m_states.PushBack( one );
+	m_states.push_back( one );
 }
 
 uiStateController::~uiStateController( void )
 {
-	m_states.Clear();
+	m_states.clear();
 }
 
 void uiStateController::Clear( void )
 {
-	m_states.Clear();
-	m_states.PushBack( m_curr );
+	m_states.clear();
+	m_states.push_back( m_curr );
 	m_index = 0;
 }
 
 uint uiStateController::Add( void )
 {
 	uiState newone = m_states[m_index];
-	m_states.PushBack( newone );
+	m_states.push_back( newone );
 	return m_states.m_count - 1;
 }
 
@@ -37,7 +37,7 @@ void uiStateController::Remove( const sint index )
 {
 	if ( index >= 0 && index < m_states.m_count && m_states.m_count > 1 )
 	{
-		m_states.RemoveByIndex( index );
+		m_states.remove_index( index );
 	}
 }
 
@@ -256,7 +256,7 @@ void uiDevice::Copy( uiElement* dest, uint& index, const uiElement* src )
 SEGAN_INLINE void uiDevice::BeginBatch( const uint count )
 {
 	if ( count )
-		m_batches.SetSize( count );
+		m_batches.set_size( count );
 }
 
 SEGAN_INLINE bool uiDevice::AddBatch( const uiElement* elem )
@@ -276,7 +276,7 @@ SEGAN_INLINE bool uiDevice::AddBatch( const uiElement* elem )
 		return false;
 	}
 
-	m_batches.PushBack( (uiElement*)elem );
+	m_batches.push_back( (uiElement*)elem );
 	return true;
 }
 
@@ -309,7 +309,7 @@ SEGAN_INLINE void uiDevice::EndBatch( uiElement* dest )
 	}
 	
 	//	release array
-	m_batches.Clear();
+	m_batches.clear();
 }
 
 

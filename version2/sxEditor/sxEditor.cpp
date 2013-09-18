@@ -180,7 +180,7 @@ void app_main_loop( float elpsTime )
 		g_engine->m_device3D->Present();
 
 		str128 str;
-		str.Format( L"fps : %d - ft : %.2f - mouse : %d , %d ", 
+		str.format( L"fps : %d - ft : %.2f - mouse : %d , %d ", 
 			g_engine->m_device3D->m_debugInfo.fps, g_engine->m_device3D->m_debugInfo.frameTime,
 			int(sx_mouse_absx(0)), int(sx_mouse_absy(0)) );
 		//g_engine->m_window->SetTitle( str );
@@ -254,7 +254,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 #if 1
 	{
 		Client* client = g_engine->m_network->m_client;
-		client->m_name.Format( L"editor %s", sx_os_get_user_name() );
+		client->m_name.format( L"editor %s", sx_os_get_user_name() );
 		client->Start( 2727, null );
 		client->Listen();
 		int tryToConnect = 0;

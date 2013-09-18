@@ -83,7 +83,7 @@ inline	  void		operator delete ( void *p ){ mem_free(p); }
 #define sx_mem_realloc( p, newsizeinbyte )		mem_realloc( (void*&)p, newsizeinbyte )
 #define sx_mem_size( p )						mem_size( p )
 #define sx_mem_free( p )						mem_free( (void*&)p )
-#define sx_mem_free_and_null( p )				mem_free_dbg( p ); p = null
+#define sx_mem_free_and_null( p )				mem_free( p ); p = null
 
 #define sx_new( obj )							( new obj )
 #define sx_delete( obj )						{ if (obj) { delete(obj) ; } }				
@@ -105,10 +105,10 @@ class MemMan
 {
 public:
 	virtual ~MemMan( void ) {}
-	virtual void* Alloc( const uint sizeInByte )			= 0;
-	virtual void Realloc( void*& p, const uint sizeInByte )	= 0;
-	virtual void Free( const void* p )						= 0;
-	virtual uint Size( const void* p )						= 0;
+	virtual void* alloc( const uint sizeInByte )			= 0;
+	virtual void realloc( void*& p, const uint sizeInByte )	= 0;
+	virtual void free( const void* p )						= 0;
+	virtual uint size( const void* p )						= 0;
 };
 
 
@@ -170,7 +170,7 @@ public:
 		mem_free( m_pool );
 	}
 
-	void* Alloc( const uint sizeInByte )
+	void* alloc( const uint sizeInByte )
 	{
 		Chunk* ch = m_root;
 		while( ch->state == CS_EMPTY )
@@ -195,27 +195,27 @@ public:
 			}
 			ch = ch->next;
 		}
-		sx_assert( "MemMan_Pool::Alloc(...) failed due to there is no free chunk exist whit specified size!"<0 );
+		sx_assert( "MemMan_Pool::alloc(...) failed due to there is no free chunk exist whit specified size!"<0 );
 		return null;
 	}
 
-	SEGAN_LIB_INLINE void Realloc( void*& p, const uint sizeInByte )
+	SEGAN_LIB_INLINE void realloc( void*& p, const uint sizeInByte )
 	{
 		if ( !p )
 		{
-			p = Alloc( sizeInByte );
+			p = alloc( sizeInByte );
 		}
 		else
 		{
 			sx_assert( pbyte(p) > m_pool && pbyte(p) < ( m_pool + mem_size(m_pool) ) );
-			void* tmp = Alloc( sizeInByte );
-			mem_copy( tmp, p, sx_min_i( Size(p), sizeInByte ) );
-			Free( p );
+			void* tmp = alloc( sizeInByte );
+			mem_copy( tmp, p, sx_min_i( size(p), sizeInByte ) );
+			free( p );
 			p = tmp;
 		}
 	}
 
-	SEGAN_LIB_INLINE void Free( const void* p )
+	SEGAN_LIB_INLINE void free( const void* p )
 	{
 		if ( !p ) return;
 		sx_assert( pbyte(p) > m_pool && pbyte(p) < ( m_pool + mem_size(m_pool) ) );
@@ -259,7 +259,7 @@ public:
 		push( ch );
 	}
 
-	SEGAN_LIB_INLINE uint Size( const void* p )
+	SEGAN_LIB_INLINE uint size( const void* p )
 	{
 		if ( !p ) return 0;
 		sx_assert( pbyte(p) > m_pool && pbyte(p) < ( m_pool + mem_size(m_pool) ) );

@@ -91,9 +91,10 @@ SEGAN_INLINE void callstack_clean( CallStackData *csd )
 
 SEGAN_INLINE _CallStack::_CallStack( const wchar* file, const sint line, const wchar* function )
 {
+	lib_enter_cs();
+
 	if ( callstack_index < CALLSTACK_MAX )
 	{
-		lib_enter_cs();
 
 		CallStackData* csd = &callstack_pool[callstack_index++];
 
@@ -123,17 +124,16 @@ SEGAN_INLINE _CallStack::_CallStack( const wchar* file, const sint line, const w
 		}
 		else
 			csd->function = null;
-
-		lib_leave_cs();
 	}
+	lib_leave_cs();
 }
 
 SEGAN_INLINE _CallStack::_CallStack( const sint line, const wchar* file, const wchar* function, ... )
 {
+	lib_enter_cs();
+
 	if ( callstack_index < CALLSTACK_MAX )
 	{
-		lib_enter_cs();
-
 		CallStackData* csd = &callstack_pool[callstack_index++];
 
 		csd->file = (wchar*)file;
@@ -171,9 +171,8 @@ SEGAN_INLINE _CallStack::_CallStack( const sint line, const wchar* file, const w
 		{
 			csd->name[0] = null;
 		}
-
-		lib_leave_cs();
 	}
+	lib_leave_cs();
 }
 
 SEGAN_INLINE _CallStack::~_CallStack( void )
@@ -242,8 +241,8 @@ void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ 
 			{
 				str1024 tmp;
 				tmp << csd->file << '(' << csd->line << L") : ";
-				if ( maxlength < tmp.Length() )
-					maxlength = tmp.Length();
+				if ( maxlength < tmp.length() )
+					maxlength = tmp.length();
 			}
 		}
 
@@ -256,7 +255,7 @@ void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ 
 				str1024 tmp;
 				tmp << csd->file << '(' << csd->line << L") : ";
 
-				sint len = tmp.Length();
+				sint len = tmp.length();
 				for ( sint spaces = maxlength + 5; spaces > len; spaces-- )
 					tmp << ' ';
 
@@ -267,7 +266,7 @@ void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ 
 				else
 					tmp << L"no name !\n";
 
-				fputws( tmp.Text(), f );
+				fputws( tmp.text(), f );
 			}
 		}
 		fclose( f );
@@ -284,7 +283,7 @@ void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ 
 //////////////////////////////////////////////////////////////////////////
 //	memory management
 //////////////////////////////////////////////////////////////////////////
-static MemMan*			s_manager			= null;
+static MemMan* s_manager = null;
 
 SEGAN_INLINE void mem_set_manager( const MemMan* manager )
 {
@@ -298,7 +297,7 @@ SEGAN_INLINE MemMan* mem_get_manager( void )
 
 SEGAN_INLINE void* mem_alloc( const uint sizeinbyte )
 {
-	return s_manager ? s_manager->Alloc( sizeinbyte ) : ::malloc( sizeinbyte );
+	return s_manager ? s_manager->alloc( sizeinbyte ) : ::malloc( sizeinbyte );
 }
 
 SEGAN_INLINE void mem_realloc( void*& p, const uint newsizeinbyte )
@@ -312,7 +311,7 @@ SEGAN_INLINE void mem_realloc( void*& p, const uint newsizeinbyte )
 
 	if ( s_manager )
 	{
-		s_manager->Realloc( p, newsizeinbyte );
+		s_manager->realloc( p, newsizeinbyte );
 		return;
 	}
 
@@ -341,14 +340,14 @@ SEGAN_INLINE void mem_realloc( void*& p, const uint newsizeinbyte )
 SEGAN_INLINE uint mem_size( const void* p )
 {
 	if ( !p ) return 0;
-	return s_manager ? s_manager->Size( p ) : (uint)::_msize( (void*)p );	
+	return s_manager ? s_manager->size( p ) : (uint)::_msize( (void*)p );	
 }
 
 SEGAN_INLINE void mem_free( const void* p )
 {
 	if ( s_manager )
 	{
-		s_manager->Free( p );
+		s_manager->free( p );
 	}
 	else
 	{
@@ -731,7 +730,7 @@ void mem_report_debug_to_window( const uint tag /*= 0 */ )
 					tmp << leaf->file << L"(" << leaf->line << L"): warning : memory leak : size = " << leaf->size << L" tag = " << leaf->tag;
 				tmp << L"\n";
 
-				OutputDebugString( tmp.Text() );
+				OutputDebugString( tmp.text() );
 			}
 			leaf = leaf->next;
 		}
@@ -749,7 +748,7 @@ void mem_report_debug_to_window( const uint tag /*= 0 */ )
 				tmp << leaf->file << L"(" << leaf->line << L"): warning : memory leak : size = " << leaf->size << L" tag = " << leaf->tag;
 			tmp << L"\n";
 
-			OutputDebugString( tmp.Text() );
+			OutputDebugString( tmp.text() );
 
 			leaf = leaf->next;
 		}
@@ -779,7 +778,7 @@ SEGAN_INLINE void mem_report_debug_to_file( const wchar* fileName, const uint ta
 					{
 						str1024 tmp;
 						tmp << leaf->file << L"(" << leaf->line << L"): error : memory corrupted : size = " << leaf->size << L" tag = " << leaf->tag << L"\n";
-						fputws( tmp.Text(), f );
+						fputws( tmp.text(), f );
 					}
 
 					leaf = leaf->next;
@@ -800,7 +799,7 @@ SEGAN_INLINE void mem_report_debug_to_file( const wchar* fileName, const uint ta
 							tmp << leaf->file << L"(" << leaf->line << L"): warning : memory leak : size = " << leaf->size << L" tag = " << leaf->tag;
 						tmp << L"\n";
 
-						fputws( tmp.Text(), f );
+						fputws( tmp.text(), f );
 					}
 					leaf = leaf->next;
 				}
@@ -819,7 +818,7 @@ SEGAN_INLINE void mem_report_debug_to_file( const wchar* fileName, const uint ta
 					tmp << leaf->file << L"(" << leaf->line << L"): warning : memory leak : size = " << leaf->size << L" tag = " << leaf->tag;
 				tmp << L"\n";
 
-				fputws( tmp.Text(), f );
+				fputws( tmp.text(), f );
 
 				leaf = leaf->next;
 			}
@@ -891,36 +890,14 @@ SEGAN_INLINE void sx_sin_cos_fast( const float IN x, float& OUT s, float& OUT c)
 //////////////////////////////////////////////////////////////////////////
 //	table of randomize number
 //////////////////////////////////////////////////////////////////////////
-#define RND_TABLE_SIZE 4096
-uint rnd_table[RND_TABLE_SIZE];
-uint rnd_index = 0;
-
-SEGAN_INLINE void sx_random_set_data( const uint* data )
-{
-	memcpy( rnd_table, data, sizeof(rnd_table) );
-}
-
-
-SEGAN_INLINE void sx_random_sync( const uint index )
-{
-	rnd_index = index;
-}
-
-
 SEGAN_INLINE float sx_random_f( const float range )
 {
-	lib_enter_cs();
-	if ( ++rnd_index >= RND_TABLE_SIZE ) rnd_index = 0;
-	lib_leave_cs();
-	return  ( range * rnd_table[rnd_index] ) / RAND_MAX;
+	return  ( range ) / RAND_MAX;
 }
 
 SEGAN_INLINE sint sx_random_i( const sint range )
 {
-	lib_enter_cs();
-	if ( ++rnd_index >= RND_TABLE_SIZE ) rnd_index = 0;
-	lib_leave_cs();
-	return  ( range * rnd_table[rnd_index] ) / RAND_MAX;
+	return  ( range ) / RAND_MAX;
 }
 
 
@@ -939,6 +916,74 @@ SEGAN_INLINE uint sx_id_generate( void )
 	return id_counter++;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//	crc32 algorithm
+//////////////////////////////////////////////////////////////////////////
+unsigned long crc32_table[256];
+
+unsigned long crc32_reflect( unsigned long ref, char ch )
+{
+	unsigned long value = 0;
+	for ( sint i = 1; i < (ch + 1); ++i )
+	{
+		if ( ref & 1 )
+			value |= 1 << (ch - i);
+		ref >>= 1;
+	}
+	return value;
+}
+
+uint crc32_init_table( void )
+{
+	unsigned long ulPolynomial = 0x04c11db7;
+	for ( sint i = 0; i <= 0xFF; ++i )
+	{
+		crc32_table[i]= crc32_reflect( i, 8 ) << 24;
+		for ( sint j = 0; j < 8; ++j )
+			crc32_table[i] = (crc32_table[i] << 1) ^ ( crc32_table[i] & (1 << 31) ? ulPolynomial : 0 );
+		crc32_table[i] = crc32_reflect( crc32_table[i], 32 );
+	}
+	return 0;
+}
+
+SEGAN_INLINE uint sx_crc32_a( const char* str )
+{
+	sint len = sx_str_len( str );
+	if ( len < 1 ) return 0;
+
+	unsigned char* buffer = (unsigned char*)str;
+
+	unsigned long ulCRC(0xffffffff);
+	while( len-- )
+		ulCRC = (ulCRC >> 8) ^ crc32_table[ (ulCRC & 0xFF) ^ *buffer++ ];
+
+	return ulCRC ^ 0xffffffff;
+}
+
+SEGAN_INLINE uint sx_crc32_w( const wchar* str )
+{
+	sint len = sx_str_len( str );
+	if ( len < 1 ) return 0;
+
+	wchar* buffer = (wchar*)str;
+	unsigned long ulCRC(0xffffffff);
+	while( len-- )
+	{
+		union hchar {
+			struct {
+				char c1;
+				char c2;
+			};
+			wchar c;
+		} hc = *(hchar*)(buffer++);
+		ulCRC = (ulCRC >> 8) ^ crc32_table[ (ulCRC & 0xFF) ^ hc.c1 ];
+		if ( hc.c2 )
+			ulCRC = (ulCRC >> 8) ^ crc32_table[ (ulCRC & 0xFF) ^ hc.c2 ];
+		
+	}
+
+	return ulCRC ^ 0xffffffff;
+}
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -950,19 +995,251 @@ SEGAN_INLINE uint sx_id_generate( void )
 wchar* str_pop( void )
 {
 	typedef wchar StrItem[1024];
-	static StrItem str_pool[256];
+	static StrItem str_pool[512];
 	static sint index = 0;
 	lib_enter_cs();
-	if ( index > 63 ) index = 0;
-	wchar* res = str_pool[index];
+	if ( index >= 512 ) index = 0;
+	wchar* res = str_pool[index++];
 	lib_leave_cs();
 	return res;
 
 }
+
+SEGAN_INLINE uint sx_wchar_to_utf8( char* dest, const uint destsize, const uint ch )
+{//	code from : http://www.opensource.apple.com/source/OpenLDAP/OpenLDAP-186/OpenLDAP/libraries/libldap/utf-8-conv.c
+	uint len = 0;
+	if ( !dest || !destsize )   /* just determine the required UTF-8 char length. */
+	{
+		if ( ch < 0 )			return 0;
+		if ( ch < 0x80 )		return 1;
+		if ( ch < 0x800 )		return 2; 
+		if ( ch < 0x10000 )		return 3;
+		if ( ch < 0x200000 )	return 4;
+		if ( ch < 0x4000000 )	return 5;
+	}
+	else if ( ch < 0 )
+	{
+		len = 0;
+	}
+	else if ( ch < 0x80 )
+	{
+		if ( destsize >= 1 )
+		{
+			dest[len++] = (char)ch;
+		}
+
+	}
+	else if ( ch < 0x800 )
+	{
+		if ( destsize >= 2 )
+		{
+			dest[len++] = 0xc0 | ( ch >> 6 );
+			dest[len++] = 0x80 | ( ch & 0x3f );
+		}
+
+	}
+	else if ( ch < 0x10000 )
+	{
+		if ( destsize >= 3 )
+		{	
+			dest[len++] = 0xe0 | ( ch >> 12 );
+			dest[len++] = 0x80 | ( (ch >> 6) & 0x3f );
+			dest[len++] = 0x80 | ( ch & 0x3f );
+		}
+	
+	}
+	else if ( ch < 0x200000 )
+	{
+		if (destsize >= 4)
+		{
+			dest[len++] = 0xf0 | ( ch >> 18 );
+			dest[len++] = 0x80 | ( (ch >> 12) & 0x3f );
+			dest[len++] = 0x80 | ( (ch >> 6) & 0x3f );
+			dest[len++] = 0x80 | ( ch & 0x3f );
+		}
+
+	}
+	else if ( ch < 0x4000000 )
+	{
+		if ( destsize >= 5 )
+		{
+			dest[len++] = 0xf8 | ( ch >> 24 );
+			dest[len++] = 0x80 | ( (ch >> 18) & 0x3f );
+			dest[len++] = 0x80 | ( (ch >> 12) & 0x3f );
+			dest[len++] = 0x80 | ( (ch >> 6) & 0x3f );
+			dest[len++] = 0x80 | ( ch & 0x3f );
+		}
+	}
+	else
+	{
+		if ( destsize >= 6 )
+		{
+			dest[len++] = 0xfc | ( ch >> 30 );
+			dest[len++] = 0x80 | ( (ch >> 24) & 0x3f );
+			dest[len++] = 0x80 | ( (ch >> 18) & 0x3f );
+			dest[len++] = 0x80 | ( (ch >> 12) & 0x3f );
+			dest[len++] = 0x80 | ( (ch >> 6) & 0x3f );
+			dest[len++] = 0x80 | ( ch & 0x3f );
+		}
+	}
+	return len;
+}
+
+
+SEGAN_INLINE uint sx_str_to_utf8( char* dest, const uint destsize, const wchar* src )
+{
+	int r = 0;
+	char tmp[32];
+	char* d = dest;
+	while ( *src )
+	{
+		r = sx_wchar_to_utf8( tmp, 32, *src++ );
+		if ( r > 0 )
+		{
+			memcpy( d, tmp, r );
+			d += r;
+		}
+		else
+		{
+			*d++ = (char)*src++;
+		}
+	}
+	*d = 0;
+	return (uint)( d - dest );
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+//	code from :
+//	http://www.opensource.apple.com/source/OpenLDAP/OpenLDAP-186/OpenLDAP/libraries/libldap/utf-8.c
+
+const char ldap_utf8_lentab[] = {
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 0, 0 };
+
+const char ldap_utf8_mintab[] = {
+	(char)0x20, (char)0x80, (char)0x80, (char)0x80, (char)0x80, (char)0x80, (char)0x80, (char)0x80,
+	(char)0x80, (char)0x80, (char)0x80, (char)0x80, (char)0x80, (char)0x80, (char)0x80, (char)0x80,
+	(char)0x30, (char)0x80, (char)0x80, (char)0x80, (char)0x80, (char)0x80, (char)0x80, (char)0x80,
+	(char)0x38, (char)0x80, (char)0x80, (char)0x80, (char)0x3c, (char)0x80, (char)0x00, (char)0x00 };
+
+	/* LDAP_MAX_UTF8_LEN is 3 or 6 depending on size of wchar_t */
+#define LDAP_MAX_UTF8_LEN		 ( sizeof(wchar) * 3/2 )
+#define LDAP_UTF8_ISASCII(p)	 ( !(*(const unsigned char *)(p) & 0x80 ) )
+#define LDAP_UTF8_CHARLEN(p)	 ( LDAP_UTF8_ISASCII(p) ? 1 : ldap_utf8_lentab[*(const unsigned char *)(p) ^ 0x80] )
+#define LDAP_UTF8_CHARLEN2(p, l) ( ( ( l = LDAP_UTF8_CHARLEN( p )) < 3 || ( ldap_utf8_mintab[*(const unsigned char *)(p) & 0x1f] & (p)[1] ) ) ? l : 0 )
+
+SEGAN_INLINE uint sx_utf8_to_wchar( wchar dest, const uint destwords, const char* src )
+{
+	if ( !src ) return 0;
+
+	/* Get UTF-8 sequence length from 1st byte */
+	sint utflen = LDAP_UTF8_CHARLEN2(src, utflen);
+
+	if ( utflen==0 || utflen > (int)LDAP_MAX_UTF8_LEN ) return 0;
+
+	/* First byte minus length tag */
+	unsigned char mask[] = { 0, 0x7f, 0x1f, 0x0f, 0x07, 0x03, 0x01 };
+	wchar ch = (wchar)( src[0] & mask[utflen] );
+
+	for( sint i = 1; i < utflen; ++i )
+	{
+		/* Subsequent bytes must start with 10 */
+		if ( ( src[i] & 0xc0 ) != 0x80 ) return 0;
+
+		ch <<= 6;			/* 6 bits of data in each subsequent byte */
+		ch |= (wchar)( src[i] & 0x3f );
+	}
+
+	dest = ch;
+	return utflen;
+}
+
+SEGAN_INLINE uint sx_utf8_to_str( wchar* dest, const uint destwords, const char* src )
+{
+	/* If input ptr is NULL or empty... */
+	if ( !src || !*src )
+	{
+		if ( dest ) *dest = 0;
+		return 0;
+	}
+
+	/* Examine next UTF-8 character.  If output buffer is NULL, ignore count */
+	uint wclen = 0;
+	while ( *src && ( !dest || wclen < destwords ) )
+	{
+		/* Get UTF-8 sequence length from 1st byte */
+		sint utflen = LDAP_UTF8_CHARLEN2(src, utflen);
+
+		if( !utflen || utflen > (sint)LDAP_MAX_UTF8_LEN ) return 0;
+
+		/* First byte minus length tag */
+		unsigned char mask[] = { 0, 0x7f, 0x1f, 0x0f, 0x07, 0x03, 0x01 };
+		wchar ch = (wchar)( src[0] & mask[utflen] );
+
+		for( sint i = 1; i < utflen; ++i )
+		{
+			/* Subsequent bytes must start with 10 */
+			if ( (src[i] & 0xc0) != 0x80 ) return 0;
+
+			ch <<= 6;			/* 6 bits of data in each subsequent byte */
+			ch |= (wchar)( src[i] & 0x3f );
+		}
+
+		if ( dest ) dest[wclen] = ch;
+
+		src += utflen;		/* Move to next UTF-8 character */
+		wclen++;			/* Count number of wide chars stored/required */
+	}
+
+	/* Add null terminator if there's room in the buffer. */
+	if ( dest && wclen < destwords ) dest[wclen] = 0;
+
+	return wclen;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+SEGAN_INLINE const wchar* sx_utf8_to_str( const char* src )
+{
+	wchar* tmp = str_pop();
+	sx_utf8_to_str( tmp, 1024, src );
+	return tmp;
+}
+
+SEGAN_LIB_API const char* sx_str_to_utf8( const wchar* src )
+{
+	char* tmp = (char*)str_pop();
+	sx_str_to_utf8( tmp, 2048, src );
+	return tmp;
+}
+
 SEGAN_INLINE const wchar* sx_int_to_str( const int number )
 {
 	wchar* tmp = str_pop();
 	_itow_s( number, tmp, 64, 10 );
+	return tmp;
+}
+
+SEGAN_INLINE const wchar* sx_uint_to_str( const uint number )
+{
+	wchar* tmp = str_pop();
+	_ultow_s( number, tmp, 64, 10 );
+	return tmp;
+}
+
+SEGAN_INLINE const wchar* sx_uint64_to_str( const uint64 number )
+{
+	wchar* tmp = str_pop();
+	_ui64tow_s( number, tmp, 64, 10 );
 	return tmp;
 }
 
@@ -1124,17 +1401,9 @@ void sx_lib_initialize( void )
 	//  initialize random seed
 	srand( (uint)time(NULL) );
 
-	//	fill random table
-	const uint halfrand = RAND_MAX / 2;
-	for ( int i = 0; i < RND_TABLE_SIZE; i++ )
-	{
-		if ( rand() > halfrand )
-		{
-			rand();
-			rnd_table[i] = rand();
-		}
-		else rnd_table[i] = rand();
-	}
+
+	//	initialize crc32 table
+	crc32_init_table();
 }
 
 // finalize internal library

@@ -32,17 +32,17 @@ GUIManager::~GUIManager( void )
 
 void GUIManager::Add( const uiControl* control )
 {
-	m_controls.PushBack( (uiControl*)control );
+	m_controls.push_back( (uiControl*)control );
 }
 
 void GUIManager::Remove( const uiControl* control )
 {
-	m_controls.Remove( (uiControl*)control );
+	m_controls.remove( (uiControl*)control );
 }
 
 void GUIManager::Delete( uiControl*& control )
 {
-	m_controls.Remove( control );
+	m_controls.remove( control );
 	sx_delete_and_null( control );
 }
 
@@ -52,7 +52,7 @@ void GUIManager::Clear( void )
 	{
 		sx_delete( m_controls[i] );
 	}
-	m_controls.Clear();
+	m_controls.clear();
 }
 
 
@@ -122,7 +122,7 @@ void GUIManager::Draw( const dword flag )
 	//g_engine->m_device3D->SetRenderState( RS_FILL, false );
 
 	//	extract all elements that should be draw
-	m_elements.Clear();
+	m_elements.clear();
 	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
 		m_controls[i]->GetElements( &m_elements );
@@ -135,7 +135,7 @@ void GUIManager::Draw( const dword flag )
 		for ( sint i=0; i<m_elements.m_count; ++i )
 		{
 			if ( g_engine->m_deviceUI->AddBatch( m_elements.m_item[i] ) )
-				m_elements.RemoveByIndex( i-- );
+				m_elements.remove_index( i-- );
 			else
 				break;
 		}

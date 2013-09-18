@@ -17,8 +17,8 @@
 #define	FM_OPEN_READ			0x0000		// Open for read access only
 #define	FM_OPEN_WRITE			0x0001		// Open for write access only
 #define	FM_OPEN_READ_WRITE		0x0002		// Open for read and write access
-#define	FM_SHARE_READ			0x0010		// Write access for other thread is denied
-#define	FM_SHARE_WRITE			0x0020		// Read access for other thread is denied - not supported on all platforms
+#define	FM_SHARE_READ			0x0010		// write access for other thread is denied
+#define	FM_SHARE_WRITE			0x0020		// read access for other thread is denied - not supported on all platforms
 #define	FM_SHARE_READ_WRITE		0x0030		// Allows full access for others.
 
 
@@ -38,13 +38,13 @@ public:
 	void Close( void );
 
 	//! write data to file
-	uint Write( const void* buf, const uint size);
+	uint write( const void* buf, const uint size);
 
 	//! read data from file
-	uint Read( void* buf, const uint size );
+	uint read( void* buf, const uint size );
 
 	//! seek in the file
-	uint Seek( SeekType ST_ seekType, const uint offset = 0 );
+	uint seek( SeekType ST_ seekType, const uint offset = 0 );
 
 	//! lock file
 	bool LockFile( void );

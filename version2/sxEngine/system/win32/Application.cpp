@@ -227,7 +227,7 @@ void sx_app_finalize( void )
 	}
 
 	// destroy windows and unregister classes
-	for ( MapWindow::Iterator it = s_application->windows.First(); !it.IsLast(); it++ )
+	for ( MapWindow::Iterator it = s_application->windows.first(); !it.is_last(); it++ )
 	{
 		sx_delete_and_null( *it );
 	}
@@ -260,7 +260,7 @@ Window* sx_app_create_window( const wchar* name, WindowBorderType WBT_ borderTyp
 	win->m_handle = CreateWindowEx(
 		winStyles.LowPart,
 		win->m_windowClass.lpszClassName,
-		win->m_title.Text(),
+		win->m_title.text(),
 		winStyles.HighPart | WS_TABSTOP | WS_GROUP,
 		win->m_rect.left,
 		win->m_rect.top,
@@ -277,7 +277,7 @@ Window* sx_app_create_window( const wchar* name, WindowBorderType WBT_ borderTyp
 		s_application->mainWindow = win->m_handle;
 
 	// add this new window to the map list
-	s_application->windows.Insert( reinterpret_cast<uint64>(win->m_handle), win );
+	s_application->windows.insert( reinterpret_cast<uint64>(win->m_handle), win );
 
 	//  update the window
 	win->Update();
@@ -294,7 +294,7 @@ void sx_app_destroy_window( Window*& pwindow )
 	if ( win->m_handle )
 	{
 		// remove this window from the map list
-		s_application->windows.Remove( reinterpret_cast<uint64>(win->m_handle) );
+		s_application->windows.remove( reinterpret_cast<uint64>(win->m_handle) );
 	}
 
 	sx_delete_and_null( pwindow );
@@ -302,7 +302,7 @@ void sx_app_destroy_window( Window*& pwindow )
 
 bool sx_app_get_window( handle whandle, Window*& pwindow )
 {
-	return s_application->windows.Find( reinterpret_cast<uint64>( *( (HWND*)whandle ) ), (Window_win32*&)pwindow );
+	return s_application->windows.find( reinterpret_cast<uint64>( *( (HWND*)whandle ) ), (Window_win32*&)pwindow );
 }
 
 void sx_app_run( ApplicationMainLoop mainLoop )
@@ -353,7 +353,7 @@ LRESULT WINAPI DefaultMsgProc( HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam
 	case WM_CLOSE:
 		{
 			Window_win32* win;
-			if ( s_application->windows.Find(reinterpret_cast<uint64>(hWnd), win) )
+			if ( s_application->windows.find(reinterpret_cast<uint64>(hWnd), win) )
 			{
 				if ( s_application->callbackEvents )
 				{
@@ -387,7 +387,7 @@ LRESULT WINAPI DefaultMsgProc( HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam
 			if ( s_application->callbackEvents )
 			{
 				Window_win32* pWin = null;
-				if (  s_application->windows.Find( reinterpret_cast<uint64>(hWnd), pWin ) )
+				if (  s_application->windows.find( reinterpret_cast<uint64>(hWnd), pWin ) )
 				{
 					WindowEvent wevent = { msg, wParam, lParam, &hWnd };
 					if ( s_application->callbackEvents( pWin, &wevent ) == 0 )
@@ -407,7 +407,7 @@ LRESULT WINAPI DefaultMsgProc( HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam
 		if ( s_application->callbackEvents )
 		{
 			Window_win32* pWin = null;
-			s_application->windows.Find( reinterpret_cast<uint64>(hWnd), pWin );
+			s_application->windows.find( reinterpret_cast<uint64>(hWnd), pWin );
 			WindowEvent wevent = { msg, wParam, lParam, &hWnd };
 			if ( s_application->callbackEvents( pWin, &wevent ) == 0 )
 					return 0;

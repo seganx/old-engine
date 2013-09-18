@@ -40,74 +40,69 @@ public:
 		mem_free( m_item );
 	}
 
-	SEGAN_LIB_INLINE void Clear( void )
+	SEGAN_LIB_INLINE void clear( void )
 	{
-		_Realloc( 0 );
+		_realloc( 0 );
 		m_count = 0;
 	}
 
-	SEGAN_LIB_INLINE void SetCount( sint newCount )
-	{
-		m_count = newCount;
-		_Realloc( m_count );
-	}
-
-	SEGAN_LIB_INLINE void SetSize( sint newSize )
-	{
-		m_sampler = newSize;
-		_Realloc( newSize-1 );
-	}
-
-	SEGAN_LIB_INLINE sint Count( void ) const
-	{
-		return m_count;
-	}
-
-	SEGAN_LIB_INLINE bool IsEmpty( void ) const
+	SEGAN_LIB_INLINE bool is_empty( void )
 	{
 		return ( m_count == 0 );
 	}
 
-	SEGAN_LIB_INLINE void PushBack( const T& newItem )
+	SEGAN_LIB_INLINE void set_count( const sint newCount )
 	{
-		_Realloc( ++m_count );
+		m_count = newCount;
+		_realloc( m_count );
+	}
+
+	SEGAN_LIB_INLINE void set_size( const sint newSize )
+	{
+		m_sampler = newSize;
+		_realloc( newSize-1 );
+	}
+
+	SEGAN_LIB_INLINE void push_back( const T& newItem )
+	{
+		_realloc( ++m_count );
 		m_item[m_count-1] = newItem;
 	}
 
-	SEGAN_LIB_INLINE void PushFront( const T& newItem )
+	SEGAN_LIB_INLINE void push_front( const T& newItem )
 	{
-		_Realloc( ++m_count );
+		_realloc( ++m_count );
 		for ( sint i = m_count-1; i>0; i-- )
 			m_item[i] = m_item[i-1];
 		m_item[0] = newItem;
 	}
 
-	SEGAN_LIB_INLINE void Insert( sint index, const T& newItem )
+	SEGAN_LIB_INLINE void insert( const sint index, const T& newItem )
 	{
 		sx_assert(index>=0 && index<=m_count);
-		_Realloc( ++m_count );
+		_realloc( ++m_count );
 		for ( sint i = m_count-1; i>index; i-- )
 			m_item[i] = m_item[i-1];
 		m_item[index] = newItem;
 	}
 
-	SEGAN_LIB_INLINE bool Remove( const T& item )
+	SEGAN_LIB_INLINE bool remove( const T& item )
 	{
-		sint i = IndexOf( item );
+		sint i = index_of( item );
 		if ( i < 0 ) return false;
-		RemoveByIndex( i );
+		remove_index( i );
 		return true;
 	}
 
-	SEGAN_LIB_INLINE void RemoveByIndex( sint index )
+	SEGAN_LIB_INLINE void remove_index( const sint index )
 	{
 		sx_assert(index>=0 && index<m_count);
 		for ( sint i=index; i<m_count-1; i++ )
 			m_item[i] = m_item[i+1];
-		_Realloc( --m_count );
+		_realloc( --m_count );
 	}
 
-	SEGAN_LIB_INLINE void Swap( sint index1, sint index2 )
+	SEGAN_LIB_INLINE void swap( const sint index1, const sint index2 )
 	{
 		sx_assert(index1>=0 && index1<m_count && index2>=0 && index2<m_count);
 		if ( index1 == index2 ) return;
@@ -116,12 +111,12 @@ public:
 		m_item[index2] = _tmp;
 	}
 
-	SEGAN_LIB_INLINE void Sort( compFunc cmpFunc = null )
+	SEGAN_LIB_INLINE void sort( compFunc cmpFunc = null )
 	{
-		if ( m_count > 1 ) QuickSort( cmpFunc, 0, m_count-1 );
+		if ( m_count > 1 ) quick_sort( cmpFunc, 0, m_count-1 );
 	}
 
-	SEGAN_LIB_INLINE sint IndexOf( const T& item )
+	SEGAN_LIB_INLINE sint index_of( const T& item )
 	{
 		for ( sint i=0; i<m_count; i++ ) {
 			if ( m_item[i] == item ) {
@@ -131,19 +126,19 @@ public:
 		return -1;
 	}
 
-	SEGAN_LIB_INLINE T& At( sint index )
+	SEGAN_LIB_INLINE T& at( const sint index )
 	{
 		sx_assert(index>=0 && index<m_count);
 		return m_item[index];
 	}
 
-	SEGAN_LIB_INLINE T& operator[]( sint index ) const
+	SEGAN_LIB_INLINE T& operator[]( const sint index ) const
 	{
 		sx_assert(index>=0 && index<m_count);
 		return m_item[index];
 	}
 
-	SEGAN_LIB_INLINE void QuickSort( compFunc cmpFunc, sint leftarg, sint rightarg )
+	SEGAN_LIB_INLINE void quick_sort( compFunc cmpFunc, sint leftarg, sint rightarg )
 	{	//	base code from IBM with some changes : http://publib.boulder.ibm.com/infocenter/lnxpcomp/v8v101/index.jsp?topic=%2Fcom.ibm.xlcpp8l.doc%2Flanguage%2Fref%2Ffunction_templates.htm&topic=%2Fcom.ibm.xlcpp8l.doc%2Flanguage%2Fref%2Ffunction_templates.htm
 		if ( leftarg < rightarg )
 		{
@@ -183,26 +178,26 @@ public:
 				else if ( pivotvalue == left )	pivotvalue = right;
 			}
 
-			QuickSort( cmpFunc, leftarg, right );
-			QuickSort( cmpFunc, right + 1, rightarg );
+			quick_sort( cmpFunc, leftarg, right );
+			quick_sort( cmpFunc, right + 1, rightarg );
 		}
 	}
 #endif
 
 private:
 
-	SEGAN_LIB_INLINE void _Realloc( sint newSize )
+	SEGAN_LIB_INLINE void _realloc( const sint newsize )
 	{
 		if ( m_sampler )
 		{
-			if ( newSize > m_size || ( m_size - newSize ) > m_sampler ) {
-				m_size = sint( newSize / m_sampler  + 1 ) * m_sampler;
+			if ( newsize > m_size || ( m_size - newsize ) > m_sampler ) {
+				m_size = sint( newsize / m_sampler  + 1 ) * m_sampler;
 				mem_realloc( (void*&)m_item, m_size * sizeof(T) );
 			}
 		}
 		else
 		{
-			m_size = newSize;
+			m_size = newsize;
 			mem_realloc( (void*&)m_item, m_size * sizeof(T) );
 		}
 		
@@ -241,7 +236,7 @@ public:
 	{
 	}
 
-	SEGAN_LIB_INLINE void Clear( void )
+	SEGAN_LIB_INLINE void clear( void )
 	{
 		m_count = 0;
 #if _DEBUG
@@ -249,29 +244,19 @@ public:
 #endif
 	}
 
-	SEGAN_LIB_INLINE void SetCount( sint newCount )
+	SEGAN_LIB_INLINE void set_count( const sint newCount )
 	{
 		if ( newCount >= count ) return;
 		m_count = newCount;
 	}
 
-	SEGAN_LIB_INLINE sint Count( void )
-	{
-		return m_count;
-	}
-
-	SEGAN_LIB_INLINE bool IsEmpty( void ) const
-	{
-		return ( m_count == 0 );
-	}
-
-	SEGAN_LIB_INLINE void PushBack( const T& newItem )
+	SEGAN_LIB_INLINE void push_back( const T& newItem )
 	{
 		if ( m_count >= count ) return;
 		m_item[m_count++] = newItem;
 	}
 
-	SEGAN_LIB_INLINE void PushFront( const T& newItem )
+	SEGAN_LIB_INLINE void push_front( const T& newItem )
 	{
 		if ( m_count >= count ) return;
 		for ( sint i = ++m_count; i>0; i-- )
@@ -279,7 +264,7 @@ public:
 		m_item[0] = newItem;
 	}
 
-	SEGAN_LIB_INLINE void Insert( sint index, const T& newItem )
+	SEGAN_LIB_INLINE void insert( const sint index, const T& newItem )
 	{
 		sx_assert(index>=0 && index<=m_count);
 		if ( m_count >= count ) return;
@@ -288,15 +273,15 @@ public:
 		m_item[index] = newItem;
 	}
 
-	SEGAN_LIB_INLINE bool Remove( const T& item )
+	SEGAN_LIB_INLINE bool remove( const T& item )
 	{
-		sint i = IndexOf( item );
+		sint i = index_of( item );
 		if ( i < 0 ) return false;
-		RemoveByIndex( i );
+		remove_index( i );
 		return true;
 	}
 
-	SEGAN_LIB_INLINE void RemoveByIndex( sint index )
+	SEGAN_LIB_INLINE void remove_index( const sint index )
 	{
 		sx_assert(index>=0 && index<m_count);
 		m_count--;
@@ -304,7 +289,7 @@ public:
 			m_item[i] = m_item[i+1];
 	}
 
-	SEGAN_LIB_INLINE void Swap( sint index1, sint index2 )
+	SEGAN_LIB_INLINE void swap( const sint index1, const sint index2 )
 	{
 		sx_assert(index1>=0 && index1<m_count && index2>=0 && index2<m_count);
 		if ( index1 == index2 ) return;
@@ -313,12 +298,12 @@ public:
 		m_item[index2] = _tmp;
 	}
 
-	SEGAN_LIB_INLINE void Sort( compFunc cmpFunc = null )
+	SEGAN_LIB_INLINE void sort( compFunc cmpFunc = null )
 	{
-		if ( m_count > 1 ) QuickSort( cmpFunc, 0, m_count-1 );
+		if ( m_count > 1 ) quick_sort( cmpFunc, 0, m_count-1 );
 	}
 
-	SEGAN_LIB_INLINE sint IndexOf( const T& item )
+	SEGAN_LIB_INLINE sint index_of( const T& item )
 	{
 		for ( sint i=0; i<m_count; i++ ) {
 			if ( m_item[i] == item ) {
@@ -328,13 +313,13 @@ public:
 		return -1;
 	}
 
-	SEGAN_LIB_INLINE T& At( sint index )
+	SEGAN_LIB_INLINE T& at( const sint index )
 	{
 		sx_assert(index>=0 && index<m_count);
 		return m_item[index];
 	}
 
-	SEGAN_LIB_INLINE T& operator[]( sint index ) const
+	SEGAN_LIB_INLINE T& operator[]( const sint index ) const
 	{
 		sx_assert(index>=0 && index<m_count);
 		return m_item[index];
@@ -342,7 +327,7 @@ public:
 
 #if 1
 
-	void QuickSort(compFunc cmpFunc, int leftarg, int rightarg)
+	void quick_sort(compFunc cmpFunc, int leftarg, int rightarg)
 	{	//	base code from IBM with some changes : http://publib.boulder.ibm.com/infocenter/lnxpcomp/v8v101/index.jsp?topic=%2Fcom.ibm.xlcpp8l.doc%2Flanguage%2Fref%2Ffunction_templates.htm&topic=%2Fcom.ibm.xlcpp8l.doc%2Flanguage%2Fref%2Ffunction_templates.htm
 		if ( leftarg < rightarg )
 		{
@@ -382,8 +367,8 @@ public:
 				else if ( pivotvalue == left )	pivotvalue = right;
 			}
 
-			QuickSort( cmpFunc, leftarg, right );
-			QuickSort( cmpFunc, right + 1, rightarg );
+			quick_sort( cmpFunc, leftarg, right );
+			quick_sort( cmpFunc, right + 1, rightarg );
 		}
 	}
 

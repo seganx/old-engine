@@ -46,8 +46,8 @@ bool FileStream::Open( const wchar* filename, const dword FM_ mode )
 	}
 	else
 	{
-		m_size = Seek( ST_END );
-		Seek( ST_BEGIN );
+		m_size = seek( ST_END );
+		seek( ST_BEGIN );
 		return true;
 	}
 }
@@ -58,39 +58,39 @@ void FileStream::Close()
 	{
 		if ( !CloseHandle( m_handle ) )
 		{
-			g_logger->Log( L"Error : Closing file '%s' failed !", m_fileName.Text() );
+			g_logger->Log( L"Error : Closing file '%s' failed !", m_fileName.text() );
 		}
 		m_handle = null;
 	}
 
-	m_fileName.Clear();
+	m_fileName.clear();
 }
 
-uint FileStream::Write( const void* buf, const uint size )
+uint FileStream::write( const void* buf, const uint size )
 {
 	if ( size == 0 || !m_handle ) return 0;
 	DWORD Result = 0;
-	uint currPos = Seek( ST_CUR );
+	uint currPos = seek( ST_CUR );
 	if ( !WriteFile( m_handle, buf, size, &Result, null ) ) {
-		g_logger->Log( L"Error : Writing to file '%s' failed !", m_fileName.Text() );
+		g_logger->Log( L"Error : Writing to file '%s' failed !", m_fileName.text() );
 		return 0;
 	}
 	if ( currPos + size > m_size ) m_size = currPos + size;
 	return (uint)Result;
 }
 
-uint FileStream::Read( void* buf, const uint size )
+uint FileStream::read( void* buf, const uint size )
 {
 	if ( size == 0 || !m_handle ) return 0;
 	DWORD Result = 0;
 	if ( !ReadFile( m_handle, buf, size, &Result, null ) ) {
-		g_logger->Log( L"Error : Reading from file '%s' failed !", m_fileName.Text() );
+		g_logger->Log( L"Error : Reading from file '%s' failed !", m_fileName.text() );
 		return 0;
 	}
 	return Result;
 }
 
-uint FileStream::Seek( SeekType seekType, const uint offset )
+uint FileStream::seek( SeekType seekType, const uint offset )
 {
 	if ( !m_handle ) return 0;
 	return SetFilePointer( m_handle, offset, null, (dword)seekType );
@@ -110,9 +110,9 @@ bool FileStream::LockFile( void )
 	overlap.Internal = 0;
 	overlap.InternalHigh = 0;
 	overlap.Offset = 0;
-	overlap.OffsetHigh = Size();
+	overlap.OffsetHigh = size();
 	overlap.Pointer = null;
-	return ( LockFileEx( m_handle, LOCKFILE_EXCLUSIVE_LOCK, 0, 0, Size(), &overlap ) == TRUE );
+	return ( LockFileEx( m_handle, LOCKFILE_EXCLUSIVE_LOCK, 0, 0, size(), &overlap ) == TRUE );
 }
 
 
