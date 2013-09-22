@@ -9,6 +9,8 @@
 #ifndef GUARD_Assert_HEADER_FILE
 #define GUARD_Assert_HEADER_FILE
 
+#include "Def.h"
+
 // assertion
 #if ( defined(_DEBUG) || SEGAN_CALLSTACK )
 

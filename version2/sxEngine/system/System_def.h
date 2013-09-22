@@ -10,6 +10,6 @@
 #define GUARD_System_def_HEADER_FILE
 
 #include "../../sxLib/Lib.h"
-
+#include "../Engine_def.h"
 
 #endif // GUARD_System_def_HEADER_FILE

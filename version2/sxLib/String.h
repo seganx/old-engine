@@ -9,11 +9,8 @@
 #ifndef GUARD_String_HEADER_FILE
 #define GUARD_String_HEADER_FILE
 
-#include <wchar.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "Memory.h"
+
+#include "Def.h"
 
 
 #if	defined(_WIN32)

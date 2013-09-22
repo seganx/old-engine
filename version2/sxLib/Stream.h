@@ -11,7 +11,7 @@
 #ifndef GUARD_Stream_HEADER_FILE
 #define GUARD_Stream_HEADER_FILE
 
-#include "Memory.h"
+#include "Def.h"
 
 
 #define ST_

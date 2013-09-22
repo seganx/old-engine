@@ -10,8 +10,7 @@
 #ifndef GUARD_Array_HEADER_FILE
 #define GUARD_Array_HEADER_FILE
 
-#include "Memory.h"
-#include "Assert.h"
+#include "Def.h"
 
 /*! 
 this array class doesn't use the copy constructor of class objects when it pushes them.

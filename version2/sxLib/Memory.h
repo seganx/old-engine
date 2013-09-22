@@ -11,7 +11,6 @@
 #define GUARD_Memory_HEADER_FILE
 
 #include "Def.h"
-#include "Assert.h"
 
 //////////////////////////////////////////////////////////////////////////
 //	BASIC MEMORY FUNCTIONS
@@ -105,10 +104,10 @@ class MemMan
 {
 public:
 	virtual ~MemMan( void ) {}
-	virtual void* alloc( const uint sizeInByte )			= 0;
-	virtual void realloc( void*& p, const uint sizeInByte )	= 0;
-	virtual void free( const void* p )						= 0;
-	virtual uint size( const void* p )						= 0;
+	virtual void* alloc( const uint sizeInByte )					= 0;
+	virtual void* realloc( const void* p, const uint sizeInByte )	= 0;
+	virtual void free( const void* p )								= 0;
+	virtual uint size( const void* p )								= 0;
 };
 
 
@@ -119,11 +118,21 @@ public:
 
 /*! a fast general memory pool which allocates a memory block in initialization from OS and uses the allocated 
 memory pool in any allocation call. using this memory manager has restriction of block protection. */
-class MemMan_Pool : public MemMan
+class SEGAN_LIB_API MemMan_Pool : public MemMan
 {
-
 	SEGAN_STERILE_CLASS(MemMan_Pool);
+
 public:
+	MemMan_Pool( const uint poolSizeInBytes );
+	~MemMan_Pool( void );
+	
+	void* alloc( const uint sizeInByte );
+	void* realloc( const void* p, const uint sizeInByte );
+	void free( const void* p );
+	uint size( const void* p );
+
+public:
+
 	enum ChunkState
 	{
 		CS_NULL			= 0xf0f0f0f0,
@@ -139,152 +148,15 @@ public:
 		Chunk*		prev;
 		uint		size;
 		ChunkState	state;
-	} 
-	typedef *PChunk;
-
-public:
-	MemMan_Pool( const uint poolSizeInBytes ): MemMan()
-	{
-		uint memsize = poolSizeInBytes + 0x0fff * sizeof(Chunk);
-		m_pool = (pbyte)mem_alloc( memsize );
-		sx_assert( m_pool );
-#ifdef _DEBUG
-		mem_set( m_pool, 0, memsize );
-#endif
-		//  set first empty chunk
-		Chunk* ch	= PChunk(m_pool);
-		ch->state	= CS_EMPTY;
-		ch->size	= memsize - 2 * sizeof(Chunk);
-
-		//  create last inactive chuck
-		Chunk*	ich	= PChunk( m_pool + memsize - sizeof(Chunk) );
-		ich->behind	= ch;
-		ich->state	= CS_NULL;
-		ich->size	= 0;
-		m_root = ich;
-		push( ch );
-	}
-
-	~MemMan_Pool( void )
-	{
-		mem_free( m_pool );
-	}
-
-	void* alloc( const uint sizeInByte )
-	{
-		Chunk* ch = m_root;
-		while( ch->state == CS_EMPTY )
-		{
-			if ( ch->size >= sizeInByte )
-			{
-				//  free chunk founded
-				pop( ch );
-				if ( ( ch->size - sizeInByte ) > sizeof(Chunk) )
-				{
-					//  create new empty chunk by remaining size
-					Chunk* ech  = PChunk( pbyte(ch) + sizeof(Chunk) + sizeInByte );
-					ech->behind = ch;
-					ech->size	= ch->size - ( sizeof(Chunk) + sizeInByte );
-					ech->state	= CS_EMPTY;
-					push( ech );
-					PChunk( pbyte(ech) + sizeof(Chunk) + ech->size )->behind = ech;
-					ch->size = sizeInByte;
-				}
-				ch->state = CS_FULL;
-				return ( pbyte(ch) + sizeof(Chunk) );
-			}
-			ch = ch->next;
-		}
-		sx_assert( "MemMan_Pool::alloc(...) failed due to there is no free chunk exist whit specified size!"<0 );
-		return null;
-	}
-
-	SEGAN_LIB_INLINE void realloc( void*& p, const uint sizeInByte )
-	{
-		if ( !p )
-		{
-			p = alloc( sizeInByte );
-		}
-		else
-		{
-			sx_assert( pbyte(p) > m_pool && pbyte(p) < ( m_pool + mem_size(m_pool) ) );
-			void* tmp = alloc( sizeInByte );
-			mem_copy( tmp, p, sx_min_i( size(p), sizeInByte ) );
-			free( p );
-			p = tmp;
-		}
-	}
-
-	SEGAN_LIB_INLINE void free( const void* p )
-	{
-		if ( !p ) return;
-		sx_assert( pbyte(p) > m_pool && pbyte(p) < ( m_pool + mem_size(m_pool) ) );
-
-		Chunk* ch = PChunk( pbyte(p) - sizeof(Chunk) );
-		sx_assert( ch->state == CS_FULL );	//	avoid to free a chunk more that once
-
-#ifdef _DEBUG
-		mem_set( (void*)p, 0, ch->size );
-#endif
-
-		//  look at neighbor chunk in right side
-		Chunk* rch = PChunk( pbyte(p) + ch->size );
-		if ( rch->state == CS_EMPTY )
-		{
-			PChunk( pbyte(rch) + sizeof(Chunk) + rch->size )->behind = ch;
-			ch->size += sizeof(Chunk) + rch->size;
-			pop( rch );
-
-#ifdef _DEBUG
-			mem_set( rch, 0, sizeof(Chunk) );
-#endif
-		}
-
-		//  look at neighbor chunk in left side
-		if ( ch->behind )
-		{	
-			if ( ch->behind->state == CS_EMPTY )
-			{
-				PChunk( pbyte(ch) + sizeof(Chunk) + ch->size )->behind = ch->behind;
-				ch->behind->size += sizeof(Chunk) + ch->size;
-#ifdef _DEBUG
-				mem_set( ch, 0, sizeof(Chunk) );
-#endif
-				return;	//	this one is already exist in list
-			}
-		}
-
-		//	push to free list
-		ch->state = CS_EMPTY;
-		push( ch );
-	}
-
-	SEGAN_LIB_INLINE uint size( const void* p )
-	{
-		if ( !p ) return 0;
-		sx_assert( pbyte(p) > m_pool && pbyte(p) < ( m_pool + mem_size(m_pool) ) );
-		Chunk* ch = PChunk( pbyte(p) - sizeof(Chunk) );
-		return ch->size;
-	}
+	};
+	typedef Chunk* PChunk;
 
 private:
-	SEGAN_LIB_INLINE void push( Chunk* ch )
-	{
-		ch->next = m_root;
-		ch->prev = null;
-		m_root->prev = ch;
-		m_root = ch;
-	}
 
-	SEGAN_LIB_INLINE void pop( Chunk* ch )
-	{
-		if(ch->prev)	ch->prev->next = ch->next;
-		if(ch->next)	ch->next->prev = ch->prev;
-		if(ch==m_root)	m_root = ch->next;
-	}
+	void push( Chunk* ch );
+	void pop( Chunk* ch );
 
 public:
-
 	pbyte		m_pool;
 	Chunk*		m_root;
 

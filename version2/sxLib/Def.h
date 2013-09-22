@@ -77,13 +77,6 @@ typedef byte				*pbyte;
 	#define SEGAN_LIB_API		__declspec(dllexport)
 #endif
 
-#if defined( SEGAN_IMPORT )
-	#define SEGAN_ENG_API		__declspec(dllimport)
-#else
-	#define SEGAN_ENG_API		__declspec(dllexport)
-#endif
-
-
 #define SEGAN_LIB_INLINE		__forceinline
 
 #define SEGAN_INLINE			inline
@@ -95,8 +88,6 @@ typedef byte				*pbyte;
 #define SEGAN_CALLSTACK			1		// enable call stack system to log stack of function
 
 #define SEGAN_LIB_ASSERT		1		// check and log some special events on containers
-
-#define SEGAN_MATH_SIMD			0		// use SIMD instruction in some math functions
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -130,6 +121,14 @@ typedef byte				*pbyte;
 //! disable container warnings
 #pragma warning(disable:4251)
 #pragma warning(disable:4275)
+
+
+//! includes
+#include <wchar.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 
 #endif	//	GUARD_Def_HEADER_FILE

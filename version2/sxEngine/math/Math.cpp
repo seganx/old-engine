@@ -1,6 +1,3 @@
-#include "../Math.h"
-#include "../Memory.h"
-
 #include "Math_vec.h"
 #include "Math_utils.h"
 #include "Math_tools.h"

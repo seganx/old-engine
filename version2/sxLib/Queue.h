@@ -10,7 +10,7 @@
 #ifndef GUARD_Queue_HEADER_FILE
 #define GUARD_Queue_HEADER_FILE
 
-#include "Memory.h"
+#include "Def.h"
 
 /*! 
 Queue container classes that use double linked List to hold data.

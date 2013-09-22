@@ -9,8 +9,8 @@
 #ifndef GUARD_Device3D_HEADER_FILE
 #define GUARD_Device3D_HEADER_FILE
 
-#include "../../sxLib/Lib.h"
-
+//#include "../../sxLib/Lib.h"
+#include "../math/Math.h"
 
 //! flags of rendering device
 #define	SX_D3D_
@@ -181,7 +181,11 @@ struct d3dDebugInfo
 };
 
 //! color struct
-typedef Color2 d3dColor;
+struct d3dColor
+{
+	Color c0;
+	Color c1;
+};
 
 //! view port structure
 struct d3dViewport

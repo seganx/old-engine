@@ -16,9 +16,7 @@
 #ifndef GUARD_Map_HEADER_FILE
 #define GUARD_Map_HEADER_FILE
 
-#include "Memory.h"
-
-
+#include "Def.h"
 
 
 /*! 

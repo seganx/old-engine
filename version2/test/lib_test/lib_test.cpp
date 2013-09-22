@@ -60,105 +60,115 @@ int main(int argc, char* argv[])
 
 
 #if 1
-	String str = "hello";
-	bool e = str == L"hello1";
-
-	const wchar* tst = sx_str_make_pathstyle( L"D:\\SeganX\\version.2\\sxLib.txt" );
-	str = tst;
-#endif
-
-#if 0
-	Array<int> array_i;
-
-	array_i.PushBack(3);
-	sx_callstack_push(array_i.PushBack(3));
-	int i= array_i[0];
-
-	printf( "%d\n", sx_sqr_i(-2) );
-	printf( "%d\n", sx_cube_i(-2) );
-	printf( "%d\n", sx_abs_i(-2) );
-
-	for ( int i = 0; i < 7; i++ )
 	{
-		printf( "%d\n", power(i, i*i) );
+		String str = "hello";
+		bool e = str == L"hello1";
+
+		const wchar* tst = sx_str_make_pathstyle( L"D:\\SeganX\\version.2\\sxLib.txt" );
+		str = tst;
 	}
 #endif
 
-#if 0
-	char buffer[32];
-	for ( int i=0; i<32; i++ )
-		buffer[i] = i+65;
+#if 1
+	{
+		Array<int> array_i;
 
-	MemoryStream stream;
-	sx_stream_write( buffer );
-	stream.SetPos(0);
+		array_i.push_back(3);
+		sx_callstack_param(array_i.PushBack(3));
+		int i= array_i[0];
 
-	char newbuffer[64] = {0};
-	sx_stream_read( newbuffer );
-	newbuffer[63] = 0;
+		printf( "%d\n", sx_sqr_i(-2) );
+		printf( "%d\n", sx_cube_i(-2) );
+		printf( "%d\n", sx_abs_i(-2) );
 
-	stream.SetPos(0);
-	MemoryStream mem;
-	mem.CopyFrom( stream, 67 );
+		for ( int i = 0; i < 7; i++ )
+		{
+			printf( "%d\n", power(i, i*i) );
+		}
+	}
 #endif
 
-#if 0
-	MemMan_Pool pool( 60 );
-	int* b = (int*)pool.m_pool;
+#if 1
+	{
 
-	printf( "\n" );
-	for ( int i=0; i<6; i++ )
-		printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
+		char buffer[32];
+		for ( int i=0; i<32; i++ )
+			buffer[i] = i+65;
 
-	int* a = (int*)pool.Alloc( 20 );
-	a[0] = 0xaaaaaaaa;
-	a[1] = 0xaaaaaaaa;
-	a[2] = 0xaaaaaaaa;
-	a[3] = 0xaaaaaaaa;
-	a[4] = 0xaaaaaaaa;
+		MemoryStream stream;
+		sx_stream_write( buffer );
+		stream.set_pos(0);
 
-	printf( "\n" );
-	b = (int*)pool.m_pool;
-	for ( int i=0; i<6; i++ )
-		printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
+		char newbuffer[64] = {0};
+		sx_stream_read( newbuffer );
+		newbuffer[63] = 0;
 
-	int* c = (int*)pool.Alloc( 20 );
-	c[0] = 0xcccccccc;
-	c[1] = 0xcccccccc;
-	c[2] = 0xcccccccc;
-	c[3] = 0xcccccccc;
-	c[4] = 0xcccccccc;
+		stream.set_pos(0);
+		MemoryStream mem;
+		mem.copy_from( stream, 67 );
+	}
+#endif
 
-	printf( "\n" );
-	b = (int*)pool.m_pool;
-	for ( int i=0; i<6; i++ )
-		printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
+#if 1
+	{
 
-	int* e = (int*)pool.Alloc( 20 );
-	e[0] = 0xeeeeeeee;
-	e[1] = 0xeeeeeeee;
-	e[2] = 0xeeeeeeee;
-	e[3] = 0xeeeeeeee;
-	e[4] = 0xeeeeeeee;
+		MemMan_Pool pool( 60 );
+		int* b = (int*)pool.m_pool;
 
-	printf( "\n" );
-	b = (int*)pool.m_pool;
-	for ( int i=0; i<6; i++ )
-		printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
+		printf( "\n" );
+		for ( int i=0; i<6; i++ )
+			printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
 
-	pool.Free(a);
+		int* a = (int*)pool.alloc( 20 );
+		a[0] = 0xaaaaaaaa;
+		a[1] = 0xaaaaaaaa;
+		a[2] = 0xaaaaaaaa;
+		a[3] = 0xaaaaaaaa;
+		a[4] = 0xaaaaaaaa;
 
-	printf( "\n" );
-	b = (int*)pool.m_pool;
-	for ( int i=0; i<6; i++ )
-		printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
+		printf( "\n" );
+		b = (int*)pool.m_pool;
+		for ( int i=0; i<6; i++ )
+			printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
 
-	pool.Free(c);
+		int* c = (int*)pool.alloc( 20 );
+		c[0] = 0xcccccccc;
+		c[1] = 0xcccccccc;
+		c[2] = 0xcccccccc;
+		c[3] = 0xcccccccc;
+		c[4] = 0xcccccccc;
 
-	printf( "\n" );
-	b = (int*)pool.m_pool;
-	for ( int i=0; i<6; i++ )
-		printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
+		printf( "\n" );
+		b = (int*)pool.m_pool;
+		for ( int i=0; i<6; i++ )
+			printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
+
+		int* e = (int*)pool.alloc( 20 );
+		e[0] = 0xeeeeeeee;
+		e[1] = 0xeeeeeeee;
+		e[2] = 0xeeeeeeee;
+		e[3] = 0xeeeeeeee;
+		e[4] = 0xeeeeeeee;
+
+		printf( "\n" );
+		b = (int*)pool.m_pool;
+		for ( int i=0; i<6; i++ )
+			printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
+
+		pool.free(a);
+
+		printf( "\n" );
+		b = (int*)pool.m_pool;
+		for ( int i=0; i<6; i++ )
+			printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
+
+		pool.free(c);
+
+		printf( "\n" );
+		b = (int*)pool.m_pool;
+		for ( int i=0; i<6; i++ )
+			printf( "%.8x %.8x %.8x %.8x %.8x \n", *b++, *b++, *b++, *b++, *b++ );
+	}
 #endif
 
 	getchar();

@@ -12,7 +12,6 @@
 #define GUARD_Math_HEADER_FILE
 
 #include "Def.h"
-#include <math.h>
 
 
 #ifdef PI

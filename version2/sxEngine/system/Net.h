@@ -16,7 +16,6 @@
 #ifndef GUARD_Net_HEADER_FILE
 #define GUARD_Net_HEADER_FILE
 
-#include "../../sxLib/Lib.h"
 
 
 //!	callback functions
