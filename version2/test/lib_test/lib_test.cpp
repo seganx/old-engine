@@ -171,6 +171,13 @@ int main(int argc, char* argv[])
 	}
 #endif
 
+#if 1
+	{
+		int* a = (int*)sx_mem_alloc( 16 );
+		a[5] = 4;
+	}
+#endif
+
 	getchar();
 	sx_detect_crash();
 	return 0;
