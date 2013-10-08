@@ -22,4 +22,11 @@
 #include "Stream.h"
 
 
+// initialize internal library
+void sx_lib_initialize( void );
+
+// finalize internal library
+void sx_lib_finalize( void );
+
+
 #endif	//	GUARD_Lib_HEADER_FILE

@@ -58,6 +58,7 @@ inline    void		operator delete( void *p ){ mem_free_dbg(p); }
 //! report memory debugger to a file. pass 0 to show all tags, pass -1 to show only memory corruptions
 #define sx_mem_report_debug_to_file( fileName, tag )	mem_report_debug_to_file( fileName, tag )
 
+
 #define sx_mem_alloc( sizeinbyte )				mem_alloc_dbg( sizeinbyte, _CRT_WIDE(__FILE__), __LINE__ )
 #define sx_mem_realloc( p, newsizeinbyte )		mem_realloc_dbg( (void*&)p, newsizeinbyte, _CRT_WIDE(__FILE__), __LINE__ )
 #define sx_mem_size( p )						mem_size( p )

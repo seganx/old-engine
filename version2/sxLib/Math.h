@@ -302,20 +302,20 @@ SEGAN_LIB_API float sx_cos_fast( const float x );
 //! compute sine and cosine of the angle x in same time. maximum absolute error is 0.001f
 SEGAN_LIB_API void sx_sin_cos_fast( const float IN x, float& OUT s, float& OUT c);
 
-//! return random number from the random table
+//! return float random number
 SEGAN_LIB_API float sx_random_f( const float range );
 
-//! return random number from the random table
+//! return integer random number
 SEGAN_LIB_API sint sx_random_i( const sint range );
 
-//! return random number from the random table
+//! return float random number between min and max
 SEGAN_LIB_INLINE float sx_random_f_limit( const float minRange, const float maxRange )
 {
 	float len = maxRange - minRange;
 	return sx_random_f( len ) + minRange;
 }
 
-//! return random number from the random table
+//! return integer random number between min and max
 SEGAN_LIB_INLINE sint sx_random_i_limit( const sint minRange, const sint maxRange )
 {
 	sint len = maxRange - minRange + 1;
@@ -333,6 +333,54 @@ SEGAN_LIB_API uint sx_crc32_a( const char* str );
 
 //! generate unique id from given string
 SEGAN_LIB_API uint sx_crc32_w( const wchar* str );
+
+
+
+//! a simple class to generate random numbers
+class SEGAN_LIB_API RandomNumber
+{
+public:
+	RandomNumber( void ): m_number(1363) {}
+	RandomNumber( const uint seed ): m_number(seed) {}
+
+	//! generate a random number
+	sint generate( void )
+	{
+		m_number = ( ( m_number * 214013L + 2531011L ) >> 16 );
+		return sint( m_number & 0x7fff );
+	}
+
+	//! return float random number
+	float get_f( const float range )
+	{
+		return  ( range * (float)generate() ) / (float)RAND_MAX;
+	}
+
+	//! return integer random number
+	sint get_i( const sint range )
+	{
+		return  ( range * generate() ) / RAND_MAX;
+	}
+
+	//! return float random number between min and max
+	float get_f_limit( const float minRange, const float maxRange )
+	{
+		float len = maxRange - minRange;
+		return get_f( len ) + minRange;
+	}
+
+	//! return integer random number between min and max
+	sint get_i_limit( const sint minRange, const sint maxRange )
+	{
+		sint len = maxRange - minRange + 1;
+		return get_i( len ) + minRange;
+	}
+
+public:
+	uint	m_number;
+};
+
+
 
 #endif	//	GUARD_Math_HEADER_FILE
 

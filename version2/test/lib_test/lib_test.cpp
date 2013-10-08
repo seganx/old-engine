@@ -58,6 +58,12 @@ int main(int argc, char* argv[])
 
 	//Logger_Log( L" this is a simple test" );
 
+	RandomNumber rnd(2);
+	for ( uint i=0; i<1000; ++i )
+	{
+		printf( "%d ", rnd.get_i( 1000 ) );
+	}
+	printf( "\n" );
 
 #if 1
 	{
@@ -82,9 +88,16 @@ int main(int argc, char* argv[])
 		printf( "%d\n", sx_abs_i(-2) );
 
 		for ( int i = 0; i < 7; i++ )
-		{
 			printf( "%d\n", power(i, i*i) );
-		}
+		printf( "\n" );
+
+		for ( int i=0; i<10; i++ )
+			printf( "%.2f\n", sx_random_f( 20.0f ) );
+		printf( "\n" );
+
+		for ( int i=0; i<10; i++ )
+			printf( "%d\n", sx_random_i( 20 ) );
+		printf( "\n" );
 	}
 #endif
 
@@ -171,15 +184,24 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-#if 1
+#if 0
 	{
 		int* a = (int*)sx_mem_alloc( 16 );
-		a[5] = 4;
+		a[6] = 4;
+	}
+#endif
+
+#if 0
+	{
+		sx_callstack();
+
+		sx_callstack_param(salam%d, 192);
 	}
 #endif
 
 	getchar();
 	sx_detect_crash();
+
 	return 0;
 }
 

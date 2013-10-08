@@ -83,12 +83,13 @@ typedef byte				*pbyte;
 
 #define SEGAN_ALIGN_16			__declspec(align(16))
 
-#define SEGAN_MEMLEAK			1		// use first version of memory leak detector
+#define SEGAN_MEMLEAK			1		//	use first version of memory leak detector
 
-#define SEGAN_CALLSTACK			1		// enable call stack system to log stack of function
+#define SEGAN_CALLSTACK			1		//	enable call stack system to log stack of function
 
-#define SEGAN_LIB_ASSERT		1		// check and log some special events on containers
+#define SEGAN_LIB_ASSERT		1		//	check and log some special events on containers
 
+#define SEGAN_CRITICAL_SECTION	1		//	use critical section for multi threaded safety
 
 //////////////////////////////////////////////////////////////////////////
 //!!!  DO NOT CHANGE THIS AREA ANY MORE	 !!!//
@@ -118,6 +119,13 @@ typedef byte				*pbyte;
 #define sx_fourcc(ch0, ch1, ch2, ch3)		( (dword)(byte)(ch0) | ((dword)(byte)(ch1) << 8) | ((dword)(byte)(ch2) << 16) | ((dword)(byte)(ch3) << 24 ) )
 
 
+//	some crazy macro to define unique names
+#define PP_CAT(a, b) PP_CAT_I(a, b)
+#define PP_CAT_I(a, b) PP_CAT_II(~, a ## b)
+#define PP_CAT_II(p, res) res
+#define sx_unique_name(base) PP_CAT(base, __COUNTER__)
+
+
 //! disable container warnings
 #pragma warning(disable:4251)
 #pragma warning(disable:4275)
@@ -130,5 +138,22 @@ typedef byte				*pbyte;
 #include <stdlib.h>
 #include <math.h>
 
+
+
+//////////////////////////////////////////////////////////////////////////
+//	basic functions
+//////////////////////////////////////////////////////////////////////////
+
+#if ( SEGAN_CRITICAL_SECTION == 1 )
+void lib_enter_cs( void );
+void lib_leave_cs( void );
+//! enter critical section
+#define sx_enter_cs()		lib_enter_cs()
+//! leave critical section
+#define sx_leave_cs()		lib_leave_cs()
+#else
+#define sx_enter_cs()
+#define sx_leave_cs()
+#endif
 
 #endif	//	GUARD_Def_HEADER_FILE
