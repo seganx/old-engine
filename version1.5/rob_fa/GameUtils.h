@@ -75,6 +75,7 @@ namespace GU
 		float	m_minZ;
 		float	m_maxZ;
 
+		float	m_shaking;
 		bool	m_freeMode;
 
 	}; // Camera_RTS

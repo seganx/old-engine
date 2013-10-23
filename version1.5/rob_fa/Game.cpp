@@ -82,6 +82,7 @@ Game::Game( void )
 ,	m_difficultyLevel(0)
 ,	m_game_currentLevel(-1)
 ,	m_game_nextLevel(0)
+,	m_game_restarting(0)
 ,	m_game_paused(false)
 ,	m_app_Paused(false)
 ,	m_app_Loading(0)
@@ -416,6 +417,7 @@ void Game::ClearLevel( void )
 
 void Game::Reset( void )
 {
+	m_game_restarting = 20;
 	PostMessage( 0, GMT_GAME_RESETING, 0 );
 	PostMessage( 0, GMT_GAME_RESET, 0 );
 	m_gui->ShowTips( L" Game Restarted !", 0xffff0000 );
@@ -456,6 +458,10 @@ void Game::Update( float elpsTime )
 		if ( g_game->m_game_currentLevel )
 			g_game->PostMessage( 0, GMT_GAME_START, 0 );
 		m_app_Loading = 0;
+	}
+	if ( m_game_restarting )
+	{
+		--m_game_restarting;
 	}
 	
 // 	if ( m_app_Loading && SEGAN_KEYDOWN( 0, SX_INPUT_KEY_ESCAPE ) )
@@ -524,7 +530,7 @@ void Game::Render( DWORD flag )
 {
 	sx_callstack();
 
-	if ( m_app_Closing || m_game_currentLevel != m_game_nextLevel ) return;
+	if ( m_game_restarting || m_app_Closing || m_game_currentLevel != m_game_nextLevel ) return;
 	if ( !sx::core::Renderer::CanRender() ) return;
 
 	sx::core::Renderer::Begin();
@@ -775,6 +781,10 @@ void Achievement::AddValue( int val /*= 1 */ )
 
 	msg_SoundPlay msg( true, 0, 0, L"achievement" );
 	g_game->m_gui->m_main->m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+
+	//	copy achievements values
+	for ( int i=0; i<15; i++ )
+		g_game->m_player->m_profile.achievements[i] = g_game->m_achievements[i].value;
 
 #if USE_GAMEUP
 	gameup_add_score( GAME_SCORE_ACHIV );

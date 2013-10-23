@@ -205,6 +205,24 @@ public:
 	void OnClick(sx::gui::PControl sender);
 };
 
+class MenuConfirmMenu: public Menu
+{
+public:
+	virtual void Initialize(void);
+	virtual void Finalize(void);
+	virtual void ProcessInput(bool& inputHandled, float elpsTime);
+
+	virtual void Show(void);
+	virtual void Hide(void);
+
+	void OnClick(sx::gui::PControl sender);
+
+public:
+	sx::gui::PanelEx*	m_form;
+	sx::gui::Button*	m_yes;
+	sx::gui::Button*	m_no;
+};
+
 class MenuConfirmExit: public Menu
 {
 public:
@@ -241,12 +259,17 @@ class MenuPause: public Menu
 {
 public:
 	void Initialize(void);
+	void Finalize(void);
 	void ProcessInput(bool& inputHandled, float elpsTime);
 	void Update(float elpsTime);
+	void Draw(DWORD flag);
 	void MsgProc(UINT recieverID, UINT msg, void* data);
 	void Show(void);
 	void Hide(void);
 	void OnClick(sx::gui::PControl sender);
+
+public:
+	MenuConfirmMenu		m_confirmMenu;
 };
 
 class MenuVictory: public Menu

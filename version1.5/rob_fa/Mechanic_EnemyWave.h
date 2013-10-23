@@ -119,6 +119,7 @@ namespace GM
 
 		sx::gui::PPanelEx		m_back;				//	gui to show wave info
 		sx::gui::PLabel			m_label;			//	label to show number of waves
+		sx::gui::PLabel			m_labelGold;		//	label to show the amount of catching golds
 		sx::gui::PPanelEx		m_nextWave;			//	gui to show next wave info
 		sx::gui::PProgressBar	m_startProgr;		//	progress bar to show the time
 	

@@ -92,6 +92,17 @@ namespace GM
 			g_game->m_gui->m_goldPeople->m_back->m_Child.Swap( i, i-1 );
 			i--;
 		}
+
+		m_labelGold = sx_new( sx::gui::Label );
+		m_labelGold->SetFont( L"font_wave_call_gold.fnt" );
+		m_labelGold->SetAlign( GTA_CENTER );
+		m_labelGold->SetParent( g_game->m_gui->m_goldPeople->m_back );
+		m_labelGold->SetSize( float2( 50.0f, 50.0f ) );
+		m_labelGold->Position().Set( -60.0f, -100.0f, 0.0f );
+		m_labelGold->GetElement(0)->Color() = D3DColor( 0, 0, 0, 0 );
+		m_labelGold->GetElement(1)->Color() = 0xffffff00;
+		m_labelGold->SetText( L"+17" );
+
 	}
 
 	void Mechanic_EnemyWaves::Finalize( void )
@@ -114,6 +125,26 @@ namespace GM
 
 	void Mechanic_EnemyWaves::Update( float elpsTime )
 	{
+		//	update label
+		if ( m_labelGold->m_SclOffset.z < 3.0f )
+		{
+			float& t = m_labelGold->m_SclOffset.z;
+			t += elpsTime * 0.001f;
+			m_labelGold->m_PosOffset.y = 200 * t * t - 300 * t;
+
+			if ( m_labelGold->m_PosOffset.y > 10.0f )
+				m_labelGold->GetElement(1)->Color().a = sx_clamp_f( 1.0f - m_labelGold->m_PosOffset.y * 0.01f, 0.0f, 1.0f );
+			else
+				m_labelGold->GetElement(1)->Color().a = 1.0f;
+
+			str16 txtnumber;
+			if ( 400 * t - 200 < 0 )
+				txtnumber.Format( L"+ %d", sx_random_i(99) );
+			else
+				txtnumber.Format( L"+ %d", m_labelGold->GetUserTag() );
+			m_labelGold->SetText( txtnumber );
+		}
+
 		UpdateMusic( elpsTime );
 
 		if ( m_wavesSrc.IsEmpty() || g_game->m_game_paused || !g_game->m_game_currentLevel || m_waveIndex >= m_wavesSrc.Count()+1 )
@@ -412,6 +443,10 @@ namespace GM
 
 				msg_SoundPlay msg( true, 0, 0, L"waveCall" );
 				m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+
+				m_labelGold->m_SclOffset.z = 0.0f;
+				m_labelGold->SetUserTag( addGold );
+
 			}
 			m_startProgr->SetMax( pWave->nextWaveTime );
 			m_startProgr->SetValue( pWave->nextWaveTime );
@@ -531,7 +566,23 @@ namespace GM
 					}
 
 					if ( script.GetString(i, L"tipsStartNode", tmpStr) )
+					{
 						CopyString( ew->tipsStartNode, 64, tmpStr );
+
+						//  play particle/sound of start wave
+						if ( ew->tipsStartNode[0] )
+						{
+							sx::core::ArrayPNode nodelist;
+							sx::core::Scene::GetNodesByName( ew->tipsStartNode, nodelist );
+							for ( int i=0; i<nodelist.Count(); ++i )
+							{
+								sx::core::Node* node = nodelist[i];
+
+								msg_Particle msgPrtcl_2(SX_PARTICLE_SPRAY, 0, L"entry_path");
+								node->MsgProc( MT_PARTICLE, &msgPrtcl_2 );
+							}
+						}
+					}
 					else
 						ew->tipsStartNode[0] = 0;
 

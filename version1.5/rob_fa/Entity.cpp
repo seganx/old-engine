@@ -28,6 +28,7 @@ Entity::Entity( void )
 , m_maxLevel(NUM_LEVELS-1)
 , m_weaponType(GWT_NULL)
 , m_experience(0)
+, m_levelVisual(0,1,2,1)
 , test_onDamageXP(0)
 , test_onDeadXP(0)
 {
@@ -270,9 +271,9 @@ void Entity::SetLevel( int level )
 			m_node->MsgProc( MT_PARTICLE, &msgPar );
 		}
 
-		if ( level < 4 )
+		if ( level == 2 )
 		{
-			msg_Animator msgAnim( SX_ANIMATION_PLAY, 0, 0, level, 1 );
+			msg_Animator msgAnim( SX_ANIMATION_PLAY, 0, 0, 4, 1 );
 			m_node->MsgProc( MT_ANIMATOR, &msgAnim );
 		}
 
@@ -576,7 +577,33 @@ void Entity::Update( float elpsTime )
 #endif
 
 	}
-	
+
+	//	apply visualize for towers
+	if ( m_partyCurrent == PARTY_TOWER )
+	{
+		switch ( m_level )
+		{
+		case 1: case 2: case 3:
+			{
+				const float ftime = elpsTime * 0.001f;
+				m_levelVisual.x += ( 2.0f - m_levelVisual.x ) * ftime;
+				m_levelVisual.y += ( 1.0f - m_levelVisual.y ) * ftime;
+				m_levelVisual.z += ( 0.0f - m_levelVisual.z ) * ftime;
+				m_mesh->GetMaterial(0)->SetFloat4(0, m_levelVisual );
+			}
+			break;
+
+		case 4: case 5: case 6:
+			{
+				const float ftime = elpsTime * 0.001f;
+				m_levelVisual.x += ( 1.5f - m_levelVisual.x ) * ftime;
+				m_levelVisual.y += ( 0.3f - m_levelVisual.y ) * ftime;
+				m_levelVisual.z += ( 0.3f - m_levelVisual.z ) * ftime;
+				m_mesh->GetMaterial(0)->SetFloat4(0, m_levelVisual );
+			}
+			break;
+		}
+	}
 }
 
 void Entity::MsgProc( UINT msg, void* data )

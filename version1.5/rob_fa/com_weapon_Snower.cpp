@@ -200,6 +200,17 @@ void com_weapon_Snower::Update( float elpsTime )
 		if ( m_shootTime > 3000 )
 			m_shootCount = sx::cmn::Random(5);
 	}
+
+	if ( m_owner->m_level >= 3 )
+	{
+		float scl = m_owner->m_levelVisual.w;
+		scl += ( 1.4f - scl ) * elpsTime * 0.0005f;
+		Matrix& mat = (Matrix&)m_nodeWeapon->GetMatrix_local();
+		Matrix sclmat;
+		sclmat.Scale( scl, scl, scl );
+		mat.Multiply( mat, sclmat );
+		m_owner->m_levelVisual.w = scl;
+	}
 }
 
 void com_weapon_Snower::MsgProc( UINT msg, void* data )

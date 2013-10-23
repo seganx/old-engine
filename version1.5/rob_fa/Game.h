@@ -16,7 +16,7 @@
 
 #define VER_USERDEMO		0
 #define VER_PREVIEW			1
-#define VER_PREVIEW_NAME	L"Christian Sauerteig's uncle Keywan and his family"
+#define VER_PREVIEW_NAME	L"Christian Sauerteig"
 #define USE_RTL				0
 #define USE_GAMEUP			0
 #define USE_LOCK_NAME		L"christiansauerteig"
@@ -91,6 +91,7 @@ public:
 	int						m_difficultyLevel;			//	difficulty level 0 = norm , 1 = hard , 2 = insane
 	int						m_game_currentLevel;		//  index of current level. 0 = GUI mode
 	int						m_game_nextLevel;			//  index of current level. 0 = GUI mode
+	int						m_game_restarting;			//	restart the game
 	bool					m_game_paused;				//  game paused
 	bool					m_app_Paused;				//  application paused
 	bool					m_app_Closing;				//  application is closing

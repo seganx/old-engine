@@ -1,6 +1,8 @@
 #include "Projectile_BOMB.h"
 #include "ProjectileManager.h"
 #include "Entity.h"
+#include "Game.h"
+#include "Player.h"
 
 #define PROJ_STATE_MOVING		0
 #define PROJ_STATE_EXPLODING	1
@@ -145,9 +147,13 @@ void Projectile_BOMB::Update( float elpsTime )
 				msg_Particle msgPar( SX_PARTICLE_SPRAY );
 				node->MsgProc( MT_PARTICLE, &msgPar );
 
-				msg_SoundPlay msgSnd( true );
+				msg_SoundPlay msgSnd( false, 0, 0, 0, sx::cmn::Random(10) );
 				node->MsgProc( MT_SOUND_PLAY, &msgSnd );
 			}
+
+			//  shake the camera
+			if ( m_initPos.y > 20.0f )
+				g_game->m_player->m_camera_RTS.m_shaking = 0.3f;
 		}
 
 	}

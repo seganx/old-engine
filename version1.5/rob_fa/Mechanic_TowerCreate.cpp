@@ -550,7 +550,7 @@ namespace GM
 
 			ReleaseCaughtTower();
 
-			if ( tower)
+			if ( tower )
 			{
 				pos.y -= 0.5f;
 				tower->SetPosition( pos );

@@ -45,6 +45,7 @@ namespace GU
 		, m_maxX(500)
 		, m_minZ(-500)
 		, m_maxZ(500)
+		, m_shaking(0)
 		, m_freeMode(false)
 	{
 
@@ -172,19 +173,30 @@ namespace GU
 			m_Camera.Eye.y = camheight + 5.0f;
 #endif
 
+		// calculate camera shaking
+		float3 shaking( 0, 0, 0 );
+		if ( m_shaking > 0.01f )
+		{
+			const float zoom = sx_sqrt( m_Rad ) * 0.1f;
+			shaking.x = ( sx::cmn::Random( 1.0f ) - sx::cmn::Random( 1.0f ) ) * zoom;
+			shaking.y = ( sx::cmn::Random( 1.0f ) - sx::cmn::Random( 1.0f ) ) * zoom;
+			shaking.z = ( sx::cmn::Random( 1.0f ) - sx::cmn::Random( 1.0f ) ) * zoom;
+			m_shaking -= elpsTime * 0.001f;
+		}
+
 		sx::core::PCamera pCam = sx::core::Renderer::GetCamera();
 
 		pCam->Far = m_Camera.Far;
 		pCam->FOV += (m_Camera.FOV - pCam->FOV) * 0.01f * elpsTime;
 		pCam->Aspect = m_Camera.Aspect;
 
-		pCam->At.x += (m_Camera.At.x - pCam->At.x) * 0.02f * elpsTime;
-		pCam->At.y += (m_Camera.At.y - pCam->At.y) * 0.02f * elpsTime;
-		pCam->At.z += (m_Camera.At.z - pCam->At.z) * 0.02f * elpsTime;
+		pCam->At.x += (m_Camera.At.x - pCam->At.x) * 0.02f * elpsTime + shaking.x;
+		pCam->At.y += (m_Camera.At.y - pCam->At.y) * 0.02f * elpsTime + shaking.y;
+		pCam->At.z += (m_Camera.At.z - pCam->At.z) * 0.02f * elpsTime + shaking.z;
 
-		pCam->Eye.x += (m_Camera.Eye.x - pCam->Eye.x) * 0.015f * elpsTime;
-		pCam->Eye.y += (m_Camera.Eye.y - pCam->Eye.y) * 0.015f * elpsTime;
-		pCam->Eye.z += (m_Camera.Eye.z - pCam->Eye.z) * 0.015f * elpsTime;
+		pCam->Eye.x += (m_Camera.Eye.x - pCam->Eye.x) * 0.015f * elpsTime + shaking.x;
+		pCam->Eye.y += (m_Camera.Eye.y - pCam->Eye.y) * 0.015f * elpsTime + shaking.y;
+		pCam->Eye.z += (m_Camera.Eye.z - pCam->Eye.z) * 0.015f * elpsTime + shaking.z;
 
 		sx::core::Renderer::SetCamera( pCam );
 	}
@@ -213,6 +225,8 @@ namespace GU
 
 		m_minPhi = m_Phi - m_phiThreshold;
 		m_maxPhi = m_Phi + m_phiThreshold;
+
+		m_shaking = 0.0f;
 	}
 
 	void Camera_RTS::SetLimit_Phi( float minPhi, float maxPhi )

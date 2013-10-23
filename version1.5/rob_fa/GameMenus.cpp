@@ -1959,6 +1959,96 @@ void MenuCredits::OnClick( sx::gui::PControl sender )
 //////////////////////////////////////////////////////////////////////////
 //	exit confirmation menu
 //////////////////////////////////////////////////////////////////////////
+void MenuConfirmMenu::Initialize( void )
+{
+	Menu::Initialize();
+
+	m_back->SetSize( float2( 3000, 3000 ) );
+	m_back->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_back->RemProperty( SX_GUI_PROPERTY_BLENDCHILDS );
+	m_back->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
+	m_back->State_GetByIndex(1).Color.Set( 0, 0, 0, 0.7f );
+
+	//	create confirmation form
+	m_form = sx_new( sx::gui::PanelEx );
+	m_form->SetParent( m_back );
+	m_form->AddProperty( SX_GUI_PROPERTY_BLENDCHILDS );
+	m_form->SetSize( float2( 512, 256 ) );
+	m_form->GetElement(0)->SetTextureSrc( L"gui_confirmMenu.txr" );
+	m_form->State_Add();
+	m_form->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
+	m_form->State_GetByIndex(1).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
+
+	//	create button yes
+	m_yes = sx_new( sx::gui::Button );
+	m_yes->SetParent( m_back );
+	m_yes->SetSize( float2(128, 32) );
+	m_yes->Position().Set( -75.0f, -19.0f, 0.0f );
+	m_yes->GetElement(0)->Color().a = 0;
+	m_yes->GetElement(1)->SetTextureSrc( L"gui_exitYes.txr" );
+	m_yes->GetElement(2)->Color().a = 0;
+	SEGAN_GUI_SET_ONCLICK( m_yes, MenuConfirmMenu::OnClick );
+	SEGAN_GUI_SET_ONENTER( m_yes, Menu::OnEnter );
+
+	//	create button no
+	m_no = sx_new( sx::gui::Button );
+	m_no->SetParent( m_back );
+	m_no->SetSize( float2(128, 32) );
+	m_no->Position().Set( 76.0f, -19.0f, 0.0f );
+	m_no->GetElement(0)->Color().a = 0;
+	m_no->GetElement(1)->SetTextureSrc( L"gui_exitNo.txr" );
+	m_no->GetElement(2)->Color().a = 0;
+	SEGAN_GUI_SET_ONCLICK( m_no, MenuConfirmMenu::OnClick );
+	SEGAN_GUI_SET_ONENTER( m_no, Menu::OnEnter );
+}
+
+void MenuConfirmMenu::Finalize( void )
+{
+	Menu::Finalize();
+}
+
+void MenuConfirmMenu::Show( void )
+{
+	m_yes->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_no->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_form->State_SetIndex(1);
+	Menu::Show();
+}
+
+void MenuConfirmMenu::Hide( void )
+{
+	m_yes->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_no->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_form->State_SetIndex(0);
+	Menu::Hide();
+}
+
+void MenuConfirmMenu::OnClick( sx::gui::PControl sender )
+{
+	Hide();
+
+	if ( sender == m_yes )
+		g_game->m_game_nextLevel = 0;
+
+	msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
+	m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+}
+
+void MenuConfirmMenu::ProcessInput( bool& inputHandled, float elpsTime )
+{
+	sx_callstack();
+
+	Menu::ProcessInput( inputHandled, elpsTime );
+	if ( !m_back->State_GetIndex() ) return;
+	if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_ESCAPE ) )
+	{
+		Hide();
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+//	exit confirmation menu
+//////////////////////////////////////////////////////////////////////////
 void MenuConfirmExit::Initialize( void )
 {
 	Menu::Initialize();
@@ -2211,10 +2301,21 @@ void MenuPause::Initialize( void )
 		butn->GetElement(0)->Color().a = 0;
 		butn->GetElement(2)->Color().a = 0.5f;
 	}
+
+	m_confirmMenu.Initialize();
+}
+
+void MenuPause::Finalize( void )
+{
+	m_confirmMenu.Finalize();
+	Menu::Finalize();
 }
 
 void MenuPause::ProcessInput( bool& inputHandled, float elpsTime )
 {
+	if ( inputHandled ) return;
+	m_confirmMenu.ProcessInput( inputHandled, elpsTime );
+
 	if ( inputHandled ) return;
 	sx_callstack();
 
@@ -2253,13 +2354,21 @@ void MenuPause::Update( float elpsTime )
 // 		m_back->Rotation().x = mousey * 0.0005f;
 // 	}
 
+	m_confirmMenu.Update( elpsTime );
 	Menu::Update( elpsTime );
+}
+
+void MenuPause::Draw( DWORD flag )
+{
+	Menu::Draw(flag);
+	m_confirmMenu.Draw(flag);
 }
 
 void MenuPause::MsgProc( UINT recieverID, UINT msg, void* data )
 {
 	sx_callstack_param(MenuPause::MsgProc(recieverID=%d, msg=%d), recieverID, msg);
 
+	m_confirmMenu.MsgProc( recieverID, msg, data );
 	Menu::MsgProc( recieverID, msg, data );
 
 	switch ( msg )
@@ -2335,8 +2444,9 @@ void MenuPause::OnClick( sx::gui::PControl sender )
 
 	case 3:	//	exit to menu
 		{
-			Hide();
-			g_game->m_game_nextLevel = 0;
+			//Hide();
+			//g_game->m_game_nextLevel = 0;
+			m_confirmMenu.Show();
 
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );

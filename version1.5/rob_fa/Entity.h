@@ -118,6 +118,8 @@ public:
 	WeaponType				m_weaponType;						//	weapon type
 	float					m_experience;						//	experience
 
+	float4					m_levelVisual;					//	visual params of upgrade
+
 	//	TEST
 	float					test_onDamageXP;
 	float					test_onDeadXP;
