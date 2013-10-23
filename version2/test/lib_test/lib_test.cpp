@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 
 	//Logger_Log( L" this is a simple test" );
 
-	RandomNumber rnd(2);
+	Randomer rnd(2);
 	for ( uint i=0; i<1000; ++i )
 	{
 		printf( "%d ", rnd.get_i( 1000 ) );

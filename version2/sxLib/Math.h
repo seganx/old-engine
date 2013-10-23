@@ -337,11 +337,11 @@ SEGAN_LIB_API uint sx_crc32_w( const wchar* str );
 
 
 //! a simple class to generate random numbers
-class SEGAN_LIB_API RandomNumber
+class SEGAN_LIB_API Randomer
 {
 public:
-	RandomNumber( void ): m_number(1363) {}
-	RandomNumber( const uint seed ): m_number(seed) {}
+	Randomer( void ): m_number(1363) {}
+	Randomer( const uint seed ): m_number(seed) {}
 
 	//! generate a random number
 	sint generate( void )
