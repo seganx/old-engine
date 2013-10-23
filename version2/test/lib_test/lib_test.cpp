@@ -199,6 +199,20 @@ int main(int argc, char* argv[])
 	}
 #endif
 
+#if 1
+	{
+		char* s1 = "4567";
+		sx_callstack();
+		char* s2 = "1234";
+		sx_callstack();
+		printf( "strcmp( %s, %s ) = %d\n", s1, s2, sx_str_cmp( s1, s2 ) );
+
+		String test = L"salam";
+		test.format( L"this is %S \n", s1 );
+		wprintf( test );
+	}
+#endif
+
 	getchar();
 	sx_detect_crash();
 

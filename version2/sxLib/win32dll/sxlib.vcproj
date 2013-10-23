@@ -233,6 +233,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\String.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\String.h"
 				>
 			</File>

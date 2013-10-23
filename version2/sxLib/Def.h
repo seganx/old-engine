@@ -145,8 +145,8 @@ typedef byte				*pbyte;
 //////////////////////////////////////////////////////////////////////////
 
 #if ( SEGAN_CRITICAL_SECTION == 1 )
-void lib_enter_cs( void );
-void lib_leave_cs( void );
+SEGAN_LIB_API void lib_enter_cs( void );
+SEGAN_LIB_API void lib_leave_cs( void );
 //! enter critical section
 #define sx_enter_cs()		lib_enter_cs()
 //! leave critical section
