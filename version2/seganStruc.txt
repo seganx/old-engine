@@ -25,6 +25,8 @@ sx_random_f(max)
 sx_random_f_l(min, max)
 sx_random_i(max)
 sx_random_i_l(min, max)
+...
+...
 
 MemMan
 MemManPool
@@ -34,6 +36,8 @@ Queue
 Stack
 Stream
 String
+...
+...
 
 int2
 int4
@@ -49,8 +53,63 @@ Sphere
 AABox
 OBBox
 Ray
+...
+...
 
 
+
+//////////////////////////////////
+../common
+
+table ( arrange data by name, id, ... )
+	|
+	| name
+	| value
+
+
+values ( contain array of values and can interpolate between them by time )
+	|
+	| mode ( linear, spline )
+	| array of vectors
+	| time
+
+
+blender ( blend between to values )
+	|
+	| amplitude
+	| velocity
+
+	
+	
+	
+
+//////////////////////////////////
+../render
+
+RenderMan --| initialize()
+			| finalize()
+			| set_size()
+			|
+			| cameras
+			| materials
+			| terrain
+			| static meshes
+			| static lights
+			| dynamic meshes
+			| dynamic lights
+			| animated meshes
+			| particles
+			| other objects ( fog, rain, ... )
+			|
+			| uiElement
+			| labels
+			| texts
+
+
+			
+
+			
+			
 //////////////////////////////////
 ../system
 sx_os_initialize()
@@ -66,7 +125,8 @@ FileManager
 Task
 TaskManager
 
-
+			
+			
 //////////////////////////////////
 ../d3d
 

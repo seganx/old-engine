@@ -69,9 +69,19 @@ int main(int argc, char* argv[])
 	{
 		String str = "hello";
 		bool e = str == L"hello1";
-
-		const wchar* tst = sx_str_make_pathstyle( L"D:\\SeganX\\version.2\\sxLib.txt" );
+		const wchar* tst = sx_str_make_pathstyle( L"D:/SeganX/version.2/sxLib.txt" );
 		str = tst;
+		wprintf( L"%s\n", str );
+
+		char* s1 = "4567";
+		sx_callstack();
+		char* s2 = "1234";
+		sx_callstack();
+		printf( "strcmp( %s, %s ) = %d\n", s1, s2, sx_str_cmp( s1, s2 ) );
+
+		String test = L"salam";
+		test.format( L"this is %S \n", s1 );
+		wprintf( test );
 	}
 #endif
 
@@ -201,15 +211,13 @@ int main(int argc, char* argv[])
 
 #if 1
 	{
-		char* s1 = "4567";
-		sx_callstack();
-		char* s2 = "1234";
-		sx_callstack();
-		printf( "strcmp( %s, %s ) = %d\n", s1, s2, sx_str_cmp( s1, s2 ) );
-
-		String test = L"salam";
-		test.format( L"this is %S \n", s1 );
-		wprintf( test );
+		Logger log;
+		log.initialize( true, L"D:/test.txt", null );
+		log.log( L"Hi this is a simple test %d", 10 );
+		log.log( L"Hi this is a simple test %d", 20 );
+		log.log( L"Hi this is a simple test %d", 30 );
+		log.log_( L"Hi this is a simple test %d", 40 );
+		log.log_( L"Hi this is a simple test %d", 50 );
 	}
 #endif
 

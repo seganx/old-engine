@@ -20,6 +20,7 @@
 #include "Map.h"
 #include "String.h"
 #include "Stream.h"
+#include "Logger.h"
 
 
 // initialize internal library

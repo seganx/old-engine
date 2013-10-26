@@ -8,15 +8,6 @@
 #endif
 
 
-#if defined(_DEBUG)
-#if defined(_MSC_VER)
-#if ( _MSC_VER >= 1400 )
-#define DEBUG_OUTPUT_WINDOW
-#endif
-#endif
-#endif
-
-
 //////////////////////////////////////////////////////////////////////////
 //	memory management
 //////////////////////////////////////////////////////////////////////////
@@ -199,7 +190,7 @@ SEGAN_INLINE MemCodeReport mem_decode_protection( const void* p )
 		res.mb	= (MemBlock*)( pbyte(p) - s_mem_protect_size - sizeof(MemBlock) );
 		res.p	= res.mb;
 
-		// check protection sign for mem block
+		// check protection sign for memory block
 		if ( memcmp( res.mb->sign, s_mem_protection, s_mem_protect_size ) )
 		{
 			res.p = null;
@@ -278,7 +269,7 @@ SEGAN_INLINE void* mem_alloc_dbg( const uint sizeinbyte, const wchar* file, cons
 			//	sign memory to check memory corruption
 			MemCodeReport memreport = mem_code_protection( res, sizeinbyte );
 
-			//	store mem block to link list
+			//	store memory block to link list
 			if ( memreport.mb )
 			{
 				memreport.mb->file	= (wchar*)file;

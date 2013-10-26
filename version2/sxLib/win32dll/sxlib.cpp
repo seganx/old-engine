@@ -5,14 +5,6 @@
 #include <Windows.h>
 
 
-//! initialize internal library
-extern void sx_lib_initialize( void );
-
-//! finalize internal library
-extern void sx_lib_finalize( void );
-
-
-
 //////////////////////////////////////////////////////////////////////////
 //	DLL main function
 BOOL APIENTRY DllMain ( HMODULE hModule, dword  ul_reason_for_call, LPVOID lpReserved )

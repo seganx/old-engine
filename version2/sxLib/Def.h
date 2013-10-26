@@ -72,24 +72,26 @@ typedef byte				*pbyte;
 //!!!    CHANGE THESE PREPROCESSORS TO CHANGE COMPILER BEHAVIOR      !!!//
 //////////////////////////////////////////////////////////////////////////
 #if defined( SEGAN_IMPORT )
-	#define SEGAN_LIB_API		__declspec(dllimport)
+	#define SEGAN_LIB_API					__declspec(dllimport)
 #else
-	#define SEGAN_LIB_API		__declspec(dllexport)
+	#define SEGAN_LIB_API					__declspec(dllexport)
 #endif
 
-#define SEGAN_LIB_INLINE		__forceinline
+#define SEGAN_LIB_INLINE					__forceinline
 
-#define SEGAN_INLINE			inline
+#define SEGAN_INLINE						inline
 
-#define SEGAN_ALIGN_16			__declspec(align(16))
+#define SEGAN_ALIGN_16						__declspec(align(16))
 
-#define SEGAN_MEMLEAK			1		//	use first version of memory leak detector
+#define SEGAN_MEMLEAK						1		//	use first version of memory leak detector
 
-#define SEGAN_CALLSTACK			1		//	enable call stack system to log stack of function
+#define SEGAN_CALLSTACK						1		//	enable call stack system to log stack of function
 
-#define SEGAN_LIB_ASSERT		1		//	check and log some special events on containers
+#define SEGAN_LIB_ASSERT					1		//	check and log some special events on containers
 
-#define SEGAN_CRITICAL_SECTION	1		//	use critical section for multi threaded safety
+#define SEGAN_CRITICAL_SECTION				1		//	use critical section for multi threaded safety
+
+
 
 //////////////////////////////////////////////////////////////////////////
 //!!!  DO NOT CHANGE THIS AREA ANY MORE	 !!!//
@@ -125,6 +127,14 @@ typedef byte				*pbyte;
 #define PP_CAT_II(p, res) res
 #define sx_unique_name(base) PP_CAT(base, __COUNTER__)
 
+//	use debug output window in IDE
+#if defined(_DEBUG)
+#if defined(_MSC_VER)
+#if ( _MSC_VER >= 1400 )
+#define DEBUG_OUTPUT_WINDOW
+#endif
+#endif
+#endif
 
 //! disable container warnings
 #pragma warning(disable:4251)
