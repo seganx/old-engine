@@ -229,6 +229,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\protocol.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\protocol.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Queue.h"
 				>
 			</File>
