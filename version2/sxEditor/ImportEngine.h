@@ -25,19 +25,6 @@ Desc:		This file contain the header files of SeganX engine.
 
 #include "../sxEngine/sxEngine.h"
 
-//! create main engine instance, initialize main systems and return pointer to the singleton object
-Engine* sx_engine_get_singleton( EngineConfig* config = null );
-
-//! initialize subsystems and verify objects. return true if engine has started and false if starting failed
-bool sx_engine_initialize( void );
-
-//! finalize all system and subsystem of engine
-void sx_engine_finalize( void );
-
-//!	start engine and call the main game loop
-void sx_engine_start( ApplicationMainLoop mainloop );
-
-
 
 #if defined(_WIN32)
 #define _WIN32_WINNT	0x0500		// use new features of the windows

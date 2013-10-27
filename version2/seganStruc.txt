@@ -67,7 +67,7 @@ table ( arrange data by name, id, ... )
 	| value
 
 
-values ( contain array of values and can interpolate between them by time )
+variable ( contain array of values and can interpolate between them by time )
 	|
 	| mode ( linear, spline )
 	| array of vectors

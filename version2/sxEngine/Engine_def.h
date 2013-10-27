@@ -10,10 +10,13 @@
 #define GUARD_Engine_def_HEADER_FILE
 
 
+#include "../../sxLib/Lib.h"
+
+
 #if defined( SEGAN_IMPORT )
-#define SEGAN_ENG_API		__declspec(dllimport)
+#define SEGAN_ENG_API			__declspec(dllimport)
 #else
-#define SEGAN_ENG_API		__declspec(dllexport)
+#define SEGAN_ENG_API			__declspec(dllexport)
 #endif
 
 

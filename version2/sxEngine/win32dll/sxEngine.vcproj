@@ -170,8 +170,12 @@
 	</References>
 	<Files>
 		<Filter
-			Name="renderer"
+			Name="render"
 			>
+			<File
+				RelativePath="..\render\Render.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="common"

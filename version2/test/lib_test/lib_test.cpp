@@ -201,15 +201,21 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-#if 0
+#if 1
 	{
 		sx_callstack();
+
+		for ( uint i=0; i < 10; ++i )
+		{
+			float r = sx_hermite_lerp( 30, 50, 10, 20, i * 0.1f, 0, 0 );
+			printf( "%.1f ", r );
+		}
 
 		sx_callstack_param(salam%d, 192);
 	}
 #endif
 
-#if 1
+#if 0
 	{
 		Logger log;
 		log.initialize( true, L"D:/test.txt", null );

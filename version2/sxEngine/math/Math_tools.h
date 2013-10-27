@@ -10,6 +10,9 @@
 #define GUARD_Math_tools_HEADER_FILE
 
 
+#include "../Engine_def.h"
+
+
 //////////////////////////////////////////////////////////////////////////
 //	VECTOR 2D
 //////////////////////////////////////////////////////////////////////////
@@ -285,7 +288,7 @@ SEGAN_INLINE bool sx_isequal( const matrix& m1, const matrix& m2 )
 	{
 		for ( int j=0; i<4; i++ )
 		{
-			if ( sx_abs_f( m1.m[i][j] - m2.m[i][j] ) > EPSILON) return false;
+			if ( sx_abs_f( m1.m[i][j] - m2.m[i][j] ) > EPSILON ) return false;
 		}
 	}
 	return true;
@@ -659,5 +662,6 @@ SEGAN_INLINE float sx_view_distance( const float3& cameraEye, const float3& came
 	const float cosfov = 1.0f - sx_cos_fast( cameraFov );
 	return ( vp * cosfov );
 }
+
 
 #endif	//	GUARD_Math_tools_HEADER_FILE

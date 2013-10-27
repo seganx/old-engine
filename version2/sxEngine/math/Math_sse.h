@@ -47,7 +47,6 @@
 #define GUARD_Math_SSE_HEADER_FILE
 
 #include "Math.h"
-#include "../Lib.h"
 
 #include <xmmintrin.h>
 #include <emmintrin.h>

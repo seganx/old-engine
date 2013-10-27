@@ -9,7 +9,7 @@
 #ifndef GUARD_Math_HEADER_FILE
 #define GUARD_Math_HEADER_FILE
 
-#include "../../sxLib/Lib.h"
+#include "../Engine_def.h"
 
 //////////////////////////////////////////////////////////////////////////
 //	INTEGER POINT 2D
@@ -888,6 +888,38 @@ public:
 	float3	dirInv;		//	inverse of direction to use Smits’ method
 	sint	sign[3];	//	use of http://cag.csail.mit.edu/~amy/papers/box-jgt.pdf
 
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+//	timed variable contain 16 variable point
+//////////////////////////////////////////////////////////////////////////
+class variable
+{
+public:
+	variable(): t(0), tmax(0), tmin(0), mode(SCALAR)
+	{
+		sx_mem_set( point, 0, sizeof(point) );
+	}
+
+public:
+
+	enum tmode { SCALAR, LINEAR, COSINE, CUBIC, HERMITE = 0xaaaaaaaa };
+
+	struct tpoint
+	{
+		float value;	//	value of the current point
+		float time;		//	the specified time that point exist
+		float tension;	//	tension used in Hermite interpolation
+		float bias;		//	bias used in Hermite interpolation
+	};
+
+	tpoint	point[16];
+	float	t;
+	float	tmax;
+	float	tmin;
+	tmode	mode;
+	
 };
 
 #include "Math_tools.h"

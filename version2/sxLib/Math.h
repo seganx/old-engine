@@ -6,10 +6,11 @@
 	Site:		www.SeganX.com
 	Desc:		This file contain some basic math functions
 
-	NOTE: some alghoritm used here came from Doom 3 GPL Source Code. Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
+	NOTE:		some algorithms used here came from Doom 3 GPL Source Code. 
+				Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
 *********************************************************************/
-#ifndef GUARD_Math_HEADER_FILE
-#define GUARD_Math_HEADER_FILE
+#ifndef GUARD_Math_lib_HEADER_FILE
+#define GUARD_Math_lib_HEADER_FILE
 
 #include "Def.h"
 
@@ -142,6 +143,45 @@ SEGAN_LIB_INLINE sint sx_abs_i( const sint x )
 SEGAN_LIB_INLINE float sx_guard_zero( const float x )
 {
 	return  ( sx_abs_f( x ) < EPSILON ) ? ( sx_sign_f( x ) * EPSILON ) : x;
+}
+
+SEGAN_LIB_INLINE float sx_lerp( const float x1, const float x2, const float w )
+{
+	return ( x1 + ( x2 - x1 ) * w );
+}
+
+//! suitable orientated piece of a cosine function serves to provide a smooth transition between adjacent segments
+SEGAN_LIB_INLINE float sx_cosine_lerp( const float x1, const float x2, const float w )
+{
+	float m = ( 1.0f - sx_cos( w * PI ) ) * 0.5f;
+	return ( x1 + ( x2 - x1 ) * m );
+}
+
+//! interpolate between x1 and x2 by the w 
+SEGAN_LIB_INLINE float sx_cubic_lerp( const float x0, const float x1, const float x2, const float x3, const float w )
+{
+	const float m = w * w;
+	const float a0 = x3 - x2 - x0 + x1;
+	const float a1 = x0 - x1 - a0;
+	const float a2 = x2 - x0;
+	return ( ( a0 * w * m ) + ( a1 * m ) + ( a2 * w ) + x1 );
+}
+
+//! Hermite interpolation like cubic requires 4 points so that it can achieve a higher degree of continuity. In addition it has nice tension and biasing controls
+SEGAN_LIB_INLINE float sx_hermite_lerp( const float x0, const float x1, const float x2, const float x3, const float w, const float tension, const float bias )
+{
+	const float w2 = w * w;
+	const float w3 = w2 * w;
+	const float t0 = ( 1.0f - tension ) * 0.5f;
+	const float b1 = ( 1.0f + bias ) * t0;
+	const float b2 = ( 1.0f - bias ) * t0;
+	const float m0 = ( ( x1 - x0 ) * b1 ) + ( ( x2 - x1 ) * b2 );
+	const float m1 = ( ( x2 - x1 ) * b1 ) + ( ( x3 - x2 ) * b2 );
+	const float a0 = ( 2.0f * w3 ) - ( 3.0f * w2 ) + 1.0f;
+	const float a1 = w3 - ( 2.0f * w2 ) + w;
+	const float a2 = w3 - w2;
+	const float a3 = ( 3.0f * w2 ) - ( 2.0f * w3 );
+	return ( a0 * x1 + a1 * m0 + a2 * m1 + a3 * x2 );
 }
 
 //! fast float to sint conversion but uses current FPU round mode (default round nearest)
@@ -382,5 +422,5 @@ public:
 
 
 
-#endif	//	GUARD_Math_HEADER_FILE
+#endif	//	GUARD_Math_lib_HEADER_FILE
 
