@@ -892,7 +892,7 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////////
-//	timed variable contain 16 variable point
+//	timed variable contain 16 variable point of scalar
 //////////////////////////////////////////////////////////////////////////
 class variable
 {
@@ -904,9 +904,17 @@ public:
 
 public:
 
-	enum tmode { SCALAR, LINEAR, COSINE, CUBIC, HERMITE = 0xaaaaaaaa };
+	enum varMode 
+	{
+		SCALAR	= 0x00000001,
+		LINEAR	= 0x00000002,
+		COSINE	= 0x00000004,
+		CUBIC	= 0x00000008,
+		HERMITE = 0x00000010,
+		REPEAT	= 0x00000020
+	};
 
-	struct tpoint
+	struct varPoint
 	{
 		float value;	//	value of the current point
 		float time;		//	the specified time that point exist
@@ -914,12 +922,92 @@ public:
 		float bias;		//	bias used in Hermite interpolation
 	};
 
-	tpoint	point[16];
-	float	t;
-	float	tmax;
-	float	tmin;
-	tmode	mode;
+	varPoint	point[16];
+	float		t;
+	float		tmax;
+	float		tmin;
+	varMode		mode;
 	
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+//	timed variable contain 16 variable point of 3d vector
+//////////////////////////////////////////////////////////////////////////
+class variable3
+{
+public:
+	variable3(): t(0), tmax(0), tmin(0), mode(SCALAR)
+	{
+		sx_mem_set( point, 0, sizeof(point) );
+	}
+
+public:
+
+	enum varMode 
+	{
+		SCALAR	= 0x00000001,
+		LINEAR	= 0x00000002,
+		COSINE	= 0x00000004,
+		CUBIC	= 0x00000008,
+		HERMITE = 0x00000010,
+		REPEAT	= 0x00000020
+	};
+
+	struct varPoint
+	{
+		float3	value;	//	value of the current point
+		float	time;		//	the specified time that point exist
+		float	tension;	//	tension used in Hermite interpolation
+		float	bias;		//	bias used in Hermite interpolation
+	};
+
+	varPoint	point[16];
+	float		t;
+	float		tmax;
+	float		tmin;
+	varMode		mode;
+
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+//	timed variable contain 16 variable point of 4d vector
+//////////////////////////////////////////////////////////////////////////
+class variable4
+{
+public:
+	variable4(): t(0), tmax(0), tmin(0), mode(SCALAR)
+	{
+		sx_mem_set( point, 0, sizeof(point) );
+	}
+
+public:
+
+	enum varMode 
+	{
+		SCALAR	= 0x00000001,
+		LINEAR	= 0x00000002,
+		COSINE	= 0x00000004,
+		CUBIC	= 0x00000008,
+		HERMITE = 0x00000010,
+		REPEAT	= 0x00000020
+	};
+
+	struct varPoint
+	{
+		float4	value;	//	value of the current point
+		float	time;		//	the specified time that point exist
+		float	tension;	//	tension used in Hermite interpolation
+		float	bias;		//	bias used in Hermite interpolation
+	};
+
+	varPoint	point[16];
+	float		t;
+	float		tmax;
+	float		tmin;
+	varMode		mode;
+
 };
 
 #include "Math_tools.h"

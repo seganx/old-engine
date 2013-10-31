@@ -160,13 +160,14 @@ struct d3dMaterial
 	Color				specular;
 	Color				emissive;
 	variable			var[16];
+	variable4			var4d[4];
 	class d3dTexture*	texture[8];
 	class d3dShader*	shader;
 };
 
 
 //////////////////////////////////////////////////////////////////////////
-//	camera
+//!	camera
 struct d3dCamera
 {
 	float3	eye;
@@ -177,6 +178,20 @@ struct d3dCamera
 	float	far_z;
 };
 
+//////////////////////////////////////////////////////////////////////////
+//! mesh description
+struct d3dMeshDesc
+{
+	uint	numVertices;
+	uint	numFaces;
+	bool	hasNormal;
+	bool	hasTangent;
+	bool	hasTexcoord0;
+	bool	hasTexcoord1;
+	bool	hasColor;
+	bool	hasIndex;
+	bool	hasWeight;
+};
 
 //////////////////////////////////////////////////////////////////////////
 //! abstract class of texture
@@ -222,8 +237,41 @@ public:
 	d3dMesh( void ) {};
 	virtual ~d3dMesh( void ) {};
 
-public:
+	//! set new mesh description. this may clear current data
+	virtual void set_desc( d3dMesh& desc ) = 0;
 
+	//! lock array of positions of the mesh. return null if the function failed to lock
+	virtual float3* lock_positions( void );
+
+	//! unlock array of positions
+	virtual void unlock_positions( void );
+
+	//! lock array of normals of the mesh. return null if the function failed to lock
+	virtual float3* lock_normals( void );
+
+	//! unlock array of normals
+	virtual void unlock_normals( void );
+
+	//! lock array of tangents of the mesh. return null if the function failed to lock
+	virtual float3* lock_tangents( void );
+
+	//! unlock array of tangents
+	virtual void unlock_tangents( void );
+
+	//! lock array of texture coordinates in the mesh. return null if the function failed to lock
+	virtual float2* lock_texcoords( const uint index );
+
+	//! unlock array of texture coordinates
+	virtual void unlock_texcoords( const uint index );
+
+	//! lock array of vertex colors in the mesh. return null if the function failed to lock
+	virtual d3dColor* lock_colors( void );
+
+	//! unlock array of texture coordinates
+	virtual void unlock_colors( void );
+
+public:
+	
 };
 
 //////////////////////////////////////////////////////////////////////////

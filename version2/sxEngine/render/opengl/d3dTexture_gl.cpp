@@ -129,7 +129,7 @@ d3dTexture_gl::~d3dTexture_gl( void )
 		glDeleteTextures( 1, &m_tbo );
 }
 
-void d3dTexture_gl::SetDesc( d3dTextureDesc& desc )
+void d3dTexture_gl::set_desc( d3dTextureDesc& desc )
 {
 	if ( m_tbo && ( !desc.width || !desc.height ) )
 	{
@@ -182,7 +182,7 @@ void d3dTexture_gl::SetDesc( d3dTextureDesc& desc )
 	sx_glBindTexture( m_target, 0 );
 }
 
-void d3dTexture_gl::SetImage( void* data, uint level, uint face /*= 0 */ )
+void d3dTexture_gl::set_image( void* data, uint level, uint face /*= 0 */ )
 {
 	if ( !m_desc.width || !m_desc.height )
 		return;
@@ -208,7 +208,7 @@ void d3dTexture_gl::SetImage( void* data, uint level, uint face /*= 0 */ )
 	case GL_TEXTURE_2D:
 		{
 			if ( IsCompressedFormat( m_desc.format ) )
-				glCompressedTexImage2D( m_target, level, internalFormat, width, height, 0, GetDataSize( level ), data );
+				glCompressedTexImage2D( m_target, level, internalFormat, width, height, 0, get_data_size( level ), data );
 			else
 				glTexImage2D( m_target, level, internalFormat, width, height, 0, channelFormat, channelType, data );
 		}
@@ -218,7 +218,7 @@ void d3dTexture_gl::SetImage( void* data, uint level, uint face /*= 0 */ )
 	sx_glBindTexture( m_target, 0 );
 }
 
-void d3dTexture_gl::GetImage( void* data, uint level, uint face /*= 0 */ )
+void d3dTexture_gl::get_image( void* data, uint level, uint face /*= 0 */ )
 {
 	if ( !m_tbo || !m_desc.width || !m_desc.height )
 		return;
@@ -247,7 +247,7 @@ void d3dTexture_gl::GetImage( void* data, uint level, uint face /*= 0 */ )
 	sx_glBindTexture( m_target, 0 );
 }
 
-SEGAN_INLINE uint d3dTexture_gl::GetDataSize( uint level )
+SEGAN_INLINE uint d3dTexture_gl::get_data_size( uint level )
 {
 	bool c	= IsCompressedFormat( m_desc.format );
 	uint w	= GetSizeInMipMapLevel( m_desc.width,	level );
@@ -256,8 +256,4 @@ SEGAN_INLINE uint d3dTexture_gl::GetDataSize( uint level )
 	return s * glBytesPerBlock[ m_desc.format ];
 }
 
-SEGAN_INLINE void d3dTexture_gl::SetToDevice( uint stage )
-{
-	sx_assert( m_device );
-	m_device->SetTexture( this, stage );
-}
+

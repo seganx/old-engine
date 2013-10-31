@@ -20,15 +20,13 @@ public:
 	d3dTexture_gl( void );
 	virtual ~d3dTexture_gl( void );
 
-	virtual void SetDesc( d3dTextureDesc& desc );
+	virtual void set_desc( d3dTextureDesc& desc );
 
-	virtual void SetImage( void* data, uint level, uint face = 0 );
+	virtual void set_image( void* data, uint level, uint face = 0 );
 
-	virtual void GetImage( void* data, uint level, uint face = 0 );
+	virtual void get_image( void* data, uint level, uint face = 0 );
 
-	virtual uint GetDataSize( uint level );
-
-	virtual void SetToDevice( uint stage );
+	virtual uint get_data_size( uint level );
 
 public:
 
