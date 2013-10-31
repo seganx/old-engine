@@ -84,23 +84,6 @@ enum d3dTextureType
 };
 
 //////////////////////////////////////////////////////////////////////////
-//! texture description
-struct d3dTextureDesc
-{
-	d3dTextureType	type;		//	type of texture
-	d3dFormat		format;
-	d3dFilter		filter;
-	d3dAddressMode	addressMode;
-	uint			width;
-	uint			height;
-	uint			depth;
-	uint			mipmaps;	//	number of additional mipmaps
-	uint			lod;
-	uint			anisotropy;
-	dword			flag;		//	resource flag SX_D3D_RESOURCE_
-};
-
-//////////////////////////////////////////////////////////////////////////
 //! describe the information of the display graphic card
 struct d3dDriverInfo
 {
@@ -152,16 +135,48 @@ struct d3dColor
 };
 
 //////////////////////////////////////////////////////////////////////////
+//! texture description
+struct d3dTextureDesc
+{
+	d3dTextureType	type;		//	type of texture
+	d3dFormat		format;
+	d3dFilter		filter;
+	d3dAddressMode	addressMode;
+	uint			width;
+	uint			height;
+	uint			depth;
+	uint			mipmaps;	//	number of additional mipmaps
+	uint			lod;
+	uint			anisotropy;
+	dword			flag;		//	resource flag SX_D3D_RESOURCE_
+};
+
+//////////////////////////////////////////////////////////////////////////
+//!	material properties
+struct d3dMaterial 
+{
+	Color				ambient;
+	Color				diffuse;
+	Color				specular;
+	Color				emissive;
+	variable			var[16];
+	class d3dTexture*	texture[8];
+	class d3dShader*	shader;
+};
+
+
+//////////////////////////////////////////////////////////////////////////
 //	camera
 struct d3dCamera
 {
-	float3	m_eye;
-	float3	m_at;
-	float3	m_up;
-	float	m_fov;
-	float	m_near_z;
-	float	m_far_z;
+	float3	eye;
+	float3	at;
+	float3	up;
+	float	fov;
+	float	near_z;
+	float	far_z;
 };
+
 
 //////////////////////////////////////////////////////////////////////////
 //! abstract class of texture
@@ -175,28 +190,41 @@ public:
 	virtual ~d3dTexture( void ) {};
 
 	//! set new texture description. this may clear current data
-	virtual void SetDesc( d3dTextureDesc& desc ) = 0;
+	virtual void set_desc( d3dTextureDesc& desc ) = 0;
 
 	/*! 
 	copy data to the texture buffer in the specified level and face.
 	NOTE: size of data in byte most be the same as size of the texture image.
 	*/
-	virtual void SetImage( void* data, uint level = 0, uint face = 0 ) = 0;
+	virtual void set_image( void* data, uint level = 0, uint face = 0 ) = 0;
 
 	/*
 	copy texture image to the data buffer from specified level and face.
 	NOTE: size of data in byte most be the same as size of texture image.
 	*/
-	virtual void GetImage( void* data, uint level = 0, uint face = 0 ) = 0;
+	virtual void get_image( void* data, uint level = 0, uint face = 0 ) = 0;
 
 	//! return size of image in byte
-	virtual uint GetDataSize( uint level = 0 ) = 0;
+	virtual uint get_data_size( uint level = 0 ) = 0;
 
 public:
 
 	d3dTextureDesc		m_desc;		//  description of texture
 };
 
+//////////////////////////////////////////////////////////////////////////
+//!	mesh
+class d3dMesh
+{
+	SEGAN_STERILE_CLASS(d3dMesh)
+
+public:
+	d3dMesh( void ) {};
+	virtual ~d3dMesh( void ) {};
+
+public:
+
+};
 
 //////////////////////////////////////////////////////////////////////////
 //	renderer

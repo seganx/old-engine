@@ -16,7 +16,7 @@
 
 #define VER_USERDEMO		0
 #define VER_PREVIEW			1
-#define VER_PREVIEW_NAME	L"Christian Sauerteig"
+#define VER_PREVIEW_NAME	L"Immanitas Entertainment GmbH"
 #define USE_RTL				0
 #define USE_GAMEUP			0
 #define USE_LOCK_NAME		L"christiansauerteig"
@@ -30,7 +30,7 @@
 
 #if VER_PREVIEW
 #undef GAME_TITLE
-#define GAME_TITLE		L"Roads of Battle - preview version for " VER_PREVIEW_NAME L" - not for sale"
+#define GAME_TITLE		L"Roads of Battle - Evaluation code – NOT FOR SALE. " VER_PREVIEW_NAME
 #endif
 
 class Player;

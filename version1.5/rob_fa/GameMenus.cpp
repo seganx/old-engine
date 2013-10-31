@@ -176,7 +176,7 @@ void MenuMain::Initialize( void )
 	pretext->SetAlign( GTA_LEFT );
 	pretext->SetParent( m_slantBack );
 	pretext->SetFont( L"Font_Tips.fnt" );
-	pretext->SetText( L"`0xffff22`preview version for\n " VER_PREVIEW_NAME L"\n  NOT FOR SALE" );
+	pretext->SetText( L"`0xffff22`Evaluation code - NOT FOR SALE. \n " VER_PREVIEW_NAME );
 	pretext->GetElement(0)->Color().a = 0;
 	pretext->Position().Set( 40.0f, -180.0f, 0.0f );
 #endif
