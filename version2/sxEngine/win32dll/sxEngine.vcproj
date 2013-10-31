@@ -176,6 +176,50 @@
 				RelativePath="..\render\Render.h"
 				>
 			</File>
+			<Filter
+				Name="opengl"
+				>
+				<File
+					RelativePath="..\render\opengl\d3dDevice_gl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\d3dDevice_gl.h"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\d3dIndexBuffer_gl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\d3dIndexBuffer_gl.h"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\d3dTexture_gl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\d3dTexture_gl.h"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\d3dVertexBuffer_gl.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\d3dVertexBuffer_gl.h"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\OpenGLExtensions.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\OpenGLExtensions.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="common"
