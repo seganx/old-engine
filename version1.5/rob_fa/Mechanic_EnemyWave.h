@@ -123,6 +123,8 @@ namespace GM
 		sx::gui::PPanelEx		m_nextWave;			//	gui to show next wave info
 		sx::gui::PProgressBar	m_startProgr;		//	progress bar to show the time
 	
+		sx::gui::PPanelEx		m_mapBack;			//	background for mini map
+
 		sx::core::Node*			m_musicNode;			//	music node of the waves
 		sx::core::Sound*		m_musicCurrSound;		//	current sound object
 		sx::core::Sound*		m_musicLastSound;		//	last sound object

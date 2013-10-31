@@ -118,7 +118,10 @@ public:
 	WeaponType				m_weaponType;						//	weapon type
 	float					m_experience;						//	experience
 
-	float4					m_levelVisual;					//	visual params of upgrade
+	float4					m_levelVisual;						//	visual params of upgrade
+
+	float					m_traveling;						//	value between 0..1 describe the traveling value
+	sx::gui::Panel*			m_travelingGUI;						//	the gui to display the unit on the map
 
 	//	TEST
 	float					test_onDamageXP;

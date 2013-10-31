@@ -3154,7 +3154,7 @@ void MenuInfo::Initialize( void )
 	m_helper.back->State_GetByIndex(0).Color.Set( 0.0f, 0.0f, 0.0f, 0.5f );
 	m_helper.back->State_GetByIndex(0).Blender.Set( 0.2f, 0.6f );
 	m_helper.back->State_Add();
-	m_helper.back->State_GetByIndex(1).Position.Set( 0.0f, 0.0f, 0.0f );
+	m_helper.back->State_GetByIndex(1).Position.Set( 0.0f, -30.0f, 0.0f );
 
 	m_helper.image = sx_new( sx::gui::Panel );
 	m_helper.image->SetParent( m_helper.back );

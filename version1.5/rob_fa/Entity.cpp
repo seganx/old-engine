@@ -29,6 +29,8 @@ Entity::Entity( void )
 , m_weaponType(GWT_NULL)
 , m_experience(0)
 , m_levelVisual(0,1,2,1)
+, m_traveling(0)
+, m_travelingGUI(0)
 , test_onDamageXP(0)
 , test_onDeadXP(0)
 {
@@ -134,6 +136,8 @@ void Entity::Initialize( void )
 void Entity::Finalize( void )
 {
 	sx_callstack_param(Entity[%s]::Finalize(), m_typeName.Text());
+
+	sx_delete_and_null( m_travelingGUI );
 
 	if ( s_Selected == this )
 		s_Selected = NULL;
@@ -317,6 +321,7 @@ void Entity::SetState( UINT state )
 	case ES_DIE:
 		m_move.animScale = 1.0f;
 		m_move.animSpeed = 1.0f;
+		sx_delete_and_null( m_travelingGUI );
 
 		{	//	stop sounds and particles
 			msg_SoundStop msgSnd( false );

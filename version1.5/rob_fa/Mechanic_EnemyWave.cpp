@@ -103,10 +103,22 @@ namespace GM
 		m_labelGold->GetElement(1)->Color() = 0xffffff00;
 		m_labelGold->SetText( L"+17" );
 
+
+		//////////////////////////////////////////////////////////////////////////
+		//	create a panel for mini map
+		m_mapBack = sx_new( sx::gui::PanelEx );
+		m_mapBack->GetElement(0)->SetTextureSrc( L"gui_minimap.txr" );
+		m_mapBack->SetSize( float2( 512, 512 ) );
+		m_mapBack->State_GetByIndex(0).Align.Set( -1.0f, 0.0f );
+		m_mapBack->State_GetByIndex(0).Position.Set( 392.0f, 250.0f, 0.0f );
+		m_mapBack->SetParent( g_game->m_gui->m_goldPeople->m_back );
 	}
 
 	void Mechanic_EnemyWaves::Finalize( void )
 	{
+		m_mapBack->SetParent( NULL );
+		sx_delete_and_null( m_mapBack );
+
 		m_back->SetParent( NULL );
 		sx_delete_and_null( m_back );
 	}
@@ -125,6 +137,7 @@ namespace GM
 
 	void Mechanic_EnemyWaves::Update( float elpsTime )
 	{
+
 		//	update label
 		if ( m_labelGold->m_SclOffset.z < 3.0f )
 		{
@@ -178,6 +191,21 @@ namespace GM
 			g_game->m_game_paused = true;
 			g_game->m_gui->m_victory->Show();
 			return;
+		}
+		else
+		{
+			for ( uint i=0; i<EntityManager::GetEntityCount(); ++i )
+			{
+				Entity* e = EntityManager::GetEntityByIndex( i );
+				if ( e->m_travelingGUI )
+				{
+					const float targetx = 225.0f - e->m_traveling * 450.0f;
+					e->m_travelingGUI->Position().x += ( targetx - e->m_travelingGUI->Position().x ) * 0.02f;
+					const float colorhealth = (float)e->m_health.icur / (float)e->m_health.imax;
+					e->m_travelingGUI->GetElement(0)->Color().r = sx_clamp_f( colorhealth * 2.0f, 0.0f, 1.0f );
+					e->m_travelingGUI->GetElement(0)->Color().g = sx_clamp_f( ( 1.0f - colorhealth ) * 2.0f, 0.0f, 1.0f );
+				}
+			}
 		}
 
 		if ( m_waveIndex >= m_wavesSrc.Count() )
@@ -303,6 +331,19 @@ namespace GM
 
 			m.flag = MISSION_SUICIDE;
 			entity->GetBrain()->AddMission(m);
+
+			//	create a simple gui to display unit in the map
+			entity->m_travelingGUI = sx_new( sx::gui::Panel );
+			entity->m_travelingGUI->SetSize( float2( 24.0f, 24.0f ) );
+			entity->m_travelingGUI->SetParent( m_mapBack );
+			entity->m_travelingGUI->Position().Set( -230.0f, -230.0f, 0.0f );
+			if ( wcsstr( pWave->tipsStartIcon, L"start" ) )
+				entity->m_travelingGUI->GetElement(0)->SetTextureSrc( L"gui_w_ground.txr" );
+			else
+				entity->m_travelingGUI->GetElement(0)->SetTextureSrc( pWave->tipsStartIcon );
+			entity->m_travelingGUI->GetElement(0)->Color().b = 0;
+			entity->m_travelingGUI->GetElement(0)->Color().g = 0;
+			entity->m_travelingGUI->GetElement(0)->Color().a = 0.8f;
 
 			//  add entity to game
 			EntityManager::AddEntity( entity );

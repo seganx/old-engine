@@ -159,6 +159,12 @@ void Task_goto_node::Update( float elpstime, DWORD& status )
 			sxLog::Log( L"WARNING : entity %s has %.2f animSpeed !", m_owner->m_typeName.Text(), m_owner->m_move.animSpeed );
 	}
 
+	//	compute traveling value
+	{
+		const float maxdistance = (float)m_Path.Count(); //m_startNode->GetPosition_world().Distance_sqr( m_endNode->GetPosition_world() );
+		const float curdistance = (float)m_targetNode; //curPos.Distance_sqr( m_endNode->GetPosition_world() );
+		m_owner->m_traveling = sx_clamp_f( 1.0f - (curdistance / maxdistance), 0.0f, 1.0f );
+	}
 }
 
 FORCEINLINE void Task_goto_node::MsgProc( UINT msg, void* data )
