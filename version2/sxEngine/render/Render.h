@@ -15,12 +15,15 @@
 //////////////////////////////////////////////////////////////////////////
 //! flags of rendering device
 #define	SX_D3D_
-#define SX_D3D_CREATE_DX				0x00000001		//	create directX device
-#define SX_D3D_CREATE_GL				0x00000002		//	create openGL device
-#define	SX_D3D_VSYNC					0x00000004		//  init device with vertical synchronization
-#define	SX_D3D_FULLSCREEN				0x00000008		//	init device in full screen mode
-#define SX_D3D_RESOURCE_DYNAMIC			0x00000010		//	create hardware dynamic resource
-#define SX_D3D_RESOURCE_MANAGED			0x00000020		//	hold a copy of data in system memory and use it at lock/unlock calls
+#define	SX_D3D_VSYNC					0x00000001		//  init device with vertical synchronization
+#define	SX_D3D_FULLSCREEN				0x00000002		//	init device in full screen mode
+#define SX_D3D_RESOURCE_DYNAMIC			0x00000004		//	create hardware dynamic resource
+#define SX_D3D_RESOURCE_MANAGED			0x00000008		//	hold a copy of data in system memory and use it at lock/unlock calls
+#define SX_D3D_VISIBLE					0x00000010
+#define SX_D3D_ENABLE					0x00000020
+#define SX_D3D_CASTSHADOW				0x00000040
+#define SX_D3D_RECEIVESHADOW			0x00000080
+#define SX_D3D_REFLECT					0x00000100
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -42,7 +45,13 @@ enum d3dFormat
 	FMT_D24S8,
 	FMT_D32,
 
-	FMT_32BITENUM = 0xffffffff
+	FMT_VNORMAL		= 0x10000000,
+	FMT_VTANGENT	= 0x20000000,
+	FMT_VCOORD0		= 0x40000000,
+	FMT_VCOORD1		= 0x80000000,
+	FMT_VCOLORS		= 0x01000000,
+	FMT_VINDEX		= 0x02000000,
+	FMT_VWEIGHT		= 0x04000000
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -165,6 +174,16 @@ struct d3dMaterial
 	class d3dShader*	shader;
 };
 
+//////////////////////////////////////////////////////////////////////////
+//! mesh description
+struct d3dMeshDesc
+{
+	dword		flag;			//! resource flag SX_D3D_RESOURCE_
+	d3dFormat	format;			//! combination of FMT_VXXX
+	uint		numVertices;	//! number of vertices
+	uint		numTriangles;	//!	number of triangles
+};
+
 
 //////////////////////////////////////////////////////////////////////////
 //!	camera
@@ -178,20 +197,6 @@ struct d3dCamera
 	float	far_z;
 };
 
-//////////////////////////////////////////////////////////////////////////
-//! mesh description
-struct d3dMeshDesc
-{
-	uint	numVertices;
-	uint	numFaces;
-	bool	hasNormal;
-	bool	hasTangent;
-	bool	hasTexcoord0;
-	bool	hasTexcoord1;
-	bool	hasColor;
-	bool	hasIndex;
-	bool	hasWeight;
-};
 
 //////////////////////////////////////////////////////////////////////////
 //! abstract class of texture
@@ -231,7 +236,7 @@ public:
 //!	mesh
 class d3dMesh
 {
-	SEGAN_STERILE_CLASS(d3dMesh)
+	SEGAN_STERILE_CLASS( d3dMesh );
 
 public:
 	d3dMesh( void ) {};
@@ -241,49 +246,55 @@ public:
 	virtual void set_desc( d3dMesh& desc ) = 0;
 
 	//! lock array of positions of the mesh. return null if the function failed to lock
-	virtual float3* lock_positions( void );
+	virtual float3* lock_positions( void ) = 0;
 
 	//! unlock array of positions
-	virtual void unlock_positions( void );
+	virtual void unlock_positions( void ) = 0;
 
 	//! lock array of normals of the mesh. return null if the function failed to lock
-	virtual float3* lock_normals( void );
+	virtual float3* lock_normals( void ) =  0;
 
 	//! unlock array of normals
-	virtual void unlock_normals( void );
+	virtual void unlock_normals( void ) = 0;
 
 	//! lock array of tangents of the mesh. return null if the function failed to lock
-	virtual float3* lock_tangents( void );
+	virtual float3* lock_tangents( void ) = 0;
 
 	//! unlock array of tangents
-	virtual void unlock_tangents( void );
+	virtual void unlock_tangents( void ) = 0;
 
 	//! lock array of texture coordinates in the mesh. return null if the function failed to lock
-	virtual float2* lock_texcoords( const uint index );
+	virtual float2* lock_texcoords( const uint index ) = 0;
 
 	//! unlock array of texture coordinates
-	virtual void unlock_texcoords( const uint index );
+	virtual void unlock_texcoords( const uint index ) = 0;
 
 	//! lock array of vertex colors in the mesh. return null if the function failed to lock
-	virtual d3dColor* lock_colors( void );
+	virtual d3dColor* lock_colors( void ) = 0;
 
 	//! unlock array of texture coordinates
-	virtual void unlock_colors( void );
+	virtual void unlock_colors( void ) = 0;
 
 public:
-	
+
+	Array<d3dMaterial*>		m_materials;	//	array of the material
+	uint					m_matIndex;		//	index of the current material
 };
 
 //////////////////////////////////////////////////////////////////////////
 //	renderer
-class SEGAN_ENG_API RenderMan
+class SEGAN_ENG_API Renderer
 {
-	SEGAN_STERILE_CLASS( RenderMan );
+	SEGAN_STERILE_CLASS( Renderer );
 public:
 	virtual void initialize( dword flags ) = 0;
 	virtual void set_size( const uint width, const uint height, const dword SX_D3D_ flags ) = 0;
 	virtual void update( float elpstime ) = 0;
 	virtual void draw( float elpstime, uint flag ) = 0;
+
+	virtual d3dTexture* create_texture( void );
+	virtual d3dMaterial* create_material( void );
+	virtual d3dMesh* create_mesh( void );
 
 public:
 
@@ -296,7 +307,7 @@ public:
 };
 
 //! create a renderer object
-RenderMan* sx_create_renderer( const dword SX_D3D_ flags );
+Renderer* sx_create_renderer( const dword SX_D3D_ flags );
 
 
 
