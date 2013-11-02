@@ -277,33 +277,53 @@ public:
 
 public:
 
+	AABox					m_box;			//	axis aligned bounding box of the mesh
+	Sphere					m_sphere;		//	bounding sphere around the mesh
 	Array<d3dMaterial*>		m_materials;	//	array of the material
 	uint					m_matIndex;		//	index of the current material
 };
 
 //////////////////////////////////////////////////////////////////////////
-//	renderer
-class SEGAN_ENG_API Renderer
+//	scene manager
+class SEGAN_ENG_API d3dScene
 {
-	SEGAN_STERILE_CLASS( Renderer );
+	SEGAN_STERILE_CLASS( d3dScene );
 public:
+	d3dScene( void ) {}
+	virtual d3dScene( void ) {}
+
+	virtual d3dTexture* create_texture( void ) = 0;
+	virtual d3dMaterial* create_material( void ) = 0;
+	virtual d3dMesh* create_mesh( void ) = 0;
+
+
+public:
+	d3dCamera			m_camera;
+	//	d3dMeshMan*			m_meshes;
+	//	d3dLightMan*		m_lights;
+	//	d3dMaterialMan*		m_materials;
+	//	d3dTerrain*			m_terrain;
+	//	d3dStaticMan*		m_statics;
+
+
+};
+
+//////////////////////////////////////////////////////////////////////////
+//	renderer
+class SEGAN_ENG_API d3dRenderer
+{
+	SEGAN_STERILE_CLASS( d3dRenderer );
+public:
+	d3dRenderer( void ) {}
+	virtual d3dRenderer( void ) {}
+
 	virtual void initialize( dword flags ) = 0;
 	virtual void set_size( const uint width, const uint height, const dword SX_D3D_ flags ) = 0;
 	virtual void update( float elpstime ) = 0;
 	virtual void draw( float elpstime, uint flag ) = 0;
 
-	virtual d3dTexture* create_texture( void );
-	virtual d3dMaterial* create_material( void );
-	virtual d3dMesh* create_mesh( void );
-
 public:
 
-	d3dCamera			m_camera;
-//	d3dLightMan*		m_lights;
-//	d3dMaterialMan*		m_materials;
-//	d3dTerrain*			m_terrain;
-//	d3dStaticMan*		m_statics;
-//	d3dMeshMan*			m_meshes;
 };
 
 //! create a renderer object
