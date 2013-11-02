@@ -249,6 +249,38 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="system"
+			>
+			<File
+				RelativePath="..\system\OS.h"
+				>
+			</File>
+			<File
+				RelativePath="..\system\System.h"
+				>
+			</File>
+			<File
+				RelativePath="..\system\Window.h"
+				>
+			</File>
+			<Filter
+				Name="win32"
+				>
+				<File
+					RelativePath="..\system\win32\OS.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\system\win32\Win6.h"
+					>
+				</File>
+				<File
+					RelativePath="..\system\win32\Window.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
 		<File
 			RelativePath="..\Engine_def.h"
 			>

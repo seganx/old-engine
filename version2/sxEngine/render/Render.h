@@ -206,8 +206,8 @@ class SEGAN_ENG_API d3dTexture
 
 public:
 
-	d3dTexture( void ) {};
-	virtual ~d3dTexture( void ) {};
+	d3dTexture( void ) {}
+	virtual ~d3dTexture( void ) {}
 
 	//! set new texture description. this may clear current data
 	virtual void set_desc( d3dTextureDesc& desc ) = 0;
@@ -239,8 +239,8 @@ class d3dMesh
 	SEGAN_STERILE_CLASS( d3dMesh );
 
 public:
-	d3dMesh( void ) {};
-	virtual ~d3dMesh( void ) {};
+	d3dMesh( void ) {}
+	virtual ~d3dMesh( void ) {}
 
 	//! set new mesh description. this may clear current data
 	virtual void set_desc( d3dMesh& desc ) = 0;
@@ -283,6 +283,44 @@ public:
 	uint					m_matIndex;		//	index of the current material
 };
 
+
+//////////////////////////////////////////////////////////////////////////
+//	mesh manager
+class SEGAN_ENG_API d3dMeshMan
+{
+	SEGAN_STERILE_CLASS( d3dMeshMan );
+public:
+	d3dMeshMan( void ) {}
+	virtual ~d3dMeshMan( void ) {}
+
+	/*! 
+	add a mesh to the scene 
+	NOTE: this function must add the new mesh to the list of meshes for additional access
+	*/
+	virtual void add( const d3dMesh* mesh ) = 0;
+
+	/*!
+	remove mesh from the scene
+	NOTE: this function must remove the mesh from the list of meshes
+	*/
+	virtual void remove( const d3dMesh* mesh ) = 0;
+
+	/*!
+	get meshes from an specified area
+	NOTE: this function should uses a tree structure for fast search
+	*/
+	virtual uint get_by_area( Array<d3dMesh*>& result, const float3& pos, const float radius ) = 0;
+
+	/*!
+	get meshes from an specified frustum
+	NOTE: this function should uses a tree structure for fast search
+	*/
+	virtual uint get_by_frustum( Array<d3dMesh*>& result, const Frustum& frustum ) = 0;
+
+public:
+	Array<d3dMesh*>		m_list;
+};
+
 //////////////////////////////////////////////////////////////////////////
 //	scene manager
 class SEGAN_ENG_API d3dScene
@@ -290,7 +328,7 @@ class SEGAN_ENG_API d3dScene
 	SEGAN_STERILE_CLASS( d3dScene );
 public:
 	d3dScene( void ) {}
-	virtual d3dScene( void ) {}
+	virtual ~d3dScene( void ) {}
 
 	virtual d3dTexture* create_texture( void ) = 0;
 	virtual d3dMaterial* create_material( void ) = 0;
@@ -299,7 +337,7 @@ public:
 
 public:
 	d3dCamera			m_camera;
-	//	d3dMeshMan*			m_meshes;
+	d3dMeshMan*			m_meshes;
 	//	d3dLightMan*		m_lights;
 	//	d3dMaterialMan*		m_materials;
 	//	d3dTerrain*			m_terrain;
@@ -315,7 +353,7 @@ class SEGAN_ENG_API d3dRenderer
 	SEGAN_STERILE_CLASS( d3dRenderer );
 public:
 	d3dRenderer( void ) {}
-	virtual d3dRenderer( void ) {}
+	virtual ~d3dRenderer( void ) {}
 
 	virtual void initialize( dword flags ) = 0;
 	virtual void set_size( const uint width, const uint height, const dword SX_D3D_ flags ) = 0;
@@ -326,8 +364,17 @@ public:
 
 };
 
+
+
+//////////////////////////////////////////////////////////////////////////
+//	HELPER FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+//! create a scene object
+d3dScene* sx_d3d_create_scene( void );
+
 //! create a renderer object
-Renderer* sx_create_renderer( const dword SX_D3D_ flags );
+d3dRenderer* sx_d3d_create_renderer( const dword SX_D3D_ flags );
 
 
 
