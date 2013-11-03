@@ -10,8 +10,7 @@
 #ifndef GUARD_OS_HEADER_FILE
 #define GUARD_OS_HEADER_FILE
 
-
-#include "System_def.h"
+#include "../Engine_def.h"
 
 #ifndef DRIVE_UNKNOWN
 #define DRIVE_UNKNOWN     0

@@ -250,8 +250,6 @@ public:
 //	additional helper functions
 //////////////////////////////////////////////////////////////////////////
 
-#define sx_logger(format, ...)		{ }
-
 SEGAN_INLINE SEGAN_ENG_API void sx_glBindBuffer( GLenum target, GLuint buffer );
 SEGAN_INLINE SEGAN_ENG_API void sx_glBindTexture( GLenum target, GLuint texture );
 

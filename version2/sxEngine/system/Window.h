@@ -1,19 +1,17 @@
 /********************************************************************
-	created:	2012/04/14
-	filename: 	Application.h
+	created:	2013/11/3
+	filename: 	Window.h
 	Author:		Sajad Beigjani
 	eMail:		sajad.b@gmail.com
 	Site:		www.SeganX.com
-	Desc:		This file contain window and application class to 
-				manage windows of game/editor application
+	Desc:		This file contain a simple window class for game/editor
 *********************************************************************/
-#ifndef GUARD_Application_HEADER_FILE
-#define GUARD_Application_HEADER_FILE
+#ifndef GUARD_Window_HEADER_FILE
+#define GUARD_Window_HEADER_FILE
 
-#include "System_def.h"
+#include "../Engine_def.h"
 
 //! define style of border of window
-#define WBT_
 enum WindowBorderType {
 	WBT_NONE = 0,
 	WBT_ORDINARY,
@@ -23,9 +21,9 @@ enum WindowBorderType {
 	WBT_DIALOG,
 	WBT_DIALOG_RESIZABLE,
 };
+#define WBT_
 
 //! enumeration cursor types
-#define WCT_
 enum WindowCursorType{
 	WCT_ARROW = 0, 
 	WCT_IBEAM,
@@ -44,6 +42,7 @@ enum WindowCursorType{
 	WCT_HELP,
 	WCT_Count
 };
+#define WCT_
 
 //! contain information of window position and size
 struct WindowRect
@@ -60,20 +59,15 @@ struct WindowRect
 #if defined(_WIN32)
 struct WindowEvent 
 {
-	uint	msg;
-	uint64	wparam;
-	uint64	lparam;
-	handle	windowHandle;		//	this can be null
+	uint			msg;
+	uint64			wparam;
+	uint64			lparam;
+	struct HWND__*	windowHandle;		//	this can be null
 };
 #endif
 
 //! window event call back. return 0 if event handled
 typedef int (*WindowEventCallback)( class Window* Sender, const WindowEvent* data );
-
-
-//!	main loop of application.
-typedef void (*ApplicationMainLoop)( float elpsTime );
-
 
 /*
 Window class is a simple abstract class to create and modify a window.
@@ -85,15 +79,15 @@ public:
 	Window( void );
 	virtual ~Window( void );
 
-	virtual const handle GetHandle( void ) const = 0;
-	virtual void SetTitle( const wchar* caption ) = 0;
-	virtual void SetCursor( const WindowCursorType cursorType ) = 0;
-	virtual void SetRect( const int left, const int top, const int width, const int height ) = 0;
-	virtual void SetRect( const WindowRect& rect ) = 0;
-	virtual void SetBorder( const WindowBorderType border ) = 0;
-	virtual void SetTopMostEnable( const bool enable ) = 0;
-	virtual void SetVisible( const bool visible ) = 0;
-	virtual void SetFullScreen( const bool fullscreen ) = 0;
+#if defined(_WIN32)
+	virtual const struct HWND__* get_handle( void ) const = 0;
+#endif
+	virtual void set_title( const wchar* caption ) = 0;
+	virtual void set_cursor( const WindowCursorType cursorType ) = 0;
+	virtual void set_rect( const int left, const int top, const int width, const int height ) = 0;
+	virtual void set_border( const WindowBorderType border ) = 0;
+	virtual void set_topmost( const bool enable ) = 0;
+	virtual void set_visible( const bool visible ) = 0;
 
 public:
 	enum Options
@@ -103,37 +97,20 @@ public:
 		WINDOW_FULLSCREEN	= 0x00000004,
 	};
 
-	String				m_name;		//	name of the window
-	String				m_title;	//	title of window
-	WindowRect			m_rect;		//	window rectangle
-	WindowBorderType	m_border;	//! type of border
-	dword				m_option;	//  options of window
+	dword					m_option;		//! options of window
+	String					m_name;			//!	name of the window
+	String					m_title;		//!	title of window
+	WindowRect				m_rect;			//!	window rectangle
+	WindowBorderType		m_border;		//! type of border
+	WindowEventCallback		m_callback;		//! callback function
 
 };
 
-//////////////////////////////////////////////////////////////////////////
-//	application management
-//////////////////////////////////////////////////////////////////////////
-
-//! initialize the application
-SEGAN_ENG_API void sx_app_initialize( WindowEventCallback callbackEvents );
-
-//! finalize the application
-SEGAN_ENG_API void sx_app_finalize( void );
-
 //! create a new window
-SEGAN_ENG_API Window* sx_app_create_window( const wchar* name, WindowBorderType WBT_ borderType = WBT_ORDINARY_RESIZABLE, bool background = true );
+SEGAN_ENG_API Window* sx_create_window( const wchar* name, WindowBorderType WBT_ borderType = WBT_ORDINARY_RESIZABLE, bool background = true );
 
 //! destroy a window
-SEGAN_ENG_API void sx_app_destroy_window( Window*& pwindow );
+SEGAN_ENG_API void sx_destroy_window( Window* pwindow );
 
-//! return a pointer to the window by specified handle
-SEGAN_ENG_API bool sx_app_get_window( handle whandle, Window*& pwindow );
 
-//! run the application and call main loop
-SEGAN_ENG_API void sx_app_run( ApplicationMainLoop mainLoop );
-
-//! close all windows and terminate the application
-SEGAN_ENG_API void sx_app_terminate(void);
-
-#endif	//	GUARD_Application_HEADER_FILE
+#endif	//	GUARD_Window_HEADER_FILE

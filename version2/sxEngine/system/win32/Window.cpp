@@ -1,12 +1,8 @@
 #if defined(_WIN32)
 
-#include "../Application.h"
-#include "../Log.h"
+#include "../Window.h"
 #include "../OS.h"
 #include "Win6.h"
-#include "resource.h"
-
-typedef Map<u64, class Window_win32*> MapWindow;
 
 extern const HCURSOR cursorHandle[WCT_Count] = 
 {
@@ -27,19 +23,6 @@ extern const HCURSOR cursorHandle[WCT_Count] =
 	LoadCursor( null, IDC_HELP    )
 };
 
-// internal class
-struct app_internal
-{
-	MapWindow				windows;
-	Window_win32*			newOne;
-	HWND					mainWindow;
-	WindowRect				fullscreenRect;
-	WindowEventCallback		callbackEvents;
-
-	app_internal(): mainWindow(0), newOne(0), callbackEvents(0) {}
-};
-static app_internal * s_application = null;
-
 
 LRESULT WINAPI DefaultMsgProc(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam);
 LARGE_INTEGER GetWinStyles(WindowBorderType wbtype, bool topmost);
@@ -48,7 +31,7 @@ LARGE_INTEGER GetWinStyles(WindowBorderType wbtype, bool topmost);
 //////////////////////////////////////////////////////////////////////////
 //	window_win32
 //////////////////////////////////////////////////////////////////////////
-Window::Window( void ): m_border(WBT_ORDINARY_RESIZABLE), m_option(0) {}
+Window::Window( void ): m_border(WBT_ORDINARY_RESIZABLE), m_option(0), m_callback(0) {}
 Window::~Window( void ) {}
 
 // ! driven class of window for windows operation system
@@ -65,15 +48,10 @@ public:
 		m_windowClass.style 		= CS_CLASSDC;
 		m_windowClass.hInstance		= GetModuleHandle( null );
 
-		m_rect.left		= sx_os_get_monitor()->workingWidth / 2 - 400;
+		m_rect.left		= sx_os_get_monitor()->workingWidth / 2 - 512;
 		m_rect.top		= sx_os_get_monitor()->workingHeight / 2 - 300;
-		m_rect.width	= 800;
+		m_rect.width	= 1024;
 		m_rect.height	= 600;
-
-		s_application->fullscreenRect.left		= 0;
-		s_application->fullscreenRect.top		= 0;
-		s_application->fullscreenRect.width		= sx_os_get_monitor()->areaWidth;
-		s_application->fullscreenRect.height	= sx_os_get_monitor()->areaHeight;
 	}
 
 	virtual ~Window_win32( void )
@@ -85,12 +63,12 @@ public:
 		UnregisterClass( m_windowClass.lpszClassName, m_windowClass.hInstance );
 	}
 
-	virtual const handle GetHandle( void ) const
+	virtual const struct HWND__* get_handle( void ) const
 	{
-		return (handle)&m_handle;
+		return m_handle;
 	}
 
-	virtual void SetTitle( const wchar* caption )
+	virtual void set_title( const wchar* caption )
 	{
 		if ( m_title == caption ) return;
 
@@ -99,14 +77,14 @@ public:
 			SetWindowText( m_handle, *m_title );
 	}
 
-	virtual void SetCursor( const WindowCursorType cursorType )
+	virtual void set_cursor( const WindowCursorType cursorType )
 	{
 		m_windowClass.hCursor = cursorHandle[cursorType];
 		SetClassLong( m_handle, GCL_HCURSOR, (LONG)((uint64)m_windowClass.hCursor) );
 		Update();
 	}
 
-	virtual void SetRect( const sint left, const sint top, const sint width, const sint height )
+	virtual void set_rect( const sint left, const sint top, const sint width, const sint height )
 	{
 		m_rect.left		= left;
 		m_rect.top		= top;
@@ -115,13 +93,7 @@ public:
 		Update();
 	}
 
-	virtual void SetRect( const WindowRect& rect )
-	{
-		m_rect = rect;
-		Update();
-	}
-
-	virtual void SetBorder( const WindowBorderType border )
+	virtual void set_border( const WindowBorderType border )
 	{
 		if ( m_border != border )
 		{
@@ -137,7 +109,7 @@ public:
 		}
 	}
 
-	virtual void SetTopMostEnable( const bool enable )
+	virtual void set_topmost( const bool enable )
 	{
 		if ( enable )
 			sx_set_add( m_option, WINDOW_TOPMOST );
@@ -146,7 +118,7 @@ public:
 		Update();
 	}
 
-	virtual void SetVisible( const bool visible )
+	virtual void set_visible( const bool visible )
 	{
 		if ( visible )
 			sx_set_add( m_option, WINDOW_VISIBLE );
@@ -170,7 +142,6 @@ public:
 		sx_callstack();
 
 		HWND winpos = ( m_option & WINDOW_TOPMOST ) ? HWND_TOPMOST : HWND_TOP;
-		WindowRect* rect = ( m_option & WINDOW_FULLSCREEN ) ? &s_application->fullscreenRect : &m_rect;
 		WindowBorderType border = ( m_option & WINDOW_FULLSCREEN ) ? WBT_NONE : m_border;
 
 		//  compute offsets
@@ -183,7 +154,7 @@ public:
 			H = (winfo.rcClient.top  - winfo.rcWindow.top)  + (winfo.rcWindow.bottom - winfo.rcClient.bottom);
 		}
 
-		SetWindowPos( m_handle, winpos, rect->left, rect->top, rect->width + W, rect->height + H, SWP_NOOWNERZORDER );
+		SetWindowPos( m_handle, winpos, m_rect.left, m_rect.top, m_rect.width + W, m_rect.height + H, SWP_NOOWNERZORDER );
 
 		if ( m_option & WINDOW_VISIBLE )
 			ShowWindow( m_handle, SW_SHOWDEFAULT );
@@ -195,8 +166,9 @@ public:
 
 public:
 
-	HWND					m_handle;			//! handle of this window
+	struct HWND__*			m_handle;			//! handle of this window
 	WNDCLASSEX				m_windowClass;		//! class of window
+
 };
 
 
@@ -204,43 +176,18 @@ public:
 
 
 //////////////////////////////////////////////////////////////////////////
-//	application
+//	helper functions
 //////////////////////////////////////////////////////////////////////////
+Map<uint64, class Window_win32*>*	s_windows = null;
 
-void sx_app_initialize( WindowEventCallback callbackEvents )
+Window* sx_create_window( const wchar* name, WindowBorderType WBT_ borderType /*= WBT_ORDINARY_RESIZABLE*/, bool background /*= true */ )
 {
-	if ( s_application )
-	{
-		g_logger->Log(L"Warning! calling Application::Initialize failed. application has been initialized !");
-		return;
-	}
-	s_application = sx_new( app_internal );
-	s_application->callbackEvents = callbackEvents;
-}
+	sx_callstack_param(sx_create_window(name=%s), name);
 
-void sx_app_finalize( void )
-{
-	if ( !s_application )
-	{
-		g_logger->Log(L"Warning! calling system::Finalize failed. system is not initialized !");
-		return;
-	}
-
-	// destroy windows and unregister classes
-	for ( MapWindow::Iterator it = s_application->windows.first(); !it.is_last(); it++ )
-	{
-		sx_delete_and_null( *it );
-	}
-
-	sx_delete_and_null( s_application );
-}
-
-Window* sx_app_create_window( const wchar* name, WindowBorderType WBT_ borderType /*= WBT_ORDINARY_RESIZABLE*/, bool background /*= true */ )
-{
-	sx_callstack_param(sx_app_create_window(name=%s), name);
+	if ( s_windows == null )
+		s_windows = sx_new( (Map<uint64, class Window_win32*>) );
 
 	Window_win32* win = sx_new( Window_win32 );
-	s_application->newOne = win;
 
 	win->m_name = name ? name : L"SeganX Window";
 	win->m_border = borderType;
@@ -250,42 +197,38 @@ Window* sx_app_create_window( const wchar* name, WindowBorderType WBT_ borderTyp
 	win->m_windowClass.lpszClassName = win->m_name;
 	win->m_windowClass.hbrBackground = background ? (HBRUSH)COLOR_WINDOW : null;
 	win->m_windowClass.hCursor = LoadCursor(null, IDC_ARROW);
-	win->m_windowClass.hIcon = LoadIcon(win->m_windowClass.hInstance, MAKEINTRESOURCE(IDI_SXENGINE));
+	win->m_windowClass.hIcon = LoadIcon( null, IDI_APPLICATION );
 	RegisterClassEx( &win->m_windowClass );
 
-	//  calculate win styles
+	//  compute win styles
 	LARGE_INTEGER winStyles = GetWinStyles( win->m_border, ( win->m_option & Window::WINDOW_TOPMOST ) != 0 );
 
 	// Create the window
 	win->m_handle = CreateWindowEx(
 		winStyles.LowPart,
 		win->m_windowClass.lpszClassName,
-		win->m_title.text(),
+		( win->m_title.text() ? win->m_title.text() : win->m_name.text() ),
 		winStyles.HighPart | WS_TABSTOP | WS_GROUP,
 		win->m_rect.left,
 		win->m_rect.top,
 		win->m_rect.width,
 		win->m_rect.height,
-		s_application->mainWindow,
+		null,
 		null,
 		win->m_windowClass.hInstance,
 		null );
-	win->SetTitle( win->m_name );
-
-	//  store main window handle
-	if ( !s_application->mainWindow )
-		s_application->mainWindow = win->m_handle;
-
-	// add this new window to the map list
-	s_application->windows.insert( reinterpret_cast<uint64>(win->m_handle), win );
+	win->set_title( win->m_name );
 
 	//  update the window
-	win->Update();
+	win->set_visible( true );
+
+	// add this new window to the map list
+	s_windows->insert( reinterpret_cast<uint64>(win->m_handle), win );
 
 	return win;
 }
 
-void sx_app_destroy_window( Window*& pwindow )
+void sx_destroy_window( Window*& pwindow )
 {
 	if ( !pwindow ) return;
 	sx_callstack();
@@ -294,17 +237,16 @@ void sx_app_destroy_window( Window*& pwindow )
 	if ( win->m_handle )
 	{
 		// remove this window from the map list
-		s_application->windows.remove( reinterpret_cast<uint64>(win->m_handle) );
+		s_windows->remove( reinterpret_cast<uint64>(win->m_handle) );
+
+		if ( s_windows->m_count < 1 )
+			sx_delete_and_null( s_windows );
 	}
 
 	sx_delete_and_null( pwindow );
 }
 
-bool sx_app_get_window( handle whandle, Window*& pwindow )
-{
-	return s_application->windows.find( reinterpret_cast<uint64>( *( (HWND*)whandle ) ), (Window_win32*&)pwindow );
-}
-
+#if 0
 void sx_app_run( ApplicationMainLoop mainLoop )
 {
 	static float blendedElapesTime = 0;
@@ -345,73 +287,16 @@ void sx_app_terminate( void )
 {
 	PostQuitMessage(0);
 }
+#endif
 
 LRESULT WINAPI DefaultMsgProc( HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam )
 {
-	switch (msg)
+	Window_win32* pwin = null;
+	if ( s_windows->find( reinterpret_cast<uint64>(hWnd), pwin ) )
 	{
-	case WM_CLOSE:
-		{
-			Window_win32* win;
-			if ( s_application->windows.find(reinterpret_cast<uint64>(hWnd), win) )
-			{
-				if ( s_application->callbackEvents )
-				{
-					WindowEvent wevent = { msg, wParam, lParam, &hWnd };
-					if ( s_application->callbackEvents( win, &wevent ) == 0 )
-						return 0;
-				}
-
-				if ( hWnd != s_application->mainWindow )
-				{
-					win->SetVisible(false);
-					return 0;
-				}
-			}
-		}
-		break;
-
-	case WM_CREATE:
-		if ( s_application->newOne )
-		{
-			s_application->newOne->m_handle = hWnd;
-			WindowEvent wevent = { msg, wParam, lParam, &hWnd };
-			if ( s_application->callbackEvents )
-				s_application->callbackEvents( s_application->newOne, &wevent );
-			s_application->newOne = null;
-		}
-		break;
-
-	case WM_DESTROY:
-		{
-			if ( s_application->callbackEvents )
-			{
-				Window_win32* pWin = null;
-				if (  s_application->windows.find( reinterpret_cast<uint64>(hWnd), pWin ) )
-				{
-					WindowEvent wevent = { msg, wParam, lParam, &hWnd };
-					if ( s_application->callbackEvents( pWin, &wevent ) == 0 )
-						return 0;
-				}
-			}
-
-			if ( hWnd == s_application->mainWindow )
-			{
-				PostQuitMessage( 0 );
-				return 0;
-			}
-		}
-		break;
-
-	default:
-		if ( s_application->callbackEvents )
-		{
-			Window_win32* pWin = null;
-			s_application->windows.find( reinterpret_cast<uint64>(hWnd), pWin );
-			WindowEvent wevent = { msg, wParam, lParam, &hWnd };
-			if ( s_application->callbackEvents( pWin, &wevent ) == 0 )
-					return 0;
-		}
+		WindowEvent wevent = { msg, wParam, lParam, hWnd };
+		if ( pwin->m_callback && pwin->m_callback( pwin, &wevent ) == 0 )
+			return 0;
 	}
 
 	return DefWindowProc( hWnd, msg, wParam, lParam );

@@ -11,6 +11,6 @@
 #define GUARD_sxEngine_HEADER_FILE
 
 #include "../sxLib/Lib.h"
-
+#include "system/System.h"
 
 #endif	//	GUARD_sxEngine_HEADER_FILE

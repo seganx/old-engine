@@ -1,7 +1,6 @@
 #if defined(_WIN32)
 
 #include "../OS.h"
-#include "../Log.h"
 #include "Win6.h"
 
 #include <time.h>
@@ -36,13 +35,9 @@ typedef struct PROCESSOR_POWER_INFORMATION {
 #define HIDIGIT(d)		((byte)(d>>4))
 #define LODIGIT(d)		((byte)(d&0x0F))
 
-struct sys_internal
-{
-	CRITICAL_SECTION	m_criticalSection[MAX_CS_COUNT];
-	sint				m_csIndex;
-	bool				m_screensaverActivity;
-};
-static sys_internal*	s_system = null;
+
+bool				s_screensaverActivity = false;
+
 
 //////////////////////////////////////////////////////////////////////////
 //		SORTING HELPER FUNCTIONS		//
@@ -52,8 +47,9 @@ SEGAN_INLINE sint _sort_fils_by_name( const FileInfo& info1, const FileInfo& inf
 	if (*info2.name == null) return -1;
 
 	//  make names lower case
-	str256 s1 = info1.name, s2 = info2.name;
-	s1.make_lower();	s2.make_lower();
+	wchar s1[256], s2[256];
+	for ( uint i=0; i<256; ++i ) s1[i] = sx_str_lower( info1.name[i] );
+	for ( uint i=0; i<256; ++i ) s2[i] = sx_str_lower( info2.name[i] );
 	return ( wcscmp( s1, s2 ) );
 }
 
@@ -65,8 +61,9 @@ SEGAN_INLINE sint _sort_fils_by_type( const FileInfo& info1, const FileInfo& inf
 	if (*info2.type == null) return -1;
 	
 	//  make type names lower case
-	str32 s1 = info1.type, s2 = info2.type;
-	s1.make_lower();	s2.make_lower();
+	wchar s1[32], s2[32];
+	for ( uint i=0; i<32; ++i ) s1[i] = sx_str_lower( info1.type[i] );
+	for ( uint i=0; i<32; ++i ) s2[i] = sx_str_lower( info2.type[i] );
 	return ( wcscmp( s1, s2 ) );
 }
 
@@ -136,9 +133,7 @@ void _get_files_in_dir_x( const wchar* root, const wchar* path, const String& ex
 		bool extenAccepted = true;
 		if ( checkExten )
 		{
-			str256 ext = ffd.cFileName;
-			ext.extract_file_extension();
-			extenAccepted = exten.find( ext ) > -1;
+			extenAccepted = exten.find( sx_str_extract_extension( ffd.cFileName ) ) > -1;
 		}
 
 		if ( extenAccepted )
@@ -150,9 +145,8 @@ void _get_files_in_dir_x( const wchar* root, const wchar* path, const String& ex
 				sx_str_copy( finfo.type, 32, L"<DIR>" );
 			else
 			{
-				str256 ext = ffd.cFileName;
-				ext.extract_file_extension().make_lower();
-				sx_str_copy( finfo.type, 32, ext );
+				const wchar* ext = sx_str_extract_extension( ffd.cFileName );
+				for ( uint i=0; i<32; ++i ) finfo.type[i] = sx_str_lower( ext[i] );
 			}
 
 			filesize.LowPart  = ffd.nFileSizeLow;
@@ -186,14 +180,6 @@ void _get_files_in_dir_x( const wchar* root, const wchar* path, const String& ex
 //////////////////////////////////////////////////////////////////////////
 void sx_os_initialize( void )
 {
-	if ( s_system )
-	{
-		g_logger->Log( L"warning! calling systemInitialize failed. system has been initialized !" );
-		return;
-	}
-	s_system = (sys_internal*)mem_alloc( sizeof(sys_internal) );
-	ZeroMemory( s_system, sizeof(sys_internal) );
-
 	//////////////////////////////////////////////////////////////////////////
 	/*	by HUMUS : http://www.humus.name/index.php?page=3D
 	Force the main thread to always run on cpu 0.
@@ -208,27 +194,13 @@ void sx_os_initialize( void )
 	SetErrorMode( SEM_FAILCRITICALERRORS );
 
 	//	get screen saver activity
-	SystemParametersInfo( 16, 0, &s_system->m_screensaverActivity, 0 );
+	SystemParametersInfo( 16, 0, &s_screensaverActivity, 0 );
 
-	//  initialize critical sections
-	for (sint i=0; i<MAX_CS_COUNT; i++)
-		InitializeCriticalSection( &s_system->m_criticalSection[i] );
-	s_system->m_csIndex = 0;
 }
 
 void sx_os_finalize( void )
 {
-	if ( !s_system )
-	{
-		g_logger->Log( L"warning! calling systemFinalize failed. system is not initialized !" );
-		return;
-	}
 
-	//  finalize critical sections
-	for (sint i=0; i<MAX_CS_COUNT; i++)
-		DeleteCriticalSection( &s_system->m_criticalSection[i] );
-
-	mem_free( s_system );
 }
 
 SEGAN_INLINE void sx_os_sleep( const uint miliseconds )
@@ -236,37 +208,6 @@ SEGAN_INLINE void sx_os_sleep( const uint miliseconds )
 	Sleep( (DWORD)miliseconds );
 }
 
-SEGAN_INLINE void sx_os_enter_critical_section( void )
-{
-	sx_callstack();
-
-	if ( s_system->m_csIndex < MAX_CS_COUNT )
-	{
-		EnterCriticalSection( &s_system->m_criticalSection[ s_system->m_csIndex ] );
-		s_system->m_csIndex++;
-	}
-	else
-	{
-		sx_assert( L"Error! enter critical section overflowed !" < 0 );
-		g_logger->Log( L"Error! enter critical section overflowed !" );
-	}
-}
-
-SEGAN_INLINE void sx_os_leave_critical_section( void )
-{
-	sx_callstack();
-
-	if ( s_system->m_csIndex > 0 )
-	{
-		s_system->m_csIndex--;
-		LeaveCriticalSection( &s_system->m_criticalSection[ s_system->m_csIndex ] );
-	}
-	else
-	{
-		sx_assert( L"Error! leave critical section overflowed !" < 0 );
-		g_logger->Log( L"Error! leave critical section overflowed !" );
-	}
-}
 
 SEGAN_ENG_API double sx_os_get_timer( void )
 {
@@ -413,7 +354,7 @@ void sx_os_get_info( OSInfo& osInfo )
 	if ( osvi.dwPlatformId != VER_PLATFORM_WIN32_NT || osvi.dwMajorVersion <= 4 )
 		return;
 
-	str512 res = L"Microsoft ";
+	String res = L"Microsoft ";
 
 	// Test for the specific product.
 	if ( osvi.dwMajorVersion == 6 )
@@ -506,7 +447,7 @@ void sx_os_get_info( OSInfo& osInfo )
 	// Include service pack (if any) and build number.
 	if( wcslen(osvi.szCSDVersion) > 0 )	res << L" " << osvi.szCSDVersion;
 
-	res << L" (build " << /*sint(osvi.dwBuildNumber)*/L" !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << L")";
+	res << L" (build " << sx_uint_to_str( osvi.dwBuildNumber ) << L")";
 	if ( osvi.dwMajorVersion >= 6 )
 	{
 		if ( si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64 )		res << L", 64-bit";
@@ -612,12 +553,9 @@ void sx_os_get_battery_status( BatteryStatus& batteryStatus )
 
 	if ( sbs.EstimatedTime < 0xFFFFFF )
 	{
-		str32 tmp;
-		tmp.format( L"%.2d:%.2d", sint(sbs.EstimatedTime / 3600), sint((sbs.EstimatedTime % 3600) / 60) );
-		sx_str_copy( batteryStatus.estimatedTime, 8, tmp );
+		swprintf_s( batteryStatus.estimatedTime, 8, L"%.2d:%.2d", sint(sbs.EstimatedTime / 3600), sint((sbs.EstimatedTime % 3600) / 60) );
 	}
 	else memcpy( batteryStatus.estimatedTime, L"00:00", 12 );
-		
 }
 
 void sx_os_set_screensaver_activity( bool active )
@@ -627,7 +565,7 @@ void sx_os_set_screensaver_activity( bool active )
 
 void sx_os_set_screensaver_default( void )
 {
-	sx_os_set_screensaver_activity( s_system->m_screensaverActivity );
+	sx_os_set_screensaver_activity( s_screensaverActivity );
 }
 
 void sx_os_keep_wakeful( void )
@@ -826,8 +764,7 @@ const wchar* sx_os_get_drive_label( wchar DriveName )
 
 void sx_os_get_drive_info( wchar DriveName, DriveInfo& dinfo )
 {
-	str64 str	= sx_os_get_drive_label( DriveName );
-	sx_str_copy( dinfo.label, 64, str );
+	sx_str_copy( dinfo.label, 64, sx_os_get_drive_label( DriveName ) );
 
 	dinfo.size	= sx_os_get_drive_space( DriveName );
 	dinfo.free	= sx_os_get_drive_free_space( DriveName );
@@ -854,7 +791,7 @@ bool sx_os_get_file_info( const wchar* fileName, FileInfo& finfo )
 
 	ZeroMemory( &finfo, sizeof(FileInfo) );
 
-	str512 tmpStr;
+	String tmpStr;
 
 	tmpStr = fileName;
 	if ( sx_str_is_pathstyle( fileName ) )
@@ -889,23 +826,22 @@ void sx_os_get_files( const wchar* path, const wchar* exten, FileInfoArray& file
 {
 	if (!path || !sx_os_dir_exist( path ) ) return;
 
-	str32 strExt = exten;
-	str512 strDir = path;
-	strDir.make_path_style();
-	strDir << L"*.*";
-
 	// find the first file in the directory.
 	WIN32_FIND_DATA ffd;
-	HANDLE hFind = FindFirstFile(strDir.text(), &ffd);
-	if (hFind == INVALID_HANDLE_VALUE)
+	HANDLE hFind = NULL;
+	{
+		wchar dir[400];
+		swprintf_s( dir, 400, L"%s*.*", sx_str_make_pathstyle( path ) );
+		hFind = FindFirstFile( dir, &ffd);
+	}
+	if ( hFind == INVALID_HANDLE_VALUE )
 		return;
 
-	
 	// List all the files in the directory with some info about them.
 	FILETIME		fileTime;
 	LARGE_INTEGER	fileSize;
 	FileInfo		fileInfo;
-	bool			checkExtn = strExt.length() && strExt != L"*.*";
+	bool			checkExtn = exten && wcscmp( exten, L"*.*" );
 	ZeroMemory( &fileInfo, sizeof(fileInfo) );
 
 	//  traverse between files
@@ -917,9 +853,7 @@ void sx_os_get_files( const wchar* path, const wchar* exten, FileInfoArray& file
 		bool extenAccepted = true;
 		if ( checkExtn )
 		{
-			str256 s = ffd.cFileName;
-			s.extract_file_extension();
-			extenAccepted = strExt.find( s ) > -1;
+			extenAccepted = wcsstr( exten, sx_str_extract_extension( ffd.cFileName ) ) != null;
 		}
 
 		if ( extenAccepted )
@@ -930,9 +864,7 @@ void sx_os_get_files( const wchar* path, const wchar* exten, FileInfoArray& file
 				sx_str_copy( fileInfo.type, 32, L"<DIR>" );
 			else
 			{
-				str256 ext = ffd.cFileName;
-				ext.extract_file_extension().make_lower();
-				sx_str_copy( fileInfo.type, 32, ext );
+				sx_str_copy( fileInfo.type, 32, sx_str_extract_extension( ffd.cFileName ) );
 			}
 
 			fileSize.LowPart  = ffd.nFileSizeLow;
@@ -1028,7 +960,7 @@ SEGAN_ENG_API bool sx_os_remove_dir( const wchar* folderName, CB_RemoveDir callb
 
 	if ( !sx_os_dir_exist( folderName ) ) return false;
 
-	str1024 dirName = folderName;
+	String dirName = folderName;
 	dirName.make_path_style();
 
 	//  extract list of content of the folder
@@ -1038,7 +970,7 @@ SEGAN_ENG_API bool sx_os_remove_dir( const wchar* folderName, CB_RemoveDir callb
 	sint c = flist.m_count;
 	for ( sint i=c-1; i>=0; i-- )
 	{
-		str1024 path = dirName;
+		String path = dirName;
 		path << flist[i].name;
 		
 		if ( flist[i].flag & FILE_ATTRIBUTE_DIRECTORY )
@@ -1070,10 +1002,10 @@ SEGAN_ENG_API bool sx_os_copy_dir( const wchar* srcFolder, const wchar* destFold
 
 	if ( !sx_os_dir_exist( srcFolder ) ) return false;
 
-	str1024 srcDir = srcFolder;
+	String srcDir = srcFolder;
 	srcDir.make_path_style();
 
-	str1024 destDir = destFolder;
+	String destDir = destFolder;
 	destDir.make_path_style();
 
 	//  extract list of content of the folder
@@ -1087,8 +1019,8 @@ SEGAN_ENG_API bool sx_os_copy_dir( const wchar* srcFolder, const wchar* destFold
 	sint c = flist.m_count;
 	for ( sint i=0; i<c; i++ )
 	{
-		str1024 srcPath; srcPath << *srcDir  << *flist[i].name;
-		str1024 desPath; desPath << *destDir << *flist[i].name;
+		String srcPath; srcPath << *srcDir  << *flist[i].name;
+		String desPath; desPath << *destDir << *flist[i].name;
 
 		if ( flist[i].flag & FILE_ATTRIBUTE_DIRECTORY )
 		{
@@ -1149,7 +1081,7 @@ bool sx_os_rename_dir( const wchar* srcFolder, const wchar* newName )
 
 	sx_callstack_param(sx_os_remove_dir(srcFolder=%s, newName=%s), srcFolder, newName);
 
-	str1024 fldr = srcFolder;
+	String fldr = srcFolder;
 	if ( sx_str_is_pathstyle( srcFolder ) )
 		fldr.remove( fldr.length() - 1 );
 	
