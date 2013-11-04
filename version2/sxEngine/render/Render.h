@@ -24,6 +24,8 @@
 #define SX_D3D_CASTSHADOW				0x00000040
 #define SX_D3D_RECEIVESHADOW			0x00000080
 #define SX_D3D_REFLECT					0x00000100
+#define SX_D3D_WIREFRAME				0x00000200
+#define SX_D3D_BOUNINGBOX				0x00000400
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -93,17 +95,11 @@ enum d3dTextureType
 };
 
 //////////////////////////////////////////////////////////////////////////
-//! describe the information of the display graphic card
+//! describe the information and capabilities of display graphic card
 struct d3dDriverInfo
 {
 	wchar	vendor[256];
 	wchar	description[256];
-};
-
-//////////////////////////////////////////////////////////////////////////
-//! describe the capabilities of display graphic card
-struct d3dDriverCaps
-{
 	uint	maxAnisotropy;
 	uint	maxTextureSize;
 	uint	maxMrtCount;
@@ -111,7 +107,7 @@ struct d3dDriverCaps
 
 //////////////////////////////////////////////////////////////////////////
 //! describe the information of the current display mode
-struct d3dDisplayeMode
+struct d3dDisplayeInfo
 {
 	uint		width;
 	uint		height;
@@ -356,12 +352,26 @@ public:
 	virtual ~d3dRenderer( void ) {}
 
 	virtual void initialize( dword flags ) = 0;
-	virtual void set_size( const uint width, const uint height, const dword SX_D3D_ flags ) = 0;
+
+#if defined(_WIN32)
+	virtual void set_size( const uint width, const uint height, const dword SX_D3D_ flags, struct HWND__* hwnd ) = 0;
+#endif
+
+	//!	set a new scene and apply scene configuration
+	virtual void set_scene( const d3dScene* scene ) = 0;
+
+	//!	update renderer
 	virtual void update( float elpstime ) = 0;
+
+	//! draw scene to the display
 	virtual void draw( float elpstime, uint flag ) = 0;
 
 public:
 
+	d3dDriverInfo		m_driverinfo;
+	d3dDisplayeInfo		m_displayinfo;
+	d3dCamera			m_camera;
+	d3dScene*			m_scene;
 };
 
 
@@ -371,10 +381,10 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 //! create a scene object
-d3dScene* sx_d3d_create_scene( void );
+d3dScene* sx_create_scene( void );
 
 //! create a renderer object
-d3dRenderer* sx_d3d_create_renderer( const dword SX_D3D_ flags );
+d3dRenderer* sx_create_renderer( const dword SX_D3D_ flags );
 
 
 

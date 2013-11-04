@@ -171,7 +171,7 @@ void d3dTexture_gl::set_desc( d3dTextureDesc& desc )
 	glTexParameteri( m_target, GL_TEXTURE_MIN_FILTER, minfilter );
 
 	// Setup anisotropic filtering
-	if ( m_desc.mipmaps && m_device->m_driverCaps.maxAnisotropy > 1 && GL_EXT_texture_filter_anisotropic_supported )
+	if ( m_desc.mipmaps && m_device->m_driverInfo.maxAnisotropy > 1 && GL_EXT_texture_filter_anisotropic_supported )
 	{
 		if (m_desc.filter == FILTER_LINEAR_ANISOTROPIC		|| 
 			m_desc.filter == FILTER_BILINEAR_ANISOTROPIC	|| 

@@ -29,6 +29,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	//win->set_border( WBT_NONE );
 	win->set_visible( true );
 
+
 	static float blendedElapesTime = 0;
 	float initTime = (float)sx_os_get_timer();
 	float elpsTime = 0;

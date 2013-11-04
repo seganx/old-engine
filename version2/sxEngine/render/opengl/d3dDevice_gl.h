@@ -218,8 +218,7 @@ public:
 	};
 
 	d3dDriverInfo				m_driverInfo;			//  contain driver information
-	d3dDriverCaps				m_driverCaps;			//	contain driver capabilities
-	d3dDisplayeMode				m_driverDisplayMode;	//	contain default driver display mode
+	d3dDisplayeInfo				m_driverDisplayMode;	//	contain default driver display mode
 	d3dDebugInfo				m_debugInfo;			//	describe debug information	
 	d3dViewport					m_viewport;				//	current viewport
 

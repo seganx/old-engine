@@ -113,15 +113,15 @@ void d3dDevice_gl::Initialize( const handle displayHandle )
 
 		int maxTextureSize = 0;
 		glGetIntegerv( GL_MAX_TEXTURE_SIZE, &maxTextureSize );
-		m_driverCaps.maxTextureSize = maxTextureSize;
+		m_driverInfo.maxTextureSize = maxTextureSize;
 
 		int maxMRT = 0;
 		glGetIntegerv( GL_MAX_DRAW_BUFFERS_ARB, &maxMRT );
-		m_driverCaps.maxMrtCount = maxMRT;
+		m_driverInfo.maxMrtCount = maxMRT;
 
 		int maxAniso = 0;
 		glGetIntegerv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAniso );
-		m_driverCaps.maxAnisotropy = maxAniso;
+		m_driverInfo.maxAnisotropy = maxAniso;
 	}
 
 	//	get current display properties
