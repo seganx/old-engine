@@ -26,7 +26,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	sx_detect_crash();
 
 	Window* win = sx_create_window( null, &cb_window, true, false );
-	win->set_border( WBT_WINTOOL_RESIZABLE );
+	//win->set_border( WBT_NONE );
 	win->set_visible( true );
 
 	static float blendedElapesTime = 0;
