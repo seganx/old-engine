@@ -180,7 +180,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 Map<uint64, class Window_win32*>*	s_windows = null;
 
-Window* sx_create_window( const wchar* name, WindowBorderType WBT_ borderType /*= WBT_ORDINARY_RESIZABLE*/, bool background /*= true */ )
+Window* sx_create_window( const wchar* name, const CB_Window callback, const bool background /*= true*/, const bool visible /*= true */ )
 {
 	sx_callstack_param(sx_create_window(name=%s), name);
 
@@ -190,7 +190,11 @@ Window* sx_create_window( const wchar* name, WindowBorderType WBT_ borderType /*
 	Window_win32* win = sx_new( Window_win32 );
 
 	win->m_name = name ? name : L"SeganX Window";
-	win->m_border = borderType;
+	win->m_callback = callback;
+	win->m_border = WBT_ORDINARY_RESIZABLE;
+
+	// add this new window to the map with zero handle
+	s_windows->insert_multi( 0, win );
 
 	// Register the window class
 	win->m_windowClass.lpfnWndProc = DefaultMsgProc;
@@ -220,10 +224,7 @@ Window* sx_create_window( const wchar* name, WindowBorderType WBT_ borderType /*
 	win->set_title( win->m_name );
 
 	//  update the window
-	win->set_visible( true );
-
-	// add this new window to the map list
-	s_windows->insert( reinterpret_cast<uint64>(win->m_handle), win );
+	win->set_visible( visible );
 
 	return win;
 }
@@ -292,7 +293,20 @@ void sx_app_terminate( void )
 LRESULT WINAPI DefaultMsgProc( HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam )
 {
 	Window_win32* pwin = null;
-	if ( s_windows->find( reinterpret_cast<uint64>(hWnd), pwin ) )
+
+	//	search in registered windows
+	if ( s_windows->find( reinterpret_cast<uint64>(hWnd), pwin ) == false )
+	{
+		//	if no window has been fined search for new created window
+		if ( hWnd && s_windows->find( 0, pwin ) )
+		{
+			s_windows->remove( 0 );
+			s_windows->insert( reinterpret_cast<uint64>(hWnd), pwin );
+		}
+	}
+
+	//	verify that any window has been found
+	if ( pwin )
 	{
 		WindowEvent wevent = { msg, wParam, lParam, hWnd };
 		if ( pwin->m_callback && pwin->m_callback( pwin, &wevent ) == 0 )

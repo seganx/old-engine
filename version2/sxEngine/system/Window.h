@@ -67,7 +67,7 @@ struct WindowEvent
 #endif
 
 //! window event call back. return 0 if event handled
-typedef int (*WindowEventCallback)( class Window* Sender, const WindowEvent* data );
+typedef int (*CB_Window)( class Window* sender, const WindowEvent* data );
 
 /*
 Window class is a simple abstract class to create and modify a window.
@@ -85,7 +85,7 @@ public:
 	virtual void set_title( const wchar* caption ) = 0;
 	virtual void set_cursor( const WindowCursorType cursorType ) = 0;
 	virtual void set_rect( const int left, const int top, const int width, const int height ) = 0;
-	virtual void set_border( const WindowBorderType border ) = 0;
+	virtual void set_border( const WindowBorderType WBT_ border ) = 0;
 	virtual void set_topmost( const bool enable ) = 0;
 	virtual void set_visible( const bool visible ) = 0;
 
@@ -97,17 +97,17 @@ public:
 		WINDOW_FULLSCREEN	= 0x00000004,
 	};
 
-	dword					m_option;		//! options of window
-	String					m_name;			//!	name of the window
-	String					m_title;		//!	title of window
-	WindowRect				m_rect;			//!	window rectangle
-	WindowBorderType		m_border;		//! type of border
-	WindowEventCallback		m_callback;		//! callback function
+	dword				m_option;		//! options of window
+	String				m_name;			//!	name of the window
+	String				m_title;		//!	title of window
+	WindowRect			m_rect;			//!	window rectangle
+	WindowBorderType	m_border;		//! type of border
+	CB_Window			m_callback;		//! callback function
 
 };
 
 //! create a new window
-SEGAN_ENG_API Window* sx_create_window( const wchar* name, WindowBorderType WBT_ borderType = WBT_ORDINARY_RESIZABLE, bool background = true );
+SEGAN_ENG_API Window* sx_create_window( const wchar* name, const CB_Window callback, const bool background = true, const bool visible = true );
 
 //! destroy a window
 SEGAN_ENG_API void sx_destroy_window( Window* pwindow );

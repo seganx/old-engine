@@ -4,6 +4,19 @@
 
 
 
+int cb_window( class Window* sender, const WindowEvent* data )
+{
+	switch ( data->msg )
+	{
+	case WM_CLOSE:
+		{
+			PostQuitMessage(0);
+		}
+		break;
+	}
+	return data->msg;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //	START POINT OF PROGRAM
 //////////////////////////////////////////////////////////////////////////
@@ -12,10 +25,9 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	sx_detect_crash();
 
-
-	Window* win = sx_create_window( null );
-	//win->SetVisible( true );
-
+	Window* win = sx_create_window( null, &cb_window, true, false );
+	win->set_border( WBT_WINTOOL_RESIZABLE );
+	win->set_visible( true );
 
 	static float blendedElapesTime = 0;
 	float initTime = (float)sx_os_get_timer();
