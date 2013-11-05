@@ -353,11 +353,13 @@ public:
 	virtual void set_size( const uint width, const uint height, const dword SX_D3D_ flags, struct HWND__* hwnd ) = 0;
 #endif
 
-
+	//!	create and return a texture object
 	virtual d3dTexture* create_texture( void ) = 0;
 
+	//! create and return a material object
 	virtual d3dMaterial* create_material( void ) = 0;
 
+	//! create and return a mesh
 	virtual d3dMesh* create_mesh( void ) = 0;
 
 	//! create and return a scene object

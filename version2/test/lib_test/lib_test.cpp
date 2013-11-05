@@ -52,20 +52,34 @@ void Logger_Log( const wchar* format, ... )
 
 }
 
+
+bool table_callback( void* userdata, const wchar* name, int& data )
+{
+	wprintf( L"%s \t%d\n", name, data );
+// 	if ( sx_str_cmp( name, "s" ) == 0 )
+// 		return false;
+// 	else
+		return true;
+}
+
 int main(int argc, char* argv[])
 {
 	SetThreadAffinityMask( GetCurrentThread(), 1 );
 
 	//Logger_Log( L" this is a simple test" );
 
-	Randomer rnd(2);
-	for ( uint i=0; i<1000; ++i )
+#if 0
 	{
-		printf( "%d ", rnd.get_i( 1000 ) );
+		Randomer rnd(2);
+		for ( uint i=0; i<1000; ++i )
+		{
+			printf( "%d ", rnd.get_i( 1000 ) );
+		}
+		printf( "\n" );
 	}
-	printf( "\n" );
+#endif
 
-#if 1
+#if 0
 	{
 		String str = "hello";
 		bool e = str == L"hello1";
@@ -85,7 +99,7 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-#if 1
+#if 0
 	{
 		Array<int> array_i;
 
@@ -111,7 +125,7 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-#if 1
+#if 0
 	{
 
 		char buffer[32];
@@ -132,7 +146,7 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-#if 1
+#if 0
 	{
 
 		MemMan_Pool pool( 60 );
@@ -201,7 +215,7 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-#if 1
+#if 0
 	{
 		sx_callstack();
 
@@ -224,6 +238,24 @@ int main(int argc, char* argv[])
 		log.log( L"Hi this is a simple test %d", 30 );
 		log.log_( L"Hi this is a simple test %d", 40 );
 		log.log_( L"Hi this is a simple test %d", 50 );
+	}
+#endif
+
+
+#if 0
+	{
+		Table<int> table;
+		table.insert( L"kajud", 0 );
+		table.insert( L"Ashoob", 7 );
+		table.insert( L"abooos", 9 );
+		table.insert( L"s", 1 );
+		table.insert( L"kaj", 2 );
+		table.insert( L"sajad", 3 );
+		table.insert( L"sujud", 6 );
+		table.insert( L"kelafe", 4 );
+
+		table.Iterate( null, &table_callback );
+		printf( "\ncount = %d\n", table.m_count );
 	}
 #endif
 

@@ -256,6 +256,10 @@
 				RelativePath="..\String.h"
 				>
 			</File>
+			<File
+				RelativePath="..\Table.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\sxlib.cpp"
