@@ -326,10 +326,6 @@ public:
 	d3dScene( void ) {}
 	virtual ~d3dScene( void ) {}
 
-	virtual d3dTexture* create_texture( void ) = 0;
-	virtual d3dMaterial* create_material( void ) = 0;
-	virtual d3dMesh* create_mesh( void ) = 0;
-
 
 public:
 	d3dCamera			m_camera;
@@ -357,6 +353,16 @@ public:
 	virtual void set_size( const uint width, const uint height, const dword SX_D3D_ flags, struct HWND__* hwnd ) = 0;
 #endif
 
+
+	virtual d3dTexture* create_texture( void ) = 0;
+
+	virtual d3dMaterial* create_material( void ) = 0;
+
+	virtual d3dMesh* create_mesh( void ) = 0;
+
+	//! create and return a scene object
+	virtual d3dScene* create_scene( void ) = 0;
+
 	//!	set a new scene and apply scene configuration
 	virtual void set_scene( const d3dScene* scene ) = 0;
 
@@ -379,9 +385,6 @@ public:
 //////////////////////////////////////////////////////////////////////////
 //	HELPER FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-
-//! create a scene object
-d3dScene* sx_create_scene( void );
 
 //! create a renderer object
 d3dRenderer* sx_create_renderer( const dword SX_D3D_ flags );
