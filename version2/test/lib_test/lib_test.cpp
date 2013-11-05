@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
 #endif
 
 
-#if 0
+#if 1
 	{
 		Table<int> table;
 		table.insert( L"kajud", 0 );
@@ -256,6 +256,8 @@ int main(int argc, char* argv[])
 
 		table.Iterate( null, &table_callback );
 		printf( "\ncount = %d\n", table.m_count );
+
+		table.clear();
 	}
 #endif
 

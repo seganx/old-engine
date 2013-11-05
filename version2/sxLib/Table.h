@@ -57,7 +57,14 @@ public:
 	};
 
 	Table( void ): m_root(0), m_count(0) {}
-	~Table( void ) {}
+	~Table( void ) { clear(); }
+
+	void clear( void )
+	{
+		_clear( m_root );
+		m_root = 0;
+		m_count = 0;
+	}
 
 	bool insert( const wchar* name, const T_data& data )
 	{
@@ -90,6 +97,17 @@ public:
 	}
 
 private:
+
+	void _clear( Leaf* leaf )
+	{
+		if ( !leaf ) return;
+		if ( leaf->row )
+			mem_free( leaf->row );
+		_clear( leaf->right );
+		_clear( leaf->down );
+		mem_free( leaf );
+	}
+
 	bool _insert( Leaf* leaf, uint index, const wchar* name, const T_data& data )
 	{
 #if TABLE_CASE_INSENSITIVE
