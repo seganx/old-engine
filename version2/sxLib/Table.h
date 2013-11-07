@@ -27,7 +27,7 @@ public:
 
 	struct Row
 	{
-		wchar	name[512];
+		//wchar	name[512];
 		T_data	data;
 	};
 
@@ -80,12 +80,14 @@ public:
 
 	bool remove( const wchar* name )
 	{
+		sx_assert( name );
 		if ( !name || !m_root ) return false;
 		return _remove( m_root, 0, name );
 	}
 
 	bool find( const wchar* name, T_data& result )
 	{
+		sx_assert( name );
 		if ( !name || !m_root ) return false;
 		return _find( m_root, 0, name, result );
 	}
@@ -138,7 +140,7 @@ private:
 			{
 				leaf->row = (Row*)mem_alloc( sizeof(Row) );
 				leaf->row->data = data;
-				memcpy( leaf->row->name, name, wcslen(name)*2+2 );
+				//memcpy( leaf->row->name, name, wcslen(name)*2+2 );
 				++m_count;
 				return true;
 			}
@@ -253,7 +255,7 @@ private:
 
 		bool res = true;
 		if ( leaf->row )
-			res = callback( userdata, leaf->row->name, leaf->row->data );
+			res = callback( userdata, L"test" /*leaf->row->name*/, leaf->row->data );
 
 		if ( res && leaf->right )
 			res = _Iterate( leaf->right, userdata, callback );
