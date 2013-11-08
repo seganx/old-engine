@@ -245,18 +245,35 @@ int main(int argc, char* argv[])
 #if 1
 	{
 		Table<int> table;
-		table.insert( L"kajud", 0 );
-		table.insert( L"Ashoob", 7 );
-		table.insert( L"abooos", 9 );
-		table.insert( L"s", 1 );
-		table.insert( L"kaj", 2 );
-		table.insert( L"sajad", 3 );
-		table.insert( L"sujud", 6 );
-		table.insert( L"kelafe", 4 );
 
-		table.Iterate( null, &table_callback );
-		printf( "\ncount = %d\n", table.m_count );
+		FILE* f = 0;
+		if ( fopen_s( &f, "D:/test.txt", "r, ccs=UNICODE" ) == 0 )
+		{
+			int cnt = 0;
+			wchar tmp[1024] = {0};
+			wchar c = 0; int index = 0;
+			while ( fread_s( &c, 2, 2, 1, f ) )
+			{
+				if ( c == '\n' )
+				{
+					tmp[index] = 0;
+					if ( index )
+						table.insert( tmp, ++cnt );
+					index = 0;
+					tmp[0] = 0;
+				}
+				else if ( c && c!='\r' )
+				{
+					tmp[index++] = c;
+				}
+			}
+			fclose(f);
+		}
 
+		table.iterate( null, &table_callback );
+		printf( "\ncount = %d\n\n", table.m_count );
+
+		table.print( table.m_root, 0 );
 		table.clear();
 	}
 #endif
