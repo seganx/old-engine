@@ -273,7 +273,9 @@ int main(int argc, char* argv[])
 		table.iterate( null, &table_callback );
 		printf( "\ncount = %d\n\n", table.m_count );
 
-		//table.print( table.m_root, 0 );
+#if _DEBUG
+		table.print( table.m_root, 0 );
+#endif
 		table.clear();
 	}
 #endif
