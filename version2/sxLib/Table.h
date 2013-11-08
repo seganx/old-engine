@@ -104,13 +104,13 @@ public:
 	{
 		if ( !leaf ) return;
 
-		if ( leaf->right )
-		{
-			printf( "%c", leaf->label );
-			print( leaf->right, index + 1 );
-		}
+		if ( leaf->row )
+			printf( "%c", toupper(leaf->label) );
 		else
-			printf( "%c", leaf->label, index + 1 );
+			printf( "%c", tolower(leaf->label) );
+
+		if ( leaf->right )
+			print( leaf->right, index + 1 );
 
 		if ( leaf->down )
 		{
@@ -212,8 +212,16 @@ private:
 				}
 				else
 				{
-					parent->down = newone;
-					newone->down = leaf;
+					if ( parent )
+					{
+						parent->down = newone;
+						newone->down = leaf;
+					}
+					else
+					{
+						m_root = newone;
+						newone->down = leaf;
+					}
 				}
 			}
 			else leaf->down = newone;
