@@ -350,7 +350,7 @@ public:
 	virtual void initialize( dword flags ) = 0;
 
 #if defined(_WIN32)
-	virtual void set_size( const uint width, const uint height, const dword SX_D3D_ flags, struct HWND__* hwnd ) = 0;
+	virtual void set_size( const uint width, const uint height, const dword SX_D3D_ flags, const struct HWND__* hwnd ) = 0;
 #endif
 
 	//!	create and return a texture object
@@ -389,7 +389,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 //! create a renderer object
-d3dRenderer* sx_create_renderer( const dword SX_D3D_ flags );
+SEGAN_ENG_API d3dRenderer* sx_create_renderer( const dword SX_D3D_ flags );
 
 
 

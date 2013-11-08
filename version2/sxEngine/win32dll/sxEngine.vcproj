@@ -180,35 +180,15 @@
 				Name="opengl"
 				>
 				<File
-					RelativePath="..\render\opengl\d3dDevice_gl.cpp"
+					RelativePath="..\render\opengl\Device.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\render\opengl\d3dDevice_gl.h"
+					RelativePath="..\render\opengl\Device.h"
 					>
 				</File>
 				<File
-					RelativePath="..\render\opengl\d3dIndexBuffer_gl.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\render\opengl\d3dIndexBuffer_gl.h"
-					>
-				</File>
-				<File
-					RelativePath="..\render\opengl\d3dTexture_gl.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\render\opengl\d3dTexture_gl.h"
-					>
-				</File>
-				<File
-					RelativePath="..\render\opengl\d3dVertexBuffer_gl.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\render\opengl\d3dVertexBuffer_gl.h"
+					RelativePath="..\render\opengl\IndexBuffer.cpp"
 					>
 				</File>
 				<File
@@ -217,6 +197,22 @@
 				</File>
 				<File
 					RelativePath="..\render\opengl\OpenGLExtensions.h"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\Renderer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\Renderer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\Texture.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\VertexBuffer.cpp"
 					>
 				</File>
 			</Filter>

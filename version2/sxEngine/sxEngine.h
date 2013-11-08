@@ -12,5 +12,6 @@
 
 #include "../sxLib/Lib.h"
 #include "system/System.h"
+#include "render/Render.h"
 
 #endif	//	GUARD_sxEngine_HEADER_FILE

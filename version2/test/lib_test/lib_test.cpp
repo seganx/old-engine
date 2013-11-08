@@ -55,7 +55,7 @@ void Logger_Log( const wchar* format, ... )
 
 bool table_callback( void* userdata, const wchar* name, int& data )
 {
-	wprintf( L"%s \t%d\n", name, data );
+	wprintf( L"%s\n", name );
 // 	if ( sx_str_cmp( name, "s" ) == 0 )
 // 		return false;
 // 	else
@@ -258,7 +258,7 @@ int main(int argc, char* argv[])
 				{
 					tmp[index] = 0;
 					if ( index )
-						table.insert( tmp, ++cnt );
+						table.insert_sort( tmp, ++cnt );
 					index = 0;
 					tmp[0] = 0;
 				}
@@ -273,7 +273,7 @@ int main(int argc, char* argv[])
 		table.iterate( null, &table_callback );
 		printf( "\ncount = %d\n\n", table.m_count );
 
-		table.print( table.m_root, 0 );
+		//table.print( table.m_root, 0 );
 		table.clear();
 	}
 #endif

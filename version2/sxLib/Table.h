@@ -62,7 +62,7 @@ public:
 
 	void clear( void )
 	{
-		_clear( m_root );
+		_free( m_root );
 		m_root = 0;
 		m_count = 0;
 	}
@@ -73,33 +73,46 @@ public:
 		if ( !name ) return false;
 		if ( !m_root )
 		{
-			m_root = (Leaf*)mem_alloc( sizeof(Leaf) );
+			m_root = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 			m_root->init( name[0] );
 		}
-		return _insert( null, m_root, 0, name, data );
+		return _put( m_root, 0, name, data );
+	}
+
+	bool insert_sort( const wchar* name, const T_data& data )
+	{
+		sx_assert( name );
+		if ( !name ) return false;
+		if ( !m_root )
+		{
+			m_root = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
+			m_root->init( name[0] );
+		}
+		return _put_x( null, m_root, 0, name, data );
 	}
 
 	bool remove( const wchar* name )
 	{
 		sx_assert( name );
 		if ( !name || !m_root ) return false;
-		return _remove( m_root, 0, name );
+		return _putaway( m_root, 0, name );
 	}
 
 	SEGAN_LIB_INLINE bool find( const wchar* name, T_data& result )
 	{
 		sx_assert( name );
 		if ( !name || !m_root ) return false;
-		return _find( m_root, 0, name, result );
+		return _pickup( m_root, 0, name, result );
 	}
 
 	void iterate( void* userdata, CB_Table callback )
 	{
 		if ( !m_root ) return;
 		wchar name[1024];
-		_Iterate( m_root, userdata, callback, name, 0 );
+		_traverse( m_root, userdata, callback, name, 0 );
 	}
 
+#if _DEBUG
 	void print( Leaf* leaf, int index )
 	{
 		if ( !leaf ) return;
@@ -120,21 +133,21 @@ public:
 			print( leaf->down, index );
 		}
 	}
+#endif
 
 private:
 
-	void _clear( Leaf* leaf )
+	void _free( Leaf* leaf )
 	{
 		if ( !leaf ) return;
 		if ( leaf->row )
-			mem_free( leaf->row );
-		_clear( leaf->right );
-		_clear( leaf->down );
-		mem_free( leaf );
+			sx_mem_free( leaf->row );
+		_free( leaf->right );
+		_free( leaf->down );
+		sx_mem_free( leaf );
 	}
 
-#if 0
-	SEGAN_LIB_INLINE bool _insert( Leaf* leaf, uint index, const wchar* name, const T_data& data )
+	SEGAN_LIB_INLINE bool _put( Leaf* leaf, uint index, const wchar* name, const T_data& data )
 	{
 #if TABLE_CASE_INSENSITIVE
 		wchar label = tolower( name[index] );
@@ -150,7 +163,7 @@ private:
 		//	no leaf has been found, so just create new one
 		if ( leaf->label != label )
 		{
-			leaf->down = (Leaf*)mem_alloc( sizeof(Leaf) );
+			leaf->down = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 			leaf->down->init( label );
 			leaf = leaf->down;
 		}
@@ -162,7 +175,7 @@ private:
 			//	we are in position. verify the row and put the data
 			if ( !leaf->row )
 			{
-				leaf->row = (Row*)mem_alloc( sizeof(Row) );
+				leaf->row = (Row*)sx_mem_alloc( sizeof(Row) );
 				leaf->row->data = data;
 				++m_count;
 				return true;
@@ -174,15 +187,14 @@ private:
 			//	just go deeper leaf
 			if ( !leaf->right )
 			{
-				leaf->right =  (Leaf*)mem_alloc( sizeof(Leaf) );
+				leaf->right =  (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 				leaf->right->init( label );
 			}
-			return _insert( leaf->right, index+1, name, data );
+			return _put( leaf->right, index+1, name, data );
 		}
 	}
-#endif
 
-	SEGAN_LIB_INLINE bool _insert( Leaf* left, Leaf* leaf, uint index, const wchar* name, const T_data& data )
+	SEGAN_LIB_INLINE bool _put_x( Leaf* left, Leaf* leaf, uint index, const wchar* name, const T_data& data )
 	{
 #if TABLE_CASE_INSENSITIVE
 		wchar label = tolower( name[index] );
@@ -200,7 +212,7 @@ private:
 		//	no leaf has been found, so just create new one
 		if ( leaf->label != label )
 		{
-			Leaf* newone = (Leaf*)mem_alloc( sizeof(Leaf) );
+			Leaf* newone = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 			newone->init( label );
 			
 			if ( label < leaf->label )
@@ -236,7 +248,7 @@ private:
 			//	we are in position. verify the row and put the data
 			if ( !leaf->row )
 			{
-				leaf->row = (Row*)mem_alloc( sizeof(Row) );
+				leaf->row = (Row*)sx_mem_alloc( sizeof(Row) );
 				leaf->row->data = data;
 				++m_count;
 				return true;
@@ -248,14 +260,14 @@ private:
 			//	just go deeper leaf
 			if ( !leaf->right )
 			{
-				leaf->right =  (Leaf*)mem_alloc( sizeof(Leaf) );
+				leaf->right =  (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 				leaf->right->init( label );
 			}
-			return _insert( leaf, leaf->right, index+1, name, data );
+			return _put_x( leaf, leaf->right, index+1, name, data );
 		}
 	}
 
-	SEGAN_LIB_INLINE bool _find( Leaf* leaf, uint index, const wchar* name, T_data& data )
+	SEGAN_LIB_INLINE bool _pickup( Leaf* leaf, uint index, const wchar* name, T_data& data )
 	{
 #if TABLE_CASE_INSENSITIVE
 		wchar label = tolower( name[index] );
@@ -285,13 +297,13 @@ private:
 		{
 			//	just go deeper leaf
 			if ( leaf->right )
-				return _find( leaf->right, index+1, name, data );
+				return _pickup( leaf->right, index+1, name, data );
 			else
 				return false;
 		}
 	}
 
-	SEGAN_LIB_INLINE bool _remove( Leaf* leaf, uint index, const wchar* name )
+	SEGAN_LIB_INLINE bool _putaway( Leaf* leaf, uint index, const wchar* name )
 	{
 		if ( !leaf ) return false;
 
@@ -303,11 +315,11 @@ private:
 		//	search through other leafs
 		if ( leaf->label != label )
 		{
-			bool res = _remove( leaf->down, index, name );
+			bool res = _putaway( leaf->down, index, name );
 			if ( res && leaf->down->can_remove() )
 			{
 				Leaf* tmp = leaf->down->down;
-				mem_free( leaf->down );
+				sx_mem_free( leaf->down );
 				leaf->down = tmp;
 			}
 			return res;
@@ -320,7 +332,7 @@ private:
 			//	we are in position. verify the row and remove the row
 			if ( leaf->row )
 			{
-				mem_free( leaf->row );
+				sx_mem_free( leaf->row );
 				leaf->row = null;
 				--m_count;
 				return true;
@@ -332,11 +344,11 @@ private:
 			//	just go deeper leaf
 			if ( leaf->right )
 			{
-				bool res = _remove( leaf->right, index+1, name );
+				bool res = _putaway( leaf->right, index+1, name );
 				if ( res && leaf->right->can_remove() )
 				{
 					Leaf* tmp = leaf->right->down;
-					mem_free( leaf->right );
+					sx_mem_free( leaf->right );
 					leaf->right = tmp;
 				}
 				return res;
@@ -346,7 +358,7 @@ private:
 		}
 	}
 
-	SEGAN_LIB_INLINE bool _Iterate( const Leaf* leaf, void* userdata, CB_Table callback, wchar* name, uint index )
+	SEGAN_LIB_INLINE bool _traverse( const Leaf* leaf, void* userdata, CB_Table callback, wchar* name, uint index )
 	{
 		if ( !leaf ) return true;
 
@@ -361,10 +373,10 @@ private:
 		}
 
 		if ( res && leaf->right )
-			res = _Iterate( leaf->right, userdata, callback, name, index+1 );
+			res = _traverse( leaf->right, userdata, callback, name, index+1 );
 
 		if ( res && leaf->down )
-			res = _Iterate( leaf->down, userdata, callback, name, index );
+			res = _traverse( leaf->down, userdata, callback, name, index );
 
 		return res;
 	}
