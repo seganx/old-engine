@@ -80,7 +80,7 @@ public:
 	SEGAN_INLINE operator const float* ( void ) const { return e; }
 
 	//! set new value for this vector
-	SEGAN_INLINE float2& Set( const float _x, const float _y )
+	SEGAN_INLINE float2& set( const float _x, const float _y )
 	{
 		x = _x;
 		y = _y;
@@ -88,7 +88,7 @@ public:
 	}
 
 	//! return interpolated vector of v1 and v2 by weight of w to this
-	SEGAN_INLINE float2& Lerp( const float2& v1, const float2& v2, const float w )
+	SEGAN_INLINE float2& lerp( const float2& v1, const float2& v2, const float w )
 	{
 		x = v1.x + ( v2.x - v1.x ) * w;
 		y = v1.y + ( v2.y - v1.y ) * w;
@@ -96,7 +96,7 @@ public:
 	}
 
 	//! normalize this vector
-	SEGAN_INLINE float2& Normalize( void )
+	SEGAN_INLINE float2& normalize( void )
 	{
 		float len = sx_sqrt_fast( x * x + y * y );
 		if ( len ) len = 1.0f / len;
@@ -106,7 +106,7 @@ public:
 	}
 
 	//! normalize the vector v to this. this = normalize(v)
-	SEGAN_INLINE float2& Normalize( const float2& v )
+	SEGAN_INLINE float2& normalize( const float2& v )
 	{
 		float len = sx_sqrt_fast( v.x * v.x + v.y * v.y );
 		if ( len ) len = 1.0f / len;
@@ -161,7 +161,7 @@ public:
 	SEGAN_INLINE operator const float* ( void ) const { return e; }
 
 	//! set new value for this vector
-	SEGAN_INLINE float3& Set( const float _x, const float _y, const float _z )
+	SEGAN_INLINE float3& set( const float _x, const float _y, const float _z )
 	{
 		x = _x;
 		y = _y;
@@ -170,7 +170,7 @@ public:
 	}
 
 	//! return interpolated vector of v1 and v2 by weight of w to this
-	SEGAN_INLINE float3& Lerp( const float3& v1, const float3& v2, const float w )
+	SEGAN_INLINE float3& lerp( const float3& v1, const float3& v2, const float w )
 	{
 		x = v1.x + ( v2.x - v1.x ) * w;
 		y = v1.y + ( v2.y - v1.y ) * w;
@@ -179,7 +179,7 @@ public:
 	}
 
 	//! normalize this vector
-	SEGAN_INLINE float3& Normalize( void )
+	SEGAN_INLINE float3& normalize( void )
 	{
 		float len = sx_sqrt_fast( x * x + y * y + z * z );
 		if ( len ) len = 1.0f / len;
@@ -190,7 +190,7 @@ public:
 	}
 
 	//! normalize the vector v to this. this = normalize(v)
-	SEGAN_INLINE float3& Normalize( const float3& v )
+	SEGAN_INLINE float3& normalize( const float3& v )
 	{
 		float len = sx_sqrt_fast( v.x * v.x + v.y * v.y + v.z * v.z );
 		if ( len ) len = 1.0f / len;
@@ -201,7 +201,7 @@ public:
 	}
 
 	//! return the vector of cross product of v1 and v2 to this. this = (v2 x v2)
-	SEGAN_INLINE float3& Cross( const float3& v1, const float3& v2 )
+	SEGAN_INLINE float3& cross( const float3& v1, const float3& v2 )
 	{
 		x = v1.y * v2.z - v1.z * v2.y;
 		y = v1.z * v2.x - v1.x * v2.z;
@@ -256,7 +256,7 @@ public:
 	SEGAN_INLINE operator const float* ( void ) const { return e; }
 
 	//! set new value for this vector
-	SEGAN_INLINE float4& Set( const float _x, const float _y, const float _z, const float _w )
+	SEGAN_INLINE float4& set( const float _x, const float _y, const float _z, const float _w )
 	{
 		x = _x;
 		y = _y;
@@ -266,7 +266,7 @@ public:
 	}
 
 	//! return interpolated vector of v1 and v2 by weight of w to this
-	SEGAN_INLINE float4& Lerp( const float4& v1, const float4& v2, const float _w )
+	SEGAN_INLINE float4& lerp( const float4& v1, const float4& v2, const float _w )
 	{
 		x = v1.x + ( v2.x - v1.x ) * _w;
 		y = v1.y + ( v2.y - v1.y ) * _w;
@@ -276,7 +276,7 @@ public:
 	}
 
 	//! normalize this vector
-	SEGAN_INLINE float4& Normalize( void )
+	SEGAN_INLINE float4& normalize( void )
 	{
 		float len = sx_sqrt_fast( x * x + y * y + z * z + w * w );
 		if ( len ) len = 1.0f / len;
@@ -288,7 +288,7 @@ public:
 	}
 
 	//! normalize the vector v to this. this = normalize(v)
-	SEGAN_INLINE float4& Normalize( const float4& v )
+	SEGAN_INLINE float4& normalize( const float4& v )
 	{
 		float len = sx_sqrt_fast( v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w );
 		if ( len ) len = 1.0f / len;
@@ -329,7 +329,7 @@ public:
 	SEGAN_INLINE operator const float* ( void ) const { return e; }
 
 	//! set new value for this quaternion
-	SEGAN_INLINE quat& Set( const float _x, const float _y, const float _z, const float _w )
+	SEGAN_INLINE quat& set( const float _x, const float _y, const float _z, const float _w )
 	{
 		x = _x;
 		y = _y;
@@ -339,7 +339,7 @@ public:
 	}
 
 	//! return interpolated quaternion of q1 and q2 by weight of t to this
-	SEGAN_INLINE quat& Lerp( const quat& q1, const quat& q2, const float t )
+	SEGAN_INLINE quat& lerp( const quat& q1, const quat& q2, const float t )
 	{
 		x = q1.x + ( q2.x - q1.x ) * t;
 		y = q1.y + ( q2.y - q1.y ) * t;
@@ -349,7 +349,7 @@ public:
 	}
 
 	//! normalize this quaternion
-	SEGAN_INLINE quat& Normalize( void )
+	SEGAN_INLINE quat& normalize( void )
 	{
 		float len = sx_sqrt_fast( x * x + y * y + z * z );
 		if ( len ) len = 1.0f / len;
@@ -361,7 +361,7 @@ public:
 	}
 
 	//! normalize the quaternion q to this. this = normalize(v)
-	SEGAN_INLINE quat& Normalize( const quat& v )
+	SEGAN_INLINE quat& normalize( const quat& v )
 	{
 		float len = sx_sqrt_fast( v.x * v.x + v.y * v.y + v.z * v.z );
 		if ( len ) len = 1.0f / len;
@@ -373,7 +373,7 @@ public:
 	}
 
 	//! (-x, -y, -z, w)
-	SEGAN_INLINE quat& Conjugate( void )
+	SEGAN_INLINE quat& conjugate( void )
 	{
 		x = - x;
 		y = - y;
@@ -382,7 +382,7 @@ public:
 	}
 
 	//! (-x, -y, -z, w)
-	SEGAN_INLINE quat& Conjugate( const quat& q )
+	SEGAN_INLINE quat& conjugate( const quat& q )
 	{
 		x = - q.x;
 		y = - q.y;
@@ -439,7 +439,7 @@ public:
 	SEGAN_INLINE operator const float* ( void ) const { return &m00; }
 
 	//! zero all elements of this matrix
-	SEGAN_INLINE matrix& Zero( void )
+	SEGAN_INLINE matrix& zero( void )
 	{
 		m00 = m01 = m02 = m03 = 0;
 		m10 = m11 = m12 = m13 = 0;
@@ -449,7 +449,7 @@ public:
 	}
 
 	//! make this matrix identity
-	SEGAN_INLINE matrix& Identity( void )
+	SEGAN_INLINE matrix& identity( void )
 	{
 		m01 = m02 = m03 = 0;
 		m10 = m12 = m13 = 0;
@@ -461,14 +461,14 @@ public:
 
 
 	//! set translation of this matrix without change of rotation
-	SEGAN_INLINE matrix& SetTranslation( const float x, const float y, const float z )
+	SEGAN_INLINE matrix& set_translation( const float x, const float y, const float z )
 	{
 		m30 = x; m31 = y; m32 = z;
 		return *this;
 	}
 
 	//! make this as an scaling matrix. Use this with care. some objects in 3d space have no absolute scale. like rigid bodies, triggers, etc
-	SEGAN_INLINE matrix& MakeScale( const float x, const float y, const float z )
+	SEGAN_INLINE matrix& make_scale( const float x, const float y, const float z )
 	{
 		m01 = m02 = m03 = 0;
 		m10 = m12 = m13 = 0;
@@ -479,7 +479,7 @@ public:
 	}
 
 	//! set scale of this matrix. Use this with care. some objects in 3d space have no absolute scale. like rigid bodies, triggers, etc
-	SEGAN_INLINE matrix& SetScale( const float x, const float y, const float z )
+	SEGAN_INLINE matrix& set_scale( const float x, const float y, const float z )
 	{
 		m00 *= x; m11 *= y; m22 *= z;
 		return *this;
@@ -511,9 +511,9 @@ public:
 	SEGAN_INLINE Color() {}
 	SEGAN_INLINE Color( const dword c ): code(c) {}
 	SEGAN_INLINE Color( const Color& c ): code(c.code) {}
-	SEGAN_INLINE Color( const float* p ) { Set( p[0], p[1], p[2], p[3] ); }
+	SEGAN_INLINE Color( const float* p ) { set( p[0], p[1], p[2], p[3] ); }
 	SEGAN_INLINE Color( const byte _r, const byte _g, const byte _b, const byte _a ): r(_r), g(_g), b(_b), a(_a) { /*return ( ca << 24 ) | ( cr << 16 ) | ( cg << 8 ) | cb;*/ }
-	SEGAN_INLINE Color( const float _r, const float _g, const float _b, const float _a ) { Set( _r, _g, _b, _a ); }
+	SEGAN_INLINE Color( const float _r, const float _g, const float _b, const float _a ) { set( _r, _g, _b, _a ); }
 
 	// assignment operators
 	SEGAN_INLINE Color& operator += ( const Color& c )	{ code = sx_clamp_u( code + c.code, 0, 0xffffffff ); return *this; }
@@ -529,7 +529,7 @@ public:
 	SEGAN_INLINE operator const dword ( void ) const { return code; }
 
 	//! set new value for this color
-	SEGAN_INLINE Color& Set( const float _r, const float _g, const float _b, const float _a )
+	SEGAN_INLINE Color& set( const float _r, const float _g, const float _b, const float _a )
 	{
 		r = _r >= 1.0f ? 0xff : ( _r <= 0.0f ? 0x00 : byte( _r * 255.0f + 0.5f ) );
 		g = _g >= 1.0f ? 0xff : ( _g <= 0.0f ? 0x00 : byte( _g * 255.0f + 0.5f ) );
@@ -539,7 +539,7 @@ public:
 	}
 
 	//! return interpolated color of c1 and c2 by weight of t to this
-	SEGAN_INLINE Color& Lerp( const Color& c1, const Color& c2, const float t )
+	SEGAN_INLINE Color& lerp( const Color& c1, const Color& c2, const float t )
 	{
 		r = c1.r + byte( float( c2.r - c1.r ) * t );
 		g = c1.g + byte( float( c2.g - c1.g ) * t );
@@ -587,30 +587,30 @@ public:
 	SEGAN_INLINE operator const float* ( void ) const { return e; }
 
 	//! set new value for this plane
-	SEGAN_INLINE Plane& Set( const float _a, const float _b, const float _c, const float _d )
+	SEGAN_INLINE Plane& set( const float _a, const float _b, const float _c, const float _d )
 	{
 		a = _a; b = _b; c = _c; d = _d;
 		return *this;
 	}
 
 	//! construct a plane from 3 points in space
-	SEGAN_INLINE Plane& MakeFromPoints( const float3& p1, const float3& p2, const float3& p3 )
+	SEGAN_INLINE Plane& make_from_points( const float3& p1, const float3& p2, const float3& p3 )
 	{
 		float3 v1( p2.x - p1.x, p2.y - p1.y, p2.z - p1.z );
 		float3 v2( p3.x - p1.x, p3.y - p1.y, p3.z - p1.z );
 		float3 nr( v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x );
-		return MakeFromNormal( p1, nr );
+		return make_from_normal( p1, nr );
 	}
 
 	//! construct a plane from a point and a normal
-	SEGAN_INLINE Plane& MakeFromNormal( const float3& p, const float3& n )
+	SEGAN_INLINE Plane& make_from_normal( const float3& p, const float3& n )
 	{
 		a = n.x; b = n.y; c = n.z; d = - ( p.x * n.x ) - ( p.y * n.y ) - ( p.z * n.z );
 		return *this;
 	}
 
 	//! normalize plane p to this
-	SEGAN_INLINE Plane& Normalize( const Plane& p )
+	SEGAN_INLINE Plane& normalize( const Plane& p )
 	{
 		float len = sx_sqrt_fast( ( p.a * p.a ) + ( p.b * p.b ) + ( p.c * p.c ) );
 		if ( len ) len = 1.0f / len;
@@ -622,7 +622,7 @@ public:
 	}
 
 	//! normalize itself
-	SEGAN_INLINE Plane& Normalize( void )
+	SEGAN_INLINE Plane& normalize( void )
 	{
 		float len = sx_sqrt_fast( ( a * a ) + ( b * b ) + ( c * c ) );
 		if ( len ) len = 1.0f / len;
@@ -671,14 +671,14 @@ public:
 	SEGAN_INLINE operator const float* ( void ) const { return p0.e; }
 
 	//! normalize frustum f to this
-	SEGAN_INLINE Frustum& Normalize( const Frustum& fr )
+	SEGAN_INLINE Frustum& normalize( const Frustum& fr )
 	{
-		p0.Normalize( fr.p0 );
-		p1.Normalize( fr.p1 );
-		p2.Normalize( fr.p2 );
-		p3.Normalize( fr.p3 );
-		p4.Normalize( fr.p4 );
-		p5.Normalize( fr.p5 );
+		p0.normalize( fr.p0 );
+		p1.normalize( fr.p1 );
+		p2.normalize( fr.p2 );
+		p3.normalize( fr.p3 );
+		p4.normalize( fr.p4 );
+		p5.normalize( fr.p5 );
 		return *this;
 	}
 
@@ -716,14 +716,14 @@ public:
 	SEGAN_INLINE operator const float* ( void ) const { return &x; }
 
 	//! resize the sphere to the zero
-	SEGAN_INLINE Sphere& Zero( void )
+	SEGAN_INLINE Sphere& zero( void )
 	{
 		x = 0; y = 0; z = 0; r = 0;
 		return *this;
 	}
 
 	//! set new properties
-	SEGAN_INLINE Sphere& Set( const float3& cen, const float rad )
+	SEGAN_INLINE Sphere& set( const float3& cen, const float rad )
 	{
 		center = cen;
 		radius = rad;
@@ -765,7 +765,7 @@ public:
 	//! conventional operators
 	SEGAN_INLINE operator const float* ( void ) const { return &x1; }
 
-	SEGAN_INLINE AABox& Set( const float3& _min, const float3& _max )
+	SEGAN_INLINE AABox& set( const float3& _min, const float3& _max )
 	{
 		min = _min;
 		max = _max;
@@ -773,7 +773,7 @@ public:
 	}
 
 	//! resize the box to the zero
-	SEGAN_INLINE AABox& Zero( void )
+	SEGAN_INLINE AABox& zero( void )
 	{
 		x1 = 0; y1 = 0; z1 = 0;
 		x2 = 0; y2 = 0; z2 = 0;
@@ -781,7 +781,7 @@ public:
 	}
 
 	//! resize the current box to cover the entry box
-	SEGAN_INLINE AABox& Cover( const AABox& box )
+	SEGAN_INLINE AABox& cover( const AABox& box )
 	{	   
 		if ( x1 > box.x1 ) x1 = box.x1;
 		if ( y1 > box.y1 ) y1 = box.y1;
@@ -822,13 +822,13 @@ public:
 class OBBox
 {
 public:
-	SEGAN_INLINE OBBox() { world.Identity(); }
+	SEGAN_INLINE OBBox() { world.identity(); }
 	SEGAN_INLINE OBBox( const OBBox& box ) { *this = box; }
 
 	//! conventional operators
 	SEGAN_INLINE operator const float* ( void ) const { return &aabox.x1; }
 
-	SEGAN_INLINE OBBox& Set( const float3& min, const float3& max, const matrix& matworld )
+	SEGAN_INLINE OBBox& set( const float3& min, const float3& max, const matrix& matworld )
 	{
 		// 		v[0] = max;
 		// 		v[1].Set( min.x, max.y, max.z );
@@ -839,20 +839,20 @@ public:
 		// 		v[6].Set( min.x, max.y, min.z );
 		// 		v[7] = min;
 		world = matworld;
-		aabox.Set( min, max );
+		aabox.set( min, max );
 		return *this;
 	}
 
-	SEGAN_INLINE OBBox& Set( const AABox& box, const matrix& matworld )
+	SEGAN_INLINE OBBox& set( const AABox& box, const matrix& matworld )
 	{
 		world = matworld;
 		aabox = box;
 		return *this;
 	}
 
-	SEGAN_INLINE OBBox& SetAABox( const AABox& box )
+	SEGAN_INLINE OBBox& set_box( const AABox& box )
 	{
-		aabox.Set( box.min, box.max );
+		aabox.set( box.min, box.max );
 		return *this;
 	}
 
@@ -868,14 +868,14 @@ class Ray
 {
 public:
 	SEGAN_INLINE Ray(){}
-	SEGAN_INLINE Ray( const float3& _pos, const float3& _dir ){ Set( _pos, _dir ); };
+	SEGAN_INLINE Ray( const float3& _pos, const float3& _dir ){ set( _pos, _dir ); };
 
 	//! set new value for this ray
-	SEGAN_INLINE void Set( const float3& _pos, const float3& _dir )
+	SEGAN_INLINE void set( const float3& _pos, const float3& _dir )
 	{
 		pos = _pos;
 		dir = _dir;
-		dirInv.Set( 1 / _dir.x, 1 / _dir.y, 1 / _dir.z );
+		dirInv.set( 1 / _dir.x, 1 / _dir.y, 1 / _dir.z );
 		sign[0] = ( dirInv.x < 0 );
 		sign[1] = ( dirInv.y < 0 );
 		sign[2] = ( dirInv.z < 0 );

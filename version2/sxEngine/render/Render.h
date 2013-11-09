@@ -26,6 +26,7 @@
 #define SX_D3D_REFLECT					0x00000100
 #define SX_D3D_WIREFRAME				0x00000200
 #define SX_D3D_BOUNINGBOX				0x00000400
+#define SX_D3D_BILLBOARD					0x00000800
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -371,8 +372,35 @@ public:
 	//!	update renderer
 	virtual void update( float elpstime ) = 0;
 
+	//!	start to draw the scene
+	virtual void begin_draw( const Color& bgcolor ) = 0;
+
+	//! finish drawing the scene
+	virtual void end_draw( void ) = 0;
+
 	//! draw scene to the display
-	virtual void draw( float elpstime, uint flag ) = 0;
+	virtual void render( float elpstime, uint flag ) = 0;
+
+	//! draw a simple line
+	virtual void draw_line( const float3& v1, const float3& v2, const Color& color ) = 0;
+
+	//! draw a grid, snapped to integer space but always in front of camera
+	virtual void draw_grid( const uint size, const Color& color ) = 0;
+
+	//! draw a compass by specified size
+	virtual void draw_compass( void ) = 0;
+
+	//! visualize a simple circle
+	virtual void draw_circle( const float3& center, const float radius, const dword flags, const Color& color ) = 0;
+
+	//! visualize a wired box
+	virtual void draw_box( const AABox& box, const Color& color ) = 0;
+
+	//! visualize a wired box
+	virtual void draw_box( const OBBox& box, const Color& color ) = 0;
+
+	//! visualize a simple sphere
+	virtual void draw_sphere( const Sphere& sphere, const dword flags, const Color& color, const uint stacks = 17, const uint slices = 20 ) = 0;
 
 public:
 

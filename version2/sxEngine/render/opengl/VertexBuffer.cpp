@@ -1,7 +1,7 @@
 #include "Device.h"
 
 
-d3dVertexBuffer::d3dVertexBuffer( void )
+VertexBuffer::VertexBuffer( void )
 :	m_vbo(0)
 ,	m_data(0)
 ,	m_device(0)
@@ -9,14 +9,14 @@ d3dVertexBuffer::d3dVertexBuffer( void )
 
 }
 
-d3dVertexBuffer::~d3dVertexBuffer( void )
+VertexBuffer::~VertexBuffer( void )
 {
 	sx_mem_free( m_data );
 	if ( m_vbo )
 		glDeleteBuffers( 1, &m_vbo );
 }
 
-void d3dVertexBuffer::SetDesc( const uint flag, const uint sizeinbytes, void* data /*= null */ )
+void VertexBuffer::set_desc( const uint flag, const uint sizeinbytes, void* data /*= null */ )
 {
 	m_size = sizeinbytes;
 	m_flag = flag;
@@ -35,7 +35,7 @@ void d3dVertexBuffer::SetDesc( const uint flag, const uint sizeinbytes, void* da
 	}
 }
 
-void* d3dVertexBuffer::Lock( void )
+void* VertexBuffer::lock( void )
 {
 	if ( m_flag & SX_D3D_RESOURCE_MANAGED )
 	{
@@ -48,7 +48,7 @@ void* d3dVertexBuffer::Lock( void )
 	}
 }
 
-void d3dVertexBuffer::Unlock( void )
+void VertexBuffer::unlock( void )
 {
  	if ( m_flag & SX_D3D_RESOURCE_MANAGED )
 	{

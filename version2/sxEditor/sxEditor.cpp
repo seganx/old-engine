@@ -5,7 +5,7 @@
 Window*			window = null;
 d3dRenderer*	render = null;
 
-int cb_window( class Window* sender, const WindowEvent* data )
+int windowcallback( class Window* sender, const WindowEvent* data )
 {
 	switch ( data->msg )
 	{
@@ -15,7 +15,7 @@ int cb_window( class Window* sender, const WindowEvent* data )
 		}
 		break;
 
-	case WM_EXITSIZEMOVE:
+	case WM_SIZE:
 		{
 			WINDOWINFO winfo;
 			GetWindowInfo( data->windowHandle, &winfo );
@@ -30,10 +30,17 @@ int cb_window( class Window* sender, const WindowEvent* data )
 }
 
 
-void MainLoop( float elpstime )
+void mainloop( float elpstime )
 {
 	render->update( elpstime );
-	render->draw( elpstime, 0 );
+
+	render->begin_draw( 0xff332211 );
+	render->draw_grid( 7, 0xff888888 );
+	render->draw_sphere( Sphere( -3, 1, 2, 1 ), SX_D3D_WIREFRAME, 0xff6688aa );
+	render->draw_circle( float3( 1,1,1 ), 1, SX_D3D_BILLBOARD, 0xff33cc33 );
+	render->render( elpstime, 0 );
+	render->draw_compass();
+	render->end_draw();
 
 	sx_os_sleep( 25 );
 }
@@ -47,7 +54,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	sx_detect_crash();
 
-	window = sx_create_window( null, &cb_window, true, false );
+	window = sx_create_window( null, &windowcallback, true, false );
 	//window->set_border( WBT_NONE );
 	window->set_visible( true );
 
@@ -60,7 +67,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 
 	//////////////////////////////////////////////////////////////////////////
-	//	goint to main loop in window
+	//	going to main loop in window
 	static float blendedElapesTime = 0;
 	float initTime = (float)sx_os_get_timer();
 	float elpsTime = 0;
@@ -90,7 +97,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		{
 			// call the main loop function
 			blendedElapesTime += (elpsTime - blendedElapesTime) * 0.1f;
-			MainLoop( blendedElapesTime );
+			mainloop( blendedElapesTime );
 		}
 	}
 

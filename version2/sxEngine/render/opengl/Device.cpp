@@ -36,9 +36,9 @@ d3dDevice::d3dDevice( void )
 	m_initParam.colorBits = 32;
 	m_initParam.depthBits = 16;
 
-	m_world.Identity();
-	m_view.Identity();
-	m_projection.Identity();
+	m_world.identity();
+	m_view.identity();
+	m_projection.identity();
 
 	m_rs_alpha = 0;
 	m_rs_cull = 1;
@@ -58,7 +58,7 @@ d3dDevice::~d3dDevice( void )
 }
 
 
-void d3dDevice::Initialize( const struct HWND__* displayHandle )
+void d3dDevice::initialize( const struct HWND__* displayHandle )
 {
 	m_initParam.hwnd = (HWND)displayHandle;
 
@@ -209,9 +209,9 @@ void d3dDevice::Initialize( const struct HWND__* displayHandle )
 		glHint( GL_GENERATE_MIPMAP_HINT, GL_NICEST );
 		glHint( GL_TEXTURE_COMPRESSION_HINT, GL_NICEST );
 
-		SetRenderState( RS_ZENABLE, true );
-		SetRenderState( RS_FILL, true );
-		SetRenderState( RS_CULL, SX_CULL_CCW );
+		set_render_state( RS_ZENABLE, true );
+		set_render_state( RS_FILL, true );
+		set_render_state( RS_CULL, SX_CULL_CCW );
 
 		String slog = L"Graphic card information:";
 		slog <<
@@ -242,7 +242,7 @@ void d3dDevice::Initialize( const struct HWND__* displayHandle )
 	}
 }
 
-void d3dDevice::Finalize( void )
+void d3dDevice::finalize( void )
 {
 #if defined(_WIN32)
 	wglMakeCurrent( null, null );
@@ -251,7 +251,7 @@ void d3dDevice::Finalize( void )
 #endif
 }
 
-bool d3dDevice::SetSize( const uint width, const uint height, const dword SX_D3D_ flag )
+bool d3dDevice::set_size( const uint width, const uint height, const dword SX_D3D_ flag )
 {
 	//  validate data and save current flags
 	if ( flag != -1 )	m_creationData.flag = flag;
@@ -283,59 +283,59 @@ bool d3dDevice::SetSize( const uint width, const uint height, const dword SX_D3D
 	return true;
 }
 
-void d3dDevice::CreateVertexBuffer( d3dVertexBuffer*& OUT vertexBuffer )
+void d3dDevice::create_vertex_buffer( VertexBuffer*& OUT vertexBuffer )
 {
-	d3dVertexBuffer* vb = sx_new( d3dVertexBuffer );
+	VertexBuffer* vb = sx_new( VertexBuffer );
 	m_vertexBufferArray.push_back( vb );
 	vb->m_device = this;
 	vertexBuffer = vb;
 }
 
-void d3dDevice::DestroyVertexBuffer( d3dVertexBuffer*& IN_OUT vertexBuffer )
+void d3dDevice::destroy_vertex_buffer( VertexBuffer*& IN_OUT vertexBuffer )
 {
 	if ( !vertexBuffer ) return;
 	m_vertexBufferArray.remove( vertexBuffer );
 	sx_delete_and_null( vertexBuffer );
 }
 
-SEGAN_INLINE void d3dDevice::SetVertexBuffer( const d3dVertexBuffer* vertexBuffer, uint streamIndex )
+void d3dDevice::set_vertex_buffer( const VertexBuffer* vertexBuffer, uint streamIndex )
 {
 	if ( !vertexBuffer )
 	{
 		m_vertexBuffer[streamIndex].current = 0;
 		return;
 	}
-	d3dVertexBuffer* vbgl = (d3dVertexBuffer*)vertexBuffer;
+	VertexBuffer* vbgl = (VertexBuffer*)vertexBuffer;
 	m_vertexBuffer[streamIndex].current = vbgl->m_vbo;
 }
 
-void d3dDevice::CreateIndexBuffer( d3dIndexBuffer*& OUT indexBuffer )
+void d3dDevice::create_index_buffer( IndexBuffer*& OUT indexBuffer )
 {
-	d3dIndexBuffer* ib = sx_new( d3dIndexBuffer );
+	IndexBuffer* ib = sx_new( IndexBuffer );
 	m_indexBufferArray.push_back( ib );
 	ib->m_device = this;
 	indexBuffer = ib;
 }
 
-void d3dDevice::DestroyIndexBuffer( d3dIndexBuffer*& IN_OUT indexBuffer )
+void d3dDevice::destroy_index_buffer( IndexBuffer*& IN_OUT indexBuffer )
 {
 	if ( !indexBuffer ) return;
 	m_indexBufferArray.remove( indexBuffer );
 	sx_delete_and_null( indexBuffer );
 }
 
-void d3dDevice::SetIndexBuffer( const d3dIndexBuffer* indexBuffer )
+void d3dDevice::set_index_buffer( const IndexBuffer* indexBuffer )
 {
 	if ( !indexBuffer )
 	{
 		m_indexBuffer.current = 0;
 		return;
 	}
-	d3dIndexBuffer* ibgl = (d3dIndexBuffer*)indexBuffer;
+	IndexBuffer* ibgl = (IndexBuffer*)indexBuffer;
 	m_indexBuffer.current = ibgl->m_ibo;
 }
 
-void d3dDevice::CreateTexture( d3dTexture_gl*& OUT texture )
+void d3dDevice::create_texture( d3dTexture_gl*& OUT texture )
 {
 	d3dTexture_gl* tx = sx_new( d3dTexture_gl );
 	m_textureArray.push_back( tx );
@@ -343,14 +343,14 @@ void d3dDevice::CreateTexture( d3dTexture_gl*& OUT texture )
 	texture = tx;
 }
 
-void d3dDevice::DestroyTexture( d3dTexture_gl*& IN_OUT texture )
+void d3dDevice::destroy_texture( d3dTexture_gl*& IN_OUT texture )
 {
 	if ( !texture ) return;
 	m_textureArray.remove( texture );
 	sx_delete_and_null( texture );
 }
 
-void d3dDevice::SetTexture( const d3dTexture_gl* texture, uint stage /*= 0 */ )
+void d3dDevice::set_texture( const d3dTexture_gl* texture, uint stage /*= 0 */ )
 {
 	if ( !texture )
 	{
@@ -361,12 +361,12 @@ void d3dDevice::SetTexture( const d3dTexture_gl* texture, uint stage /*= 0 */ )
 	m_textureBuffer[stage].target = texture->m_target;
 }
 
-SEGAN_INLINE void d3dDevice::SetViewport( const d3dViewport* viewport )
+void d3dDevice::set_viewport( const d3dViewport* viewport )
 {
 	m_viewport = *viewport;
 }
 
-SEGAN_INLINE void d3dDevice::SetMatrix( const d3dMatrixMode mode, const matrix& _matrix )
+void d3dDevice::set_matrix( const d3dMatrixMode mode, const matrix& _matrix )
 {
 	switch ( mode )
 	{
@@ -397,7 +397,7 @@ SEGAN_INLINE void d3dDevice::SetMatrix( const d3dMatrixMode mode, const matrix& 
 	}
 }
 
-SEGAN_INLINE const matrix& d3dDevice::GetMatrix( const d3dMatrixMode mode )
+const matrix& d3dDevice::get_matrix( const d3dMatrixMode mode )
 {
 	switch ( mode )
 	{
@@ -408,7 +408,7 @@ SEGAN_INLINE const matrix& d3dDevice::GetMatrix( const d3dMatrixMode mode )
 	return m_world;
 }
 
-void d3dDevice::SetRenderState( const d3dRenderState type, const uint mode )
+void d3dDevice::set_render_state( const d3dRenderState type, const uint mode )
 {
 	switch ( type )
 	{
@@ -492,7 +492,7 @@ void d3dDevice::SetRenderState( const d3dRenderState type, const uint mode )
 	}
 }
 
-uint d3dDevice::GetRenderState( const d3dRenderState type )
+uint d3dDevice::get_render_state( const d3dRenderState type )
 {
 	switch ( type)
 	{
@@ -505,20 +505,20 @@ uint d3dDevice::GetRenderState( const d3dRenderState type )
 	}
 }
 
-SEGAN_INLINE void d3dDevice::DrawPrimitive(const d3dPrimitiveType primType, const int firstVertex, const int vertexCount)
+void d3dDevice::draw_primitive(const d3dPrimitiveType primType, const int firstVertex, const int vertexCount)
 {
-	ApplyTextureBuffer();
-	ApplyVertexBuffer();
+	apply_texture_buffer();
+	apply_vertex_buffer();
 
 	glDrawArrays( glPrimitiveTypes[primType], firstVertex, vertexCount );
 
 	m_debugInfo.drawCalls++;
 }
 
-SEGAN_INLINE void d3dDevice::DrawIndexedPrimitive(const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount)
+void d3dDevice::draw_indexed_primitive(const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount)
 {
-	ApplyTextureBuffer();
-	ApplyVertexBuffer();
+	apply_texture_buffer();
+	apply_vertex_buffer();
 
 	glDrawElements( glPrimitiveTypes[primType], indicesCount, GL_UNSIGNED_INT, BUFFER_OFFSET(firstIndex*4) );
 
@@ -526,9 +526,9 @@ SEGAN_INLINE void d3dDevice::DrawIndexedPrimitive(const d3dPrimitiveType primTyp
 }
 
 
-void d3dDevice::DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const Color& color )
+void d3dDevice::draw_debug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const Color& color )
 {
-	ApplyTextureBuffer();
+	apply_texture_buffer();
 
 	switch ( primType )
 	{
@@ -556,7 +556,7 @@ void d3dDevice::DrawDebug( const d3dPrimitiveType primType, const uint vertxcoun
 }
 
 
-bool d3dDevice::BeginScene( void )
+bool d3dDevice::begin_scene( void )
 {
 #if defined(_WIN32)
 	InvalidateRect( m_initParam.hwnd, NULL, FALSE );
@@ -567,12 +567,12 @@ bool d3dDevice::BeginScene( void )
 	return true;
 }
 
-void d3dDevice::EndScene( void )
+void d3dDevice::end_scene( void )
 {
 
 }
 
-void d3dDevice::Present( void )
+void d3dDevice::present( void )
 {
 	static int    s_frameCount	= 0;
 	static double s_countTime	= 0;
@@ -599,7 +599,7 @@ void d3dDevice::Present( void )
 	m_debugInfo.frameTime = (float)elpTime;
 }
 
-void d3dDevice::ClearScreen( const Color& bgcolor )
+void d3dDevice::clear_screen( const Color& bgcolor )
 {
 	GLbitfield clearBits = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
 
@@ -618,7 +618,7 @@ void d3dDevice::ClearScreen( const Color& bgcolor )
 	glClear( clearBits );
 }
 
-void d3dDevice::ClearTarget( const Color& bgcolor )
+void d3dDevice::clear_target( const Color& bgcolor )
 {
 	float r = bgcolor.r / 255.0f;
 	float g = bgcolor.g / 255.0f;
@@ -632,7 +632,7 @@ void d3dDevice::ClearTarget( const Color& bgcolor )
 	glClear( GL_COLOR_BUFFER_BIT );
 }
 
-void d3dDevice::ClearZBuffer( void )
+void d3dDevice::clear_zbuffer( void )
 {
 	GLbitfield clearBits = GL_DEPTH_BUFFER_BIT;
 
@@ -645,17 +645,17 @@ void d3dDevice::ClearZBuffer( void )
 	glClear( clearBits );
 }
 
-void d3dDevice::SetClipPlane( const uint index, const float* pplane )
+void d3dDevice::set_clip_plane( const uint index, const float* pplane )
 {
 
 }
 
-void d3dDevice::GetClipPlane( const uint index, float* pplane )
+void d3dDevice::get_clip_plane( const uint index, float* pplane )
 {
 
 }
 
-SEGAN_INLINE void d3dDevice::ApplyVertexBuffer( void )
+SEGAN_INLINE void d3dDevice::apply_vertex_buffer( void )
 {
 	//	apply vertices to the device
 	for ( int streamIndex = 0; streamIndex < 8; streamIndex++ )
@@ -822,7 +822,7 @@ SEGAN_INLINE void d3dDevice::ApplyVertexBuffer( void )
 	}
 }
 
-void d3dDevice::ApplyTextureBuffer( void )
+void d3dDevice::apply_texture_buffer( void )
 {
 	for ( int stage = 0; stage < 8; stage++ )
 	{

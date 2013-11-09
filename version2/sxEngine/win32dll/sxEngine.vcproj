@@ -192,6 +192,18 @@
 					>
 				</File>
 				<File
+					RelativePath="..\render\opengl\Mesh.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\Mesh.h"
+					>
+				</File>
+				<File
+					RelativePath="..\render\opengl\MeshMan.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\render\opengl\OpenGLExtensions.cpp"
 					>
 				</File>

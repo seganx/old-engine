@@ -647,7 +647,7 @@ SEGAN_INLINE void sx_cover( Sphere& res, const Sphere& s1, const Sphere& s2 )
 	}
 	else
 	{
-		v.Normalize();
+		v.normalize();
 		res.center = ( s1.center + s2.center ) * 0.5f;
 		res.center += v * ( s1.r * 0.5f );
 		res.center -= v * ( s2.r * 0.5f );
@@ -703,7 +703,7 @@ SEGAN_INLINE Ray sx_ray( const float x, const float y, const float width, const 
 	// Transform the screen space pick ray into 3D space
 	float3 dir;
 	sx_transform_normal( dir, v, m );
-	dir.Normalize();
+	dir.normalize();
 	return Ray( float3( m.m30, m.m31, m.m32 ), dir );
 }
 
@@ -859,7 +859,7 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const AABox& aabox, float3* outP
 				float z = pos.z + dir.z*t;
 				if ( z < box.min.z || z > box.max.z ) return false;
 
-				if ( outNormal ) outNormal->Set( xn, 0.0f, 0.0f );
+				if ( outNormal ) outNormal->set( xn, 0.0f, 0.0f );
 			} break;
 
 		case 1: // intersect with xz Plane
@@ -869,7 +869,7 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const AABox& aabox, float3* outP
 				float z = pos.z + dir.z*t;
 				if ( z < box.min.z || z > box.max.z ) return false;
 
-				if ( outNormal ) outNormal->Set( 0.0f, yn, 0.0f );
+				if ( outNormal ) outNormal->set( 0.0f, yn, 0.0f );
 			} break;
 
 		case 2: // intersect with xy Plane
@@ -879,7 +879,7 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const AABox& aabox, float3* outP
 				float y = pos.y + dir.y*t;
 				if ( y < box.min.y || y > box.max.y ) return false;
 
-				if ( outNormal ) outNormal->Set( 0.0f, 0.0f, zn );
+				if ( outNormal ) outNormal->set( 0.0f, 0.0f, zn );
 			} break;
 	}
 
@@ -959,8 +959,8 @@ SEGAN_INLINE bool sx_intersect( const Ray& ray, const float3& v0, const float3& 
 
 	if ( outNormal )
 	{
-		qvec.Cross(edge1, edge2);
-		outNormal->Normalize( qvec );
+		qvec.cross(edge1, edge2);
+		outNormal->normalize( qvec );
 	}
 
 	return true;

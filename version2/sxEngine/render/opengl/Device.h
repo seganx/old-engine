@@ -92,20 +92,20 @@ struct d3dViewport
 };
 
 //! index buffer structure
-class d3dIndexBuffer
+class IndexBuffer
 {
-	SEGAN_STERILE_CLASS(d3dIndexBuffer);
+	SEGAN_STERILE_CLASS(IndexBuffer);
 
 public:
 
-	d3dIndexBuffer( void );
-	~d3dIndexBuffer( void );
+	IndexBuffer( void );
+	~IndexBuffer( void );
 
-	void SetDesc( const uint flag, const uint sizeinbytes, void* data = null );
+	void set_dest( const uint flag, const uint sizeinbytes, void* data = null );
 
-	void* Lock( void );
+	void* lock( void );
 
-	void Unlock( void );
+	void unlock( void );
 
 public:
 	dword					m_flag;		//!	resource flag SX_D3D_RESOURCE_
@@ -115,20 +115,20 @@ public:
 	class d3dDevice*		m_device;
 };
 
-class d3dVertexBuffer
+class VertexBuffer
 {
-	SEGAN_STERILE_CLASS(d3dVertexBuffer);
+	SEGAN_STERILE_CLASS(VertexBuffer);
 
 public:
 
-	d3dVertexBuffer( void );
-	~d3dVertexBuffer( void );
+	VertexBuffer( void );
+	~VertexBuffer( void );
 
-	void SetDesc( const uint flag, const uint sizeinbytes, void* data = null );
+	void set_desc( const uint flag, const uint sizeinbytes, void* data = null );
 
-	void* Lock( void );
+	void* lock( void );
 
-	void Unlock( void );
+	void unlock( void );
 
 public:
 	dword					m_flag;		//!	resource flag SX_D3D_RESOURCE_
@@ -174,66 +174,66 @@ public:
 	~d3dDevice( void );
 
 #if defined(_WIN32)
-	void Initialize( const struct HWND__* displayHandle );
+	void initialize( const struct HWND__* displayHandle );
 #endif
 
-	void Finalize( void );
+	void finalize( void );
 
-	bool SetSize( const uint width, const uint height, const dword SX_D3D_ flag );
+	bool set_size( const uint width, const uint height, const dword SX_D3D_ flag );
 
-	void CreateVertexBuffer( d3dVertexBuffer*& OUT vertexBuffer );
+	void create_vertex_buffer( VertexBuffer*& OUT vertexBuffer );
 
-	void DestroyVertexBuffer( d3dVertexBuffer*& IN_OUT vertexBuffer );
+	void destroy_vertex_buffer( VertexBuffer*& IN_OUT vertexBuffer );
 
-	void SetVertexBuffer( const d3dVertexBuffer* vertexBuffer, uint streamIndex );
+	void set_vertex_buffer( const VertexBuffer* vertexBuffer, uint streamIndex );
 
-	void CreateIndexBuffer( d3dIndexBuffer*& OUT indexBuffer );
+	void create_index_buffer( IndexBuffer*& OUT indexBuffer );
 
-	void DestroyIndexBuffer( d3dIndexBuffer*& IN_OUT indexBuffer );
+	void destroy_index_buffer( IndexBuffer*& IN_OUT indexBuffer );
 
-	void SetIndexBuffer( const d3dIndexBuffer* indexBuffer );
+	void set_index_buffer( const IndexBuffer* indexBuffer );
 
-	void CreateTexture( d3dTexture_gl*& OUT texture );
+	void create_texture( d3dTexture_gl*& OUT texture );
 
-	void DestroyTexture( d3dTexture_gl*& IN_OUT texture );
+	void destroy_texture( d3dTexture_gl*& IN_OUT texture );
 
-	void SetTexture( const d3dTexture_gl* texture, uint stage = 0 );
+	void set_texture( const d3dTexture_gl* texture, uint stage = 0 );
 	
-	void SetViewport( const d3dViewport* viewport );
+	void set_viewport( const d3dViewport* viewport );
 
-	void SetMatrix( const d3dMatrixMode mode, const matrix& _matrix );
+	void set_matrix( const d3dMatrixMode mode, const matrix& _matrix );
 
-	const matrix& GetMatrix( const d3dMatrixMode mode );
+	const matrix& get_matrix( const d3dMatrixMode mode );
 	
-	void SetRenderState( const d3dRenderState type, const uint mode );
+	void set_render_state( const d3dRenderState type, const uint mode );
 
-	uint GetRenderState( const d3dRenderState type );
+	uint get_render_state( const d3dRenderState type );
 
-	void DrawPrimitive( const d3dPrimitiveType primType, const int firstVertex, const int vertexCount );
+	void draw_primitive( const d3dPrimitiveType primType, const int firstVertex, const int vertexCount );
 
-	void DrawIndexedPrimitive( const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount );
+	void draw_indexed_primitive( const d3dPrimitiveType primType, const int firstIndex, const int indicesCount, const int firstVertex, const int vertexCount );
 
-	void DrawDebug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const Color& color );
+	void draw_debug( const d3dPrimitiveType primType, const uint vertxcount, const float* vertices, const Color& color );
 
-	bool BeginScene( void );
+	bool begin_scene( void );
 
-	void EndScene( void );
+	void end_scene( void );
 
-	void Present( void );
+	void present( void );
 
-	void ClearScreen( const Color& bgcolor );
+	void clear_screen( const Color& bgcolor );
 
-	void ClearTarget( const Color& bgcolor );
+	void clear_target( const Color& bgcolor );
 
-	void ClearZBuffer( void );
+	void clear_zbuffer( void );
 
-	void SetClipPlane( const uint index, const float* pplane );
+	void set_clip_plane( const uint index, const float* pplane );
 
-	void GetClipPlane( const uint index, float* pplane );
+	void get_clip_plane( const uint index, float* pplane );
 
-	void ApplyVertexBuffer( void );
+	void apply_vertex_buffer( void );
 
-	void ApplyTextureBuffer( void );
+	void apply_texture_buffer( void );
 
 public:
 
@@ -281,8 +281,8 @@ public:
 	BufferStates				m_vertexBuffer[8];
 	BufferStates				m_textureBuffer[8];
 
-	Array<d3dVertexBuffer*>		m_vertexBufferArray;
-	Array<d3dIndexBuffer*>		m_indexBufferArray;
+	Array<VertexBuffer*>		m_vertexBufferArray;
+	Array<IndexBuffer*>		m_indexBufferArray;
 	Array<d3dTexture_gl*>		m_textureArray;
 
 	matrix						m_world;

@@ -404,12 +404,12 @@ SEGAN_INLINE float sx_distance( const Plane& plane, const float3& point )
 //! normalize the given frustum
 SEGAN_INLINE void sx_normalize( Frustum& fr )
 {
-	fr.p0.Normalize();
-	fr.p1.Normalize();
-	fr.p2.Normalize();
-	fr.p3.Normalize();
-	fr.p4.Normalize();
-	fr.p5.Normalize();
+	fr.p0.normalize();
+	fr.p1.normalize();
+	fr.p2.normalize();
+	fr.p3.normalize();
+	fr.p4.normalize();
+	fr.p5.normalize();
 }
 
 
@@ -539,12 +539,12 @@ SEGAN_ENG_API AABox sx_cover( const AABox& b1, const OBBox& b2 );
 SEGAN_INLINE void sx_get_points( float3* dest, const OBBox& box )
 {
 	dest[0] = box.aabox.max;
-	dest[1].Set( box.aabox.min.x, box.aabox.max.y, box.aabox.max.z );
-	dest[2].Set( box.aabox.min.x, box.aabox.min.y, box.aabox.max.z );
-	dest[3].Set( box.aabox.max.x, box.aabox.min.y, box.aabox.max.z );
-	dest[4].Set( box.aabox.max.x, box.aabox.min.y, box.aabox.min.z );
-	dest[5].Set( box.aabox.max.x, box.aabox.max.y, box.aabox.min.z );
-	dest[6].Set( box.aabox.min.x, box.aabox.max.y, box.aabox.min.z );
+	dest[1].set( box.aabox.min.x, box.aabox.max.y, box.aabox.max.z );
+	dest[2].set( box.aabox.min.x, box.aabox.min.y, box.aabox.max.z );
+	dest[3].set( box.aabox.max.x, box.aabox.min.y, box.aabox.max.z );
+	dest[4].set( box.aabox.max.x, box.aabox.min.y, box.aabox.min.z );
+	dest[5].set( box.aabox.max.x, box.aabox.max.y, box.aabox.min.z );
+	dest[6].set( box.aabox.min.x, box.aabox.max.y, box.aabox.min.z );
 	dest[7] = box.aabox.min;
 
 	for ( int i=0; i<8; ++i )
@@ -554,14 +554,14 @@ SEGAN_INLINE void sx_get_points( float3* dest, const OBBox& box )
 //! transform AABox to OBBox by matrix mat
 SEGAN_INLINE void sx_transform( OBBox& res, const AABox& box, const matrix& mat )
 {
-	res.Set( box, mat );
+	res.set( box, mat );
 }
 
 //! transform AABox by matrix mat and return OBBox
 SEGAN_INLINE OBBox sx_transform( const AABox& box, const matrix& mat )
 {
 	OBBox res;
-	res.Set( box, mat );
+	res.set( box, mat );
 	return res;
 }
 
@@ -657,7 +657,7 @@ note that we need distance of objects from the near plane instead of camera posi
 SEGAN_INLINE float sx_view_distance( const float3& cameraEye, const float3& cameraAt, const float cameraFov, const float3& position, const float obj_radius )
 {
 	float3 dir = cameraAt - cameraEye;
-	dir.Normalize();
+	dir.normalize();
 	const float vp = sx_dot( dir, position ) - sx_dot( dir, cameraEye ) - obj_radius;
 	const float cosfov = 1.0f - sx_cos_fast( cameraFov );
 	return ( vp * cosfov );

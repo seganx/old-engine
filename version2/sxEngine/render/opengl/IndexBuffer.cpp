@@ -1,7 +1,7 @@
 #include "Device.h"
 
 
-d3dIndexBuffer::d3dIndexBuffer( void )
+IndexBuffer::IndexBuffer( void )
 :	m_ibo(0)
 ,	m_data(0)
 ,	m_device(0)
@@ -9,14 +9,14 @@ d3dIndexBuffer::d3dIndexBuffer( void )
 
 }
 
-d3dIndexBuffer::~d3dIndexBuffer( void )
+IndexBuffer::~IndexBuffer( void )
 {
 	sx_mem_free( m_data );
 	if ( m_ibo )
 		glDeleteBuffers( 1, &m_ibo );
 }
 
-void d3dIndexBuffer::SetDesc( const uint flag, const uint sizeinbytes, void* data /*= null */ )
+void IndexBuffer::set_dest( const uint flag, const uint sizeinbytes, void* data /*= null */ )
 {
 	m_size = sizeinbytes;
 	m_flag = flag;
@@ -36,7 +36,7 @@ void d3dIndexBuffer::SetDesc( const uint flag, const uint sizeinbytes, void* dat
 	
 }
 
-void* d3dIndexBuffer::Lock( void )
+void* IndexBuffer::lock( void )
 {
 	if ( m_flag & SX_D3D_RESOURCE_MANAGED )
 	{
@@ -49,7 +49,7 @@ void* d3dIndexBuffer::Lock( void )
 	}
 }
 
-void d3dIndexBuffer::Unlock( void )
+void IndexBuffer::unlock( void )
 {
 	if ( m_flag & SX_D3D_RESOURCE_MANAGED )
 	{

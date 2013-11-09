@@ -11,7 +11,6 @@ Desc:		This file contain the class of device 3d used OpenGL
 #ifndef GUARD_d3dRenderer_gl_HEADER_FILE
 #define GUARD_d3dRenderer_gl_HEADER_FILE
 
-#include "../Render.h"
 #include "Device.h"
 
 class SEGAN_ENG_API Renderer : public d3dRenderer
@@ -45,8 +44,35 @@ public:
 	//!	update renderer
 	void update( float elpstime );
 
+	//!	start to draw the scene
+	void begin_draw( const Color& bgcolor );
+
+	//! finish drawing the scene
+	void end_draw( void );
+
 	//! draw scene to the display
-	void draw( float elpstime, uint flag );
+	void render( float elpstime, uint flag );
+
+	//! draw a simple line
+	void draw_line( const float3& v1, const float3& v2, const Color& color );
+
+	//! draw a grid, snapped to integer space but always in front of camera
+	void draw_grid( const uint size, const Color& color );
+
+	//! draw a compass by specified size
+	void draw_compass( void );
+
+	//! visualize a simple circle
+	void draw_circle( const float3& center, const float radius, const dword flags, const Color& color );
+
+	//! visualize a wired box
+	void draw_box( const AABox& box, const Color& color );
+
+	//! visualize a wired box
+	void draw_box( const OBBox& box, const Color& color );
+
+	//! visualize a simple sphere
+	void draw_sphere( const Sphere& sphere, const dword flags, const Color& color, const uint stacks = 17, const uint slices = 20 );
 
 public:
 	d3dDevice*		m_device;
