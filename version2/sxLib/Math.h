@@ -374,6 +374,14 @@ SEGAN_LIB_API uint sx_crc32_a( const char* str );
 //! generate unique id from given string
 SEGAN_LIB_API uint sx_crc32_w( const wchar* str );
 
+//! create a hash number from given data
+SEGAN_LIB_API uint sx_checksum( const void* data, const uint size, const uint key = 1363 );
+
+//! encrypt src data to the dest using key value
+SEGAN_LIB_API void sx_encrypt( void* dest, const void* src, const uint size, const uint key = 1363 );
+
+//! decrypt src data to the dest using key value
+SEGAN_LIB_API void sx_decrypt( void* dest, const void* src, const uint size, const uint key = 1363 );
 
 
 //! a simple class to generate random numbers

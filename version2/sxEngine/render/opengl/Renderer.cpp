@@ -86,6 +86,14 @@ void Renderer::render( float elpstime, uint flag )
 	float vert[9] = { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f };
 	m_device->draw_debug( PT_LINE_STRIP, 3, vert, Color(0.0f, 0.0f, 1.0f, 1.0f) );
 #endif
+
+#if 1
+	for ( sint i=0; i<m_elements.m_count; ++i )
+	{
+		d3dElement* elmnt = m_elements[i];
+		m_device->draw_debug( PT_LINE_STRIP, elmnt->vcount, &elmnt->pos->x, 0xffffffff );
+	}
+#endif
 }
 
 void Renderer::draw_line( const float3& v1, const float3& v2, const Color& color )

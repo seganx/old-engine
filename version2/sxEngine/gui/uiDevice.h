@@ -10,7 +10,8 @@
 #define GUARD_uiDevice_HEADER_FILE
 
 
-#include "../../sxLib/Lib.h"
+#include "../Engine_def.h"
+#include "../math/Math.h"
 
 #define SX_GUI_MAX_ELEMENT				4
 
@@ -31,12 +32,19 @@
 #define SX_GUI_PROGRESSCIRCLE			0x00002000		//!	Progress : control will display as circle mode
 #define SX_GUI_PROGRESSUV				0x00004000		//!	Progress : control will display as linear mode and UV alignment
 
+//! GUI post properties
+#define _SX_GUI_NOT_VISIBLE_			0x10000000
+#define _SX_GUI_NOT_ENABLE_				0x20000000
+#define _SX_GUI_IN_3DSPACE_				0x40000000
+
 //! bounding conditions
 #define SX_GUI_MINIMUM_ALPHA			0.001f			//!	minimum alpha value that controls can be shown
 #define SX_GUI_MINIMUM_SCALE			0.0001f			//! minimum scale value that controls can be shown
 
 //! prevent rubbing surfaces
 #define SX_GUI_Z_BIAS					-0.15f
+
+
 
 //! these are types of GUI controls
 enum uiType
@@ -116,8 +124,8 @@ enum uiMouseState
 	MS_32BITENUM = 0xffffffff
 };
 
-/*! input reporter reports that which input values used in other processes */
-struct uiInputReport
+/*! input also reports that which input values used in other processes */
+struct uiInput
 {
 	Ray				ray;				//!	ray comes from the mouse
 	uint			mouseLocked;		//!	contain the id of object who locked mouse
@@ -130,13 +138,13 @@ struct uiInputReport
 	word			keychar;			//!	key down character
 	dword			keycodeEx;			//!	additional extended key code
 
-	uiInputReport(void): ray( float3(0,0,0), float3(0,0,0) ), mouseLocked(0), keyboardLocked(0), 
+	uiInput(void): ray( float3(0,0,0), float3(0,0,0) ), mouseLocked(0), keyboardLocked(0), 
 		mouseLeft(MS_NORMAL), mouseRight(MS_NORMAL), mouseMidd(MS_NORMAL), mouseWheel(0), keycode(0), keychar(0), keycodeEx(0) {}
 };
 
 
 //! describe character information
-struct uiFontChar
+struct uiChar
 {
 	dword	id;
 	sint	x;
@@ -148,7 +156,7 @@ struct uiFontChar
 	sint	xAdvance;
 	sint	page;
 
-	uiFontChar(): id(0), x(0), y(0), width(0), height(0), xOffset(0), yOffset(0), xAdvance(0), page(0) {};
+	uiChar(): id(0), x(0), y(0), width(0), height(0), xOffset(0), yOffset(0), xAdvance(0), page(0) {};
 };
 
 //! describe font information
@@ -182,42 +190,29 @@ struct uiState
 class SEGAN_ENG_API uiStateController
 {
 	SEGAN_STERILE_CLASS(uiStateController);
+
 public:
+
 	uiStateController( void );
 	~uiStateController( void );
 
 	//! clear all states except one first state
-	void Clear( void );
-
-	//! return the number of states
-	uint Count( void ) const;
+	void clear( void );
 
 	//! add a new state and fill it by current state and return index of new state
-	uint Add( void );
+	uint add( void );
 
 	//! remove an state by specified index
-	void Remove( const sint index );
-
-	//! return the index of current state
-	uint GetIndex( void ) const;
+	void remove( const sint index );
 
 	//! set index of the state
-	void SetIndex( const sint index );
-
-	//! return reference to the current state structure
-	uiState* GetCurrent( void );
-
-	//! return reference to state by index
-	uiState* GetByIndex( const sint index );
-
-	//! return reference of the blended state structure
-	uiState* GetBlended( void );
+	void set_current( const sint index );
 
 	//! return true if the state is blending
-	bool IsBlending( void ) const;
+	bool is_blending( void ) const;
 
 	//! TODO: move option from this to the uiControl body !! get options and update controller then return new option 
-	void Update( const dword option, float elpsTime );
+	void update( const dword option, float elpsTime );
 
 public:
 
@@ -245,15 +240,15 @@ public:
 	~uiElement( void );
 
 	//! create vertices
-	void CreateVertices( const uint count );
+	void create_vertices( const uint count );
 
 	//! clear all vertices
-	void ClearVertices( void );
+	void clear_vertices( void );
 
 public:
 	uiElementType	m_type;				//	type of data in the element
 	uint			m_image;			//	image id helps the manager to compound elements
-	uint			m_numVertices;		//	number of vertices
+	uint			m_vcount;			//	number of vertices
 	float3*			m_pos;				//	positions
 	float2*			m_uv;				//	UV coordinates
 	Color2*			m_color;			//	colors
@@ -261,21 +256,21 @@ public:
 };
 
 //! base class of forms
-class Form
+class uiForm
 {
 public:	
-	virtual ~Form( void ) {};
+	virtual ~uiForm( void ) {};
 };
 
 //! this is the standard GUI callback event.
-typedef void (Form::*GUICallback)(class uiControl* sender);
+typedef void (uiForm::*CB_UIControl)(class uiControl* sender);
 
 //! object structure used to assign GUI member functions
-class GUIFuncPtr
+class uiFunction
 {
 public:
-	GUIFuncPtr(): m_form(null), m_func(null) {};
-	GUIFuncPtr( Form* form, GUICallback func ): m_form(form), m_func(func) {};
+	uiFunction(): m_form(null), m_func(null) {};
+	uiFunction( uiForm* form, CB_UIControl func ): m_form(form), m_func(func) {};
 	void operator ()( class uiControl* sender )
 	{
 		if ( m_form && m_func )
@@ -283,8 +278,8 @@ public:
 	}
 
 public:
-	Form*			m_form;
-	GUICallback		m_func;
+	uiForm*			m_form;
+	CB_UIControl	m_func;
 };
 
 //! basic GUI control
@@ -296,22 +291,22 @@ public:
 	~uiControl( void );
 
 	//! set the parent of this control
-	virtual void SetParent( uiControl* parent );
+	virtual void set_parent( uiControl* parent );
 
 	//! set size of control
-	virtual void SetSize( const float width, const float height );
+	virtual void set_size( const float width, const float height );
 
 	//! update the control
-	virtual void Update( float elpsTime, const matrix& viewInverse, const matrix& viewProjection, const uint vpwidth, const uint vpheight );
+	virtual void update( float elpsTime, const matrix& viewInverse, const matrix& viewProjection, const uint vpwidth, const uint vpheight );
 
 	//! process input for this control
-	virtual void ProcessInput( uiInputReport* inputReport );
+	virtual void process_input( uiInput* inputReport );
 
 	//! extract valid elements in the control
-	void GetElements( Array<uiElement*> * elementArray, const bool traversChilds = true );
+	void get_elements( Array<uiElement*> * elementArray, const bool traversChilds = true );
 
 	/*! return index of element contacted by mouse ray and fill out uv point of intersection. return -1 if no contact */
-	sint IntersectRay( const Ray* ray, const sint element = -1, OUT float2* uv = null );
+	sint intersect_ray( const Ray* ray, const sint element = -1, OUT float2* uv = null );
 
 public:
 
@@ -330,12 +325,12 @@ public:
 	Array<uiControl*>	m_child;							//!	array of children
 
 	uiMouseState		m_mouseState;						//!	hold the state of mouse
-	GUIFuncPtr			m_onClick;							//!	callback function for mouse click
-	GUIFuncPtr			m_onEnter;							//!	callback function for mouse enter
-	GUIFuncPtr			m_onExit;							//!	callback function for mouse leave
-	GUIFuncPtr			m_onMove;							//!	callback function for mouse move
-	GUIFuncPtr			m_onWheel;							//!	callback function for mouse wheel
-	GUIFuncPtr			m_onKeyDown;						//!	callback function for key down
+	uiFunction			m_onClick;							//!	callback function for mouse click
+	uiFunction			m_onEnter;							//!	callback function for mouse enter
+	uiFunction			m_onExit;							//!	callback function for mouse leave
+	uiFunction			m_onMove;							//!	callback function for mouse move
+	uiFunction			m_onWheel;							//!	callback function for mouse wheel
+	uiFunction			m_onKeyDown;						//!	callback function for key down
 
 };
 
@@ -349,48 +344,9 @@ public:
 	~uiPanel( void );
 
 	//! set size of control
-	virtual void SetSize( const float width, const float height );
+	virtual void set_size( const float width, const float height );
 
 };
-
-//! uiDevice contain some additional functions
-class SEGAN_ENG_API uiDevice
-{
-	SEGAN_STERILE_CLASS(uiDevice);
-public:
-
-	uiDevice( void );
-	~uiDevice( void );
-
-	//! create and return a GUI by given type
-	uiControl* CreateContorl( const uiType type );
-
-	//! copy the src element to the dest element in the given index position
-	void Copy( uiElement* dest, uint& index, const uiElement* src );
-
-	//! prepare for batching elements. pass count 0 to compute number of batch automatically
-	void BeginBatch( const uint count );
-
-	//! add an element to the batch and return false if can't batch the element with another
-	bool AddBatch( const uiElement* elem );
-
-	//! return number of vertices need to batch all added elements
-	uint GetBatchVertexCount( void );
-
-	//! end patch and insert them to dest element. the last data in dest will be lost
-	void EndBatch( uiElement* dest );
-
-public:
-
-	Array<uiElement*>	m_batches;		//!	us in batch system
-	bool				m_editor;		//! indicates that GUI is running in editor mode
-};
-
-
-//! GUI post properties
-#define _SX_GUI_NOT_VISIBLE_			0x10000000
-#define _SX_GUI_NOT_ENABLE_				0x20000000
-#define _SX_GUI_IN_3DSPACE_				0x40000000
 
 //! return true if the ray intersect with element
 SEGAN_ENG_API bool sx_intersect( const Ray* ray, const uiElement* element, OUT float2* uv = null );

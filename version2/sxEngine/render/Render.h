@@ -26,7 +26,7 @@
 #define SX_D3D_REFLECT					0x00000100
 #define SX_D3D_WIREFRAME				0x00000200
 #define SX_D3D_BOUNINGBOX				0x00000400
-#define SX_D3D_BILLBOARD					0x00000800
+#define SX_D3D_BILLBOARD				0x00000800
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -158,17 +158,35 @@ struct d3dTextureDesc
 };
 
 //////////////////////////////////////////////////////////////////////////
+//! shader description
+struct d3dShaderDesc
+{
+	uint				numTexture;		//!	number of texture used in shader
+	uint				numVariable;	//! number of variable used in shader
+	uint				numVariable4;	//!	number of 4D variable used in shader
+	float				var[16];		//! variables of the shader
+	float4				var4d[8];		//! 4D variables of the shader
+};
+
+//////////////////////////////////////////////////////////////////////////
 //!	material properties
 struct d3dMaterial 
 {
-	Color				ambient;
-	Color				diffuse;
-	Color				specular;
-	Color				emissive;
-	variable			var[16];
-	variable4			var4d[4];
-	class d3dTexture*	texture[8];
-	class d3dShader*	shader;
+	variable			var[16];		//! variables of the material will pass to shader
+	variable4			var4d[8];		//! 4D variables of the material will pass to shader
+	class d3dTexture*	texture[16];	//! textures of the material will pass to shader
+	class d3dShader*	shader;			//! shader of material
+};
+
+//////////////////////////////////////////////////////////////////////////
+//!	basic element of a graphical user interface
+struct d3dElement
+{
+	uint				vcount;			//!	number of vertices
+	d3dMaterial*		material;		//!	material used to draw element
+	float3*				pos;			//!	positions
+	float2*				uv;				//!	UV coordinates
+	Color2*				color;			//!	colors
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -177,8 +195,8 @@ struct d3dMeshDesc
 {
 	dword		flag;			//! resource flag SX_D3D_RESOURCE_
 	d3dFormat	format;			//! combination of FMT_VXXX
-	uint		numVertices;	//! number of vertices
-	uint		numTriangles;	//!	number of triangles
+	uint		vercount;		//! number of vertices
+	uint		tricount;		//!	number of triangles
 };
 
 
@@ -229,9 +247,51 @@ public:
 	d3dTextureDesc		m_desc;		//  description of texture
 };
 
+
+//////////////////////////////////////////////////////////////////////////
+//! abstract class of shader
+//////////////////////////////////////////////////////////////////////////
+class SEGAN_ENG_API d3dShader
+{
+	SEGAN_STERILE_CLASS( d3dShader );
+
+public:
+	d3dShader( void ) {}
+	virtual ~d3dShader( void ) {}
+
+	//! set shader code
+	virtual void set_code( const wchar* code ) = 0;
+
+	//! compile the shader. return false if operation failed and fill out the destlog with error message
+	virtual bool compile( const char* defines, wchar* destlog = null ) = 0;
+
+	//! return the name of float variable parameter
+	virtual const wchar* get_float_name( const uint index ) = 0;
+
+	//! return the name of float4 variable parameter
+	virtual const wchar* get_float4_name( const uint index ) = 0;
+
+	//! return the name of texture parameter
+	virtual const wchar* get_texture_name( const uint index ) = 0;
+
+	//! set new float variable
+	virtual void set_float( const uint index, const float var ) = 0;
+
+	//! set new 4D float variable
+	virtual void set_float4( const uint index, const float4 var ) = 0;
+
+	//! set new texture
+	virtual void set_texture( const uint index, const d3dTexture* tex ) = 0;
+
+public:
+
+	d3dShaderDesc	m_desc;		//	description of the shader
+};
+
+
 //////////////////////////////////////////////////////////////////////////
 //!	mesh
-class d3dMesh
+class SEGAN_ENG_API d3dMesh
 {
 	SEGAN_STERILE_CLASS( d3dMesh );
 
@@ -404,10 +464,11 @@ public:
 
 public:
 
-	d3dDriverInfo		m_driverinfo;
-	d3dDisplayeInfo		m_displayinfo;
-	d3dCamera			m_camera;
-	d3dScene*			m_scene;
+	d3dDriverInfo			m_driverinfo;		//!	describe the device capabilities
+	d3dDisplayeInfo			m_displayinfo;		//!	describe the display information
+	d3dCamera				m_camera;			//!	camera used in rendering
+	d3dScene*				m_scene;			//!	the scene should be draw in render function
+	Array<d3dElement*>		m_elements;			//!	all elements should be draw at the end of rendering function 
 };
 
 

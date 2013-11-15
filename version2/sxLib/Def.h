@@ -87,7 +87,7 @@ typedef byte				*pbyte;
 
 #define SEGAN_CALLSTACK						1		//	enable call stack system to log stack of function
 
-#define SEGAN_LIB_ASSERT					1		//	check and log some special events on containers
+#define SEGAN_ASSERT						1		//	check and log some special events on containers
 
 #define SEGAN_CRITICAL_SECTION				1		//	use critical section for multi threaded safety
 
@@ -166,4 +166,12 @@ SEGAN_LIB_API void lib_leave_cs( void );
 #define sx_leave_cs()
 #endif
 
+// assertion
+#if ( defined(_DEBUG) || SEGAN_ASSERT )
+#define sx_assert(expression)	((!!(expression)) || lib_assert(_CRT_WIDE(#expression), _CRT_WIDE(__FILE__), __LINE__))
+//! assertion function will stop application and report call stack
+SEGAN_LIB_API sint lib_assert( const wchar* expression, const wchar* file, const sint line );
+#else
+#define sx_assert(expression)
+#endif
 #endif	//	GUARD_Def_HEADER_FILE

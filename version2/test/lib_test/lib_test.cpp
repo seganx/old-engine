@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
 #endif
 
 
-#if 1
+#if 0
 	{
 		Table<int> table;
 
@@ -277,6 +277,27 @@ int main(int argc, char* argv[])
 		table.print( table.m_root, 0 );
 #endif
 		table.clear();
+
+		printf("\n\n");
+	}
+#endif
+
+
+#if 1
+	{
+		String tmp;
+		sx_load_string( tmp, L"D:/test.txt" );
+		wprintf( L"%s\n", tmp );
+
+		printf("\n\n");
+
+		Array<String*> list;
+		sx_load_string_list( list, L"D:/test.txt" );
+		for ( sint i=0; i<list.m_count; ++i )
+		{
+			wprintf( L"%d %s\n", i, list[i]->text() );
+		}
+
 	}
 #endif
 

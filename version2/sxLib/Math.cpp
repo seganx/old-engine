@@ -153,6 +153,92 @@ SEGAN_INLINE uint sx_crc32_w( const wchar* str )
 }
 
 
+
+//////////////////////////////////////////////////////////////////////////
+//	checksum and encryption functions
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//	use protocol random class to handle multi threaded calls
+class CSRandom
+{
+public:
+	CSRandom( const uint seed = 1363 ): m_seed(seed), m_curr(seed) {}
+
+	uint get( void )
+	{
+		m_curr += ( ( m_curr * m_seed * 28454642 ) + ( m_curr * 38745674 ) );
+		return ( m_curr % 255 );
+	}
+
+public:
+	uint	m_seed;
+	uint	m_curr;
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+// helper functions
+SEGAN_INLINE int checksum_helper( CSRandom* randomer, const uint index )
+{
+	uint r = randomer->get() * 10;
+	switch ( index % 10 )
+	{
+	case 0 :	return int( 100 * ( r * 0.5f ) );
+	case 1 :	return int( 150 * ( r * 0.1f ) );
+	case 2 :	return int( 170 * ( r * 0.6f ) );
+	case 3 :	return int( 200 * ( r * 0.4f ) );
+	case 4 :	return int( 110 * ( r * 0.3f ) );
+	case 5 :	return int( 180 * ( r * 0.8f ) );
+	case 6 :	return int( 130 * ( r * 0.7f ) );
+	case 7 :	return int( 120 * ( r * 0.9f ) );
+	case 8 :	return int( 240 * ( r * 0.1f ) );
+	case 9 :	return int( 190 * ( r * 0.4f ) );
+	}
+	return 0;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+//	encryption functions
+//////////////////////////////////////////////////////////////////////////
+SEGAN_INLINE uint sx_checksum( const void* data, const uint size, const uint key /*= 1363*/ )
+{
+	if ( !data || !size ) return 0;
+	uint r = 0;
+	const char* d = (char*)data;
+	CSRandom randomer(key);
+	for ( uint i=0; i<size; ++i )
+		r += d[i] + checksum_helper( &randomer, i );
+	return r;
+}
+
+SEGAN_INLINE void sx_encrypt( void* dest, const void* src, const uint size, const uint key /*= 1363*/ )
+{
+	CSRandom randomer(key);
+	byte* d = (byte*)dest;
+	byte* s = (byte*)src;
+	for ( uint i=0; i<size; ++i )
+	{
+		byte a = checksum_helper( &randomer, i );
+		d[i] = s[i] + a;
+	}
+}
+
+SEGAN_INLINE void sx_decrypt( void* dest, const void* src, const uint size, const uint key /*= 1363*/ )
+{
+	CSRandom randomer(key);
+	byte* d = (byte*)dest;
+	byte* s = (byte*)src;
+	for ( uint i=0; i<size; ++i )
+	{
+		byte a = checksum_helper( &randomer, i );
+		d[i] = s[i] - a;
+	}
+}
+
+
+
 //////////////////////////////////////////////////////////////////////////
 // initialize internal library
 bool sx_lib_init_math( void )
@@ -166,7 +252,6 @@ bool sx_lib_init_math( void )
 
 	//  initialize random seed
 	srand( (uint)time(NULL) );
-
 
 	//	initialize crc32 table
 	crc32_init_table();

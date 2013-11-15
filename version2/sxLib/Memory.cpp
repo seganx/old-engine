@@ -1,10 +1,14 @@
 #include <memory>
 #include "Memory.h"
 #include "Assert.h"
-#include "Math.h"
 
 #if defined(_WIN32)
 #include <Windows.h>
+#endif
+
+
+#ifndef min
+#define min(a,b) (((a)<(b))?(a):(b))
 #endif
 
 
@@ -54,7 +58,7 @@ SEGAN_INLINE void mem_realloc( void*& p, const uint newsizeinbyte )
 		{
 			//  if reallocate function failed then try to allocate new one and copy last data to new pool
 			newptr = ::malloc( newsizeinbyte );
-			memcpy( newptr, p, sx_min_i( sx_mem_size( p ), newsizeinbyte ) );
+			memcpy( newptr, p, min( sx_mem_size( p ), newsizeinbyte ) );
 			::free( p );
 			p = newptr;
 		}
@@ -653,7 +657,7 @@ SEGAN_INLINE void* MemMan_Pool::realloc( const void* p, const uint sizeInByte )
 	{
 		sx_assert( pbyte(p) > m_pool && pbyte(p) < ( m_pool + mem_size(m_pool) ) );
 		void* tmp = alloc( sizeInByte );
-		mem_copy( tmp, p, sx_min_i( size(p), sizeInByte ) );
+		mem_copy( tmp, p, min( size(p), sizeInByte ) );
 		free( p );
 		return tmp;
 	}

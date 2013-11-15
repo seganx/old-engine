@@ -22,6 +22,7 @@
 #include "Stream.h"
 #include "Logger.h"
 #include "Table.h"
+#include "Utils.h"
 
 
 // initialize internal library

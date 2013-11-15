@@ -59,7 +59,6 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	window->set_visible( true );
 
 
-
 	render = sx_create_renderer( 0 );
 	render->initialize( 0 );
 	render->set_size( window->m_rect.width, window->m_rect.height, SX_D3D_VSYNC, window->get_handle() );

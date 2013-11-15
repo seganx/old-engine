@@ -88,7 +88,7 @@ public:
 			m_root = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 			m_root->init( name[0] );
 		}
-		return _put_x( null, m_root, 0, name, data );
+		return _put_sort( null, m_root, 0, name, data );
 	}
 
 	bool remove( const wchar* name )
@@ -194,7 +194,7 @@ private:
 		}
 	}
 
-	SEGAN_LIB_INLINE bool _put_x( Leaf* left, Leaf* leaf, uint index, const wchar* name, const T_data& data )
+	SEGAN_LIB_INLINE bool _put_sort( Leaf* left, Leaf* leaf, uint index, const wchar* name, const T_data& data )
 	{
 #if TABLE_CASE_INSENSITIVE
 		wchar label = tolower( name[index] );
@@ -263,7 +263,7 @@ private:
 				leaf->right =  (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 				leaf->right->init( label );
 			}
-			return _put_x( leaf, leaf->right, index+1, name, data );
+			return _put_sort( leaf, leaf->right, index+1, name, data );
 		}
 	}
 

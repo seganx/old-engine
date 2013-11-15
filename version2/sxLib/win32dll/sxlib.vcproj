@@ -177,10 +177,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Assert.h"
-				>
-			</File>
-			<File
 				RelativePath="..\Callstack.cpp"
 				>
 			</File>
@@ -229,14 +225,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\protocol.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\protocol.h"
-				>
-			</File>
-			<File
 				RelativePath="..\Queue.h"
 				>
 			</File>
@@ -258,6 +246,18 @@
 			</File>
 			<File
 				RelativePath="..\Table.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="utils"
+			>
+			<File
+				RelativePath="..\Utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Utils.h"
 				>
 			</File>
 		</Filter>

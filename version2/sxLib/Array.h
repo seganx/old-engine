@@ -181,7 +181,6 @@ public:
 			quick_sort( cmpFunc, right + 1, rightarg );
 		}
 	}
-#endif
 
 private:
 
@@ -370,6 +369,7 @@ public:
 			quick_sort( cmpFunc, right + 1, rightarg );
 		}
 	}
+#endif
 
 public:
 

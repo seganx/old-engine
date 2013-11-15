@@ -135,7 +135,7 @@ uiElement::uiElement( void )
 uiElement::~uiElement( void )
 {
 	if ( m_numVertices )
-		ClearVertives();
+		ClearVertices();
 }
 
 void uiElement::CreateVertices( const uint count )
@@ -161,10 +161,10 @@ void uiElement::CreateVertices( const uint count )
 		}
 		m_numVertices = count;
 	}
-	else ClearVertives();
+	else ClearVertices();
 }
 
-void uiElement::ClearVertives( void )
+void uiElement::ClearVertices( void )
 {
 	if ( m_numVertices )
 	{

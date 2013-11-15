@@ -289,6 +289,34 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="gui"
+			>
+			<File
+				RelativePath="..\gui\uiControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\gui\uiDevice.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\gui\uiDevice.h"
+				>
+			</File>
+			<File
+				RelativePath="..\gui\uiManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\gui\uiManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\gui\uiPanel.cpp"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\Engine_def.h"
 			>
