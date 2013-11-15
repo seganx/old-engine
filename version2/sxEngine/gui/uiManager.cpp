@@ -1,7 +1,7 @@
 #include "uiManager.h"
 #include "uiDevice.h"
 
-GUIManager::GUIManager( void )
+uiManager::uiManager( void )
 : m_controls(128)
 , m_elements(128)
 {
@@ -10,29 +10,29 @@ GUIManager::GUIManager( void )
 	m_drawable->m_type = ET_TRIANGLES;
 }
 
-GUIManager::~GUIManager( void )
+uiManager::~uiManager( void )
 {
 	//	destroy drawable element
 	sx_delete_and_null( m_drawable );
 }
 
-void GUIManager::Add( const uiControl* control )
+void uiManager::Add( const uiControl* control )
 {
 	m_controls.push_back( (uiControl*)control );
 }
 
-void GUIManager::Remove( const uiControl* control )
+void uiManager::Remove( const uiControl* control )
 {
 	m_controls.remove( (uiControl*)control );
 }
 
-void GUIManager::Delete( uiControl*& control )
+void uiManager::Delete( uiControl*& control )
 {
 	m_controls.remove( control );
 	sx_delete_and_null( control );
 }
 
-void GUIManager::Clear( void )
+void uiManager::Clear( void )
 {
 	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
@@ -42,7 +42,7 @@ void GUIManager::Clear( void )
 }
 
 
-void GUIManager::Update( float elpsTime, const float vpwidth, const float vpheight )
+void uiManager::Update( float elpsTime, const float vpwidth, const float vpheight )
 {
 	matrix proj = sx_orthographic( vpwidth, vpheight, -200.0f, 200.0f );
 	matrix view = sx_lookat( float3(0, 0, 1), float3( 0, 0, 0), float3( 0, 1, 0) );
@@ -54,7 +54,7 @@ void GUIManager::Update( float elpsTime, const float vpwidth, const float vpheig
 
 	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
-//		m_controls.m_item[i]->Update( elpsTime, viewinvr, viewproj, g_engine->m_device3D->m_viewport.width, g_engine->m_device3D->m_viewport.height );
+		m_controls.m_item[i]->update( elpsTime, viewinvr, viewproj, vpwidth, vpheight );
 	}
 }
 
@@ -90,7 +90,7 @@ void GUIManager::ProcessInput( struct InputReport* inputReport )
 }
 #endif
 
-void GUIManager::Draw( const dword flag )
+void uiManager::Draw( const dword flag )
 {
 	//	extract all elements that should be draw
 	m_elements.clear();
@@ -99,40 +99,25 @@ void GUIManager::Draw( const dword flag )
 		m_controls[i]->get_elements( &m_elements );
 	}
 
-#if 0
+#if 1
 
 	//	batch elements and draw them
 	while ( m_elements.m_count )
 	{
-		g_engine->m_deviceUI->BeginBatch( 0 );
+		BeginBatch( 0 );
 		for ( sint i=0; i<m_elements.m_count; ++i )
 		{
-			if ( g_engine->m_deviceUI->AddBatch( m_elements.m_item[i] ) )
+			if ( AddBatch( m_elements.m_item[i] ) )
 				m_elements.remove_index( i-- );
 			else
 				break;
 		}
 
 		//	verify that one element batched at least
-		if ( g_engine->m_deviceUI->m_batches.m_count < 1 ) break;
+		if ( m_batches.m_count < 1 ) break;
 
 		//	end batch
-		g_engine->m_deviceUI->EndBatch( m_drawable );
-
-		//	draw the final element
-		vbdescPos.size = m_drawable->m_numVertices * sizeof(float3);
-		vbdescUV.size = m_drawable->m_numVertices * sizeof(float2);
-		vbdescColor.size = m_drawable->m_numVertices * sizeof(Color2);
-
-		m_vb_pos->SetDesc( vbdescPos, m_drawable->m_posfinal );
-		m_vb_uv->SetDesc( vbdescUV, m_drawable->m_uv );
-		m_vb_color->SetDesc( vbdescColor, m_drawable->m_color );
-
-		g_engine->m_device3D->SetVertexBuffer( m_vb_pos,	SX_VERTEX_POSITION );
-		g_engine->m_device3D->SetVertexBuffer( m_vb_uv,		SX_VERTEX_UV0 );
-		g_engine->m_device3D->SetVertexBuffer( m_vb_color,	SX_VERTEX_COLORS );
-
-		g_engine->m_device3D->DrawPrimitive( PT_TRIANGLE_LIST, 0, m_drawable->m_numVertices );
+		EndBatch( m_drawable );
 	}
 #endif
 
@@ -140,7 +125,7 @@ void GUIManager::Draw( const dword flag )
 
 
 
-uiControl* GUIManager::CreateContorl( const uiType type )
+uiControl* uiManager::CreateContorl( const uiType type )
 {
 	switch ( type )
 	{
@@ -159,7 +144,7 @@ uiControl* GUIManager::CreateContorl( const uiType type )
 	return null;
 }
 
-void GUIManager::Copy( uiElement* dest, uint& index, const uiElement* src )
+void uiManager::Copy( uiElement* dest, uint& index, const uiElement* src )
 {
 	switch ( src->m_type )
 	{
@@ -202,13 +187,13 @@ void GUIManager::Copy( uiElement* dest, uint& index, const uiElement* src )
 	}
 }
 
-SEGAN_INLINE void GUIManager::BeginBatch( const uint count )
+SEGAN_INLINE void uiManager::BeginBatch( const uint count )
 {
 	if ( count )
 		m_batches.set_size( count );
 }
 
-SEGAN_INLINE bool GUIManager::AddBatch( const uiElement* elem )
+SEGAN_INLINE bool uiManager::AddBatch( const uiElement* elem )
 {
 	//	verify that all these have the same image id
 	if ( m_batches.m_count && m_batches[0]->m_image != elem->m_image ) return false;
@@ -229,7 +214,7 @@ SEGAN_INLINE bool GUIManager::AddBatch( const uiElement* elem )
 	return true;
 }
 
-SEGAN_INLINE uint GUIManager::GetBatchVertexCount( void )
+SEGAN_INLINE uint uiManager::GetBatchVertexCount( void )
 {
 	// compute number of vertices
 	uint sumVertices = 0;
@@ -242,7 +227,7 @@ SEGAN_INLINE uint GUIManager::GetBatchVertexCount( void )
 	return sumVertices;
 }
 
-SEGAN_INLINE void GUIManager::EndBatch( uiElement* dest )
+SEGAN_INLINE void uiManager::EndBatch( uiElement* dest )
 {
 	//	get number of vertices needed to batch them
 	const uint sumVertices = GetBatchVertexCount();

@@ -13,5 +13,6 @@
 #include "../sxLib/Lib.h"
 #include "system/System.h"
 #include "render/Render.h"
+#include "gui/uiManager.h"
 
 #endif	//	GUARD_sxEngine_HEADER_FILE

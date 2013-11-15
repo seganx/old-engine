@@ -1,14 +1,14 @@
 /********************************************************************
 	created:	2013/03/15
-	filename: 	GUIManager.h
+	filename: 	uiManager.h
 	Author:		Sajad Beigjani
 	eMail:		sajad.b@gmail.com
 	Site:		www.SeganX.com
 	Desc:		This file contains a simple GUI manager for ordering 
 				and drawing controls and managing events of them
 *********************************************************************/
-#ifndef GUARD_GUIManager_HEADER_FILE
-#define GUARD_GUIManager_HEADER_FILE
+#ifndef GUARD_uiManager_HEADER_FILE
+#define GUARD_uiManager_HEADER_FILE
 
 #include "../Engine_def.h"
 #include "uiDevice.h"
@@ -19,14 +19,14 @@ class uiElement;
 class d3dVertexBuffer;
 
 /*! this class draw controls on the screen and manage events */
-class SEGAN_ENG_API GUIManager
+class SEGAN_ENG_API uiManager
 {
-	SEGAN_STERILE_CLASS(GUIManager);
+	SEGAN_STERILE_CLASS(uiManager);
 
 public:
 
-	GUIManager( void );
-	~GUIManager( void );
+	uiManager( void );
+	~uiManager( void );
 
 	//! add new control to manager
 	void Add( const uiControl* control );
@@ -78,4 +78,4 @@ public:
 	uiElement*			m_drawable;		//	final drawable element
 };
 
-#endif	//	GUARD_GUIManager_HEADER_FILE
+#endif	//	GUARD_uiManager_HEADER_FILE

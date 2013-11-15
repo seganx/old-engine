@@ -4,6 +4,7 @@
 
 Window*			window = null;
 d3dRenderer*	render = null;
+uiManager*		gui = null;
 
 int windowcallback( class Window* sender, const WindowEvent* data )
 {
@@ -33,6 +34,15 @@ int windowcallback( class Window* sender, const WindowEvent* data )
 void mainloop( float elpstime )
 {
 	render->update( elpstime );
+	gui->Update( elpstime, window->m_rect.width, window->m_rect.height );
+
+	gui->Draw( 0 );
+
+	d3dElement elmnt;
+	elmnt.vcount = gui->m_drawable->m_vcount;
+	elmnt.pos = gui->m_drawable->m_posfinal;
+	render->m_elements.clear();
+	render->m_elements.push_back( &elmnt );
 
 	render->begin_draw( 0xff332211 );
 	render->draw_grid( 7, 0xff888888 );
@@ -63,7 +73,10 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	render->initialize( 0 );
 	render->set_size( window->m_rect.width, window->m_rect.height, SX_D3D_VSYNC, window->get_handle() );
 
-
+	gui = sx_new( uiManager );
+	uiPanel* panel = sx_new( uiPanel );
+	panel->set_size( 2, 1 );
+	gui->Add( panel );
 
 	//////////////////////////////////////////////////////////////////////////
 	//	going to main loop in window
