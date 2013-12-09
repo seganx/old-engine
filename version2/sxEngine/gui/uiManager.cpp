@@ -7,7 +7,6 @@ uiManager::uiManager( void )
 {
 	//	create drawable element
 	m_drawable = sx_new( uiContext );
-	m_drawable->m_type = ET_TRIANGLES;
 }
 
 uiManager::~uiManager( void )
@@ -48,7 +47,7 @@ void uiManager::update( float elpsTime, const float vpwidth, const float vpheigh
 
 	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
-		m_controls.m_item[i]->update( elpsTime, viewinvr, viewproj, vpwidth, vpheight );
+		m_controls.m_item[i]->update( elpsTime, vpwidth, vpheight );
 	}
 }
 
@@ -90,7 +89,7 @@ void uiManager::draw( const dword flag )
 	m_elements.clear();
 	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
-		m_controls[i]->get_elements( &m_elements );
+		sx_get_contexts( m_controls[i], &m_elements );
 	}
 
 #if 1
@@ -119,12 +118,12 @@ void uiManager::draw( const dword flag )
 
 
 
-uiControl* uiManager::create_contorl( const uiType type )
+uiControl* uiManager::create_contorl( const char* type )
 {
+#if 0
 	switch ( type )
 	{
 	case UT_PANEL:			return sx_new( uiPanel );
-#if 0
 	case GUI_BUTTON:		return sx_new( uiButton );
 	case GUI_CHECKBOX:		return sx_new( uiCheckBox );
 	case GUI_TRACKBAR:		return sx_new( uiScroll );
@@ -133,51 +132,20 @@ uiControl* uiManager::create_contorl( const uiType type )
 	case GUI_EDITBOX:		return sx_new( uiEditBox );
 	case GUI_PANELEX:		return sx_new( uiPanelEx );
 	case GUI_LISTBOX:		return sx_new( uiListBox );
-#endif
 	}
+#endif
 	return null;
 }
 
 void uiManager::copy( uiContext* dest, uint& index, const uiContext* src )
 {
-	switch ( src->m_type )
+	const uint srcvertcount = src->m_vcount;
+	if ( srcvertcount )
 	{
-	case ET_NONE:
-		{
-			sx_assert( L"uiDevice::copy : Element type is not defined !" );
-		}
-		break;
-
-	case ET_LINES:
-		{
-			sx_assert( L"uiDevice::copy : copy Line elements is not implemented yet !" );
-		}
-		break;
-
-	case ET_TRIANGLES:
-		{
-			const uint srcvertcount = src->m_vcount;
-			if ( srcvertcount )
-			{
-				sx_mem_copy( &dest->m_posfinal[index],	src->m_posfinal,	srcvertcount * sizeof(float3) );
-				sx_mem_copy( &dest->m_uv[index],		src->m_uv,			srcvertcount * sizeof(float2) );
-				sx_mem_copy( &dest->m_color[index],		src->m_color,		srcvertcount * sizeof(Color2) );
-				index += srcvertcount;
-			}
-		}
-		break;
-
-	case ET_QUADS:
-		{
-			if ( src->m_vcount )
-			{
-				sx_convert_quat_triangle( &dest->m_posfinal[index],		src->m_posfinal		);
-				sx_convert_quat_triangle( &dest->m_uv[index],			src->m_uv			);
-				sx_convert_quat_triangle( &dest->m_color[index],		src->m_color		);
-				index += src->m_vcount + 2;
-			}
-		}
-		break;
+		sx_mem_copy( &dest->m_pos[index],		src->m_pos,			srcvertcount * sizeof(float3) );
+		sx_mem_copy( &dest->m_uv[index],		src->m_uv,			srcvertcount * sizeof(float2) );
+		sx_mem_copy( &dest->m_color[index],		src->m_color,		srcvertcount * sizeof(Color2) );
+		index += srcvertcount;
 	}
 }
 
@@ -192,18 +160,6 @@ SEGAN_INLINE bool uiManager::add_batch( const uiContext* elem )
 	//	verify that all these have the same image id
 	if ( m_batches.m_count && m_batches[0]->m_image != elem->m_image ) return false;
 
-	//	verify element type
-	switch ( elem->m_type )
-	{
-	case ET_NONE:
-		sx_assert( L"uiDevice::add_batch : Element type is not defined !" );
-		return false;
-
-	case ET_LINES:
-		sx_assert( L"uiDevice::add_batch : Line elements is not implemented yet !" );
-		return false;
-	}
-
 	m_batches.push_back( (uiContext*)elem );
 	return true;
 }
@@ -215,8 +171,7 @@ SEGAN_INLINE uint uiManager::get_batch_vcount( void )
 	for ( sint i=0; i<m_batches.m_count; ++i )
 	{
 		uiContext* elem = m_batches.m_item[i];
-		if ( elem->m_type == ET_QUADS )
-			sumVertices += elem->m_vcount + 2;
+		sumVertices += elem->m_vcount;
 	}
 	return sumVertices;
 }

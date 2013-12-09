@@ -41,7 +41,7 @@ void mainloop( float elpstime )
 
 	d3dContext elmnt;
 	elmnt.vcount = gui->m_drawable->m_vcount;
-	elmnt.pos = gui->m_drawable->m_posfinal;
+	elmnt.pos = gui->m_drawable->m_pos;
 	render->m_elements.clear();
 	render->m_elements.push_back( &elmnt );
 

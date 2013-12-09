@@ -2,17 +2,15 @@
 
 
 uiControl::uiControl( void )
-: m_type(UT_NONE)
-, m_id( sx_id_generate() )
+: m_id( sx_id_generate() )
 , m_option(SX_GUI_VISIBLE | SX_GUI_ENABLE)
 , m_size(0,0)
 , m_position_offset(0,0,0)
 , m_rotation_offset(0,0,0)
 , m_scale_offset(1,1,1)
 , m_parent(null)
-, m_mouseState(MS_NORMAL)
 {
-
+	memcpy( m_type, "null", 5 );
 }
 
 uiControl::~uiControl( void )
@@ -47,7 +45,7 @@ void uiControl::set_size( const float width, const float height )
 	m_size.set( width, height );
 }
 
-void uiControl::update( float elpsTime, const matrix& viewInverse, const matrix& viewProjection, const uint vpwidth, const uint vpheight )
+void uiControl::update( float elpsTime, const uint vpwidth, const uint vpheight )
 {
 	if ( m_option & SX_GUI_ENABLE )
 		sx_set_rem( m_option, _SX_GUI_NOT_ENABLE_ );
@@ -112,6 +110,7 @@ void uiControl::update( float elpsTime, const matrix& viewInverse, const matrix&
 		m_matrix = sx_mul( mat, matTmp );
 	}
 
+#if 0
 	//  apply aligned position
 	if ( ( m_option & SX_GUI_BILLBOARD )/* && !m_parent*/ )
 	{
@@ -161,11 +160,11 @@ void uiControl::update( float elpsTime, const matrix& viewInverse, const matrix&
 	}
 
 	//	transform vertices from local space to the world space
-	for ( uint i=0; i<SX_GUI_MAX_ELEMENT && m_element[i].m_vcount; ++i )
+	for ( uint i=0; i<SX_GUI_MAX_ELEMENT && m_context[i].m_vcount; ++i )
 	{
-		for ( uint j=0; j<m_element[i].m_vcount; ++j )
+		for ( uint j=0; j<m_context[i].m_vcount; ++j )
 		{
-			sx_transform_point( m_element[i].m_posfinal[j], m_element[i].m_pos[j], m_matrix );
+			sx_transform_point( m_context[i].m_pos[j], m_context[i].m_pos[j], m_matrix );
 		}
 	}
 
@@ -177,14 +176,16 @@ void uiControl::update( float elpsTime, const matrix& viewInverse, const matrix&
 		if ( child->m_option & _SX_GUI_IN_3DSPACE_ )
 		{
 			child->m_position_offset.z += SX_GUI_Z_BIAS;
-			child->update( elpsTime, viewInverse, viewProjection, vpwidth, vpheight );
+			child->update( elpsTime, vpwidth, vpheight );
 			child->m_position_offset.z -= SX_GUI_Z_BIAS;
 		}
 		else
 		{
-			child->update( elpsTime, viewInverse, viewProjection, vpwidth, vpheight );
+			child->update( elpsTime, vpwidth, vpheight );
 		}
 	}
+#endif
+
 }
 
 void uiControl::process_input( uiInput* inputReport )
@@ -197,7 +198,7 @@ void uiControl::process_input( uiInput* inputReport )
 	if ( !inputReport->mouseLocked )
 	{
 		Ray ray = sx_transform( inputReport->ray, m_matrix );
-		captured = ( intersect_ray( &ray ) >= 0 );
+		captured = ( sx_intersect( &ray, &m_context ) >= 0 );
 	
 		if ( m_option & SX_GUI_CLIPCHILDS )
 		{
@@ -241,7 +242,7 @@ void uiControl::process_input( uiInput* inputReport )
 			if ( inputReport->mouseLeft == MS_NORMAL )	//	verify that mouse entered on control
 			{
 				m_mouseState = MS_ENTERED;
-				m_onEnter( this );
+				m_on_enter( this );
 			}
 			break;
 
@@ -256,7 +257,7 @@ void uiControl::process_input( uiInput* inputReport )
 			if ( inputReport->mouseLeft == MS_UP )	//	verify that mouse clicked on control
 			{
 				m_mouseState = MS_UP;
-				m_onClick( this );
+				m_on_click( this );
 			}
 			break;
 
@@ -268,7 +269,7 @@ void uiControl::process_input( uiInput* inputReport )
 		}
 
 		//	call move callback
-		m_onMove( this );
+		m_on_move( this );
 
 		// lock the mouse report
 		inputReport->mouseLocked = m_id;
@@ -277,7 +278,7 @@ void uiControl::process_input( uiInput* inputReport )
 	//	when do we call Exit callback
 	if ( !captured && m_mouseState != MS_NORMAL && inputReport->mouseLeft == MS_NORMAL )
 	{
-		m_onExit( this );
+		m_on_exit( this );
 		m_mouseState = MS_NORMAL;
 	}
 
@@ -290,49 +291,3 @@ void uiControl::process_input( uiInput* inputReport )
 
 }
 
-void uiControl::get_elements( Array<uiContext*> * elementArray, const bool traversChilds /*= true*/ )
-{
-	// extract current elements
-	for ( uint i=0; i<SX_GUI_MAX_ELEMENT; ++i )
-	{
-		uiContext* element = (uiContext*)&m_element[i];
-		if ( element->m_vcount )
-		{
-			elementArray->push_back( element );
-		}
-		else break;
-	}
-
-	// extract elements of children
-	for ( sint i=0; i<m_child.m_count; ++i )
-	{
-		m_child[i]->get_elements( elementArray, traversChilds );
-	}
-}
-
-sint uiControl::intersect_ray( const Ray* ray, const sint element /*= -1*/, OUT float2* uv /*= null */ )
-{
-	sint res = -1;
-
-	if ( element < 0 )
-	{
-		for ( sint i = SX_GUI_MAX_ELEMENT-1; i >= 0; --i )
-		{
-			if ( m_element[i].m_vcount && sx_intersect( ray, &m_element[i], uv ) )
-			{
-				res = i;
-				break;
-			}
-		}
-	}
-	else
-	{
-		sx_assert( element < SX_GUI_MAX_ELEMENT );
-		if ( sx_intersect( ray, &m_element[element], uv ) )
-		{
-			res = element;
-		}
-	}
-	
-	return res;
-}

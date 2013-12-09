@@ -47,7 +47,7 @@ public:
 	void draw( const dword flag );
 
 	//! create and return a GUI by given type
-	uiControl* create_contorl( const uiType type );
+	uiControl* create_contorl( const char* type );
 
 	//! copy the src element to the dest element in the given index position
 	void copy( uiContext* dest, uint& index, const uiContext* src );

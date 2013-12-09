@@ -13,8 +13,6 @@
 #include "../Engine_def.h"
 #include "../math/Math.h"
 
-#define SX_GUI_MAX_ELEMENT				4
-
 //! these flags used as GUI properties
 #define SX_GUI_VISIBLE					0x00000001		//!	control is visible
 #define SX_GUI_ENABLE					0x00000002		//!	control is enable
@@ -46,31 +44,31 @@
 
 
 
-//! these are types of GUI controls
-enum uiType
+//! describe state of mouse on a control
+enum uiMouseState
 {
-	UT_NONE = 0,
-	UT_PANEL,
-	UT_BUTTON,
-	UT_CHECKBOX,
-	UT_SCROLL,
-	UT_PROGRESS,
-	UT_LABEL,
-	UT_EDITBOX,
-	UT_LISTBOX,
-
-	UT_32BITENUM = 0xffffffff
+	MS_NORMAL	= 0,
+	MS_ENTERED,
+	MS_DOWN,
+	MS_UP
 };
 
-//! indicate that which primitive type should be used in batch system
-enum uiElementType
+/*! input also reports that which input values used in other processes */
+struct uiInput
 {
-	ET_NONE = 0,
-	ET_LINES,			//! element contain list of lines
-	ET_TRIANGLES,		//! element contain list of triangles
-	ET_QUADS,			//! element contain list of quads
+	Ray				ray;				//!	ray comes from the mouse
+	uint			mouseLocked;		//!	contain the id of object who locked mouse
+	uint			keyboardLocked;		//!	contain the id of object who locked keyboard
+	uiMouseState	mouseLeft;			//!	state of left mouse button 
+	uiMouseState	mouseRight;			//!	state of right mouse button
+	uiMouseState	mouseMidd;			//!	state of middle mouse button
+	char			mouseWheel;			//! value of mouse wheel [ -1 , 0 , 1 ]
+	word			keycode;			//!	key down code
+	word			keychar;			//!	key down character
+	dword			keycodeEx;			//!	additional extended key code
 
-	BM_32BITENUM = 0xffffffff
+	uiInput(void): ray( float3(0,0,0), float3(0,0,0) ), mouseLocked(0), keyboardLocked(0), 
+		mouseLeft(MS_NORMAL), mouseRight(MS_NORMAL), mouseMidd(MS_NORMAL), mouseWheel(0), keycode(0), keychar(0), keycodeEx(0) {}
 };
 
 //! describe text alignment
@@ -112,36 +110,6 @@ enum uiInputLanguage
 	LI_ARABIC	= 0x40000000,	//	|
 	IL_PERSIAN	= 0x80000000	//	|
 };
-
-//! describe state of mouse on a control
-enum uiMouseState
-{
-	MS_NORMAL	= 0,
-	MS_ENTERED,
-	MS_DOWN,
-	MS_UP,
-
-	MS_32BITENUM = 0xffffffff
-};
-
-/*! input also reports that which input values used in other processes */
-struct uiInput
-{
-	Ray				ray;				//!	ray comes from the mouse
-	uint			mouseLocked;		//!	contain the id of object who locked mouse
-	uint			keyboardLocked;		//!	contain the id of object who locked keyboard
-	uiMouseState	mouseLeft;			//!	state of left mouse button 
-	uiMouseState	mouseRight;			//!	state of right mouse button
-	uiMouseState	mouseMidd;			//!	state of middle mouse button
-	char			mouseWheel;			//! value of mouse wheel [ -1 , 0 , 1 ]
-	word			keycode;			//!	key down code
-	word			keychar;			//!	key down character
-	dword			keycodeEx;			//!	additional extended key code
-
-	uiInput(void): ray( float3(0,0,0), float3(0,0,0) ), mouseLocked(0), keyboardLocked(0), 
-		mouseLeft(MS_NORMAL), mouseRight(MS_NORMAL), mouseMidd(MS_NORMAL), mouseWheel(0), keycode(0), keychar(0), keycodeEx(0) {}
-};
-
 
 //! describe character information
 struct uiChar
@@ -231,7 +199,7 @@ public:
 	} 				m_blender;	//	simple blending system to blend between states
 };
 
-//!	basic element of a graphical user interface
+//!	basic context of a graphical user interface
 class SEGAN_ENG_API uiContext
 {
 	SEGAN_STERILE_CLASS(uiContext);
@@ -246,13 +214,13 @@ public:
 	void clear_vertices( void );
 
 public:
-	uiElementType	m_type;				//	type of data in the element
-	uint			m_image;			//	image id helps the manager to compound elements
+
+	uint			m_image;			//	image id indicates the texture id in texture manager. also this can helps the painter to compound elements
 	uint			m_vcount;			//	number of vertices
 	float3*			m_pos;				//	positions
 	float2*			m_uv;				//	UV coordinates
 	Color2*			m_color;			//	colors
-	float3*			m_posfinal;			//	use temporary positions to transform elements from local space to the world space
+
 };
 
 //! base class of forms
@@ -263,14 +231,14 @@ public:
 };
 
 //! this is the standard GUI callback event.
-typedef void (uiForm::*CB_UIControl)(class uiControl* sender);
+typedef void (uiForm::*CB_uiControl)(class uiControl* sender);
 
 //! object structure used to assign GUI member functions
 class uiFunction
 {
 public:
 	uiFunction(): m_form(null), m_func(null) {};
-	uiFunction( uiForm* form, CB_UIControl func ): m_form(form), m_func(func) {};
+	uiFunction( uiForm* form, CB_uiControl func ): m_form(form), m_func(func) {};
 	void operator ()( class uiControl* sender )
 	{
 		if ( m_form && m_func )
@@ -279,7 +247,7 @@ public:
 
 public:
 	uiForm*			m_form;
-	CB_UIControl	m_func;
+	CB_uiControl	m_func;
 };
 
 //! basic GUI control
@@ -288,7 +256,7 @@ class SEGAN_ENG_API uiControl
 	SEGAN_STERILE_CLASS(uiControl);
 public:
 	uiControl( void );
-	~uiControl( void );
+	virtual ~uiControl( void );
 
 	//! set the parent of this control
 	virtual void set_parent( uiControl* parent );
@@ -297,22 +265,19 @@ public:
 	virtual void set_size( const float width, const float height );
 
 	//! update the control
-	virtual void update( float elpsTime, const matrix& viewInverse, const matrix& viewProjection, const uint vpwidth, const uint vpheight );
+	virtual void update( float elpsTime, const uint vpwidth, const uint vpheight );
+
+	//! paint the control to the context
+	virtual void paint( void ) = 0;
 
 	//! process input for this control
 	virtual void process_input( uiInput* inputReport );
 
-	//! extract valid elements in the control
-	void get_elements( Array<uiContext*> * elementArray, const bool traversChilds = true );
-
-	/*! return index of element contacted by mouse ray and fill out uv point of intersection. return -1 if no contact */
-	sint intersect_ray( const Ray* ray, const sint element = -1, OUT float2* uv = null );
-
 public:
 
-	uiType				m_type;								//!	type of control
-	String				m_name;								//!	name of control
+	char				m_type[8];							//!	type of control
 	uint				m_id;
+	String				m_name;								//!	name of control
 	dword				m_option;							//!	include control options started with SX_GUI_
 	float2				m_size;								//!	control dimensions
 	uiStateController	m_state;							//!	state of control include origin, orientation, scale, ...
@@ -320,18 +285,17 @@ public:
 	float3				m_rotation_offset;					//!	additional rotation offset
 	float3				m_scale_offset;						//!	additional scale offset
 	matrix				m_matrix;							//!	final matrix computed from states
-	uiContext			m_element[SX_GUI_MAX_ELEMENT];		//!	elements of control
+	uiContext			m_context;							//!	context of control
 	uiControl*			m_parent;							//!	parent of this control
 	Array<uiControl*>	m_child;							//!	array of children
 
-	uiMouseState		m_mouseState;						//!	hold the state of mouse
-	uiFunction			m_onClick;							//!	callback function for mouse click
-	uiFunction			m_onEnter;							//!	callback function for mouse enter
-	uiFunction			m_onExit;							//!	callback function for mouse leave
-	uiFunction			m_onMove;							//!	callback function for mouse move
-	uiFunction			m_onWheel;							//!	callback function for mouse wheel
-	uiFunction			m_onKeyDown;						//!	callback function for key down
-
+	uiMouseState		m_mouseState;						//!	last mouse state on this control
+	uiFunction			m_on_enter;							//!	callback function for mouse enter
+	uiFunction			m_on_exit;							//!	callback function for mouse leave
+	uiFunction			m_on_move;							//!	callback function for mouse move
+	uiFunction			m_on_wheel;							//!	callback function for mouse wheel
+	uiFunction			m_on_click;							//!	callback function for mouse click
+	uiFunction			m_on_keydown;						//!	callback function for key down
 };
 
 
@@ -341,14 +305,26 @@ class SEGAN_ENG_API uiPanel: public uiControl
 	SEGAN_STERILE_CLASS(uiPanel);
 public:
 	uiPanel( void );
-	~uiPanel( void );
+	virtual ~uiPanel( void );
 
 	//! set size of control
 	virtual void set_size( const float width, const float height );
 
+	//! paint the control to the context
+	virtual void paint( void );
+
 };
 
-//! return true if the ray intersect with element
-SEGAN_ENG_API bool sx_intersect( const Ray* ray, const uiContext* element, OUT float2* uv = null );
+/*! return index of first vertex of triangle which contacted by mouse ray and fill out uv point of intersection. return -1 if no contact */
+SEGAN_ENG_API sint sx_intersect( const Ray* ray, const uiContext* element, OUT float2* uv = null );
+
+//! add a rectangle to the context
+SEGAN_ENG_API void sx_add_rectangle( uiContext* context, const float2& xy1, const float2& xy2, const float2& uv1, const float2& uv2 );
+
+//! add a circle to the context
+SEGAN_ENG_API void sx_add_circle( uiContext* context, const float2& center, const float radius, const float numslice );
+
+//! extract all contexts in the control and his children
+SEGAN_ENG_API void sx_get_contexts( const uiControl* control, Array<uiContext*> * contexts, const bool traverschilds = true );
 
 #endif	//	GUARD_uiDevice_HEADER_FILE

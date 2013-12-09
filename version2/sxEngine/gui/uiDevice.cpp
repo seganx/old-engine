@@ -104,12 +104,11 @@ SEGAN_INLINE void uiStateController::update( const dword option, float elpsTime 
 //	ELEMENT
 //////////////////////////////////////////////////////////////////////////
 uiContext::uiContext( void )
-: m_type(ET_QUADS)
+: m_image(0)
 , m_vcount(0)
 , m_pos(null)
 , m_uv(null)
 , m_color(null)
-, m_posfinal(null)
 {
 
 }
@@ -132,14 +131,12 @@ void uiContext::create_vertices( const uint count )
 			const uint size_pos			= count * sizeof(float3);
 			const uint size_uv			= count * sizeof(float2);
 			const uint size_color		= count * sizeof(Color2);
-			const uint size_posfinal	= count * sizeof(float3);
 
-			byte* buffer = (byte*)sx_mem_alloc( size_pos + size_uv + size_color + size_posfinal );
+			byte* buffer = (byte*)sx_mem_alloc( size_pos + size_uv + size_color );
 
 			m_pos		= (float3*)( buffer );
 			m_uv		= (float2*)( buffer + ( size_pos ) );
 			m_color		= (Color2*)( buffer + ( size_pos + size_uv ) );
-			m_posfinal	= (float3*)( buffer + ( size_pos + size_uv + size_color ) );
 		}
 		m_vcount = count;
 	}
@@ -153,63 +150,45 @@ void uiContext::clear_vertices( void )
 		sx_mem_free_and_null( m_pos );
 		m_uv		= null;
 		m_color		= null;
-		m_posfinal	= null;
 		m_vcount = 0;
 	}
 }
 
-SEGAN_INLINE bool sx_intersect( const Ray* ray, const uiContext* element, OUT float2* uv /*= null */ )
+SEGAN_INLINE sint sx_intersect( const Ray* ray, const uiContext* element, OUT float2* uv /*= null */ )
 {
-	bool res = false;
+	sint res = -1;
 	if ( element->m_vcount )
 	{
-		switch ( element->m_type )
+		float2 outuv;
+		for ( uint i=0; i<element->m_vcount; i += 3 )
 		{
-		case ET_QUADS:
+			//	test the triangle
+			if ( sx_intersect( *ray, element->m_pos[i], element->m_pos[i+1], element->m_pos[i+2], outuv, true ) )
 			{
-				float2 outuv;
-				for ( uint i=0; i<element->m_vcount; i += 4 )
-				{
-					//	test first triangle
-					res = sx_intersect( *ray, element->m_pos[i], element->m_pos[i+1], element->m_pos[i+2], outuv, true );
-					
-					//	test second triangle
-					if ( !res )
-					{
-						res = sx_intersect( *ray, element->m_pos[i], element->m_pos[i+2], element->m_pos[i+3], outuv, true );
-					}
-
-					//	fill out the result and break the loop
-					if ( res )
-					{
-						if ( uv )
-							*uv = outuv;
-						res = true;
-						break;
-					}
-				}
+				//	fill out the result and break the loop
+				if ( uv )
+					*uv = outuv;
+				res = i;
+				break;
 			}
-			break;
-
-		case ET_TRIANGLES:
-			{
-				float2 outuv;
-				for ( uint i=0; i<element->m_vcount; i += 3 )
-				{
-					//	test the triangle
-					if ( sx_intersect( *ray, element->m_pos[i], element->m_pos[i+1], element->m_pos[i+2], outuv, true ) )
-					{
-						//	fill out the result and break the loop
-						if ( uv )
-							*uv = outuv;
-						res = true;
-						break;
-					}
-				}
-			}
-			break;
 		}
 	}
 	return res;
 }
 
+SEGAN_ENG_API void sx_get_contexts( const uiControl* control, Array<uiContext*> * contexts, const bool traverschilds /*= true */ )
+{
+	// extract current elements
+	uiContext* cntxt = (uiContext*)&control->m_context;
+	if ( cntxt->m_vcount )
+	{
+		contexts->push_back( cntxt );
+	}
+
+	// extract elements of children
+	for ( sint i=0; i<control->m_child.m_count; ++i )
+	{
+		sx_get_contexts( control->m_child[i], contexts, traverschilds );
+	}
+
+}
