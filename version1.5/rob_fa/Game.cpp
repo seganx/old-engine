@@ -435,11 +435,11 @@ void Game::Update( float elpsTime )
 
 #if VER_USERDEMO
 		//	exhibition version only shows 1, 4, 5, 8 levels
-		if ( g_game->m_game_nextLevel = 2 || g_game->m_game_nextLevel = 3 )
+		if ( g_game->m_game_nextLevel == 2 || g_game->m_game_nextLevel == 3 )
 			g_game->m_game_nextLevel = 4;
-		else if ( g_game->m_game_nextLevel = 6 || g_game->m_game_nextLevel = 7 )
+		else if ( g_game->m_game_nextLevel == 6 || g_game->m_game_nextLevel == 7 )
 			g_game->m_game_nextLevel = 8;
-		else if ( g_game->m_game_nextLevel = 9 || g_game->m_game_nextLevel = 10 )
+		else if ( g_game->m_game_nextLevel == 9 || g_game->m_game_nextLevel == 10 )
 			g_game->m_game_nextLevel = 1;
 #endif
 // #if VER_PREVIEW

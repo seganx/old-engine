@@ -34,11 +34,12 @@ int windowcallback( class Window* sender, const WindowEvent* data )
 void mainloop( float elpstime )
 {
 	render->update( elpstime );
-	gui->Update( elpstime, window->m_rect.width, window->m_rect.height );
 
-	gui->Draw( 0 );
+	gui->update( elpstime, window->m_rect.width, window->m_rect.height );
 
-	d3dElement elmnt;
+	gui->draw( 0 );
+
+	d3dContext elmnt;
 	elmnt.vcount = gui->m_drawable->m_vcount;
 	elmnt.pos = gui->m_drawable->m_posfinal;
 	render->m_elements.clear();
@@ -76,7 +77,7 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	gui = sx_new( uiManager );
 	uiPanel* panel = sx_new( uiPanel );
 	panel->set_size( 2, 1 );
-	gui->Add( panel );
+	gui->add( panel );
 
 	//////////////////////////////////////////////////////////////////////////
 	//	going to main loop in window

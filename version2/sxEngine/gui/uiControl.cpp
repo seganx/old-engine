@@ -133,16 +133,16 @@ void uiControl::update( float elpsTime, const matrix& viewInverse, const matrix&
 	{
 		if ( m_parent )
 		{
-			m_matrix.m30 += sclvalue * ( state->position.x + m_position_offset.x + m_parent->m_size.x * state->align.x );
-			m_matrix.m31 += sclvalue * ( state->position.y + m_position_offset.y + m_parent->m_size.y * state->align.y );
+			m_matrix.m30 = sclvalue * ( state->position.x + m_position_offset.x + m_parent->m_size.x * state->align.x );
+			m_matrix.m31 = sclvalue * ( state->position.y + m_position_offset.y + m_parent->m_size.y * state->align.y );
 		}
 		else
 		{
-			m_matrix.m30 += sclvalue * ( state->position.x + m_position_offset.x + vpwidth  * state->align.x );
-			m_matrix.m31 += sclvalue * ( state->position.y + m_position_offset.y + vpheight * state->align.y );
+			m_matrix.m30 = sclvalue * ( state->position.x + m_position_offset.x + vpwidth  * state->align.x );
+			m_matrix.m31 = sclvalue * ( state->position.y + m_position_offset.y + vpheight * state->align.y );
 		}
 
-		m_matrix.m32 += sclvalue * ( state->position.z + m_position_offset.z );
+		m_matrix.m32 = sclvalue * ( state->position.z + m_position_offset.z );
 	}
 
 	//	apply parent properties
@@ -290,12 +290,12 @@ void uiControl::process_input( uiInput* inputReport )
 
 }
 
-void uiControl::get_elements( Array<uiElement*> * elementArray, const bool traversChilds /*= true*/ )
+void uiControl::get_elements( Array<uiContext*> * elementArray, const bool traversChilds /*= true*/ )
 {
 	// extract current elements
 	for ( uint i=0; i<SX_GUI_MAX_ELEMENT; ++i )
 	{
-		uiElement* element = (uiElement*)&m_element[i];
+		uiContext* element = (uiContext*)&m_element[i];
 		if ( element->m_vcount )
 		{
 			elementArray->push_back( element );

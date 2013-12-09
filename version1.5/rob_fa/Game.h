@@ -14,9 +14,9 @@
 #include "gameup_import.h"
 
 
-#define VER_USERDEMO		0
+#define VER_USERDEMO		1
 #define VER_PREVIEW			1
-#define VER_PREVIEW_NAME	L"Immanitas Entertainment GmbH"
+#define VER_PREVIEW_NAME	L"Iran Computer & Video Games Foundation"
 #define USE_RTL				0
 #define USE_GAMEUP			0
 #define USE_LOCK_NAME		L"christiansauerteig"

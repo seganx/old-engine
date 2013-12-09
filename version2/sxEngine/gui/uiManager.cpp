@@ -6,7 +6,7 @@ uiManager::uiManager( void )
 , m_elements(128)
 {
 	//	create drawable element
-	m_drawable = sx_new( uiElement );
+	m_drawable = sx_new( uiContext );
 	m_drawable->m_type = ET_TRIANGLES;
 }
 
@@ -16,23 +16,17 @@ uiManager::~uiManager( void )
 	sx_delete_and_null( m_drawable );
 }
 
-void uiManager::Add( const uiControl* control )
+void uiManager::add( const uiControl* control )
 {
 	m_controls.push_back( (uiControl*)control );
 }
 
-void uiManager::Remove( const uiControl* control )
+void uiManager::remove( const uiControl* control )
 {
 	m_controls.remove( (uiControl*)control );
 }
 
-void uiManager::Delete( uiControl*& control )
-{
-	m_controls.remove( control );
-	sx_delete_and_null( control );
-}
-
-void uiManager::Clear( void )
+void uiManager::clear( void )
 {
 	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
@@ -42,7 +36,7 @@ void uiManager::Clear( void )
 }
 
 
-void uiManager::Update( float elpsTime, const float vpwidth, const float vpheight )
+void uiManager::update( float elpsTime, const float vpwidth, const float vpheight )
 {
 	matrix proj = sx_orthographic( vpwidth, vpheight, -200.0f, 200.0f );
 	matrix view = sx_lookat( float3(0, 0, 1), float3( 0, 0, 0), float3( 0, 1, 0) );
@@ -90,7 +84,7 @@ void GUIManager::ProcessInput( struct InputReport* inputReport )
 }
 #endif
 
-void uiManager::Draw( const dword flag )
+void uiManager::draw( const dword flag )
 {
 	//	extract all elements that should be draw
 	m_elements.clear();
@@ -104,10 +98,10 @@ void uiManager::Draw( const dword flag )
 	//	batch elements and draw them
 	while ( m_elements.m_count )
 	{
-		BeginBatch( 0 );
+		begin_batch( 0 );
 		for ( sint i=0; i<m_elements.m_count; ++i )
 		{
-			if ( AddBatch( m_elements.m_item[i] ) )
+			if ( add_batch( m_elements.m_item[i] ) )
 				m_elements.remove_index( i-- );
 			else
 				break;
@@ -117,7 +111,7 @@ void uiManager::Draw( const dword flag )
 		if ( m_batches.m_count < 1 ) break;
 
 		//	end batch
-		EndBatch( m_drawable );
+		end_batch( m_drawable );
 	}
 #endif
 
@@ -125,7 +119,7 @@ void uiManager::Draw( const dword flag )
 
 
 
-uiControl* uiManager::CreateContorl( const uiType type )
+uiControl* uiManager::create_contorl( const uiType type )
 {
 	switch ( type )
 	{
@@ -144,19 +138,19 @@ uiControl* uiManager::CreateContorl( const uiType type )
 	return null;
 }
 
-void uiManager::Copy( uiElement* dest, uint& index, const uiElement* src )
+void uiManager::copy( uiContext* dest, uint& index, const uiContext* src )
 {
 	switch ( src->m_type )
 	{
 	case ET_NONE:
 		{
-			sx_assert( L"uiDevice::Copy : Element type is not defined !" );
+			sx_assert( L"uiDevice::copy : Element type is not defined !" );
 		}
 		break;
 
 	case ET_LINES:
 		{
-			sx_assert( L"uiDevice::Copy : Copy Line elements is not implemented yet !" );
+			sx_assert( L"uiDevice::copy : copy Line elements is not implemented yet !" );
 		}
 		break;
 
@@ -187,13 +181,13 @@ void uiManager::Copy( uiElement* dest, uint& index, const uiElement* src )
 	}
 }
 
-SEGAN_INLINE void uiManager::BeginBatch( const uint count )
+SEGAN_INLINE void uiManager::begin_batch( const uint count )
 {
 	if ( count )
 		m_batches.set_size( count );
 }
 
-SEGAN_INLINE bool uiManager::AddBatch( const uiElement* elem )
+SEGAN_INLINE bool uiManager::add_batch( const uiContext* elem )
 {
 	//	verify that all these have the same image id
 	if ( m_batches.m_count && m_batches[0]->m_image != elem->m_image ) return false;
@@ -202,35 +196,35 @@ SEGAN_INLINE bool uiManager::AddBatch( const uiElement* elem )
 	switch ( elem->m_type )
 	{
 	case ET_NONE:
-		sx_assert( L"uiDevice::AddBatch : Element type is not defined !" );
+		sx_assert( L"uiDevice::add_batch : Element type is not defined !" );
 		return false;
 
 	case ET_LINES:
-		sx_assert( L"uiDevice::AddBatch : Line elements is not implemented yet !" );
+		sx_assert( L"uiDevice::add_batch : Line elements is not implemented yet !" );
 		return false;
 	}
 
-	m_batches.push_back( (uiElement*)elem );
+	m_batches.push_back( (uiContext*)elem );
 	return true;
 }
 
-SEGAN_INLINE uint uiManager::GetBatchVertexCount( void )
+SEGAN_INLINE uint uiManager::get_batch_vcount( void )
 {
 	// compute number of vertices
 	uint sumVertices = 0;
 	for ( sint i=0; i<m_batches.m_count; ++i )
 	{
-		uiElement* elem = m_batches.m_item[i];
+		uiContext* elem = m_batches.m_item[i];
 		if ( elem->m_type == ET_QUADS )
 			sumVertices += elem->m_vcount + 2;
 	}
 	return sumVertices;
 }
 
-SEGAN_INLINE void uiManager::EndBatch( uiElement* dest )
+SEGAN_INLINE void uiManager::end_batch( uiContext* dest )
 {
 	//	get number of vertices needed to batch them
-	const uint sumVertices = GetBatchVertexCount();
+	const uint sumVertices = get_batch_vcount();
 
 	//	prepare destination element
 	dest->create_vertices( sumVertices );
@@ -239,7 +233,7 @@ SEGAN_INLINE void uiManager::EndBatch( uiElement* dest )
 	uint index = 0;
 	for ( sint i=0; i<m_batches.m_count; ++i )
 	{
-		Copy( dest, index, m_batches.m_item[i] );
+		copy( dest, index, m_batches.m_item[i] );
 	}
 
 	//	release array

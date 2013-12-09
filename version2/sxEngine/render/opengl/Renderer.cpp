@@ -90,8 +90,8 @@ void Renderer::render( float elpstime, uint flag )
 #if 1
 	for ( sint i=0; i<m_elements.m_count; ++i )
 	{
-		d3dElement* elmnt = m_elements[i];
-		m_device->draw_debug( PT_LINE_STRIP, elmnt->vcount, &elmnt->pos->x, 0xffffffff );
+		d3dContext* elmnt = m_elements[i];
+		m_device->draw_debug( PT_LINE_LIST, elmnt->vcount, &elmnt->pos->x, 0xffffffff );
 	}
 #endif
 }

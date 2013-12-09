@@ -232,12 +232,12 @@ public:
 };
 
 //!	basic element of a graphical user interface
-class SEGAN_ENG_API uiElement
+class SEGAN_ENG_API uiContext
 {
-	SEGAN_STERILE_CLASS(uiElement);
+	SEGAN_STERILE_CLASS(uiContext);
 public:
-	uiElement( void );
-	~uiElement( void );
+	uiContext( void );
+	~uiContext( void );
 
 	//! create vertices
 	void create_vertices( const uint count );
@@ -303,7 +303,7 @@ public:
 	virtual void process_input( uiInput* inputReport );
 
 	//! extract valid elements in the control
-	void get_elements( Array<uiElement*> * elementArray, const bool traversChilds = true );
+	void get_elements( Array<uiContext*> * elementArray, const bool traversChilds = true );
 
 	/*! return index of element contacted by mouse ray and fill out uv point of intersection. return -1 if no contact */
 	sint intersect_ray( const Ray* ray, const sint element = -1, OUT float2* uv = null );
@@ -320,7 +320,7 @@ public:
 	float3				m_rotation_offset;					//!	additional rotation offset
 	float3				m_scale_offset;						//!	additional scale offset
 	matrix				m_matrix;							//!	final matrix computed from states
-	uiElement			m_element[SX_GUI_MAX_ELEMENT];		//!	elements of control
+	uiContext			m_element[SX_GUI_MAX_ELEMENT];		//!	elements of control
 	uiControl*			m_parent;							//!	parent of this control
 	Array<uiControl*>	m_child;							//!	array of children
 
@@ -349,6 +349,6 @@ public:
 };
 
 //! return true if the ray intersect with element
-SEGAN_ENG_API bool sx_intersect( const Ray* ray, const uiElement* element, OUT float2* uv = null );
+SEGAN_ENG_API bool sx_intersect( const Ray* ray, const uiContext* element, OUT float2* uv = null );
 
 #endif	//	GUARD_uiDevice_HEADER_FILE

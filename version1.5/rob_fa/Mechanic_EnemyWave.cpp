@@ -97,7 +97,7 @@ namespace GM
 		m_labelGold->SetFont( L"font_wave_call_gold.fnt" );
 		m_labelGold->SetAlign( GTA_CENTER );
 		m_labelGold->SetParent( g_game->m_gui->m_goldPeople->m_back );
-		m_labelGold->SetSize( float2( 50.0f, 50.0f ) );
+		m_labelGold->SetSize( float2( 100.0f, 75.0f ) );
 		m_labelGold->Position().Set( -60.0f, -100.0f, 0.0f );
 		m_labelGold->GetElement(0)->Color() = D3DColor( 0, 0, 0, 0 );
 		m_labelGold->GetElement(1)->Color() = 0xffffff00;

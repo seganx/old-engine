@@ -180,7 +180,7 @@ struct d3dMaterial
 
 //////////////////////////////////////////////////////////////////////////
 //!	basic element of a graphical user interface
-struct d3dElement
+struct d3dContext
 {
 	uint				vcount;			//!	number of vertices
 	d3dMaterial*		material;		//!	material used to draw element
@@ -468,7 +468,7 @@ public:
 	d3dDisplayeInfo			m_displayinfo;		//!	describe the display information
 	d3dCamera				m_camera;			//!	camera used in rendering
 	d3dScene*				m_scene;			//!	the scene should be draw in render function
-	Array<d3dElement*>		m_elements;			//!	all elements should be draw at the end of rendering function 
+	Array<d3dContext*>		m_elements;			//!	all elements should be draw at the end of rendering function 
 };
 
 

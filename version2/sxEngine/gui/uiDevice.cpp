@@ -103,7 +103,7 @@ SEGAN_INLINE void uiStateController::update( const dword option, float elpsTime 
 //////////////////////////////////////////////////////////////////////////
 //	ELEMENT
 //////////////////////////////////////////////////////////////////////////
-uiElement::uiElement( void )
+uiContext::uiContext( void )
 : m_type(ET_QUADS)
 , m_vcount(0)
 , m_pos(null)
@@ -114,13 +114,13 @@ uiElement::uiElement( void )
 
 }
 
-uiElement::~uiElement( void )
+uiContext::~uiContext( void )
 {
 	if ( m_vcount )
 		clear_vertices();
 }
 
-void uiElement::create_vertices( const uint count )
+void uiContext::create_vertices( const uint count )
 {
 	if ( count )
 	{
@@ -146,7 +146,7 @@ void uiElement::create_vertices( const uint count )
 	else clear_vertices();
 }
 
-void uiElement::clear_vertices( void )
+void uiContext::clear_vertices( void )
 {
 	if ( m_vcount )
 	{
@@ -158,7 +158,7 @@ void uiElement::clear_vertices( void )
 	}
 }
 
-SEGAN_INLINE bool sx_intersect( const Ray* ray, const uiElement* element, OUT float2* uv /*= null */ )
+SEGAN_INLINE bool sx_intersect( const Ray* ray, const uiContext* element, OUT float2* uv /*= null */ )
 {
 	bool res = false;
 	if ( element->m_vcount )
