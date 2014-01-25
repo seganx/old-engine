@@ -107,6 +107,8 @@ void Menu::OnExit( sx::gui::PControl sender )
 void MenuMain::Initialize( void )
 {
 	Menu::Initialize();
+
+
 	m_time = 0;
 	m_back->SetSize( float2(1,1) );
 	m_back->State_GetByIndex(1).Color.Set( 0.0f, 0.0f, 0.0f, 0.1f );
@@ -175,13 +177,15 @@ void MenuMain::Initialize( void )
 	pretext->SetSize( float2( 500.0f, 60.0f ) );
 	pretext->SetAlign( GTA_LEFT );
 	pretext->SetParent( m_slantBack );
-	pretext->SetFont( L"Font_Tips.fnt" );
+	pretext->SetFont( L"Font_preview.fnt" );
+#if 1
 	pretext->SetText( L"`0xffff22`Evaluation code - NOT FOR SALE. \n " VER_PREVIEW_NAME );
+#endif
 	pretext->GetElement(0)->Color().a = 0;
 	pretext->Position().Set( 40.0f, -180.0f, 0.0f );
 #endif
 
-	for ( int i=0; i<5; i++ )
+	for ( int i=0; i<6; i++ )
 	{
 		m_btn[i] = sx_new( sx::gui::PanelEx );
 		m_btn[i]->SetParent( m_slantBack );
@@ -201,33 +205,37 @@ void MenuMain::Initialize( void )
 		case 2:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.090f, 0.6f );	break;
 		case 3:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.085f, 0.6f );	break;
 		case 4:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.080f, 0.6f );	break;
+		case 5:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.075f, 0.6f );	break;
 		}
 
 		switch ( i )
 		{
-		case 0:	m_btn[i]->State_GetByIndex(1).Position.Set( 22.0f, 96.0f, 0 );	break;
-		case 1:	m_btn[i]->State_GetByIndex(1).Position.Set( 34.0f, 48.0f, 0 );	break;
-		case 2:	m_btn[i]->State_GetByIndex(1).Position.Set( 46.0f, 0.0f, 0 );	break;
-		case 3:	m_btn[i]->State_GetByIndex(1).Position.Set( 58.0f, -48.5f, 0 );	break;
-		case 4:	m_btn[i]->State_GetByIndex(1).Position.Set( 70.0f, -96.0f, 0 );	break;
+		case 0:	m_btn[i]->State_GetByIndex(1).Position.Set( 22.0f, 96.0f, 0 );		break;
+		case 1:	m_btn[i]->State_GetByIndex(1).Position.Set( 34.0f, 48.0f, 0 );		break;
+		case 2:	m_btn[i]->State_GetByIndex(1).Position.Set( 46.0f, 0.0f, 0 );		break;
+		case 3:	m_btn[i]->State_GetByIndex(1).Position.Set( 58.0f, -48.5f, 0 );		break;
+		case 4:	m_btn[i]->State_GetByIndex(1).Position.Set( 70.0f, -96.0f, 0 );		break;
+		case 5:	m_btn[i]->State_GetByIndex(1).Position.Set( 82.0f, -144.0f, 0 );	break;
 		}
 
 		switch ( i )
 		{
-		case 0:	m_btn[i]->State_GetByIndex(2).Position.Set( 16.0f, 96.0f, 0 );	break;
-		case 1:	m_btn[i]->State_GetByIndex(2).Position.Set( 28.0f, 48.0f, 0 );	break;
-		case 2:	m_btn[i]->State_GetByIndex(2).Position.Set( 40.0f, 0.0f, 0 );	break;
-		case 3:	m_btn[i]->State_GetByIndex(2).Position.Set( 52.0f, -48.5f, 0 );	break;
-		case 4:	m_btn[i]->State_GetByIndex(2).Position.Set( 60.0f, -96.0f, 0 );	break;
+		case 0:	m_btn[i]->State_GetByIndex(2).Position.Set( 16.0f, 96.0f, 0 );		break;
+		case 1:	m_btn[i]->State_GetByIndex(2).Position.Set( 28.0f, 48.0f, 0 );		break;
+		case 2:	m_btn[i]->State_GetByIndex(2).Position.Set( 40.0f, 0.0f, 0 );		break;
+		case 3:	m_btn[i]->State_GetByIndex(2).Position.Set( 52.0f, -48.5f, 0 );		break;
+		case 4:	m_btn[i]->State_GetByIndex(2).Position.Set( 60.0f, -96.0f, 0 );		break;
+		case 5:	m_btn[i]->State_GetByIndex(2).Position.Set( 72.0f, -144.0f, 0 );	break;
 		}
 
 		switch ( i )
 		{
-		case 0:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainPlay.txr" );		break;
-		case 1:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainProfile.txr" );	break;
-		case 2:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainAch.txr" );		break;
-		case 3:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainSettings.txr" );	break;
-		case 4:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainCredits.txr" );	break;
+		case 0:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainPlay.txr" );			break;
+		case 1:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainProfile.txr" );		break;
+		case 2:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainAch.txr" );			break;
+		case 3:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainEncyclopedia.txr" );	break;
+		case 4:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainSettings.txr" );		break;
+		case 5:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainCredits.txr" );		break;
 		}
 
 		sx::gui::Panel* pnl = sx_new( sx::gui::Panel );
@@ -241,10 +249,24 @@ void MenuMain::Initialize( void )
 		SEGAN_GUI_SET_ONEXIT( pnl, MenuMain::OnExit );
 	}
 
+
+	m_info = sx_new( MenuInfo );
+	m_info->Initialize();
+
+}
+
+void MenuMain::Finalize( void )
+{
+	m_info->Finalize();
+	sx_delete_and_null( m_info );
+
+	Menu::Finalize();
 }
 
 void MenuMain::ProcessInput( bool& inputHandled, float elpsTime )
 {
+	m_info->ProcessInput( inputHandled, elpsTime );
+
 	if ( inputHandled ) return;
 	sx_callstack();
 
@@ -255,7 +277,7 @@ void MenuMain::ProcessInput( bool& inputHandled, float elpsTime )
 			g_game->m_gui->m_confirmExit->Show();
 		}
 
-		for ( int i=0; i<5; i++ )
+		for ( int i=0; i<6; i++ )
 		{
 			bool ih = false;
 			m_btn[i]->GetChild(0)->ProcessInput( ih );
@@ -278,7 +300,7 @@ void MenuMain::Update( float elpsTime )
 		{
 			m_mainBack->State_SetIndex( firstTime );
 			m_slantBack->State_SetIndex(1);
-			for ( int i=0; i<5; i++ )
+			for ( int i=0; i<6; i++ )
 				m_btn[i]->State_SetIndex(1);
 			m_time = 4750.0f;
 			firstTime = 2;
@@ -290,7 +312,7 @@ void MenuMain::Update( float elpsTime )
 
 			g_game->m_gui->m_status->Show();
 
-			for ( int i=0; i<5; i++ )
+			for ( int i=0; i<6; i++ )
 				m_btn[i]->GetChild(0)->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 
 			sx::gui::PPanel( m_mainBack->GetChild(0) )->GetElement(0)->Color().a = 1;
@@ -301,12 +323,63 @@ void MenuMain::Update( float elpsTime )
 	{
 		m_mainBack->State_SetIndex(0);
 		m_slantBack->State_SetIndex(0);
-		for ( int i=0; i<5; i++ )
+		for ( int i=0; i<6; i++ )
 			m_btn[i]->State_SetIndex(0);
 		m_mainSparks->State_SetIndex(0);
 	}
 
+	m_info->Update( elpsTime );
+
 	Menu::Update( elpsTime );
+}
+
+void MenuMain::Draw( DWORD flag )
+{
+	Menu::Draw( flag );
+	m_info->Draw( flag );
+}
+
+void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
+{
+	switch (msg)
+	{
+	case GMT_LEVEL_LOADED:		/////////////////////////////////////////////////    LOAD LEVEL
+		if ( g_game->m_difficultyLevel == 0 )	//	load encyclopedia
+		{
+			m_info->ClearTutorial();
+
+			String str = sx::sys::FileManager::Project_GetDir();
+			str << L"level0/Encyclopedia.txt";
+			Scripter script;
+			script.Load( str );
+
+			for (int i=0; i<script.GetObjectCount(); i++)
+			{
+				str512 tmpStr;
+				if ( script.GetString(i, L"Type", tmpStr) )
+				{
+					if ( tmpStr == L"Encyclopedia" )
+					{
+						if ( !script.GetString(i, L"Name", tmpStr) )
+							continue;
+
+						if ( g_game->m_player->m_profile.level_played < tmpStr.ToInt() )
+							continue;
+
+						str512 title, desc, image;
+						if ( !script.GetString( i, L"title", title	) )
+							continue;
+						if ( !script.GetString( i, L"desc", desc	) )
+							continue;
+						if ( !script.GetString( i, L"image", image	) )
+							continue;
+
+						m_info->AddTutorial( title, desc, image, false, false );
+					}
+				}
+			}
+		}
+	}
 }
 
 void MenuMain::OnClick( sx::gui::PControl sender )
@@ -318,7 +391,7 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 	case 0: // play
 		{
 			m_slantBack->State_SetIndex(0);
-			for ( int i=0; i<5; i++ )
+			for ( int i=0; i<6; i++ )
 			{
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
@@ -333,7 +406,7 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 	case 1: // profile
 		{
 			m_slantBack->State_SetIndex(0);
-			for ( int i=0; i<5; i++ )
+			for ( int i=0; i<6; i++ )
 			{
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
@@ -347,7 +420,7 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 	case 2: // achievements
 		{
 			m_slantBack->State_SetIndex(0);
-			for ( int i=0; i<5; i++ )
+			for ( int i=0; i<6; i++ )
 			{
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
@@ -358,10 +431,25 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 		}
 		break;
 
-	case 3: // settings
+	case 3: // encyclopedia
 		{
 			m_slantBack->State_SetIndex(0);
-			for ( int i=0; i<5; i++ )
+			for ( int i=0; i<6; i++ )
+			{
+				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
+				m_btn[i]->State_SetIndex(0);
+			}
+
+			m_mainBack->State_SetIndex(3);
+			m_info->m_go_to_menu = true;
+			m_info->Show();
+		}
+		break;
+
+	case 4: // settings
+		{
+			m_slantBack->State_SetIndex(0);
+			for ( int i=0; i<6; i++ )
 			{
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
@@ -372,10 +460,10 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 		}
 		break;
 
-	case 4: // credits
+	case 5: // credits
 		{
 			m_slantBack->State_SetIndex(0);
-			for ( int i=0; i<5; i++ )
+			for ( int i=0; i<6; i++ )
 			{
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
@@ -1552,9 +1640,9 @@ void MenuAchievements::Initialize( void )
 	m_desc->GetElement(0)->Color() = 0x00010000;
 	m_desc->SetSize( float2( 300, 50 ) );
 #if USE_RTL
-	m_name->SetAlign( GTA_RIGHT );
+	m_desc->SetAlign( GTA_RIGHT );
 #else
-	m_name->SetAlign( GTA_LEFT );
+	m_desc->SetAlign( GTA_LEFT );
 #endif
 	m_desc->SetFont( L"font_achievements_desc.fnt" );
 	m_desc->Position().Set( 65.0f, -40.0f, 0.0f );
@@ -3087,6 +3175,7 @@ void MenuInfo::Initialize( void )
 	m_Index = -1;
 	m_time = 0;
 	m_delayTime = 0;
+	m_go_to_menu = false;
 
 	m_back->SetSize( float2( 20000, 2000 ) );
 	m_back->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
@@ -3288,7 +3377,7 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 						}
 						else
 						{
-							AddTutorial( title, desc, image, g_game->m_miniGame, showNow > 0 );
+							AddTutorial( title, desc, image, g_game->m_miniGame, ( showNow > 0 ) );
 						}
 					}
 				}
@@ -3356,6 +3445,11 @@ void MenuInfo::Hide( void )
 {
 	Menu::Hide();
 	g_game->m_game_paused = false;
+	if ( m_go_to_menu )
+	{
+		g_game->m_gui->m_main->Show();
+		m_go_to_menu = false;
+	}
 }
 
 void MenuInfo::OnClick( sx::gui::PControl sender )

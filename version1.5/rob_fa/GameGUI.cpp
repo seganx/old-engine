@@ -3,6 +3,7 @@
 #include "GameConfig.h"
 #include "Entity.h"
 #include "Player.h"
+#include "Scripter.h"
 
 #define GAMETIPS_MAXTIME		10
 #define GAMETIPS_ICON_SIZE		64
@@ -460,6 +461,56 @@ void GameGUI::Initialize( void )
 	m_powerAttaks->State_GetByIndex(1).Align.Set( -0.5f, -0.5f );
 	m_powerAttaks->State_GetByIndex(1).Center.Set( 0.205f, 0.5f, 0 );
 	m_powerAttaks->State_GetByIndex(1).Blender.Set( 0.4f, 0.5f );
+
+	//	add empty buttons to show the unlocked feature
+	{
+		//	load some default value
+		str512 power_locked;
+		String str = sx::sys::FileManager::Project_GetDir();
+		str << L"strings.txt";
+		Scripter script;
+		script.Load( str );
+		for (int i=0; i<script.GetObjectCount(); i++)
+		{
+			str512 tmpStr;
+			if ( script.GetString(i, L"Type", tmpStr) && tmpStr == L"Strings" )
+			{
+				if ( !script.GetString(i, L"Name", tmpStr) )
+					continue;
+
+				if ( tmpStr == L"GeneralTips" )
+				{
+					script.GetString( i, L"powerlocked", power_locked );
+					power_locked.Replace(L"\\n", L"\n");
+					break;
+				}
+			}
+		}
+
+		for ( uint i=0; i<5; ++i )
+		{
+			sx::gui::Panel* p = sx_new( sx::gui::Panel );
+			p->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+			p->SetParent( m_powerAttaks );
+			p->SetSize( float2( 40, 40 ) );
+			p->GetElement(0)->Color() = D3DColor( 0, 0, 0, 0.1f );
+			
+			float left, top = -11.0f;
+			switch ( i )
+			{
+			case 0:		left = -30.0f;	break;
+			case 1:		left = 27.0f;	break;
+			case 2:		left = 84.0f;	break;
+			case 3:		left = 140.0f;	break;
+			case 4:		left = 198.0f;	break;
+			default:	left = -30 + i * 80.0f;
+			}
+			p->Position().Set( left, top, 0.0f );
+
+			p->SetHint( power_locked );
+		}
+	}
+	
 	
 	//  create game speed controller
 	m_gameSpeed = sx_new( sx::gui::TrackBar );
@@ -592,6 +643,9 @@ void GameGUI::ProcessInput( bool& inputHandled, float elpsTime )
 	{
 		m_gameSpeed->ProcessInput( inputHandled );
 	}
+
+	if ( !inputHandled )
+		m_powerAttaks->ProcessInput( inputHandled );
 }
 
 void GameGUI::Update( float elpsTime )
@@ -665,7 +719,6 @@ void GameGUI::Draw( DWORD flag )
 	m_goldPeople->m_back->Draw( flag );
 	m_powerAttaks->Draw( flag );
 	m_hint->m_panelEx->Draw( flag );
-	m_info->Draw( flag );
 	m_pause->Draw( flag );
 	m_gameOver->Draw( flag );
 	m_victory->Draw( flag );
@@ -677,6 +730,7 @@ void GameGUI::Draw( DWORD flag )
 	m_credits->Draw( flag );
 	m_upgradePanel->Draw(flag);
 	m_status->Draw( flag );
+	m_info->Draw( flag );
 	m_confirmExit->Draw( flag );
 	m_cinematic->Draw( flag );
 }

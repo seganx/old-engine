@@ -83,6 +83,29 @@ namespace GM
 		g_game->m_gui->Add_Front( m_pnlCreate0 );
 
 		m_ShowRange.Initialize();
+
+
+		//	load some default value
+		String str = sx::sys::FileManager::Project_GetDir();
+		str << L"strings.txt";
+		Scripter script;
+		script.Load( str );
+		for (int i=0; i<script.GetObjectCount(); i++)
+		{
+			str512 tmpStr;
+			if ( script.GetString(i, L"Type", tmpStr) && tmpStr == L"Strings" )
+			{
+				if ( !script.GetString(i, L"Name", tmpStr) )
+					continue;
+
+				if ( tmpStr == L"GeneralTips" )
+				{
+					script.GetString( i, L"towerlocked",	m_tower_locked	);
+					m_tower_locked.Replace(L"\\n", L"\n");
+					break;
+				}
+			}
+		}
 	}
 
 	void Mechanic_TowerCreate::Finalize( void )
@@ -232,11 +255,13 @@ namespace GM
 			//  check GUI 
 			for ( int i=0; i<5; i++ )
 			{
-				if ( !m_btnCreate[i] || !m_btnCreate[i]->GetUserData() ) continue;
+				if ( !m_btnCreate[i] ) continue;
 
 				m_btnCreate[i]->MouseUp( -99999, -99999 );
 				bool res = false;
 				m_btnCreate[i]->ProcessInput( res );
+
+				if ( !m_btnCreate[i]->GetUserData() ) continue;
 
 				if ( sx::gui::Control::GetCapturedControl() == m_btnCreate[i] )
 				{
@@ -325,6 +350,10 @@ namespace GM
 						tmp.Format( L" %s \n %s ", towerType->m_displayName.Text(), towerType->m_typeDesc.Text() );
 						hint.Format( tmp, towerType->m_cost[0], g_game->m_player->m_gold );
 						m_btnCreate[i]->SetHint( hint );
+					}
+					else
+					{
+						m_btnCreate[i]->SetHint( m_tower_locked );
 					}
 				}
 			}

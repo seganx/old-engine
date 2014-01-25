@@ -38,8 +38,11 @@ class MenuMain: public Menu
 {
 public:
 	void Initialize(void);
+	void Finalize(void);
 	void ProcessInput(bool& inputHandled, float elpsTime);
 	void Update(float elpsTime);
+	void Draw(DWORD flag);
+	void MsgProc(UINT recieverID, UINT msg, void* data);
 
 	void OnClick(sx::gui::PControl sender);
 	void OnEnter( sx::gui::PControl sender );
@@ -52,8 +55,9 @@ public:
 	sx::gui::PanelEx*		m_mainBack;
 	sx::gui::PanelEx*		m_mainSparks;
 	sx::gui::PanelEx*		m_slantBack;
-	sx::gui::PanelEx*		m_btn[5];
+	sx::gui::PanelEx*		m_btn[6];
 	float					m_time;
+	class MenuInfo*			m_info;
 };
 
 class MenuUpgrade: public Menu
@@ -363,6 +367,7 @@ public:
 	sx::gui::PButton	m_prev;
 	float				m_time;
 	float				m_delayTime;
+	bool				m_go_to_menu;
 
 
 	struct Helper
