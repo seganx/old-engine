@@ -442,6 +442,84 @@ namespace sx { namespace cmn
 		sx_mem_free(tmp);
 	}
 
+
+	void StringList::LoadFromString( const WCHAR* str )
+	{
+		if ( !str ) return;
+		uint fsize = (uint)wcslen( str ) * 2;
+
+		// check the Unicode file
+		char testChar[2] = {0, 0};
+		memcpy( testChar, str, 2 );
+		bool isUnicode = testChar[0] == -1 && testChar[1] == -2;
+		
+		WCHAR* tmp = (WCHAR*)sx_mem_alloc(fsize);
+		if ( isUnicode )
+		{
+			WCHAR* ch = (WCHAR*)str;
+			ch++;
+
+			int pos = 0;
+			WCHAR c = 0;
+			do
+			{
+				c = *ch++;
+				if ( c == '\n' || c == '\r' )
+				{
+					if ( pos )
+					{
+						tmp[pos] = 0;
+						PushBack( tmp );
+						pos = 0;
+					}
+				}
+				else
+				{
+					tmp[pos++] = c;
+				}
+			}
+			while ( c );
+
+			if (pos)
+			{
+				tmp[pos] = 0;
+				PushBack( tmp );
+			}
+		}
+		else
+		{
+			char* ch = (char*)str;
+
+			int pos = 0;
+			char c = 0;
+			do
+			{
+				c = *ch++;
+				if ( c == '\n' || c == '\r' )
+				{
+					if ( pos )
+					{
+						tmp[pos] = 0;
+						PushBack( tmp );
+						pos = 0;
+					}
+				}
+				else
+				{
+					tmp[pos++] = c;
+				}
+			}
+			while ( c );
+
+			if (pos)
+			{
+				tmp[pos] = 0;
+				PushBack( tmp );
+			}
+		}
+		sx_mem_free(tmp);
+	}
+
 	String* StringList::operator[]( int index )
 	{
 		sx_assert(index>=0 && index<m_sList.Count());

@@ -237,7 +237,11 @@ namespace GM
 
 		case GMT_GAME_END:			/////////////////////////////////////////////////    END GAME
 			{						//////////////////////////////////////////////////////////////////////////
+#if USE_HASH_LOCK
+				if ( g_game->m_game_currentLevel == 8 )
+#else
 				if ( g_game->m_game_currentLevel == 10 )
+#endif
 				{
 					msg_SoundPlay sndplay( true, 0, 0, L"intro", 0 );
 					m_soundNode->MsgProc( MT_SOUND_PLAY, &sndplay );

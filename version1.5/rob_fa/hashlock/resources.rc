@@ -1,0 +1,10 @@
+#include "Config.h"
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+#if USE_HASH_LOCK
+123451             BITMAP                  "unlocker_page_en.bmp"
+123452             BITMAP                  "unlocker_page_en_steam.bmp"
+#endif

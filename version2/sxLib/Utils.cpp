@@ -59,6 +59,15 @@ SEGAN_LIB_API bool sx_load_string_list( Array<String*>& dest, const wchar* filen
 	else return false;
 }
 
+SEGAN_LIB_API void sx_clear_string_list( Array<String*>& list )
+{
+	for ( sint i=0; i < list.m_count; ++i )
+	{
+		sx_delete( list.m_item[i] );
+	}
+	list.clear();
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //	main protocol class

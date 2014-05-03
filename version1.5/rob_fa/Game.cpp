@@ -420,7 +420,7 @@ void Game::Reset( void )
 	m_game_restarting = 20;
 	PostMessage( 0, GMT_GAME_RESETING, 0 );
 	PostMessage( 0, GMT_GAME_RESET, 0 );
-	m_gui->ShowTips( L" Game Restarted !", 0xffff0000 );
+	//m_gui->ShowTips( L" Game Restarted !", 0xffff0000 );
 	m_player->SyncPlayerAndGame( true );
 }
 

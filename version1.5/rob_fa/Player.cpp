@@ -93,6 +93,8 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 	}
 #endif
 
+#if USE_HASH_LOCK
+#else
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_L) )
 	{
 		inputHandled = true;
@@ -100,6 +102,7 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 		memcpy( playername, m_profile.name, 64 );
 		m_profile.Reset();
 		m_profile.level = 10;
+		m_profile.level_played = 9;
 		for ( int i=0; i<10; i++ )
 		{
 			m_profile.stars[i] = sx::cmn::Random(3);
@@ -124,8 +127,8 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 		case 2:	Config::GetData()->display_Debug = 3; break;
 		case 3:	Config::GetData()->display_Debug = 0; break;
 		}
-		 
 	}
+#endif
 
 }
 
@@ -433,8 +436,11 @@ void Player::SyncPlayerAndGame( bool playerToGame )
 	}
 
 	if ( m_profile.level <  1 ) m_profile.level = 1;
+#if USE_HASH_LOCK
+	if ( m_profile.level > 8 ) m_profile.level = 8;
+#else
 	if ( m_profile.level > 10 ) m_profile.level = 10;
-
+#endif
 }
 
 void Player::ClearMechanincs( void )

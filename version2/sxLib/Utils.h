@@ -23,6 +23,9 @@ SEGAN_LIB_API bool sx_load_string( String& dest, const wchar* filename );
 //!	load a text file and parse the lines. return false if operation failed
 SEGAN_LIB_API bool sx_load_string_list( Array<String*>& dest, const wchar* filename );
 
+//! clear all allocated strings
+SEGAN_LIB_API void sx_clear_string_list( Array<String*>& list );
+
 
 //! protocol class used to transferring data 
 class SEGAN_LIB_API Protocol
@@ -45,6 +48,7 @@ public:
 		char*	data;		//! pointer to the main data. DO NOT changing that
 	};
 
+public:
 	Protocol( void ): m_data(0), m_size(0), m_pos(0) {}
 	~Protocol( void );
 

@@ -243,7 +243,7 @@ public:
 #else
 			m_label->SetAlign( GTA_LEFT );
 #endif
-			m_label->SetFont( L"Font_Tips.fnt" );
+			m_label->SetFont( FONT_TIPS );
 			m_label->SetSize( float2(100.0f, GAMETIPS_ICON_SIZE_div2) );
 			m_label->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 			m_label->AddProperty( SX_GUI_PROPERTY_MULTILINE );
@@ -319,7 +319,7 @@ public:
 #else
 		m_lblTitle->SetAlign( GTA_LEFT );
 #endif
-		m_lblTitle->SetFont( L"Font_hint_title.fnt" );
+		m_lblTitle->SetFont( FONT_HINT_TITLE );
 		m_lblTitle->GetElement(0)->Color() = D3DColor(0,0,0,0);
 		m_lblTitle->GetElement(1)->Color() = D3DColor(1,1,0.2f,1);
 
@@ -333,7 +333,7 @@ public:
 #else
 		m_lblDesc->SetAlign( GTA_LEFT );
 #endif
-		m_lblDesc->SetFont( L"Font_hint_desc.fnt" );
+		m_lblDesc->SetFont( FONT_HINT_DESC );
 		m_lblDesc->GetElement(0)->Color() = D3DColor(0,0,0,0);
 
 	}

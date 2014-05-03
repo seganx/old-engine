@@ -12,6 +12,7 @@ static mapWindow			s_mapWindow;
 static HINSTANCE			s_Instance = GetModuleHandle(NULL);
 static HWND					s_MainWindow = NULL;
 static SysCallback_MsgProc	s_MsgProc = NULL;
+static bool					s_app_running = false;
 
 LARGE_INTEGER GetWinStyles(WindowBorderType wbtype, bool topmost)
 {
@@ -397,7 +398,8 @@ void Application::Run( SysCallback_MainLoop MainLoop, SysCallback_MsgProc MsgPro
 	
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
-	while( msg.message != WM_QUIT )
+	s_app_running = true;
+	while( s_app_running )
 	{
 		if ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
 		{
@@ -424,6 +426,7 @@ void Application::Run( SysCallback_MainLoop MainLoop, SysCallback_MsgProc MsgPro
 			blendedElapesTime += (elpsTime - blendedElapesTime) * 0.1f;
 			if (MainLoop) MainLoop(blendedElapesTime);
 		}
+
 	}
 
 	//  clear all tasks before clearing application and finalize task manager to close threads and events
@@ -448,7 +451,7 @@ void Application::Run( SysCallback_MainLoop MainLoop, SysCallback_MsgProc MsgPro
 
 void Application::Terminate( void )
 {
-	PostQuitMessage(0);
+	s_app_running = false;
 }
 
 LRESULT WINAPI Application::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
@@ -551,17 +554,18 @@ LRESULT WINAPI Application::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 				}
 			}
 		}
-		break;
 
+#if 1
 	case WM_DESTROY:
 		{
 			if (hWnd == s_MainWindow)
 			{
-				PostQuitMessage( 0 );
+				s_app_running = false;
 				return 0;
 			}
 		}
 		break;
+#endif
 
 	case WM_SYSKEYDOWN:
 	case WM_KEYDOWN:

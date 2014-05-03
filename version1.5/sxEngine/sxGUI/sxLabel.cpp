@@ -112,15 +112,12 @@ namespace sx { namespace gui {
 
 		SetSize(float2(150.0f, 75.0f));
 
+#if 1
 		if ( sys::FileManager::File_Exist(L"Font_Default.fnt", SEGAN_PACKAGENAME_COMMON) )
 			SetFont(L"Font_Default.fnt");
 		else
-		{
-			static PFont defFont = NULL;
-			if (!defFont)
-				Font::Manager::Get(defFont, L"Font_Default.fnt");
-			SetFont(L"Font_Default.fnt");
-		}
+			Font::Manager::Get( m_Font, L"Font_Default.fnt");
+#endif
 	}
 
 	Label::~Label( void )

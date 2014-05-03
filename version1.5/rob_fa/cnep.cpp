@@ -1,10 +1,14 @@
+#include <stdio.h>
 #include "resource.h"
 #include "GameTypes.h"
 #include "Game.h"
 #include "GameConfig.h"
 #include "Mechanic_Cinematic.h"
 #include "gameup_import.h"
-#include <stdio.h>
+
+#if USE_HASH_LOCK
+#include "hashlock/lock_wnd.h"
+#endif
 
 #define NET_ACTIVATE	0
 #define NET_DELAY_TIME	60
@@ -23,6 +27,44 @@ extern GameUp*				g_gameup = null;
 #endif
 //////////////////////////////////////////////////////////////////////////
 
+#if USE_HASH_LOCK
+bool load_hash_lock_code( wchar* dest )
+{
+	String fileName = sx::sys::GetDocumentsFolder();
+	fileName.MakePathStyle();
+	fileName << L"RushForGlory";
+	fileName << L"/serial.lock";
+
+	sx::sys::FileStream file;
+	if ( file.Open( fileName, FM_OPEN_READ ) )
+	{
+		wchar tmp[128] = {0};
+		file.Read( tmp, 128 );
+		sx_decrypt( dest, tmp, 128, 128 );
+		file.Close();
+		return true;
+	}
+	return false;
+}
+
+void save_hash_lock_code( wchar* code )
+{
+	String fileName = sx::sys::GetDocumentsFolder();
+	fileName.MakePathStyle();
+	fileName << L"RushForGlory";
+	fileName << L"/serial.lock";
+
+	sx::sys::FileStream file;
+	if ( file.Open( fileName, FM_CREATE ) )
+	{
+		wchar tmp[128] = {0};
+		sx_encrypt( tmp, code, 128, 128 );
+		file.Write( tmp, 128 );
+		file.Close();
+	}
+}
+
+#endif
 
 void clientCallback( Client* client, const byte* buffer, const uint size )
 {
@@ -129,6 +171,12 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	if ( !gameup_init( g_gameup ) ) return 0;
 #endif
 
+#if USE_HASH_LOCK
+	wchar hash_lock_code[64] = {0};
+	bool hash_lock_loaded = load_hash_lock_code( hash_lock_code );
+#endif
+
+
 	//  make single application
 	String mutexName = L"SeganX Game :: "; mutexName << GAME_TITLE;
 	HANDLE mutex = CreateMutex(NULL, TRUE, *mutexName);
@@ -168,12 +216,31 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	sxLog::SetCallback( loggerCallback );
 #endif
 
+#if USE_HASH_LOCK
+	int hashlockmain = 0;
+	if ( hash_lock_loaded )
+		hashlockmain = 1;
+	else
+		hashlockmain = show_hash_lock( hInstance, hash_lock_code );
+	if ( !hashlockmain ) return 0;
+#endif
+
 	//  load configuration
 #if USE_GAMEUP
 	bool b1 = ( g_gameup->get_lock_code(0) == g_gameup->get_lock_code(5) );
 	if ( b1 )
 #endif
+
+#if USE_HASH_LOCK
+	if ( hashlockmain )
+#endif
 		Config::LoadConfig();
+
+#if USE_HASH_LOCK
+	bool verified_hash_lock_code = verify_hash_lock_code( hash_lock_code );
+	if ( !verified_hash_lock_code ) return 0;
+#endif
+
 
 	// TEST
 	String str = sx::sys::GetAppFolder();
@@ -181,9 +248,16 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 #if USE_GAMEUP
 	if ( g_gameup->get_lock_code(1) == g_gameup->get_lock_code(2) )
 #endif
+#if USE_HASH_LOCK
+	if ( verified_hash_lock_code )
+#endif
 		str << L"project1";
 	sx::sys::FileManager::Project_Open(str, FMM_ARCHIVE);
 
+#if USE_HASH_LOCK
+	if ( verified_hash_lock_code )
+		save_hash_lock_code( hash_lock_code );
+#endif
 
 	//  create application window
 	WindowRect wr;
@@ -201,6 +275,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	if ( g_gameup->get_lock_code(6) == g_gameup->get_lock_code(3) )
 #endif
 		sx::sys::Application::Create_Window(&s_window);
+	SetForegroundWindow( s_window.GetHandle() );
 	ShowCursor( FALSE );
 
 
@@ -300,6 +375,11 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 	//  turn screen saver off
 	sx::sys::ScreenSaverSetDefault();
+
+#if USE_HASH_LOCK
+	ShowCursor( TRUE );
+	show_steam( hInstance );
+#endif
 
 #if USE_GAMEUP
 	gameup_finit( g_gameup );

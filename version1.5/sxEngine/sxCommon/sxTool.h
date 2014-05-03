@@ -72,6 +72,7 @@ namespace sx { namespace cmn
 		String* At(int Index);
 		void SaveToFile(const WCHAR* FileName);
 		void LoadFromFile(const WCHAR* FileName);
+		void LoadFromString( const WCHAR* str );
 
 		String* operator[] (int index);
 	private:

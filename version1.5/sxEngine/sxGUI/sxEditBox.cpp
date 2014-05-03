@@ -74,7 +74,7 @@ namespace sx { namespace gui {
 
 		SetSize(float2(150.0f, 100.0f));
 
-		SetFont(L"Font_Default.fnt");
+		//SetFont(L"Font_Default.fnt");
 
 		SetCaretPos(0, 0);
 

@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RfG_encrypt", "RfG_encrypt.vcproj", "{04DD4C8F-CCDD-4E60-8FCC-F898D84B2FEA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF} = {E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxlib", "..\sxLib\win32dll\sxlib.vcproj", "{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04DD4C8F-CCDD-4E60-8FCC-F898D84B2FEA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{04DD4C8F-CCDD-4E60-8FCC-F898D84B2FEA}.Debug|Win32.Build.0 = Debug|Win32
+		{04DD4C8F-CCDD-4E60-8FCC-F898D84B2FEA}.Release|Win32.ActiveCfg = Release|Win32
+		{04DD4C8F-CCDD-4E60-8FCC-F898D84B2FEA}.Release|Win32.Build.0 = Release|Win32
+		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}.Debug|Win32.Build.0 = Debug|Win32
+		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}.Release|Win32.ActiveCfg = Release|Win32
+		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

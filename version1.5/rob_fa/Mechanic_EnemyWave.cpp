@@ -73,7 +73,7 @@ namespace GM
 
 		m_label = sx_new( sx::gui::Label );
 		m_label->SetParent( m_back );
-		m_label->SetFont( L"Font_rob_twedit_info.fnt" );
+		m_label->SetFont( FONT_TOWER_PANEL_INFO );
 		m_label->SetSize( float2( 100.0f, 40.0f ) );
 #if USE_RTL
 		m_label->Position().Set( -45.0f, -107.0f, 0.0f );
@@ -94,7 +94,7 @@ namespace GM
 		}
 
 		m_labelGold = sx_new( sx::gui::Label );
-		m_labelGold->SetFont( L"font_wave_call_gold.fnt" );
+		m_labelGold->SetFont( FONT_WAVE_CALL_GOLD );
 		m_labelGold->SetAlign( GTA_CENTER );
 		m_labelGold->SetParent( g_game->m_gui->m_goldPeople->m_back );
 		m_labelGold->SetSize( float2( 100.0f, 75.0f ) );

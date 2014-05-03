@@ -1049,3 +1049,88 @@ void sx_lib_finalize( void )
 	lib_finit_cs();
 }
 
+
+//////////////////////////////////////////////////////////////////////////
+//	checksum and encryption functions
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//	use protocol random class to handle multi threaded calls
+class CSRandom
+{
+public:
+	CSRandom( const uint seed = 1363 ): m_seed(seed), m_curr(seed) {}
+
+	uint get( void )
+	{
+		m_curr += ( ( m_curr * m_seed * 28454642 ) + ( m_curr * 38745674 ) );
+		return ( m_curr % 255 );
+	}
+
+public:
+	uint	m_seed;
+	uint	m_curr;
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+// helper functions
+SEGAN_LIB_API int checksum_helper( CSRandom* randomer, const uint index )
+{
+	uint r = randomer->get() * 10;
+	switch ( index % 10 )
+	{
+	case 0 :	return 102 * r;
+	case 1 :	return 155 * r;
+	case 2 :	return 173 * r;
+	case 3 :	return 207 * r;
+	case 4 :	return 115 * r;
+	case 5 :	return 189 * r;
+	case 6 :	return 131 * r;
+	case 7 :	return 122 * r;
+	case 8 :	return 248 * r;
+	case 9 :	return 194 * r;
+	}
+	return 0;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+//	encryption functions
+//////////////////////////////////////////////////////////////////////////
+SEGAN_LIB_API uint sx_checksum( const void* data, const uint size, const uint key /*= 1363*/ )
+{
+	if ( !data || !size ) return 0;
+	uint r = 0;
+	const char* d = (char*)data;
+	CSRandom randomer(key);
+	for ( uint i=0; i<size; ++i )
+		r += d[i] + checksum_helper( &randomer, i );
+	return r;
+}
+
+SEGAN_LIB_API void sx_encrypt( void* dest, const void* src, const uint size, const uint key /*= 1363*/ )
+{
+	CSRandom randomer(key);
+	byte* d = (byte*)dest;
+	byte* s = (byte*)src;
+	for ( uint i=0; i<size; ++i )
+	{
+		byte a = checksum_helper( &randomer, i );
+		d[i] = s[i] + a;
+	}
+}
+
+SEGAN_LIB_API void sx_decrypt( void* dest, const void* src, const uint size, const uint key /*= 1363*/ )
+{
+	CSRandom randomer(key);
+	byte* d = (byte*)dest;
+	byte* s = (byte*)src;
+	for ( uint i=0; i<size; ++i )
+	{
+		byte a = checksum_helper( &randomer, i );
+		d[i] = s[i] - a;
+	}
+}
+
+

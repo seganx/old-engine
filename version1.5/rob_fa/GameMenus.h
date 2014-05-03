@@ -342,7 +342,7 @@ public:
 	void MsgProc(UINT recieverID, UINT msg, void* data);
 	void Update(float elpsTime);
 	void Draw(DWORD flag);
-	void Show(void);
+	void Show( bool gamepaused = true );
 	void Hide(void);
 	void OnClick(sx::gui::PControl sender);
 

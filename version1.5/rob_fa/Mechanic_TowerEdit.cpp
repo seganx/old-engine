@@ -171,7 +171,7 @@ namespace GM
 		m_lblHealth->GetElement(0)->Color().a = 0.0f;
 		m_lblHealth->GetElement(1)->Color().a = 0.85f;
 		m_lblHealth->SetAlign( GTA_CENTER );
-		m_lblHealth->SetFont( L"Font_rob_twedit_health.fnt" );
+		m_lblHealth->SetFont( FONT_TOWER_PANEL_HEALTH );
 
 		m_lblXP = sx_new( sx::gui::Label );
 		m_lblXP->SetParent( m_back );
@@ -183,7 +183,7 @@ namespace GM
 #endif
 		m_lblXP->GetElement(0)->Color().a = 0.0f;
 		m_lblXP->GetElement(1)->Color().a = 0.85f;
-		m_lblXP->SetFont( L"Font_rob_twedit_info.fnt" );
+		m_lblXP->SetFont( FONT_TOWER_PANEL_INFO );
 
 		m_lblDamage = sx_new( sx::gui::Label );
 		m_lblDamage->SetParent( m_back );
@@ -195,7 +195,7 @@ namespace GM
 #endif
 		m_lblDamage->GetElement(0)->Color().a = 0.0f;
 		m_lblDamage->GetElement(1)->Color().a = 0.85f;
-		m_lblDamage->SetFont( L"Font_rob_twedit_info.fnt" );
+		m_lblDamage->SetFont( FONT_TOWER_PANEL_INFO );
 
 		m_lblFireRate = sx_new( sx::gui::Label );
 		m_lblFireRate->SetParent( m_back );
@@ -207,7 +207,7 @@ namespace GM
 #endif
 		m_lblFireRate->GetElement(0)->Color().a = 0.0f;
 		m_lblFireRate->GetElement(1)->Color().a = 0.85f;
-		m_lblFireRate->SetFont( L"Font_rob_twedit_info.fnt" );
+		m_lblFireRate->SetFont( FONT_TOWER_PANEL_INFO );
 
 
 		//	create images for labels

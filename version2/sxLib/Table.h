@@ -42,7 +42,7 @@ public:
 		void init( const wchar _label )
 		{
 #if TABLE_CASE_INSENSITIVE
-			label	= tolower( _label );
+			label	= sx_str_lower( _label );
 #else
 			label	= _label;
 #endif
@@ -105,6 +105,17 @@ public:
 		return _pickup( m_root, 0, name, result );
 	}
 
+	SEGAN_LIB_INLINE T_data get( const wchar* name, const T_data& failed )
+	{
+		sx_assert( name );
+		if ( !name || !m_root ) return failed;
+		T_data res;
+		if ( _pickup( m_root, 0, name, res ) )
+			return res;
+		else
+			return failed;
+	}
+
 	void iterate( void* userdata, CB_Table callback )
 	{
 		if ( !m_root ) return;
@@ -150,7 +161,7 @@ private:
 	SEGAN_LIB_INLINE bool _put( Leaf* leaf, uint index, const wchar* name, const T_data& data )
 	{
 #if TABLE_CASE_INSENSITIVE
-		wchar label = tolower( name[index] );
+		wchar label = sx_str_lower( name[index] );
 #else
 		wchar label = name[index];
 #endif
@@ -270,7 +281,7 @@ private:
 	SEGAN_LIB_INLINE bool _pickup( Leaf* leaf, uint index, const wchar* name, T_data& data )
 	{
 #if TABLE_CASE_INSENSITIVE
-		wchar label = tolower( name[index] );
+		wchar label = sx_str_lower( name[index] );
 #else
 		wchar label = name[index];
 #endif

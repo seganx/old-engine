@@ -137,7 +137,7 @@ void MenuMain::Initialize( void )
 
 	sx::gui::Panel* pnl = sx_new( sx::gui::Panel );
 	pnl->SetParent( m_mainBack );
-	pnl->SetSize( float2( 360.0f, 656.0f ) );
+	pnl->SetSize( float2( 380.0f, 656.0f ) );
 	pnl->Position().Set( 380.0f, 0.0f, 0.0f );
 	pnl->GetElement(0)->Color() = D3DColor( 0, 0, 0, 0 );
 
@@ -177,12 +177,12 @@ void MenuMain::Initialize( void )
 	pretext->SetSize( float2( 500.0f, 60.0f ) );
 	pretext->SetAlign( GTA_LEFT );
 	pretext->SetParent( m_slantBack );
-	pretext->SetFont( L"Font_preview.fnt" );
+	pretext->SetFont( FONT_PREVIEW );
 #if 1
-	pretext->SetText( L"`0xffff22`Evaluation code - NOT FOR SALE. \n " VER_PREVIEW_NAME );
+	pretext->SetText( L"`0xffff22`Evaluation version. Not for distribution.\n ");
 #endif
 	pretext->GetElement(0)->Color().a = 0;
-	pretext->Position().Set( 40.0f, -180.0f, 0.0f );
+	pretext->Position().Set( 40.0f, -200.0f, 0.0f );
 #endif
 
 	for ( int i=0; i<6; i++ )
@@ -344,8 +344,16 @@ void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
 	switch (msg)
 	{
 	case GMT_LEVEL_LOADED:		/////////////////////////////////////////////////    LOAD LEVEL
-		if ( g_game->m_difficultyLevel == 0 )	//	load encyclopedia
 		{
+			//	find maximum level played in profiles
+			sint max_level = 0;
+			for ( sint i=0; i<4; ++i )
+			{
+				if ( max_level < g_game->m_gui->m_profile->m_profiles[i].level_played )
+					max_level = g_game->m_gui->m_profile->m_profiles[i].level_played;
+			}
+			++max_level;
+
 			m_info->ClearTutorial();
 
 			String str = sx::sys::FileManager::Project_GetDir();
@@ -363,7 +371,7 @@ void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
 						if ( !script.GetString(i, L"Name", tmpStr) )
 							continue;
 
-						if ( g_game->m_player->m_profile.level_played < tmpStr.ToInt() )
+						if ( max_level < tmpStr.ToInt() )
 							continue;
 
 						str512 title, desc, image;
@@ -439,10 +447,10 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
 			}
-
 			m_mainBack->State_SetIndex(3);
+
 			m_info->m_go_to_menu = true;
-			m_info->Show();
+			m_info->Show( false );
 		}
 		break;
 
@@ -497,6 +505,8 @@ void MenuMain::OnExit( sx::gui::PControl sender )
 
 void MenuMain::Show( void )
 {
+	g_game->m_gui->m_pause->Hide();
+	g_game->m_gui->m_settings->Hide();
 	Menu::Show();
 	m_time = 200;
 }
@@ -729,7 +739,7 @@ void MenuMap::Initialize( void )
 	m_diff_label->SetAlign( GTA_CENTER );
 	m_diff_label->GetElement(0)->Color().a = 0.0f;
 	m_diff_label->GetElement(1)->Color() = 0xaaffffff;
-	m_diff_label->SetFont( L"Font_map_diff.fnt" );
+	m_diff_label->SetFont( FONT_MAP_DIFFICULTY );
 	m_diff_label->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 	m_diff_label->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
 	m_diff_label->Position().y = -5.0f;
@@ -896,7 +906,11 @@ void MenuMap::Draw( DWORD flag )
 
 void MenuMap::Show( void )
 {
+#if USE_HASH_LOCK
+	for ( int i=0; i<8; i++ )
+#else
 	for ( int i=0; i<10; i++ )
+#endif
 	{
 		m_levels[i].m_area->State_SetIndex(2);
 		
@@ -909,7 +923,11 @@ void MenuMap::Show( void )
 	}
 
 	m_selectedLevel = g_game->m_player->m_profile.level_selected;
+#if USE_HASH_LOCK
+	SEGAN_CLAMP( m_selectedLevel, 1, 8 );
+#else
 	SEGAN_CLAMP( m_selectedLevel, 1, 10 );
+#endif
 	m_chooser->State_SetIndex( m_selectedLevel );
 
 	//	load from player profile
@@ -1121,7 +1139,7 @@ void MenuProfile::Initialize( void )
 	m_profileName->SetAlign( GTA_LEFT );
 	m_profileName->GetElement(0)->Color().a = 0;
 	m_profileName->GetElement(1)->Color().a = 0.8f;
-	m_profileName->SetFont( L"Font_rob_profile.fnt" );
+	m_profileName->SetFont( FONT_PROFILE );
 	m_profileName->SetOnKeyDown( (sx::gui::PForm)this, (GUICallbackEvent)&MenuProfile::OnKey );
 
 	//	create rename button
@@ -1182,7 +1200,7 @@ void MenuProfile::Initialize( void )
 		lbl->SetAlign( GTA_LEFT );
 		lbl->GetElement(0)->Color().a = 0.0f;
 		lbl->GetElement(1)->Color().a = 0.8f;
-		lbl->SetFont( L"Font_rob_profile.fnt" );
+		lbl->SetFont( FONT_PROFILE );
 		lbl->Position().y = -5.0f;
 		SEGAN_GUI_SET_ONCLICK( lbl, MenuProfile::OnClick );
 		SEGAN_GUI_SET_ONENTER( lbl, MenuProfile::OnEnter );
@@ -1195,7 +1213,7 @@ void MenuProfile::Initialize( void )
 		lbl->SetAlign( GTA_LEFT );
 		lbl->GetElement(0)->Color().a = 0.0f;
 		lbl->GetElement(1)->Color().a = 0.8f;
-		lbl->SetFont( L"Font_tob_profileInfo.fnt" );
+		lbl->SetFont( FONT_PROFILE_INFO );
 		lbl->Position().Set( 120.0f, -18.0f, 0.0f );
 
 		//	label to show total people
@@ -1205,7 +1223,7 @@ void MenuProfile::Initialize( void )
 		lbl->SetAlign( GTA_LEFT );
 		lbl->GetElement(0)->Color().a = 0.0f;
 		lbl->GetElement(1)->Color().a = 0.8f;
-		lbl->SetFont( L"Font_tob_profileInfo.fnt" );
+		lbl->SetFont( FONT_PROFILE_INFO );
 		lbl->Position().Set( 230.0f, -18.0f, 0.0f );
 	}
 
@@ -1232,7 +1250,7 @@ void MenuProfile::Initialize( void )
 	//	load profiles
 	String fileName = sx::sys::GetDocumentsFolder();
 	fileName.MakePathStyle();
-	fileName << L"RoadsOfBattle";
+	fileName << L"RushForGlory";
 	fileName << L"/profiles.dat";
 
 	sx::sys::FileStream	file;
@@ -1393,6 +1411,7 @@ void MenuProfile::OnClick( sx::gui::PControl sender )
 
 	if ( sender == m_goback )
 	{
+		//g_game->m_gui->m_main->MsgProc( 0, GMT_LEVEL_LOADED, null );
 		Hide();
 		g_game->m_gui->m_main->Show();
 	}
@@ -1557,7 +1576,7 @@ void MenuProfile::SaveProfile( void )
 	//	save profiles
 	String fileName = sx::sys::GetDocumentsFolder();
 	fileName.MakePathStyle();
-	fileName << L"RoadsOfBattle";
+	fileName << L"RushForGlory";
 	sx::sys::MakeFolder( fileName );
 	fileName << L"/profiles.dat";
 
@@ -1631,7 +1650,7 @@ void MenuAchievements::Initialize( void )
 #else
 	m_name->SetAlign( GTA_LEFT );
 #endif
-	m_name->SetFont( L"font_achievements_name.fnt" );
+	m_name->SetFont( FONT_ACHIEVEMENTS_NAMES );
 	m_name->Position().Set( 50.0f, -5.0f, 0.0f );
 
 	//	create label for the desc
@@ -1644,7 +1663,7 @@ void MenuAchievements::Initialize( void )
 #else
 	m_desc->SetAlign( GTA_LEFT );
 #endif
-	m_desc->SetFont( L"font_achievements_desc.fnt" );
+	m_desc->SetFont( FONT_ACHIEVEMENTS_DESC );
 	m_desc->Position().Set( 65.0f, -40.0f, 0.0f );
 	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 	m_desc->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
@@ -2279,7 +2298,7 @@ void MenuStatus::Initialize( void )
 	m_playerName->Position().Set( -35.0f, 12.0f, 0.0f );
 	m_playerName->GetElement(0)->Color().a = 0.0f;
 	m_playerName->GetElement(1)->Color().a = 0.6f;
-	m_playerName->SetFont( L"Font_rob_status.fnt" );
+	m_playerName->SetFont( FONT_STATUS );
 
 	//	create battery status
 	if ( battry.BatteryPresent )
@@ -2615,7 +2634,7 @@ void MenuVictory::Initialize( void )
 	m_peopleLabel->Position().Set( -63.0f, 106.0f, 0.0f );
 	m_peopleLabel->GetElement(0)->Color().a = 0.0f;
 	m_peopleLabel->GetElement(1)->Color() = 0xffffffaa;
-	m_peopleLabel->SetFont( L"Font_victory_people.fnt" );
+	m_peopleLabel->SetFont( FONT_VICTORY_PEOPLE );
 
 	//	create label to show golds
 	m_goldLabel = (sx::gui::Label*)m_peopleLabel->Clone();
@@ -2963,8 +2982,14 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 
 			//	go ahead
 			g_game->m_game_nextLevel = usertag ? 0 : g_game->m_game_currentLevel + 1;
+
+#if USE_HASH_LOCK
+			if ( g_game->m_game_currentLevel > 7 )
+				g_game->m_game_nextLevel = 0;
+#else
 			if ( g_game->m_game_currentLevel > 9 )
 				g_game->m_game_nextLevel = 0;
+#endif
 
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
@@ -3187,7 +3212,7 @@ void MenuInfo::Initialize( void )
 	m_indicator->SetParent( m_back );
 	m_indicator->GetElement(0)->Color() = 0x00010000;
 	m_indicator->SetSize( float2( 512, 64 ) );
-	m_indicator->SetFont( L"Font_info_indicator.fnt" );
+	m_indicator->SetFont( FONT_INFO_INDICATOR );
 	m_indicator->SetAlign( GTA_CENTER );
 	m_indicator->Position().y = 250.0f;
 
@@ -3195,7 +3220,7 @@ void MenuInfo::Initialize( void )
 	m_title->SetParent( m_back );
 	m_title->GetElement(0)->Color() = 0x00010000;
 	m_title->SetSize( float2( 512, 64 ) );
-	m_title->SetFont( L"font_info_title.fnt" );
+	m_title->SetFont( FONT_INFO_TITLE );
 	m_title->SetAlign( GTA_CENTER );
 	m_title->Position().y = 230.0f;
 
@@ -3203,7 +3228,7 @@ void MenuInfo::Initialize( void )
 	m_desc->SetParent( m_back );
 	m_desc->GetElement(0)->Color() = 0x00001000;
 	m_desc->SetSize( float2( 1000, 200 ) );
-	m_desc->SetFont( L"font_info_desc.fnt" );
+	m_desc->SetFont( FONT_INFO_DESC );
 	m_desc->SetAlign( GTA_CENTER );
 	m_desc->Position().y = -260.0f;
 	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
@@ -3256,7 +3281,7 @@ void MenuInfo::Initialize( void )
 	m_helper.title->GetElement(0)->Color() = 0x00001000;
 	m_helper.title->GetElement(1)->Color() = 0xffffff00;
 	m_helper.title->SetSize( float2( 250, 30 ) );
-	m_helper.title->SetFont( L"font_info_title_helper.fnt" );
+	m_helper.title->SetFont( FONT_INFO_TITLE_HELPER );
 #if USE_RTL
 	m_helper.title->SetAlign( GTA_RIGHT );
 	m_helper.title->Position().Set( -15.0f, 5.0f, 0.0f );
@@ -3269,7 +3294,7 @@ void MenuInfo::Initialize( void )
 	m_helper.desc->SetParent( m_helper.back );
 	m_helper.desc->GetElement(0)->Color() = 0x00001000;
 	m_helper.desc->SetSize( float2( 250, 25 ) );
-	m_helper.desc->SetFont( L"font_info_desc_helper.fnt" );
+	m_helper.desc->SetFont( FONT_INFO_DESC_HELPER );
 #if USE_RTL
 	m_helper.title->SetAlign( GTA_RIGHT );
 #else
@@ -3390,8 +3415,12 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 
 void MenuInfo::Update( float elpsTime )
 {
-	if (g_game->m_gui->m_pause->IsVisible() || g_game->m_gui->m_settings->IsVisible() || 
-		g_game->m_gui->m_victory->IsVisible() || g_game->m_gui->m_gameOver->IsVisible() ) return;
+	if ( g_game->m_gui->m_pause->IsVisible() || g_game->m_gui->m_settings->IsVisible() || 
+		g_game->m_gui->m_victory->IsVisible() || g_game->m_gui->m_gameOver->IsVisible() )
+	{
+		m_helper.showTime = -1.0f;
+		m_helper.back->State_SetIndex( 0 );
+	}
 
 	if ( m_delayTime > 0 )
 	{
@@ -3434,10 +3463,10 @@ void MenuInfo::Draw( DWORD flag )
 	m_helper.back->Draw( flag );
 }
 
-void MenuInfo::Show( void )
+void MenuInfo::Show( bool gamepaused )
 {
 	Menu::Show();
-	g_game->m_game_paused = true;
+	g_game->m_game_paused = gamepaused;
 	m_time = 0;
 }
 
@@ -3555,9 +3584,9 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 
 	if ( tutor->image->GetElement(0)->GetTexture() )
 	{
-		sx::d3d::Texture::Manager::LoadInThread() = true;
+		//sx::d3d::Texture::Manager::LoadInThread() = true;
 		tutor->image->GetElement(0)->GetTexture()->Activate();
-		sx::d3d::Texture::Manager::LoadInThread() = false;
+		//sx::d3d::Texture::Manager::LoadInThread() = false;
 	}
 
 	//	push to list
@@ -3670,7 +3699,7 @@ void MenuUpgrade::Initialize( void )
 		lb->SetParent( ch );
 		lb->SetSize( float2( 160, 28 ) );
 		//lb->SetAlign( GTA_RIGHT );
-		lb->SetFont( L"font_upgrade_name.fnt" );
+		lb->SetFont( FONT_UPGRADE_NAME );
 		lb->Position().Set( 40.0f, -2.0f, 0.0f );
 		lb->GetElement(0)->Color().a = 0.0f;
 		lb->GetElement(1)->Color().a = 1.0f;
@@ -3714,7 +3743,7 @@ void MenuUpgrade::Initialize( void )
 	m_stars = sx_new( sx::gui::Label );
 	m_stars->SetParent( m_back );
 	m_stars->SetSize( float2(128, 40) );
-	m_stars->SetFont( L"font_upgrade_stars.fnt" );
+	m_stars->SetFont( FONT_UPGRADE_STARS );
 #if USE_RTL
 	m_stars->SetAlign( GTA_RIGHT );
 	m_stars->Position().Set( -130.0f, -250.0f, 0.0f );
@@ -3747,7 +3776,7 @@ void MenuUpgrade::Initialize( void )
 #else
 	m_desc->SetAlign( GTA_LEFT );
 #endif
-	m_desc->SetFont( L"font_upgrade_desc.fnt" );
+	m_desc->SetFont( FONT_UPGRADE_DESC );
 	m_desc->Position().Set( 220.0f, -250.0f, 0.0f );
 	m_desc->GetElement(0)->Color() = 0x00000001;
 	m_desc->GetElement(1)->Color() = 0xffffffaa;

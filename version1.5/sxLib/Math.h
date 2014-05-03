@@ -295,5 +295,9 @@ SEGAN_LIB_INLINE sint sx_random_i_limit( const sint minRange, const sint maxRang
 	return sx_random_i( len ) + minRange;
 }
 
+SEGAN_LIB_API void sx_decrypt( void* dest, const void* src, const uint size, const uint key /*= 1363*/ );
+SEGAN_LIB_API void sx_encrypt( void* dest, const void* src, const uint size, const uint key /*= 1363*/ );
+SEGAN_LIB_API uint sx_checksum( const void* data, const uint size, const uint key /*= 1363*/ );
+
 #endif	//	GUARD_Math_HEADER_FILE
 

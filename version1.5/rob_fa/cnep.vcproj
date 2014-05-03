@@ -627,8 +627,36 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="hashlock"
+			>
+			<File
+				RelativePath=".\hashlock\lock_wnd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\hashlock\lock_wnd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\hashlock\resources.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\hashlock\unlocker_page_en.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\hashlock\unlocker_page_en_steam.bmp"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\cnep.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Config.h"
 			>
 		</File>
 		<File

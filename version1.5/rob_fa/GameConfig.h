@@ -1,14 +1,14 @@
 /********************************************************************
 	created:	2011/07/10
-	filename: 	Config.h
+	filename: 	GameConfig.h
 	Author:		Sajad Beigjani
 	eMail:		sajad.b@gmail.com
 	Site:		www.SeganX.com
 	Desc:		This file contain an static class to manage game 
 				configuration
 *********************************************************************/
-#ifndef GUARD_Config_HEADER_FILE
-#define GUARD_Config_HEADER_FILE
+#ifndef GUARD_GameConfig_HEADER_FILE
+#define GUARD_GameConfig_HEADER_FILE
 
 #include "ImportEngine.h"
 
@@ -46,4 +46,4 @@ public:
 };
 
 
-#endif	//	GUARD_Config_HEADER_FILE
+#endif	//	GUARD_GameConfig_HEADER_FILE

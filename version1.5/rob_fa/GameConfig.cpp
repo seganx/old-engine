@@ -45,13 +45,13 @@ void Config::LoadConfig( void )
 	//  load settings
 	String confgFile = sx::sys::GetDocumentsFolder();
 	confgFile.MakePathStyle();
-	confgFile << L"RoadsOfBattle/game.config";
+	confgFile << L"RushForGlory/game.config";
 
 	if ( sx::sys::FileExist( confgFile ) == false )
 	{
 		String fileName = sx::sys::GetDocumentsFolder();
 		fileName.MakePathStyle();
-		fileName << L"RoadsOfBattle";
+		fileName << L"RushForGlory";
 		sx::sys::MakeFolder( fileName );
 
 		String curfile = sx::sys::GetAppFolder();
@@ -212,7 +212,7 @@ void Config::SaveConfig( void )
 	//  save settings
 	String confgFile = sx::sys::GetDocumentsFolder();
 	confgFile.MakePathStyle();
-	confgFile << L"RoadsOfBattle/game.config";
+	confgFile << L"RushForGlory/game.config";
 
 	sx::cmn::StringList configList;
 	configList.LoadFromFile( confgFile );
