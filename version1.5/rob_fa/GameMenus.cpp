@@ -753,6 +753,9 @@ void MenuMap::Initialize( void )
 	panel->Position().x = m_diff_scroll->GetSize().x * 0.5f;
 	SEGAN_GUI_SET_ONCLICK( panel, MenuMap::OnScroll );
 
+	m_guide = sx_new( GameGuid );
+	m_guide->m_back->SetParent( panel );
+
 	panel = sx_new( sx::gui::Panel );
 	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	panel->SetParent( m_diff_scroll );
@@ -784,10 +787,12 @@ void MenuMap::Initialize( void )
 			}
 		}
 	}
+
 }
 
 void MenuMap::Finalize( void )
 {
+	sx_delete_and_null(m_guide);
 	Menu::Finalize();
 }
 
@@ -872,7 +877,12 @@ void MenuMap::Update( float elpsTime )
 			if ( m_frame == 90 ) { for ( int i=0; i<3 && i<g_game->m_player->m_profile.stars[8]; i++)	m_levels[8].m_star[i]->State_SetIndex(1); }
 			if ( m_frame == 95 ) { for ( int i=0; i<3 && i<g_game->m_player->m_profile.stars[9]; i++)	m_levels[9].m_star[i]->State_SetIndex(1); }
 		}
-
+		else if ( g_game->m_player->m_profile.level_played > 1 && g_game->m_player->m_profile.GetNumStars() < 4 && m_selectedLevel > 2 && 
+				  g_game->m_guides[GUIDE_DIFFICULTY]->m_fresh && g_game->m_player->m_profile.curDifficulty < 2 )
+		{
+			m_guide->SetText( g_game->m_guides[GUIDE_DIFFICULTY]->Use() );
+			m_guide->Show( GameGuid::TOPLEFT, 0.0f, 15.0f, 30 );	
+		}
 	}
 
 	{
@@ -895,6 +905,7 @@ void MenuMap::Update( float elpsTime )
 
 	}
 
+	m_guide->Update(elpsTime);
 	Menu::Update(elpsTime);
 }
 
@@ -906,7 +917,7 @@ void MenuMap::Draw( DWORD flag )
 
 void MenuMap::Show( void )
 {
-#if USE_HASH_LOCK
+#if USE_8_LEVELS
 	for ( int i=0; i<8; i++ )
 #else
 	for ( int i=0; i<10; i++ )
@@ -923,7 +934,7 @@ void MenuMap::Show( void )
 	}
 
 	m_selectedLevel = g_game->m_player->m_profile.level_selected;
-#if USE_HASH_LOCK
+#if USE_8_LEVELS
 	SEGAN_CLAMP( m_selectedLevel, 1, 8 );
 #else
 	SEGAN_CLAMP( m_selectedLevel, 1, 10 );
@@ -2698,11 +2709,14 @@ void MenuVictory::Initialize( void )
 	}
 
 
+	m_guide = sx_new( GameGuid );
+	m_guide->m_back->SetParent( m_goldLabel );
 }
 
 void MenuVictory::Finalize( void )
 {
 	Hide();
+	sx_delete_and_null(m_guide);
 	Menu::Finalize();
 }
 
@@ -2717,12 +2731,26 @@ void MenuVictory::ProcessInput( bool& inputHandled, float elpsTime )
 
 void MenuVictory::Update( float elpsTime )
 {
-	//	make a simple delay to start any things
-	if ( m_time > 0 )
+	if ( !IsVisible() )
 	{
-		m_time -= elpsTime;
 		Menu::Update( elpsTime );
 		return;
+	}
+
+	//	make a simple delay to start any things
+	m_time -= elpsTime;
+	if ( m_time > 0 )
+	{
+		Menu::Update( elpsTime );
+		return;
+	}
+	if ( m_time < -2000 )
+	{
+		if ( g_game->m_guides[GUIDE_GOLDFORPEOPLE]->m_fresh && g_game->m_player->m_profile.level_played == 0 )
+		{
+			m_guide->SetText( g_game->m_guides[GUIDE_GOLDFORPEOPLE]->Use() );
+			m_guide->Show( GameGuid::BOTTOMLEFT, 0.0f, 0.0f, 120 );
+		}
 	}
 
 	if ( m_shakeTime > 0 )
@@ -2824,6 +2852,7 @@ void MenuVictory::Update( float elpsTime )
 		}
 	}
 
+	m_guide->Update(elpsTime);
 	Menu::Update( elpsTime );
 
 }
@@ -2925,6 +2954,8 @@ void MenuVictory::Hide( void )
 		g_gameup->end_score();
 #endif
 	}
+
+	m_guide->Hide();
 }
 
 void MenuVictory::ApplyChangesToProfile( void )
@@ -2977,13 +3008,14 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 			//	notify that game has been end
 			g_game->PostMessage( 0, GMT_GAME_END, NULL );
 
+			//	go ahead
+			g_game->m_game_nextLevel = usertag ? 0 : g_game->m_game_currentLevel + 1;
+			g_game->m_player->m_profile.level_selected = g_game->m_game_nextLevel;
+
 			//	apply changes
 			ApplyChangesToProfile();
 
-			//	go ahead
-			g_game->m_game_nextLevel = usertag ? 0 : g_game->m_game_currentLevel + 1;
-
-#if USE_HASH_LOCK
+#if USE_8_LEVELS
 			if ( g_game->m_game_currentLevel > 7 )
 				g_game->m_game_nextLevel = 0;
 #else

@@ -184,6 +184,173 @@ void GoldAndPeople::OnExit( sx::gui::PControl sender )
 	sx::gui::PPanelEx( sender )->State_SetIndex(0);
 }
 
+//////////////////////////////////////////////////////////////////////////
+//	panel to show game guid
+//////////////////////////////////////////////////////////////////////////
+GameGuid::GameGuid( void ): m_time(0), m_pos(0,0)//, m_used(false)
+{
+	m_back = sx_new( sx::gui::PanelEx );
+	m_back->AddProperty( SX_GUI_PROPERTY_BLENDCHILDS );
+	m_back->State_Add();
+	m_back->State_GetByIndex(0).Blender.Set(0.5f, 0.4f);
+	m_back->State_GetByIndex(0).Scale.Set(0.9f, 0.9f, 1);
+	m_back->State_GetByIndex(0).Color.Set(0, 0, 0, 0);
+	m_back->State_GetByIndex(1).Blender.Set(0.5f, 0.4f);
+	m_back->State_GetByIndex(1).Scale.Set(1, 1, 1);
+	m_back->State_GetByIndex(1).Color.Set(0.0f, 0.0f, 0.0f, 0.6f);
+	m_back->State_SetIndex(0);
+
+	m_indic = sx_new( sx::gui::Panel );
+	m_indic->SetParent( m_back );
+	m_indic->GetElement(0)->SetTextureSrc(L"gui_guid_pointer.txr");
+	m_indic->GetElement(0)->Color() = D3DColor(0.0f, 0.0f, 0.0f, 1.0f );
+	m_indic->SetSize( float2(32.0f, 32.0f) );
+
+	m_title = sx_new( sx::gui::Label );
+	m_title->SetParent( m_back );
+	m_title->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
+	m_title->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
+#if USE_RTL
+	m_title->SetAlign( GTA_RIGHT );
+#else
+	m_title->SetAlign( GTA_LEFT );
+#endif
+	m_title->SetFont( FONT_HINT_TITLE );
+	m_title->GetElement(0)->Color() = D3DColor(0,0,0,0);
+	m_title->GetElement(1)->Color() = D3DColor(1,1,0.2f,1);
+
+	m_desc = sx_new( sx::gui::Label );
+	m_desc->SetParent( m_back );
+	m_desc->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
+	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
+	m_desc->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
+#if USE_RTL
+	m_desc->SetAlign( GTA_RIGHT );
+#else
+	m_desc->SetAlign( GTA_LEFT );
+#endif
+	m_desc->SetFont( FONT_HINT_DESC );
+	m_desc->GetElement(0)->Color() = D3DColor(0,0,0,0);
+}
+
+GameGuid::~GameGuid( void )
+{
+	m_back->SetParent( null );
+	g_game->m_gui->Remove( m_back );
+	sx_delete_and_null( m_back );
+}
+
+void GameGuid::SetText( const wchar* str )
+{
+	m_hint = str;
+
+	float2 panelSize, titleSize, descSize;
+	String strTitle = str;
+	strTitle.Replace(L"\\n", L"\n");
+	int index = 0;
+	if ( ( index = strTitle.Find(L"\n") ) > -1 )
+	{
+		String strDesc;
+		strTitle.CopyTo(strDesc, index+1, 99999);
+		strTitle.Delete(index, 99999);
+
+		m_title->SetText( strTitle );
+		m_desc->SetText( strDesc );
+
+		titleSize = m_title->GetSize();
+		descSize = m_desc->GetSize();
+	}
+	else
+	{
+		m_title->SetText( strTitle );
+		m_desc->SetText( NULL );
+
+		titleSize = m_title->GetSize();
+		descSize.Set(0,0);
+	}
+
+	panelSize.x = sx_max_f( titleSize.x, descSize.x ) + 32;
+	panelSize.y = titleSize.y + descSize.y + 32;
+	m_back->SetSize( panelSize );
+	m_title->Position().Set( 0, (panelSize.y/2) - (titleSize.y/2) - 16, 0 );
+	m_desc->Position().Set( 0, - (panelSize.y/2) + (descSize.y/2) + 16, 0 );
+}
+
+
+void GameGuid::Show( const CORNER corner, const float x, const float y, const float lifetime /*= 10*/ )
+{
+	m_time = lifetime;
+
+	if ( m_hint.Length() )
+	{
+		float2 pos( x, y );
+		float2 siz = m_back->GetSize();
+
+		switch ( corner )
+		{
+		case TOPLEFT:
+			{
+				m_indic->Position().Set( - siz.x * 0.5f, siz.y * 0.5f, 0.0f );
+				m_indic->Rotation().z = PI_DIV_2;
+				pos.x += siz.x * 0.5f + 32.0f;
+				pos.y -= siz.y * 0.5f + 32.0f;
+			}
+			break;
+
+		case TOPRIGHT:
+			{
+				m_indic->Position().Set( siz.x * 0.5f, siz.y * 0.5f, 0.0f );
+				pos.x -= siz.x * 0.5f + 32.0f;
+				pos.y -= siz.y * 0.5f + 32.0f;
+			}
+			break;
+
+		case BOTTOMRIGHT:
+			{
+				m_indic->Position().Set( siz.x * 0.5f, - siz.y * 0.5f, 0.0f );
+				m_indic->Rotation().z = - PI_DIV_2;
+				pos.x -= siz.x * 0.5f + 32.0f;
+				pos.y += siz.y * 0.5f + 32.0f;
+			}
+			break;
+
+		case BOTTOMLEFT:
+			{
+				m_indic->Position().Set( - siz.x * 0.5f, - siz.y * 0.5f, 0.0f );
+				m_indic->Rotation().z = PI;
+				pos.x += siz.x * 0.5f + 32.0f;
+				pos.y += siz.y * 0.5f + 32.0f;
+			}
+			break;
+		}
+
+		m_back->State_GetByIndex(0).Position.Set( pos.x, pos.y, 0 );
+		m_back->State_GetByIndex(1).Position.Set( pos.x, pos.y, 0 );
+		m_back->State_SetIndex(1);
+	}
+	else
+	{
+		m_back->State_SetIndex(0);
+	}
+}
+
+void GameGuid::Hide( void )
+{
+	m_back->State_SetIndex(0);
+}
+
+void GameGuid::Update( const float elpsTime )
+{
+	if ( m_time > 0.0f )
+	{
+		m_time -= elpsTime * 0.001f;
+		if ( m_time <= 0.0f )
+		{
+			m_back->State_SetIndex(0);
+		}
+	}
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //	game tips
@@ -343,29 +510,20 @@ public:
 		sx_delete_and_null( m_panelEx );
 	}
 
-	void SetCurrentContorl(sx::gui::PControl pCurrent)
+	void SetText(const WCHAR* hint)
 	{
-		if ( !pCurrent || !pCurrent->GetHint() || !pCurrent->HasProperty( SX_GUI_PROPERTY_ACTIVATE ) )
-		{
-			m_panelEx->State_SetIndex(0);
-			m_Current = pCurrent;
-			return;
-		}
-		if ( m_hint == pCurrent->GetHint() && m_Current == pCurrent ) return;
-
-		m_Current = pCurrent;
-		m_hint = m_Current->GetHint();
+		m_hint = hint;
 		m_time = 0;
 
 		float2 panelSize, titleSize, descSize;
-		String strTitle = m_Current->GetHint();
+		String strTitle = hint;
 		int index = 0;
 		if ( ( index = strTitle.Find(L"\n") ) > -1 )
 		{
 			String strDesc;
 			strTitle.CopyTo(strDesc, index+1, 99999);
 			strTitle.Delete(index, 99999);
-			
+
 			m_lblTitle->SetText( strTitle );
 			m_lblDesc->SetText( strDesc );
 
@@ -386,6 +544,21 @@ public:
 		m_panelEx->SetSize( panelSize );
 		m_lblTitle->Position().Set( 0, (panelSize.y/2) - (titleSize.y/2) - 16, 0 );
 		m_lblDesc->Position().Set( 0, - (panelSize.y/2) + (descSize.y/2) + 16, 0 );
+
+	}
+
+	void SetCurrentContorl(sx::gui::PControl pCurrent)
+	{
+		if ( !pCurrent || !pCurrent->GetHint() || !pCurrent->HasProperty( SX_GUI_PROPERTY_ACTIVATE ) )
+		{
+			m_panelEx->State_SetIndex(0);
+			m_Current = pCurrent;
+			return;
+		}
+		if ( m_hint == pCurrent->GetHint() && m_Current == pCurrent ) return;
+
+		m_Current = pCurrent;
+		SetText( m_Current->GetHint() );
 
 		m_panelEx->State_SetIndex(1);
 	}
@@ -413,7 +586,7 @@ public:
 
 public:
 	float					m_time;		//  time of display
-	String			m_hint;		//  description
+	String					m_hint;		//  description
 	sx::gui::PControl		m_Current;	//	current control
 	sx::gui::PPanelEx		m_panelEx;	//	use as background
 	sx::gui::PLabel			m_lblTitle;	//  title

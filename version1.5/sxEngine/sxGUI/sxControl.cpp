@@ -631,15 +631,13 @@ namespace sx { namespace gui {
 				Matrix matView, matProj;
 				d3d::Device3D::Matrix_View_Get( matView );
 				d3d::Device3D::Matrix_Project_Get( matProj );
-
 				D3DViewport VP = *d3d::Device3D::Viewport();
-
-				float3 viewPos = m_Pos + m_PosOffset;
-				viewPos.ProjectToScreen(viewPos, math::MTRX_IDENTICAL, matView, matProj, VP);
-
-				m_Mtrx._41 = viewPos.x - VP.Width*0.5f;
-				m_Mtrx._42 = - viewPos.y + VP.Height*0.5f;;
-				m_Mtrx._43 = m_Pos.z + m_PosOffset.z;
+				float3 currpos = m_Pos + m_PosOffset;
+				float3 resultpos(0,0,0);
+				resultpos.ProjectToScreen(currpos, math::MTRX_IDENTICAL, matView, matProj, VP);
+				m_Mtrx._41 = resultpos.x;
+				m_Mtrx._42 = resultpos.y;
+				m_Mtrx._43 = 0.0f;
 			}
 			else
 			{
@@ -647,6 +645,7 @@ namespace sx { namespace gui {
 				m_Mtrx._42 = m_Pos.y + m_PosOffset.y;
 				m_Mtrx._43 = m_Pos.z + m_PosOffset.z;
 			}
+
 		}
 	}
 

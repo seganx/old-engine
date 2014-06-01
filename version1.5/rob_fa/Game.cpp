@@ -162,7 +162,6 @@ Game::Game( void )
 	label->Position().y = ringPos.y - 20;
 
 	//  load achievements information
-
 	{
 		String str = sx::sys::FileManager::Project_GetDir();
 		str << L"Achievements.txt";
@@ -200,6 +199,32 @@ Game::Game( void )
 		}
 	}
 
+	//	load guid strings
+	{
+		String str = sx::sys::FileManager::Project_GetDir();
+		str << L"Strings.txt";
+
+		Scripter script;
+		script.Load( str );
+
+		str512 tmp, tips;
+		for (int i=0; i<script.GetObjectCount(); i++)
+		{
+			if ( script.GetString(i, L"Type", tmp) )
+			{
+				if ( tmp == L"Guide" )
+				{
+					if ( !script.GetString( i, L"text", tips ) )
+						continue;
+
+					GuideText* guide = sx_new( GuideText );
+					guide->m_text.SetText( tips );
+					m_guides.PushBack( guide );
+				}
+			}
+		}
+	}
+
 	//	initialize upgrades
 	m_upgrades.LoadDefaults();
 }
@@ -208,6 +233,13 @@ Game::~Game( void )
 {
 	sx_delete(m_panel_Loading);
 	sx_delete(m_panel_Cursor);
+
+	for ( int i=0; i<g_game->m_guides.Count(); ++i )
+	{
+		GuideText* guide = g_game->m_guides[i];
+		sx_delete(guide);
+	}
+	g_game->m_guides.Clear();
 
 	for ( int i=0; i<15; i++ )
 		m_achievements[i].Finalize();

@@ -13,6 +13,8 @@
 #include "GameUtils.h"
 #include "GameTypes.h"
 
+class GameGuid;
+
 class Menu: public sx::gui::Form
 {
 public:
@@ -125,6 +127,8 @@ public:
 	str512				m_diff_insane_text;
 	int					m_frame;
 	int					m_selectedLevel;
+
+	GameGuid*			m_guide;
 };
 
 class MenuProfile: public Menu
@@ -308,6 +312,7 @@ public:
 	float				m_starTime;
 	float				m_goldTime;
 	sx::gui::Button*	m_nextLevel;
+	GameGuid*			m_guide;
 
 	struct APL
 	{
@@ -315,6 +320,7 @@ public:
 		float				age;
 	};
 	Array<APL*> m_apl;
+
 };
 
 class MenuGameOver: public Menu
@@ -382,5 +388,7 @@ public:
 
 
 };
+
+
 
 #endif	//	GUARD_GameMenus_HEADER_FILE

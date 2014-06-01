@@ -15,7 +15,12 @@
 #define USE_RTL				0
 #define USE_GAMEUP			0
 #define USE_LOCK_NAME		L"Immanitas GmbH"
+#define USE_8_LEVELS		0
 #define USE_HASH_LOCK		0
+#define USE_STEAM_LINK		0
+#define USE_CHEAT_CODE		0
+#define USE_SITE_STATS		0
+
 
 
 #if VER_USERDEMO
@@ -52,6 +57,14 @@
 #define FONT_TOWER_PANEL_HEALTH				L"Font_25_l.fnt"
 #define FONT_WAVE_CALL_GOLD					L"Font_30_l.fnt"
 #define FONT_PREVIEW						L"Font_25_l.fnt"
+#define FONT_HUD_TITLE						L"Font_25_l.fnt"
+
+
+#define GUIDE_CALLWAVE						0
+#define GUIDE_UPGRADE						1
+#define GUIDE_GOLDFORPEOPLE					2
+#define GUIDE_DIFFICULTY					3
+#define GUIDE_SELLTOWERS					4
 
 
 #endif //GUARD_Config_HEADER_FILE

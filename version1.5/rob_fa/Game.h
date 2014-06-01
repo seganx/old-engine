@@ -18,6 +18,7 @@
 class Player;
 class GamePlay;
 class GameGUI;
+class GuideText;
 
 //////////////////////////////////////////////////////////////////////////
 //  main class of the game
@@ -83,6 +84,8 @@ public:
 	sx::gui::PPanelEx		m_panel_Loading;			//  loading panel
 
 	sx::sys::Window*		m_window;					//	rendering context
+
+	Array<GuideText*>		m_guides;					//	array of strings for the guide panels
 };
 
 //	global game pointer

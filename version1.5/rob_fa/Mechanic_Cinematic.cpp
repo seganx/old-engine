@@ -237,7 +237,7 @@ namespace GM
 
 		case GMT_GAME_END:			/////////////////////////////////////////////////    END GAME
 			{						//////////////////////////////////////////////////////////////////////////
-#if USE_HASH_LOCK
+#if USE_8_LEVELS
 				if ( g_game->m_game_currentLevel == 8 )
 #else
 				if ( g_game->m_game_currentLevel == 10 )

@@ -39,6 +39,27 @@ public:
 	float				m_time;
 };
 
+class GameGuid
+{
+public:
+	enum CORNER {TOPRIGHT, TOPLEFT, BOTTOMRIGHT, BOTTOMLEFT };
+public:
+	GameGuid(void);
+	~GameGuid(void);
+	void SetText(const wchar* str);
+	void Show(const CORNER corner, const float x, const float y, const float lifetime = 10);
+	void Hide( void );
+	void Update(const float elpsTime);
+public:
+	//bool					m_used;		//	has been used before
+	float					m_time;		//  time of display
+	float2					m_pos;
+	String					m_hint;		//  description
+	sx::gui::PanelEx*		m_back;		//	background
+	sx::gui::Panel*			m_indic;	//	guid indicator
+	sx::gui::Label*			m_title;	//  title
+	sx::gui::Label*			m_desc;		//  description
+};
 
 class GameGUI: public sx::gui::Form
 {

@@ -13,6 +13,7 @@
 #include "Mechanic.h"
 
 class Entity;
+class GameGuid;
 
 namespace GM
 {
@@ -122,6 +123,8 @@ namespace GM
 		sx::gui::PLabel			m_labelGold;		//	label to show the amount of catching golds
 		sx::gui::PPanelEx		m_nextWave;			//	gui to show next wave info
 		sx::gui::PProgressBar	m_startProgr;		//	progress bar to show the time
+
+		GameGuid*				m_guide;				//	use guid to show in game tutorial 
 	
 		sx::gui::PPanelEx		m_mapBack;			//	background for mini map
 

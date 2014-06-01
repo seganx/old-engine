@@ -28,7 +28,28 @@ void get_hash( char* dest, char* src )
 	}
 }
 
-bool verify_hash_lock_code ( const wchar_t * code )
+unsigned int verify_hash_lock_code ( const unsigned systime, const wchar_t * code, int* res )
+{
+	wchar_t *c = (wchar_t*)code;
+	char part1[6] = {0};
+	char part2[6] = {0};
+	char part3[6] = {0};
+	char part4[6] = {0};
+
+	for ( int i=0; i<5; i++ ) part1[i] = (char)*c++; c++;
+	for ( int i=0; i<5; i++ ) part2[i] = (char)*c++; c++;
+	for ( int i=0; i<5; i++ ) part3[i] = (char)*c++; c++;
+	for ( int i=0; i<5; i++ ) part4[i] = (char)*c++; c++;
+
+	char tmp[6] = {0};
+	get_hash( tmp, part1 );
+	res[0] = strcmp( tmp, part2 ) + HASH_VERIFY_RES1(systime);
+	get_hash( tmp, part3 );
+	res[1] = strcmp( tmp, part4 ) + HASH_VERIFY_RES2(systime);
+	return res[0] * res[1];
+}
+
+bool verify_hash_lock_code_internal ( const wchar_t * code )
 {
 	wchar_t *c = (wchar_t*)code;
 	char part1[6] = {0};
@@ -46,11 +67,8 @@ bool verify_hash_lock_code ( const wchar_t * code )
 	if ( strcmp( tmp, part2 ) ) return false;
 	get_hash( tmp, part3 );
 	if ( strcmp( tmp, part4 ) ) return false;
-	
 	return true;
 }
-
-
 
 LRESULT CALLBACK WinProc_unlock(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
@@ -115,7 +133,7 @@ LRESULT CALLBACK WinProc_unlock(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam)
 					reinterpret_cast<LPARAM>(buffer));
 				
 				//	verify the code
-				if ( verify_hash_lock_code( buffer ) )
+				if ( verify_hash_lock_code_internal( buffer ) )
 				{
 					accepted = 1;
 					memcpy( verified_code, buffer, 120 );

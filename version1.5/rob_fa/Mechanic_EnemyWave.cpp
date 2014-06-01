@@ -6,6 +6,7 @@
 #include "Entity.h"
 #include "EntityManager.h"
 #include "GameConfig.h"
+#include "GameMenus.h"
 
 #define		MAX_ENEMIES		32
 
@@ -71,6 +72,9 @@ namespace GM
 		m_startProgr->GetElement(1)->SetTextureSrc( L"gui_waveProg.txr" );
 		SEGAN_GUI_SET_ONCLICK( m_startProgr, Mechanic_EnemyWaves::OnClick );
 
+		m_guide = sx_new( GameGuid );
+		m_guide->m_back->SetParent( m_startProgr );
+
 		m_label = sx_new( sx::gui::Label );
 		m_label->SetParent( m_back );
 		m_label->SetFont( FONT_TOWER_PANEL_INFO );
@@ -116,6 +120,9 @@ namespace GM
 
 	void Mechanic_EnemyWaves::Finalize( void )
 	{
+		m_guide->m_back->SetParent(null);
+		sx_delete_and_null( m_guide );
+
 		m_mapBack->SetParent( NULL );
 		sx_delete_and_null( m_mapBack );
 
@@ -137,6 +144,7 @@ namespace GM
 
 	void Mechanic_EnemyWaves::Update( float elpsTime )
 	{
+		m_guide->Update(elpsTime);
 
 		//	update label
 		if ( m_labelGold->m_SclOffset.z < 3.0f )
@@ -211,6 +219,7 @@ namespace GM
 		if ( m_waveIndex >= m_wavesSrc.Count() )
 		{
 			m_back->State_SetIndex(0);
+			m_guide->Hide();
 			return;
 		}
 
@@ -236,6 +245,12 @@ namespace GM
 				m_startProgr->SetValue( pWave->nextWaveTime );
 				m_back->State_SetIndex(1);
 				m_nextWave->State_SetIndex(1);
+
+				if ( g_game->m_guides[GUIDE_CALLWAVE]->m_fresh && g_game->m_player->m_profile.level_played == 0 )
+				{
+					m_guide->SetText( g_game->m_guides[GUIDE_CALLWAVE]->Use() );
+					m_guide->Show( GameGuid::TOPRIGHT, -50.0f, -20.0f, pWave->nextWaveTime );
+				}
 			}
 			else
 			{
@@ -387,6 +402,7 @@ namespace GM
 				m_enemyCount = 0;
 				m_back->State_SetIndex(1);
 				m_nextWave->State_SetIndex(1);
+				m_guide->Hide();
 				SetNextWaveImage();
 			}
 			break;	//	GMT_GAME_START
@@ -407,6 +423,7 @@ namespace GM
 				m_enemyCount = 0;
 				m_back->State_SetIndex(1);
 				m_nextWave->State_SetIndex(1);
+				m_guide->Hide();
 				SetNextWaveImage();
 			}
 			break;	//	GMT_GAME_RESET
@@ -435,6 +452,7 @@ namespace GM
 
 	void Mechanic_EnemyWaves::StartWave( void )
 	{
+		m_guide->Hide();
 		if ( !m_back->State_GetIndex() ) return;
 
 		m_waveTime = 0;

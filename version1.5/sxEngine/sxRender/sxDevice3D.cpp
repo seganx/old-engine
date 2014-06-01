@@ -65,7 +65,7 @@ public:
 	}
 
 	static bool InitAdaptor(void){
-		String strlog = L"\r\n\nGraphic card information:\r\n";
+		sxLog::Log_(L"\r\n\nGraphic card information:\r\n");
 
 		// Create Interface
 		Direct3D_internal::m_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
@@ -79,7 +79,7 @@ public:
 		Direct3D_internal::m_uAdapter = D3DADAPTER_DEFAULT;//adapterCount > 1 ? adapterCount - 1 : D3DADAPTER_DEFAULT;
 		UINT adapterCount = Direct3D_internal::m_pD3D->GetAdapterCount();
 
-		//strlog << L"\tNumber of adapters : " << (int)adapterCount << L"\r\n";
+		sxLog::Log_(L"\tNumber of adapters : %u \r\n", adapterCount);
 
 		if ( adapterCount > 1 )
 		{
@@ -94,14 +94,12 @@ public:
 
 				Direct3D_internal::m_uAdapter = i;
 				str512 tmpstr = ident.Description;
-				strlog << L"\tadapter description ";// << (int)i << tmpstr.Text() << L"\r\n";
+				sxLog::Log_( L"\tadapter description [ %u ] : %s\r\n", i, tmpstr.Text() );
 
 				tmpstr.MakeLower();
 				if ( tmpstr.Find( L"intel" ) )
 					continue;
 			}
-
-			strlog << L"\r\n";
 		}
 
 		// Get the current desktop display mode, so we can setup back buffer format
@@ -109,6 +107,18 @@ public:
 		{
 			sxLog::Log_(L"I can not get adapter display mode !");
 			return false;
+		}
+		else
+		{
+			RECT rc; rc.left = 0; rc.top = 0; rc.right = 10; rc.bottom = 10;
+			HMONITOR hMonitor = MonitorFromRect( &rc, MONITORINFOF_PRIMARY );
+
+			MONITORINFO monitorInfo;
+			ZeroMemory( &monitorInfo, sizeof(MONITORINFO) );
+			monitorInfo.cbSize = sizeof(MONITORINFO);
+			GetMonitorInfo( hMonitor, &monitorInfo );
+			m_CurDisplayMode.Width		= monitorInfo.rcMonitor.right	- monitorInfo.rcMonitor.left;
+			m_CurDisplayMode.Height		= monitorInfo.rcMonitor.bottom	- monitorInfo.rcMonitor.top;
 		}
 
 		//  Get device capabilities before create 3D Device
@@ -139,15 +149,22 @@ public:
 		memcpy(Direct3D_internal::m_DriverInfo.Driver, *tmp, tmp.Length()*2);
 
 
-// 		strlog << 
-// 			L"\tDriver: \t"				<< Direct3D_internal::m_DriverInfo.Driver			<< 
-// 			L"\r\n\tDescription: \t"	<< Direct3D_internal::m_DriverInfo.Description		<< 
-// 			L"\r\n\tProduct: \t"		<< Direct3D_internal::m_DriverInfo.Product			<<
-// 			L"\r\n\tVersion: \t"		<< Direct3D_internal::m_DriverInfo.Version			<<
-// 			L"\r\n\tSubVersion: \t"		<< Direct3D_internal::m_DriverInfo.SubVersion		<<
-// 			L"\r\n\tBuild: \t\t"		<< Direct3D_internal::m_DriverInfo.Build			<< L"\r\n\r\n";
-
-		sxLog::Log_(strlog);
+ 		sxLog::Log_( 
+ 			L"\tDriver: \t\t %s \r\n"			
+ 			L"\tDescription: \t %s \r\n"	
+ 			L"\tProduct: \t\t %d \r\n"	
+ 			L"\tVersion: \t\t %d \r\n"	
+ 			L"\tSubVersion: \t %d \r\n"	
+ 			L"\tBuild: \t\t\t %d \r\n"
+			L"\tDisplay : \t\t %d x %d\r\n\r\n",
+			Direct3D_internal::m_DriverInfo.Driver		,
+			Direct3D_internal::m_DriverInfo.Description	,
+			Direct3D_internal::m_DriverInfo.Product		,
+			Direct3D_internal::m_DriverInfo.Version		,
+			Direct3D_internal::m_DriverInfo.SubVersion	,
+			Direct3D_internal::m_DriverInfo.Build		,
+			Direct3D_internal::m_CurDisplayMode.Width	,
+			Direct3D_internal::m_CurDisplayMode.Height	);
 
 		return true;
 	}
@@ -412,7 +429,7 @@ namespace sx { namespace d3d
 		PresentParam.hDeviceWindow				= Display;
 
 		//  set device behavior
-		PresentParam.Windowed					= (Flag & SX_D3D_FULLSCREEN) ? FALSE : TRUE;
+		PresentParam.Windowed					= TRUE;// (Flag & SX_D3D_FULLSCREEN) ? FALSE : TRUE;
 		PresentParam.FullScreen_RefreshRateInHz = 0;//(Flag & SX_D3D_FULLSCREEN) ? Device3D_internal::m_CurDisplayMode.RefreshRate : 0;
 		PresentParam.PresentationInterval		= (Flag & SX_D3D_VSYNC) ? D3DPRESENT_INTERVAL_DEFAULT : D3DPRESENT_INTERVAL_IMMEDIATE;
 
@@ -677,8 +694,8 @@ namespace sx { namespace d3d
 		PresentParam.BackBufferWidth			= Width;
 
 		//  set device behavior
-		PresentParam.Windowed					= (Flag & SX_D3D_FULLSCREEN) ? FALSE : TRUE;
-		PresentParam.FullScreen_RefreshRateInHz = (Flag & SX_D3D_FULLSCREEN) ? Direct3D_internal::m_CurDisplayMode.RefreshRate : 0;
+		PresentParam.Windowed					= TRUE;//(Flag & SX_D3D_FULLSCREEN) ? FALSE : TRUE;
+		PresentParam.FullScreen_RefreshRateInHz = 0;//(Flag & SX_D3D_FULLSCREEN) ? Direct3D_internal::m_CurDisplayMode.RefreshRate : 0;
 		PresentParam.PresentationInterval		= (Flag & SX_D3D_VSYNC) ? D3DPRESENT_INTERVAL_DEFAULT : D3DPRESENT_INTERVAL_IMMEDIATE;
 
 		//  try to reset the device
@@ -821,10 +838,11 @@ e_reset:
 			s_eTime = 0;
 		}
 		s_iFrame++;
-
+#if 0
 		if (Direct3D_internal::m_creationFlag & SX_D3D_FULLSCREEN)
 			Direct3D_internal::m_pDevice->Present(NULL, NULL, NULL, NULL);
 		else
+#endif
 			Direct3D_internal::m_pDevice->Present(&Direct3D_internal::m_rc, pDestRect, Direct3D_internal::m_hDisplay, NULL);
 	}
 

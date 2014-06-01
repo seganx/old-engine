@@ -33,10 +33,15 @@
 #define SX_GUI_PROPERTY_PROGRESSUV		0x00010000		//	progress control will display as linear mode and UV alignment
 #define SX_GUI_PROPERTY_BILLBOARD		0x00020000		//	control will display as billboard
 
-//! these flags used in draw option of a gui control and it;s childes
-#define SX_GUI_DRAW_SAVEMATRIX			0x00010000		//  save current view and projection matrices
-#define SX_GUI_DRAW_JUST3D				0x00020000		//  just draw of gui has 3D space property
-#define SX_GUI_DRAW_JUST2D				0x00040000		//  just draw if gui is 2D
+//! these flags used in draw option of a gui control and it's childes
+#define SX_GUI_DRAW_SAVEMATRIX			0x01000000		//  save current view and projection matrices
+#define SX_GUI_DRAW_JUST3D				0x02000000		//  just draw of gui has 3D space property
+#define SX_GUI_DRAW_JUST2D				0x04000000		//  just draw if gui is 2D
+
+//! gui post properties
+#define _SX_GUI_NOT_VISIBLE_			0x10000000
+#define _SX_GUI_NOT_ENABLE_				0x20000000
+#define _SX_GUI_IN_3DSPACE_				0x40000000
 
 //! some key code combination
 #define SX_GUI_KEY_SHIFT				0x0001
@@ -46,11 +51,6 @@
 
 //! prevent rubbing surfaces
 #define SX_GUI_Z_BIAS					-0.15f
-
-//! gui post properties
-#define _SX_GUI_NOT_VISIBLE_			0x10000000
-#define _SX_GUI_NOT_ENABLE_				0x20000000
-#define _SX_GUI_IN_3DSPACE_				0x40000000
 
 //! gui bounding conditions
 #define SX_GUI_MINIMUM_ALPHA			0.001f

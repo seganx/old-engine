@@ -361,6 +361,9 @@ FORCEINLINE void Vector3::Transform_Norm( const Vector3& v, const Matrix& m )
 FORCEINLINE void Vector3::ProjectToScreen( const float3& vIn, const Matrix& matWorld, const Matrix& matView, const Matrix& matProj, const D3DVIEWPORT9& vp )
 {
 	D3DXVec3Project(this, &vIn, &vp, &matProj, &matView, &matWorld);
+	x = x - vp.Width * 0.5f;
+	y = - y + vp.Height * 0.5f;
+	z = 0.0f;
 }
 
 //////////////////////////////////////////////////////////////////////////

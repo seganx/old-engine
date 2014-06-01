@@ -45,6 +45,8 @@ private:
 	//float					m_healthBar_Time;	//  time of display
 	sx::gui::PProgressBar	m_healthBar;		//  health bar of entities
 
+	//sx::gui::Label*			m_title;			//	desplay type name for selected towers
+
 public:
 
 	//! reference to integer value which describe health bar display mode. 0=hide 1=always show 2=on damage show

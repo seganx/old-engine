@@ -127,6 +127,9 @@ namespace sx { namespace sys
 	//! return current system time in milliseconds
 	SEGAN_API float	GetSysTime(void);
 
+	//! return current system time in milliseconds
+	SEGAN_API UINT GetSysTime_u(void);
+
 	//! return date in YYYY/MM/DD format
 	SEGAN_API const WCHAR* GetDate(void);
 

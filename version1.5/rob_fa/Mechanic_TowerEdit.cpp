@@ -158,7 +158,6 @@ namespace GM
 		m_pnlButton[2]->SetParent( m_pnlSell );
 		m_pnlEditor1->SetParent( m_back );
 
-
 		//	create labels
 		m_lblHealth = sx_new( sx::gui::Label );
 		m_lblHealth->SetParent( m_back );
@@ -248,6 +247,10 @@ namespace GM
 #else
 		pnl->Position().Set( -50.0f, 12.0f, 0.0f );
 #endif
+
+		m_guide = sx_new( GameGuid );
+		m_guide->m_back->SetParent( m_pnlUpdate[0] );
+
 		// add editor panel to the game
 		g_game->m_gui->Add_Front( m_back );
 	}
@@ -256,8 +259,9 @@ namespace GM
 	{
 		sx_callstack();
 
-		g_game->m_gui->Remove( m_back );
+		sx_delete_and_null(m_guide);
 
+		g_game->m_gui->Remove( m_back );
 		sx_delete_and_null( m_back );
 	}
 
@@ -378,6 +382,12 @@ namespace GM
 				m_pnlUpdate[0]->State_SetIndex(1);
 				m_pnlSell->State_SetIndex(1);
 
+				if ( selectedEntity->m_upgradeReady && g_game->m_guides[GUIDE_UPGRADE]->m_fresh )
+				{
+					m_guide->SetText( g_game->m_guides[GUIDE_UPGRADE]->Use() );
+					m_guide->Show( GameGuid::BOTTOMRIGHT, -20.0f, 20.0f, 120 );
+				}
+
 				m_pnlButton[0]->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_pnlButton[1]->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_pnlButton[2]->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
@@ -449,6 +459,7 @@ namespace GM
 				m_back->State_SetIndex(2);
 				m_pnlUpdate[0]->State_SetIndex(0);
 				m_pnlSell->State_SetIndex(0);
+				m_guide->Hide();
 
 				m_pnlButton[0]->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_pnlButton[1]->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
@@ -488,12 +499,14 @@ namespace GM
 			m_back->State_SetIndex(0);
 			m_pnlUpdate[0]->State_SetIndex(0);
 			m_pnlSell->State_SetIndex(0);
+			m_guide->Hide();
 
 			m_pnlButton[0]->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 			m_pnlButton[1]->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 			m_pnlButton[2]->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 		}
 
+		m_guide->Update(elpsTime);
 	}
 
 	void Mechanic_TowerEdit::OnButtonClick( sx::gui::PControl Sender )
@@ -523,6 +536,8 @@ namespace GM
 		
 		else if ( Sender == m_pnlButton[0] )////////////////////////////////////	upgrade tower
 		{
+			m_guide->Hide();
+
 			int level = selectedTower->m_level + 1;
 
 			//  verify that the level is exist in tower

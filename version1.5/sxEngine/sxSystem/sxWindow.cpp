@@ -534,6 +534,8 @@ LRESULT WINAPI Application::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 				prc->right	= curRect.Width + prc->left + iW;
 				prc->bottom	= curRect.Height + prc->top + iH;
 
+				pWin->m_Rect = curRect;
+
 				return TRUE;
 			}
 		}

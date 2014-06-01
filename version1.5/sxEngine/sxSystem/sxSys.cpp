@@ -175,6 +175,10 @@ namespace sx { namespace sys
 		}
 	}
 
+	SEGAN_API UINT GetSysTime_u( void ){
+			return timeGetTime();
+	}
+
 	SEGAN_API const WCHAR* GetDate(void){
 		static wchar res[32];
 		res[0] = 0;

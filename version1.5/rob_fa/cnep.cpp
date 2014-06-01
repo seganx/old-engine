@@ -10,6 +10,12 @@
 #include "hashlock/lock_wnd.h"
 #endif
 
+#if USE_SITE_STATS
+#include <WinInet.h>
+#pragma comment( lib, "wininet.lib" )
+#endif
+
+
 #define NET_ACTIVATE	0
 #define NET_DELAY_TIME	60
 #define NET_TIMEOUT		60000
@@ -64,6 +70,78 @@ void save_hash_lock_code( wchar* code )
 	}
 }
 
+#endif
+
+#if USE_SITE_STATS
+DWORD sx_sys_id( void )
+{
+	DWORD dwDiskSerial = 0;
+	GetVolumeInformation(L"C:\\", 0, 0, &dwDiskSerial, 0, 0, 0, 0);
+	return dwDiskSerial;
+}
+void sx_web_request( uint* receivedsize, wchar* result, const uint resultsize, const wchar* host, const wchar* uri, const void* data, const uint sizeinbytes )
+{
+	// Initialize the Internet DLL
+	HINTERNET hSession = ::InternetOpen( L"RFG", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0 );
+	if ( hSession == NULL )
+	{
+		swprintf_s( result, 64, L"Internet session initialization failed!" );
+		return;
+	}
+
+	//	connect to server
+	HINTERNET hConnection = ::InternetConnect( hSession, host, INTERNET_DEFAULT_HTTP_PORT, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0 );
+	if ( hConnection == NULL )
+	{
+		swprintf_s( result, 64, L"Internet connection failed!" );
+		::InternetCloseHandle(hSession);
+		return;
+	}
+
+	// open a request
+	HINTERNET hRequest = ::HttpOpenRequest( hConnection, TEXT("POST"), uri, TEXT("HTTP/1.1"), NULL, NULL, INTERNET_FLAG_DONT_CACHE | INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_NO_UI, NULL );
+	if ( hRequest == NULL )
+	{
+		swprintf_s( result, 64, L"Internet opening request failed!" );
+		::InternetCloseHandle(hConnection);
+		::InternetCloseHandle(hSession);
+		return;
+	}
+
+	if ( HttpSendRequest( hRequest, L"Content-Type: application/x-www-form-urlencoded", 48, (char*)data, sizeinbytes ) == FALSE )
+	{
+		DWORD errcode = GetLastError();
+		swprintf_s( result, 64, L"Internet sending request failed! code : %d ", errcode );
+		::InternetCloseHandle(hConnection);
+		::InternetCloseHandle(hSession);
+		return;
+	}
+
+	//  read the file
+	{
+		byte* res = (byte*)result;
+		uint maxresultsize = resultsize * sizeof(wchar);
+		uint pos = 0;
+		DWORD recieved;
+		do 
+		{
+			recieved = 0;
+			::InternetReadFile( hRequest, res, (maxresultsize > 1024) ? 1024 : maxresultsize, &recieved );
+			pos += recieved;
+			res += recieved;
+			maxresultsize -= recieved;
+
+		} while ( recieved );
+
+		if ( receivedsize )
+			*receivedsize = pos;
+	}
+
+	// close opened handles
+	::InternetCloseHandle(hRequest);
+	::InternetCloseHandle(hConnection);
+	::InternetCloseHandle(hSession);
+}
 #endif
 
 void clientCallback( Client* client, const byte* buffer, const uint size )
@@ -165,6 +243,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 {
 	sx_callstack();
 
+
 #if USE_GAMEUP
 	GameUp localgameup;
 	g_gameup = &localgameup;
@@ -174,6 +253,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 #if USE_HASH_LOCK
 	wchar hash_lock_code[64] = {0};
 	bool hash_lock_loaded = load_hash_lock_code( hash_lock_code );
+	int hash_res[3] = {0};
 #endif
 
 
@@ -217,6 +297,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 #endif
 
 #if USE_HASH_LOCK
+	uint hash_systime = sx::sys::GetSysTime_u();
 	int hashlockmain = 0;
 	if ( hash_lock_loaded )
 		hashlockmain = 1;
@@ -237,8 +318,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		Config::LoadConfig();
 
 #if USE_HASH_LOCK
-	bool verified_hash_lock_code = verify_hash_lock_code( hash_lock_code );
-	if ( !verified_hash_lock_code ) return 0;
+	uint verified_hash_lock_code = verify_hash_lock_code( hash_systime, hash_lock_code, hash_res );
 #endif
 
 
@@ -249,7 +329,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	if ( g_gameup->get_lock_code(1) == g_gameup->get_lock_code(2) )
 #endif
 #if USE_HASH_LOCK
-	if ( verified_hash_lock_code )
+	if ( hash_res[0] == HASH_VERIFY_RES1(hash_systime) )
 #endif
 		str << L"project1";
 	sx::sys::FileManager::Project_Open(str, FMM_ARCHIVE);
@@ -274,6 +354,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 #if USE_GAMEUP
 	if ( g_gameup->get_lock_code(6) == g_gameup->get_lock_code(3) )
 #endif
+#if USE_HASH_LOCK
+		if ( hash_res[1] == HASH_VERIFY_RES2(hash_systime) )
+#endif
 		sx::sys::Application::Create_Window(&s_window);
 	SetForegroundWindow( s_window.GetHandle() );
 	ShowCursor( FALSE );
@@ -296,6 +379,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 #if USE_GAMEUP
 	if ( g_gameup->get_lock_code(0) == g_gameup->get_lock_code(7) )
+#endif
+#if USE_HASH_LOCK
+		if ( verified_hash_lock_code == HASH_VERIFY_RES3(hash_systime) )
 #endif
 		sx::io::Input::Attach( newDevice );
 
@@ -322,6 +408,12 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		Game::Initialize( (a == (b * 3)) ? &s_window : null );
 
 		if ( !b1 ) return 0;
+	}
+#elif USE_HASH_LOCK
+	{ 
+		int a = hash_res[0];
+		int b = hash_res[1];
+		Game::Initialize( (a*b == HASH_VERIFY_RES3(hash_systime)) ? &s_window : null );
 	}
 #else
 	Game::Initialize( &s_window );
@@ -376,7 +468,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	//  turn screen saver off
 	sx::sys::ScreenSaverSetDefault();
 
-#if USE_HASH_LOCK
+#if USE_STEAM_LINK
 	ShowCursor( TRUE );
 	show_steam( hInstance );
 #endif
@@ -394,6 +486,16 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 #endif
 
 	sx_detect_crash();
+
+#if USE_SITE_STATS
+	{
+		uint ressize = 0;
+		char res[256] = {0};
+		char post[256] = {0};
+		uint postlen = sprintf_s(post, 256, "cpuid=%lu", sx_sys_id());
+		sx_web_request( &ressize, (wchar*)res, 128, L"info.rushforglorygame.com", L"foo.php", post, postlen );
+	}
+#endif
 
 	return 0;
 }

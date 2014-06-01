@@ -2,12 +2,15 @@
 #include "Entity.h"
 #include "GameConfig.h"
 #include "Game.h"
+#include "GameGUI.h"
+#include "Player.h"
 
 //////////////////////////////////////////////////////////////////////////
 //	STATIC VARIABLES
 static int				s_initialCount	= 0;
 static D3DColor			s_color			= 0xffffffff;
 static sx::core::PNode	s_cylinderNode	= NULL;
+static sx::gui::Label*	s_entityName	= null;
 
 
 com_ShowRange::com_ShowRange( void ): Component()
@@ -44,7 +47,22 @@ void com_ShowRange::Initialize( void )
 				sxLog::Log( L" cylinder node created !" );
 			}
 		}
+
+#if 1
+		s_entityName = sx_new( sx::gui::Label );
+		s_entityName->SetSize( float2(256, 64) );
+		s_entityName->AddProperty( SX_GUI_PROPERTY_BILLBOARD );
+		s_entityName->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+		s_entityName->SetFont( FONT_HUD_TITLE );
+		s_entityName->SetAlign( GTA_CENTER );
+		//s_entityName->AddProperty( SX_GUI_PROPERTY_3DSPACE );
+		s_entityName->GetElement(0)->Color().a = 0;
+		s_entityName->GetElement(1)->Color() = D3DColor(1.0f, 0.3f, 0.3f, 1.0f);
+
+		g_game->m_gui->Add_Back( s_entityName );
+#endif
 	}
+
 	s_initialCount++;
 }
 
@@ -65,6 +83,10 @@ void com_ShowRange::Finalize( void )
 
 			sx::core::Scene::DeleteNode( s_cylinderNode );
 			s_cylinderNode = NULL;
+
+
+			g_game->m_gui->Remove( s_entityName );
+			sx_delete_and_null( s_entityName );
 		}
 	}
 }
@@ -75,8 +97,9 @@ void com_ShowRange::Update( float elpsTime )
 
 	Entity* pEntity = Entity::GetSelected();
 
-	if ( !pEntity || pEntity->m_health.icur < 1 )
+	if ( !pEntity || pEntity->m_health.icur < 1 || !g_game->m_player->m_camera_RTS.m_Activate )
 	{
+		s_entityName->RemProperty( SX_GUI_PROPERTY_VISIBLE );
 		sx::core::Scene::RemoveNode( s_cylinderNode );
 		s_color = 0xffffffff;
 	}
@@ -95,6 +118,16 @@ void com_ShowRange::Update( float elpsTime )
 
 			mesh->GetActiveMaterial()->SetFloat4( 0 , float4(s_color.r, s_color.g, s_color.b, s_color.a) );
 		}
+
+		bool showTitle = m_owner->m_partyCurrent == PARTY_TOWER && m_owner->m_initialized;
+		if ( showTitle )
+		{
+			s_entityName->SetText( m_owner->m_typeName.Text() );
+			s_entityName->Position() = m_owner->GetPosition();
+			s_entityName->Position().y = 7.0f - 10.0f / g_game->m_player->m_camera_RTS.m_Rad;
+			s_entityName->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+		}
+		else s_entityName->RemProperty( SX_GUI_PROPERTY_VISIBLE );
 	}
 }
 

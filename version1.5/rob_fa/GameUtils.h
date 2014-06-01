@@ -106,4 +106,19 @@ namespace GU
 
 } // namespace GU
 
+
+class GuideText
+{
+public:
+	GuideText(void): m_fresh(true){}
+	const wchar* Use(void)
+	{
+		m_fresh = false;
+		return m_text.Text();
+	}
+public:
+	bool	m_fresh;
+	String	m_text;
+};
+
 #endif	//	GUARD_GameUtils_HEADER_FILE

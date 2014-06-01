@@ -93,8 +93,7 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 	}
 #endif
 
-#if USE_HASH_LOCK
-#else
+#if USE_CHEAT_CODE
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_L) )
 	{
 		inputHandled = true;
@@ -429,14 +428,14 @@ void Player::SyncPlayerAndGame( bool playerToGame )
 	{
 		m_profile.people = m_people;
 
-		String::Copy(	m_profile.name, 32, m_name );
+		String::Copy( m_profile.name, 32, m_name );
 
 		for ( int i=0; i<15; i++ )
 			m_profile.achievements[i] = g_game->m_achievements[i].value;
 	}
 
 	if ( m_profile.level <  1 ) m_profile.level = 1;
-#if USE_HASH_LOCK
+#if USE_8_LEVELS
 	if ( m_profile.level > 8 ) m_profile.level = 8;
 #else
 	if ( m_profile.level > 10 ) m_profile.level = 10;
