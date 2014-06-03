@@ -359,11 +359,13 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 				{
 					m_gold += pEntity->m_cost[0] + int( g_game->m_upgrades.general_gold_income * (float)pEntity->m_cost[0] );
 
+#if USE_STEAM_SDK
+#else
 					g_game->m_achievements[0].AddValue();
 					g_game->m_achievements[1].AddValue();
 					g_game->m_achievements[2].AddValue();
 					g_game->m_achievements[3].AddValue();
-
+#endif
 				}
 				else
 				{
@@ -414,8 +416,11 @@ void Player::SyncPlayerAndGame( bool playerToGame )
 
 		m_name = m_profile.name[0] ? m_profile.name : L"Player1";
 
+#if USE_STEAM_SDK
+#else
 		for ( int i=0; i<15; i++ )
 			g_game->m_achievements[i].value = m_profile.achievements[i];
+#endif
 
 		g_game->m_upgrades.Reset();
 		for ( int i=0; i<44; i++ )
@@ -430,8 +435,11 @@ void Player::SyncPlayerAndGame( bool playerToGame )
 
 		String::Copy( m_profile.name, 32, m_name );
 
+#if USE_STEAM_SDK
+#else
 		for ( int i=0; i<15; i++ )
 			m_profile.achievements[i] = g_game->m_achievements[i].value;
+#endif
 	}
 
 	if ( m_profile.level <  1 ) m_profile.level = 1;

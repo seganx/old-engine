@@ -104,6 +104,12 @@ void Menu::OnExit( sx::gui::PControl sender )
 //////////////////////////////////////////////////////////////////////////
 //	main menu
 //////////////////////////////////////////////////////////////////////////
+#if USE_STEAM_SDK
+#define MAIN_MENU_COUNT		5
+#else
+#define MAIN_MENU_COUNT		6
+#endif
+
 void MenuMain::Initialize( void )
 {
 	Menu::Initialize();
@@ -185,7 +191,8 @@ void MenuMain::Initialize( void )
 	pretext->Position().Set( 40.0f, -200.0f, 0.0f );
 #endif
 
-	for ( int i=0; i<6; i++ )
+#if USE_STEAM_SDK
+	for ( int i=0; i<MAIN_MENU_COUNT; ++i )
 	{
 		m_btn[i] = sx_new( sx::gui::PanelEx );
 		m_btn[i]->SetParent( m_slantBack );
@@ -205,7 +212,6 @@ void MenuMain::Initialize( void )
 		case 2:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.090f, 0.6f );	break;
 		case 3:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.085f, 0.6f );	break;
 		case 4:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.080f, 0.6f );	break;
-		case 5:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.075f, 0.6f );	break;
 		}
 
 		switch ( i )
@@ -215,7 +221,6 @@ void MenuMain::Initialize( void )
 		case 2:	m_btn[i]->State_GetByIndex(1).Position.Set( 46.0f, 0.0f, 0 );		break;
 		case 3:	m_btn[i]->State_GetByIndex(1).Position.Set( 58.0f, -48.5f, 0 );		break;
 		case 4:	m_btn[i]->State_GetByIndex(1).Position.Set( 70.0f, -96.0f, 0 );		break;
-		case 5:	m_btn[i]->State_GetByIndex(1).Position.Set( 82.0f, -144.0f, 0 );	break;
 		}
 
 		switch ( i )
@@ -225,17 +230,15 @@ void MenuMain::Initialize( void )
 		case 2:	m_btn[i]->State_GetByIndex(2).Position.Set( 40.0f, 0.0f, 0 );		break;
 		case 3:	m_btn[i]->State_GetByIndex(2).Position.Set( 52.0f, -48.5f, 0 );		break;
 		case 4:	m_btn[i]->State_GetByIndex(2).Position.Set( 60.0f, -96.0f, 0 );		break;
-		case 5:	m_btn[i]->State_GetByIndex(2).Position.Set( 72.0f, -144.0f, 0 );	break;
 		}
 
 		switch ( i )
 		{
 		case 0:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainPlay.txr" );			break;
 		case 1:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainProfile.txr" );		break;
-		case 2:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainAch.txr" );			break;
-		case 3:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainEncyclopedia.txr" );	break;
-		case 4:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainSettings.txr" );		break;
-		case 5:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainCredits.txr" );		break;
+		case 2:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainEncyclopedia.txr" );	break;
+		case 3:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainSettings.txr" );		break;
+		case 4:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainCredits.txr" );		break;
 		}
 
 		sx::gui::Panel* pnl = sx_new( sx::gui::Panel );
@@ -248,7 +251,71 @@ void MenuMain::Initialize( void )
 		SEGAN_GUI_SET_ONENTER( pnl, MenuMain::OnEnter );
 		SEGAN_GUI_SET_ONEXIT( pnl, MenuMain::OnExit );
 	}
+#else
+	for ( int i=0; i<MAIN_MENU_COUNT; ++i )
+		{
+			m_btn[i] = sx_new( sx::gui::PanelEx );
+			m_btn[i]->SetParent( m_slantBack );
+			m_btn[i]->SetSize( float2( 512, 64 ) );
+			m_btn[i]->State_Add();
+			m_btn[i]->State_Add();
+			m_btn[i]->State_GetByIndex(0).Color.w = 0.0f;
+			m_btn[i]->State_GetByIndex(0).Blender.Set( 0.12f, 0.6f );
+			m_btn[i]->State_GetByIndex(0).Position.Set( 230.0f, -700.0f, 0 );
+			m_btn[i]->State_GetByIndex(2).Blender.Set( 0.1f, 0.6f );
+			m_btn[i]->State_GetByIndex(2).Color.Set( 1.0f, 0.78f, 0.0f, 1.0f );
 
+			switch ( i )
+			{
+			case 0:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.100f, 0.6f );	break;
+			case 1:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.095f, 0.6f );	break;
+			case 2:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.090f, 0.6f );	break;
+			case 3:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.085f, 0.6f );	break;
+			case 4:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.080f, 0.6f );	break;
+			case 5:	m_btn[i]->State_GetByIndex(1).Blender.Set( 0.075f, 0.6f );	break;
+			}
+
+			switch ( i )
+			{
+			case 0:	m_btn[i]->State_GetByIndex(1).Position.Set( 22.0f, 96.0f, 0 );		break;
+			case 1:	m_btn[i]->State_GetByIndex(1).Position.Set( 34.0f, 48.0f, 0 );		break;
+			case 2:	m_btn[i]->State_GetByIndex(1).Position.Set( 46.0f, 0.0f, 0 );		break;
+			case 3:	m_btn[i]->State_GetByIndex(1).Position.Set( 58.0f, -48.5f, 0 );		break;
+			case 4:	m_btn[i]->State_GetByIndex(1).Position.Set( 70.0f, -96.0f, 0 );		break;
+			case 5:	m_btn[i]->State_GetByIndex(1).Position.Set( 82.0f, -144.0f, 0 );	break;
+			}
+
+			switch ( i )
+			{
+			case 0:	m_btn[i]->State_GetByIndex(2).Position.Set( 16.0f, 96.0f, 0 );		break;
+			case 1:	m_btn[i]->State_GetByIndex(2).Position.Set( 28.0f, 48.0f, 0 );		break;
+			case 2:	m_btn[i]->State_GetByIndex(2).Position.Set( 40.0f, 0.0f, 0 );		break;
+			case 3:	m_btn[i]->State_GetByIndex(2).Position.Set( 52.0f, -48.5f, 0 );		break;
+			case 4:	m_btn[i]->State_GetByIndex(2).Position.Set( 60.0f, -96.0f, 0 );		break;
+			case 5:	m_btn[i]->State_GetByIndex(2).Position.Set( 72.0f, -144.0f, 0 );	break;
+			}
+
+			switch ( i )
+			{
+			case 0:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainPlay.txr" );			break;
+			case 1:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainProfile.txr" );		break;
+			case 2:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainAch.txr" );			break;
+			case 3:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainEncyclopedia.txr" );	break;
+			case 4:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainSettings.txr" );		break;
+			case 5:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainCredits.txr" );		break;
+			}
+
+			sx::gui::Panel* pnl = sx_new( sx::gui::Panel );
+			pnl->SetParent( m_btn[i] );
+			pnl->SetSize( float2( 252, 30 ) );
+			pnl->Position().x = -100.0f;
+			pnl->GetElement(0)->Color().a = 0.001f;
+			pnl->SetUserTag( i );
+			SEGAN_GUI_SET_ONCLICK( pnl, MenuMain::OnClick );
+			SEGAN_GUI_SET_ONENTER( pnl, MenuMain::OnEnter );
+			SEGAN_GUI_SET_ONEXIT( pnl, MenuMain::OnExit );
+		}
+#endif
 
 	m_info = sx_new( MenuInfo );
 	m_info->Initialize();
@@ -277,7 +344,7 @@ void MenuMain::ProcessInput( bool& inputHandled, float elpsTime )
 			g_game->m_gui->m_confirmExit->Show();
 		}
 
-		for ( int i=0; i<6; i++ )
+		for ( int i=0; i<MAIN_MENU_COUNT; i++ )
 		{
 			bool ih = false;
 			m_btn[i]->GetChild(0)->ProcessInput( ih );
@@ -300,7 +367,7 @@ void MenuMain::Update( float elpsTime )
 		{
 			m_mainBack->State_SetIndex( firstTime );
 			m_slantBack->State_SetIndex(1);
-			for ( int i=0; i<6; i++ )
+			for ( int i=0; i<MAIN_MENU_COUNT; i++ )
 				m_btn[i]->State_SetIndex(1);
 			m_time = 4750.0f;
 			firstTime = 2;
@@ -312,7 +379,7 @@ void MenuMain::Update( float elpsTime )
 
 			g_game->m_gui->m_status->Show();
 
-			for ( int i=0; i<6; i++ )
+			for ( int i=0; i<MAIN_MENU_COUNT; i++ )
 				m_btn[i]->GetChild(0)->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 
 			sx::gui::PPanel( m_mainBack->GetChild(0) )->GetElement(0)->Color().a = 1;
@@ -323,8 +390,10 @@ void MenuMain::Update( float elpsTime )
 	{
 		m_mainBack->State_SetIndex(0);
 		m_slantBack->State_SetIndex(0);
-		for ( int i=0; i<6; i++ )
+
+		for ( int i=0; i<MAIN_MENU_COUNT; i++ )
 			m_btn[i]->State_SetIndex(0);
+
 		m_mainSparks->State_SetIndex(0);
 	}
 
@@ -399,7 +468,7 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 	case 0: // play
 		{
 			m_slantBack->State_SetIndex(0);
-			for ( int i=0; i<6; i++ )
+			for ( int i=0; i<MAIN_MENU_COUNT; i++ )
 			{
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
@@ -425,10 +494,12 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 		}
 		break;
 
+#if USE_STEAM_SDK
+#else
 	case 2: // achievements
 		{
 			m_slantBack->State_SetIndex(0);
-			for ( int i=0; i<6; i++ )
+			for ( int i=0; i<MAIN_MENU_COUNT; i++ )
 			{
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
@@ -438,11 +509,16 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 			g_game->m_gui->m_achivements->Show();
 		}
 		break;
+#endif
 
+#if USE_STEAM_SDK
+	case 2: // encyclopedia
+#else
 	case 3: // encyclopedia
+#endif
 		{
 			m_slantBack->State_SetIndex(0);
-			for ( int i=0; i<6; i++ )
+			for ( int i=0; i<MAIN_MENU_COUNT; i++ )
 			{
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
@@ -454,10 +530,14 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 		}
 		break;
 
+#if USE_STEAM_SDK
+	case 3: // settings
+#else
 	case 4: // settings
+#endif
 		{
 			m_slantBack->State_SetIndex(0);
-			for ( int i=0; i<6; i++ )
+			for ( int i=0; i<MAIN_MENU_COUNT; i++ )
 			{
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
@@ -468,10 +548,14 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 		}
 		break;
 
+#if USE_STEAM_SDK
+	case 4: // credits
+#else
 	case 5: // credits
+#endif
 		{
 			m_slantBack->State_SetIndex(0);
-			for ( int i=0; i<6; i++ )
+			for ( int i=0; i<MAIN_MENU_COUNT; i++ )
 			{
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
@@ -1618,6 +1702,8 @@ void MenuProfile::MsgProc( UINT recieverID, UINT msg, void* data )
 //////////////////////////////////////////////////////////////////////////
 //	achievements menu
 //////////////////////////////////////////////////////////////////////////
+#if USE_STEAM_SDK
+#else
 void MenuAchievements::Initialize( void )
 {
 	Menu::Initialize();
@@ -1782,6 +1868,7 @@ void MenuAchievements::Show( void )
 
 	Menu::Show();
 }
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //	setting menu

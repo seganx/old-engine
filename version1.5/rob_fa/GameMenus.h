@@ -12,6 +12,7 @@
 #include "ImportEngine.h"
 #include "GameUtils.h"
 #include "GameTypes.h"
+#include "Config.h"
 
 class GameGuid;
 
@@ -162,6 +163,8 @@ public:
 	int					m_profIndex;
 };
 
+#if USE_STEAM_SDK
+#else
 class MenuAchievements: public Menu
 {
 public:
@@ -179,6 +182,7 @@ public:
 	sx::gui::Label*		m_name;
 	sx::gui::Label*		m_desc;
 };
+#endif
 
 class MenuSettings: public Menu
 {

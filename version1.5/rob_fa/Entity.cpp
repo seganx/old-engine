@@ -284,8 +284,11 @@ void Entity::SetLevel( int level )
 		msg_SoundPlay msgSound(true, 0, 0, L"upgrade", level);
 		m_node->MsgProc( MT_SOUND_PLAY, &msgSound );
 
+#if USE_STEAM_SDK
+#else
 		if ( level == 6 )
 			g_game->m_achievements[13].AddValue();
+#endif
 	}
 }
 
@@ -644,12 +647,14 @@ void Entity::MsgProc( UINT msg, void* data )
 					damage->sender->m_experience += damage->sender->test_onDeadXP * m_experience;
 			}
 
+#if USE_STEAM_SDK
+#else
 			//	compute achievement values
 			if ( damage->tag && m_health.icur < 1 )
 			{
 				g_game->m_achievements[ damage->tag ].AddValue();
 			}
-
+#endif
 			sx::core::PNode node = NULL;
 			if ( m_node->GetChildByName( L"_ondamage", node ) )
 			{

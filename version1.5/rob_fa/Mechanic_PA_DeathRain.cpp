@@ -374,15 +374,21 @@ namespace GM
 				if ( m_Attack.rate < 0.001f )
 					m_Attack.rate = 1;
 
+#if USE_STEAM_SDK
+#else
 				if ( g_game->m_achievements[11].value < g_game->m_achievements[11].range )
 					g_game->m_achievements[11].value = 0;
+#endif
 			}
 			break;	//	GMT_GAME_START
 
 		case GMT_GAME_END:			/////////////////////////////////////////////////    END GAME
 			{						//////////////////////////////////////////////////////////////////////////
+#if USE_STEAM_SDK
+#else
 				if ( g_game->m_achievements[11].value < g_game->m_achievements[11].range )
 					g_game->m_achievements[11].value = 0;
+#endif
 			}
 			break;	//	GMT_GAME_END
 
@@ -392,8 +398,11 @@ namespace GM
 					sx_delete( arrayBombRain[i] );
 				arrayBombRain.Clear();
 
+#if USE_STEAM_SDK
+#else
 				if ( g_game->m_achievements[11].value < g_game->m_achievements[11].range )
 					g_game->m_achievements[11].value = 0;
+#endif
 			}
 			break;
 
@@ -465,8 +474,10 @@ namespace GM
 
 			g_game->m_mouseMode = MS_Null;
 
+#if USE_STEAM_SDK
+#else
 			g_game->m_achievements[11].AddValue();
-
+#endif
 		}
 	}
 

@@ -10,6 +10,7 @@
 #define GUARD_GameTypes_HEADER_FILE
 
 #include "ImportEngine.h"
+#include "Config.h"
 
 #define _TEST_	1		//	test for games
 
@@ -286,6 +287,8 @@ struct PlayerProfile
 	}
 };
 
+#if USE_STEAM_SDK
+#else
 struct Achievement
 {
 	WCHAR				name[32];
@@ -295,13 +298,13 @@ struct Achievement
 	int					value;
 	int					range;
 
-
 	Achievement( void ){ ZeroMemory( this, sizeof(Achievement) ); }
 	void Initialize( const WCHAR* cname, const WCHAR* cdesc, const WCHAR* ctips, const WCHAR* cicon, int irange );
 	void AddValue( int val = 1 );
 	bool IsUnlocked( void );
 	void Finalize( void );
 };
+#endif
 
 struct Upgrades
 {

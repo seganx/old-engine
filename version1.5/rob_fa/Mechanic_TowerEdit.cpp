@@ -578,10 +578,12 @@ namespace GM
 			float sellPercent = 0.7f + g_game->m_upgrades.general_sell_income;
 
 			g_game->m_player->m_gold += int( sx::cmn::Round( (float)cost * sellPercent ) );
+
+#if USE_STEAM_SDK
+#else
 			g_game->m_achievements[7].AddValue();
 			g_game->m_achievements[8].AddValue();
-
-
+#endif
 			Entity::SetSelected( NULL );
 		}
 	}
@@ -594,8 +596,13 @@ namespace GM
 		{
 		case GMT_GAME_RESETING:
 		case GMT_GAME_START:
+
+#if USE_STEAM_SDK
+#else
 			if ( g_game->m_achievements[7].value < g_game->m_achievements[7].range )
 				g_game->m_achievements[7].value = 0;
+#endif
+
 		case GMT_GAME_PAUSED:
 			break;
 

@@ -20,7 +20,7 @@
 #define USE_STEAM_LINK		0
 #define USE_CHEAT_CODE		0
 #define USE_SITE_STATS		0
-
+#define USE_STEAM_SDK		1
 
 
 #if VER_USERDEMO

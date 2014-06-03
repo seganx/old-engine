@@ -612,11 +612,13 @@ namespace GM
 				//  decrease player gold by cost of this created tower
 				g_game->m_player->m_gold -= tower->m_cost[0];
 
+#if USE_STEAM_SDK
+#else
 				//	achievement
 				g_game->m_achievements[4].AddValue();
 				g_game->m_achievements[5].AddValue();
 				g_game->m_achievements[6].AddValue();
-
+#endif
 			}
 		}
 	}

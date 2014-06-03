@@ -67,7 +67,10 @@ public:
 	Player*					m_player;					// player of the game
 	GameGUI*				m_gui;						// GUI in the game
 	Upgrades				m_upgrades;					// upgrade structure
+#if USE_STEAM_SDK
+#else
 	Achievement				m_achievements[15];			// achievements
+#endif
 	MouseState				m_mouseMode;				// state mode of mouse
 
 	float					m_difficultyValue;			//	difficulty value

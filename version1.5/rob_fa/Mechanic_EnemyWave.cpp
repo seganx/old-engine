@@ -498,8 +498,10 @@ namespace GM
 				//	play a sound
 				g_game->m_player->m_gold += addGold;
 
+#if USE_STEAM_SDK
+#else
 				g_game->m_achievements[12].AddValue();
-
+#endif
 				msg_SoundPlay msg( true, 0, 0, L"waveCall" );
 				m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 

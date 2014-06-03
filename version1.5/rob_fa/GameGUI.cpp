@@ -604,7 +604,10 @@ GameGUI::GameGUI( void ): Form()
 , m_main(0)
 , m_map(0)
 , m_profile(0)
+#if USE_STEAM_SDK
+#else
 , m_achivements(0)
+#endif
 , m_settings(0)
 , m_credits(0)
 , m_confirmExit(0)
@@ -728,7 +731,10 @@ void GameGUI::Initialize( void )
 	m_main = sx_new ( MenuMain );
 	m_map = sx_new ( MenuMap );
 	m_profile = sx_new( MenuProfile );
+#if USE_STEAM_SDK
+#else
 	m_achivements = sx_new( MenuAchievements );
+#endif
 	m_settings = sx_new( MenuSettings );
 	m_credits = sx_new( MenuCredits );
 	m_confirmExit = sx_new( MenuConfirmExit );
@@ -743,7 +749,10 @@ void GameGUI::Initialize( void )
 	m_main->Initialize();
 	m_map->Initialize();
 	m_profile->Initialize();
+#if USE_STEAM_SDK
+#else
 	m_achivements->Initialize();
+#endif
 	m_settings->Initialize();
 	m_credits->Initialize();
 	m_confirmExit->Initialize();
@@ -763,7 +772,10 @@ void GameGUI::Finalize( void )
 	m_victory->Finalize();
 	m_pause->Finalize();
 	m_confirmExit->Finalize();
+#if USE_STEAM_SDK
+#else
 	m_achivements->Finalize();
+#endif
 	m_settings->Finalize();
 	m_credits->Finalize();
 	m_profile->Finalize();
@@ -782,7 +794,10 @@ void GameGUI::Finalize( void )
 	sx_delete_and_null( m_victory );
 	sx_delete_and_null( m_pause );
 	sx_delete_and_null( m_confirmExit );
+#if USE_STEAM_SDK
+#else
 	sx_delete_and_null( m_achivements );
+#endif
 	sx_delete_and_null( m_settings );
 	sx_delete_and_null( m_credits );
 	sx_delete_and_null( m_profile );
@@ -806,7 +821,10 @@ void GameGUI::ProcessInput( bool& inputHandled, float elpsTime )
 	m_goldPeople->ProcessInput( inputHandled, elpsTime );
 	m_settings->ProcessInput( inputHandled, elpsTime );
 	m_pause->ProcessInput( inputHandled, elpsTime );
+#if USE_STEAM_SDK
+#else
 	m_achivements->ProcessInput( inputHandled, elpsTime );
+#endif
 	m_credits->ProcessInput( inputHandled, elpsTime );
 	m_profile->ProcessInput( inputHandled, elpsTime );
 	m_map->ProcessInput( inputHandled, elpsTime );
@@ -850,7 +868,10 @@ void GameGUI::Update( float elpsTime )
 	m_main->Update( elpsTime );
 	m_profile->Update( elpsTime );
 	m_confirmExit->Update( elpsTime );
+#if USE_STEAM_SDK
+#else
 	m_achivements->Update( elpsTime );
+#endif
 	m_settings->Update( elpsTime );
 	m_credits->Update( elpsTime );
 	m_map->Update( elpsTime );
@@ -898,7 +919,10 @@ void GameGUI::Draw( DWORD flag )
 	m_main->Draw( flag );
 	m_map->Draw( flag );
 	m_profile->Draw( flag );
+#if USE_STEAM_SDK
+#else
 	m_achivements->Draw( flag );
+#endif
 	m_settings->Draw( flag );
 	m_credits->Draw( flag );
 	m_upgradePanel->Draw(flag);
@@ -973,7 +997,10 @@ void GameGUI::MsgProc( UINT recieverID, UINT msg, void* data )
 	m_pause->MsgProc( recieverID, msg, data );
 	m_main->MsgProc( recieverID, msg, data );
 	m_map->MsgProc( recieverID, msg, data );
+#if USE_STEAM_SDK
+#else
 	m_achivements->MsgProc( recieverID, msg, data );
+#endif
 	m_settings->MsgProc( recieverID, msg, data );
 	m_credits->MsgProc( recieverID, msg, data );
 	m_profile->MsgProc( recieverID, msg, data );

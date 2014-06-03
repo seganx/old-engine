@@ -98,13 +98,16 @@ public:
 
 	GoldAndPeople*				m_goldPeople;		//	to show gold and people
 	GameHint*					m_hint;				//  simple class to handle hints in the game
-	Array<GameTips*>	m_tips;				//  array of game tips
+	Array<GameTips*>			m_tips;				//  array of game tips
 	sx::gui::ArrayPControl		m_gui;				//	array of gui to display
 	MenuStatus*					m_status;
 	MenuMain*					m_main;
 	MenuMap*					m_map;
 	MenuProfile*				m_profile;
+#if USE_STEAM_SDK
+#else
 	MenuAchievements*			m_achivements;
+#endif
 	MenuSettings*				m_settings;
 	MenuCredits*				m_credits;
 	MenuConfirmExit*			m_confirmExit;

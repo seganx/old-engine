@@ -192,8 +192,11 @@ Game::Game( void )
 					if ( !script.GetInteger( i, L"value", v ) )
 						continue;
 
+#if USE_STEAM_SDK
+#else
 					if ( i < 15 )
 						m_achievements[i].Initialize( name, desc, tips, image, v );
+#endif
 				}
 			}
 		}
@@ -241,8 +244,11 @@ Game::~Game( void )
 	}
 	g_game->m_guides.Clear();
 
+#if USE_STEAM_SDK
+#else
 	for ( int i=0; i<15; i++ )
 		m_achievements[i].Finalize();
+#endif
 
 	sx::d3d::Texture::Manager::Release(texture_post);
 	sx::d3d::Texture::Manager::Release(texture_scene);
@@ -783,6 +789,8 @@ void gameup_add_score( const uint reason )
 //////////////////////////////////////////////////////////////////////////
 //	achievements implementation
 //////////////////////////////////////////////////////////////////////////
+#if USE_STEAM_SDK
+#else
 void Achievement::Initialize( const WCHAR* cname, const WCHAR* cdesc, const WCHAR* ctips, const WCHAR* cicon, int irange )
 {
 	if ( !cname || !cdesc || !cicon || !ctips )
@@ -834,6 +842,7 @@ void Achievement::Finalize( void )
 {
 
 }
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //	upgrades implementation
