@@ -39,17 +39,18 @@ public:
 	float				m_time;
 };
 
-class GameGuid
+class GameGuide
 {
 public:
 	enum CORNER {TOPRIGHT, TOPLEFT, BOTTOMRIGHT, BOTTOMLEFT };
 public:
-	GameGuid(void);
-	~GameGuid(void);
+	GameGuide(void);
+	~GameGuide(void);
 	void SetText(const wchar* str);
 	void Show(const CORNER corner, const float x, const float y, const float lifetime = 10);
 	void Hide( void );
 	void Update(const float elpsTime);
+	bool IsVisible(void);
 public:
 	//bool					m_used;		//	has been used before
 	float					m_time;		//  time of display
@@ -95,6 +96,7 @@ public:
 	sx::gui::PPanelEx			m_powerAttaks;
 	sx::gui::TrackBar*			m_gameSpeed;
 	sx::gui::Panel*				m_gameSpeedDefault;
+	GameGuide*					m_guide;
 
 	GoldAndPeople*				m_goldPeople;		//	to show gold and people
 	GameHint*					m_hint;				//  simple class to handle hints in the game

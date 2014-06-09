@@ -12,6 +12,11 @@
 #include "ImportEngine.h"
 #include "Config.h"
 
+#if USE_STEAM_SDK
+#include <steam/steam_api.h>
+#include <steam/isteamuserstats.h>
+#endif
+
 #define _TEST_	1		//	test for games
 
 #define MISSION_
@@ -287,8 +292,120 @@ struct PlayerProfile
 	}
 };
 
+enum AchievementType
+{
+	EAT_First_Blood = 0,
+	EAT_Slayer,
+	EAT_Blood_lust,
+	EAT_Terminator,
+	EAT_Constructor,
+	EAT_Engineer,
+	EAT_Architect,
+	EAT_Tower_Dealer,
+	EAT_Real_Estate,
+	EAT_Death_Trap,
+	EAT_Apocalypto,
+	EAT_Wrath_Of_Battle,
+	EAT_Agile_Warrior,
+	EAT_Perfect_Battle,
+	EAT_Sniper,
+
 #if USE_STEAM_SDK
+
+	EAT_Clever_Dealer,
+	EAT_Redeemer,
+	EAT_Normality,
+	EAT_Dignified_Killer,
+	EAT_Deadly_Serious,
+	EAT_Fisherman,
+	EAT_Stalwart,
+	EAT_Star_Collector,
+	EAT_Director,
+	EAT_Gamepa,
+
+#endif
+
+	Achievement_Count
+};
+
+#if USE_STEAM_SDK
+
+enum SteamCallState
+{
+	ESC_OnStart,
+	ESC_InPlay,
+	ESC_OnVictory,
+	ESC_OnGameOver,
+	ESC_OnEnd
+};
+
+enum StatType
+{
+	EST_Constructions = 0,
+	EST_Slaughtered,
+	EST_Destroyed,
+	EST_Gaining,
+	EST_Score,
+	EST_Efficiency,
+
+	EST_Helper_Enemies,		//	number of enemies created
+
+	SteamStat_Count
+};
+
+class Steam
+{
+public:
+	Steam();
+
+	void Initialize( void );
+	void Finalize( void );
+	void CallAchievement( const int type, const SteamCallState state );
+	void CallStat( const StatType type, const SteamCallState state, const float value = 0.0f );
+
+	void FindLeaderboards();
+
+	STEAM_CALLBACK( Steam, OnUserStatsReceived, UserStatsReceived_t, m_CallbackUserStatsReceived );
+	STEAM_CALLBACK( Steam, OnUserStatsStored, UserStatsStored_t, m_CallbackUserStatsStored );
+	STEAM_CALLBACK( Steam, OnAchievementStored, UserAchievementStored_t, m_CallbackAchievementStored );
+
+	// Called when SteamUserStats()->FindOrCreateLeaderboard() returns asynchronously
+	void OnFindLeaderboard( LeaderboardFindResult_t *pFindLeaderboardResult, bool bIOFailure );
+	CCallResult<Steam, LeaderboardFindResult_t> m_SteamCallResultCreateLeaderboard;
+
+	// Called when SteamUserStats()->UploadLeaderboardScore() returns asynchronously
+	void OnUploadScore( LeaderboardScoreUploaded_t *pFindLeaderboardResult, bool bIOFailure );
+	CCallResult<Steam, LeaderboardScoreUploaded_t> m_SteamCallResultUploadScore;
+
+private:
+	uint64				m_GameID;
+	ISteamUser*			m_pSteamUser;
+	ISteamUserStats*	m_pSteamUserStats;
+	bool				m_bStatsValid;
+
+	SteamLeaderboard_t	m_hEfficiencyLeaderboard;
+	SteamLeaderboard_t	m_hScoreLeaderboard;
+
+	bool	m_achievements[Achievement_Count];
+	int		m_stats_helper[SteamStat_Count];
+	int		m_stats[SteamStat_Count];
+	float	m_stat_efficiency[10];
+	int		m_real_estate;
+	int		m_death_trap;
+	int		m_apocalypto;
+	int		m_agile;
+	int		m_perfect;
+	int		m_sniper;
+	int		m_redeemer;
+	int		m_levels;
+	int		m_minilevels;
+	int		m_tower_dealer_temp;
+	int		m_wrath_temp;
+	bool	m_clever_temp;
+};
+
 #else
+
 struct Achievement
 {
 	WCHAR				name[32];

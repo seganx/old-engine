@@ -72,7 +72,7 @@ namespace GM
 		m_startProgr->GetElement(1)->SetTextureSrc( L"gui_waveProg.txr" );
 		SEGAN_GUI_SET_ONCLICK( m_startProgr, Mechanic_EnemyWaves::OnClick );
 
-		m_guide = sx_new( GameGuid );
+		m_guide = sx_new( GameGuide );
 		m_guide->m_back->SetParent( m_startProgr );
 
 		m_label = sx_new( sx::gui::Label );
@@ -174,12 +174,6 @@ namespace GM
 			return;
 		}
 
-// 		if ( g_game->m_mouseMode == MS_Null )
-// 		{
-// 			m_back->State_SetIndex(1);
-// 		}
-// 		else m_back->State_SetIndex(0);
-
 		if ( m_waveIndex < 0 )
 		{
 			m_back->State_SetIndex(1);
@@ -249,7 +243,7 @@ namespace GM
 				if ( g_game->m_guides[GUIDE_CALLWAVE]->m_fresh && g_game->m_player->m_profile.level_played == 0 )
 				{
 					m_guide->SetText( g_game->m_guides[GUIDE_CALLWAVE]->Use() );
-					m_guide->Show( GameGuid::TOPRIGHT, -50.0f, -20.0f, pWave->nextWaveTime );
+					m_guide->Show( GameGuide::TOPRIGHT, -50.0f, -20.0f, pWave->nextWaveTime );
 				}
 			}
 			else
@@ -375,6 +369,10 @@ namespace GM
 
 			//	ignore adding one tutorial twice
 			pSubWave->infoTitle[0] = 0;
+
+#if USE_STEAM_SDK
+			g_game->m_steam.CallStat( EST_Helper_Enemies, ESC_InPlay );
+#endif
 		}
 
 	}
@@ -404,6 +402,10 @@ namespace GM
 				m_nextWave->State_SetIndex(1);
 				m_guide->Hide();
 				SetNextWaveImage();
+#if USE_STEAM_SDK
+				g_game->m_steam.CallAchievement( EAT_Clever_Dealer, ESC_OnEnd );
+				g_game->m_steam.CallStat( EST_Efficiency, ESC_OnStart );
+#endif
 			}
 			break;	//	GMT_GAME_START
 
@@ -458,6 +460,13 @@ namespace GM
 		m_waveTime = 0;
 		m_waveIndex++;
 
+#if USE_STEAM_SDK
+		if ( m_waveIndex == (m_wavesSrc.Count() - 1) && g_game->m_miniGame == false )
+		{
+			g_game->m_steam.CallAchievement( EAT_Clever_Dealer, ESC_OnStart );
+		}
+#endif
+
 		if ( m_waveIndex < m_wavesSrc.Count() )
 		{
 			EnemyWave* pWave = m_wavesSrc[ m_waveIndex ];
@@ -499,8 +508,11 @@ namespace GM
 				g_game->m_player->m_gold += addGold;
 
 #if USE_STEAM_SDK
+				g_game->m_steam.CallStat( EST_Gaining, ESC_InPlay, (float)addGold + 0.5f );
+
+				g_game->m_steam.CallAchievement( EAT_Agile_Warrior, ESC_InPlay );
 #else
-				g_game->m_achievements[12].AddValue();
+				g_game->m_achievements[EAT_Agile_Warrior].AddValue();
 #endif
 				msg_SoundPlay msg( true, 0, 0, L"waveCall" );
 				m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
@@ -780,6 +792,8 @@ namespace GM
 			}
 		}	//	for (int i=0; i<script.GetObjectCount(); i++)
 
+
+#if 0
 		//	export excel friendly info in development mode
 		if ( Config::GetData()->display_Debug == 3 )
 		{
@@ -811,7 +825,7 @@ namespace GM
 					sumdamage += c * ( ew->subWave[j].type->m_attackLevel[0].electricalDamage + ew->subWave[j].addElectricalDamage + ew->addElectricalDamage );
 					sumarmor += c * ( ew->subWave[j].type->m_attackLevel[0].physicalArmor + ew->subWave[j].addPhysicalArmor + ew->addPhysicalArmor );
 					sumarmor += c * ( ew->subWave[j].type->m_attackLevel[0].electricalArmor + ew->subWave[j].addElectricalArmor + ew->addElectricalArmor );
-					sumexperience += c * ( ew->subWave[j].type->m_experience + + ew->subWave[j].addExperience + ew->addExperience );
+					sumexperience += c * ( ew->subWave[j].type->m_experience + ew->subWave[j].addExperience + ew->addExperience );
 
 					names << ew->subWave[j].type->m_typeName.Text() << L" * " << c << L"  ";
 				}
@@ -855,6 +869,7 @@ namespace GM
 			str << L"waves_excel.csv";
 			sx::cmn::String_Save( log, str, false );
 		}
+#endif
 
 
 		str.Format( L"0/%d", m_wavesSrc.Count() );

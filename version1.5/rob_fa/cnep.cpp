@@ -15,6 +15,11 @@
 #pragma comment( lib, "wininet.lib" )
 #endif
 
+#if USE_STEAM_SDK
+#include <steam/steam_api.h>
+#pragma comment( lib, "steam_api.lib" )
+#endif
+
 
 #define NET_ACTIVATE	0
 #define NET_DELAY_TIME	60
@@ -207,13 +212,16 @@ void MainLoop(float elpsTime)
 
 	if ( elpsTime > 1000 ) return;
 
+#if USE_STEAM_SDK
+	SteamAPI_RunCallbacks();
+#endif
+
 	if ( g_game->m_app_Paused )
 	{
-		Sleep(50);
+		Sleep(25);
 		if ( g_game->m_game_currentLevel && !g_game->m_game_paused )
 			g_game->PostMessage( 0, GMT_GAME_PAUSED, NULL );
 		sx::snd::Device::Pause( true );
-		return;
 	}
 
 	if ( g_game->m_app_Loading )
@@ -222,13 +230,17 @@ void MainLoop(float elpsTime)
 			sx::sys::TaskManager::Update(0);
 	}
 
-	WindowRect wr;
-	s_window.GetRect(wr);
-	SetCursorPos( wr.Left + wr.Width/2, wr.Top + wr.Height/2 );
 
-	sx::io::Input::Update(elpsTime);
-	int2 ioSize( (int)Config::GetData()->display_Size.x, (int)Config::GetData()->display_Size.y );
-	sx::io::Input::SendSignal(0, IST_SET_SIZE, &ioSize);
+	if ( !g_game->m_app_Paused )
+	{
+		WindowRect wr;
+		s_window.GetRect(wr);
+		SetCursorPos( wr.Left + wr.Width/2, wr.Top + wr.Height/2 );
+
+		sx::io::Input::Update(elpsTime);
+		int2 ioSize( (int)Config::GetData()->display_Size.x, (int)Config::GetData()->display_Size.y );
+		sx::io::Input::SendSignal(0, IST_SET_SIZE, &ioSize);
+	}
 
 	sx::gui::Control::GetCapturedControl() = NULL;
 
@@ -242,7 +254,6 @@ void MainLoop(float elpsTime)
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
 	sx_callstack();
-
 
 #if USE_GAMEUP
 	GameUp localgameup;
@@ -258,12 +269,30 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 
 	//  make single application
+#if 1
 	String mutexName = L"SeganX Game :: "; mutexName << GAME_TITLE;
 	HANDLE mutex = CreateMutex(NULL, TRUE, *mutexName);
 	if ( !mutex || GetLastError() == ERROR_ALREADY_EXISTS )
 		return 0;
+#endif
 	sx::cmn::Randomize();
 	
+
+#if USE_STEAM_SDK
+	if (SteamAPI_RestartAppIfNecessary(k_uAppIdInvalid/*303470*/))
+	{
+		MessageBox( NULL, L"Can't initialize Steam !", L"Steam API", MB_OK | MB_ICONERROR );
+		return 0;
+	}
+	if (!SteamAPI_Init())
+	{
+		MessageBox( NULL, L"Can't initialize Steam !", L"Steam API", MB_OK | MB_ICONERROR );
+		//OutputDebugString( "SteamAPI_Init() failed\n" );
+		return 0;
+	}
+
+	//SteamUtils()->SetOverlayNotificationPosition(k_EPositionBottomLeft);
+#endif
 
 	//////////////////////////////////////////////////////////////////////////
 	//	connect to console
@@ -369,7 +398,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	sx::core::Renderer::Initialize( sx_new( sx::core::Pipeline_Forward) );
 
 	//  create main graphic device
-	sx::core::Renderer::SetSize( s_window.GetHandle(), 0, 0, Config::GetData()->device_CreationFlag );
+	sx::core::Renderer::SetSize( s_window.GetHandle(), Config::GetData()->display_Size.x, Config::GetData()->display_Size.y, Config::GetData()->device_CreationFlag );
 
 	//  initialize sounds and music
 	sx::snd::Device::Create( s_window.GetHandle(), SX_SND_3D /*| SX_SND_SYNC*/ );
@@ -459,11 +488,15 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 	Config::SaveConfig();
 
+#if USE_STEAM_SDK
+	SteamAPI_Shutdown();
+#else
 	//  finalize some remain things
 	sx::core::Renderer::Finalize();
 	sx::core::Scene::Finalize();
 	sx::snd::Device::Destroy();
 	sx::io::Input::Finalize();
+#endif
 
 	//  turn screen saver off
 	sx::sys::ScreenSaverSetDefault();
@@ -477,8 +510,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	gameup_finit( g_gameup );
 #endif
 
+#if 1
 	//  close handles
 	CloseHandle( mutex );
+#endif
 
 #if NET_ACTIVATE
 	sx_delete_and_null( client );

@@ -248,7 +248,7 @@ namespace GM
 		pnl->Position().Set( -50.0f, 12.0f, 0.0f );
 #endif
 
-		m_guide = sx_new( GameGuid );
+		m_guide = sx_new( GameGuide );
 		m_guide->m_back->SetParent( m_pnlUpdate[0] );
 
 		// add editor panel to the game
@@ -382,10 +382,10 @@ namespace GM
 				m_pnlUpdate[0]->State_SetIndex(1);
 				m_pnlSell->State_SetIndex(1);
 
-				if ( selectedEntity->m_upgradeReady && g_game->m_guides[GUIDE_UPGRADE]->m_fresh )
+				if ( g_game->m_player->m_profile.level_played == 0 && selectedEntity->m_upgradeReady && g_game->m_guides[GUIDE_UPGRADE]->m_fresh )
 				{
 					m_guide->SetText( g_game->m_guides[GUIDE_UPGRADE]->Use() );
-					m_guide->Show( GameGuid::BOTTOMRIGHT, -20.0f, 20.0f, 120 );
+					m_guide->Show( GameGuide::BOTTOMRIGHT, -20.0f, 20.0f, 120 );
 				}
 
 				m_pnlButton[0]->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
@@ -577,12 +577,18 @@ namespace GM
 
 			float sellPercent = 0.7f + g_game->m_upgrades.general_sell_income;
 
-			g_game->m_player->m_gold += int( sx::cmn::Round( (float)cost * sellPercent ) );
+			int addGold = int( sx::cmn::Round( (float)cost * sellPercent ) );
+			g_game->m_player->m_gold += addGold;
 
 #if USE_STEAM_SDK
+			g_game->m_steam.CallStat( EST_Gaining, ESC_InPlay, (float)addGold + 0.5f );
+
+			g_game->m_steam.CallAchievement( EAT_Tower_Dealer, ESC_InPlay );
+			g_game->m_steam.CallAchievement( EAT_Real_Estate, ESC_InPlay );
+			g_game->m_steam.CallAchievement( EAT_Clever_Dealer, ESC_InPlay );
 #else
-			g_game->m_achievements[7].AddValue();
-			g_game->m_achievements[8].AddValue();
+			g_game->m_achievements[EAT_Tower_Dealer].AddValue();
+			g_game->m_achievements[EAT_Real_Estate].AddValue();
 #endif
 			Entity::SetSelected( NULL );
 		}
@@ -598,9 +604,10 @@ namespace GM
 		case GMT_GAME_START:
 
 #if USE_STEAM_SDK
+			g_game->m_steam.CallAchievement( EAT_Tower_Dealer, ESC_OnStart );
 #else
-			if ( g_game->m_achievements[7].value < g_game->m_achievements[7].range )
-				g_game->m_achievements[7].value = 0;
+			if ( g_game->m_achievements[EAT_Tower_Dealer].value < g_game->m_achievements[EAT_Tower_Dealer].range )
+				g_game->m_achievements[EAT_Tower_Dealer].value = 0;
 #endif
 
 		case GMT_GAME_PAUSED:

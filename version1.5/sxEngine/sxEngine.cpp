@@ -92,7 +92,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		break;
 	case DLL_PROCESS_DETACH:
 		
-		Engine_internal::Finalize();
+		//Engine_internal::Finalize();
 
 		break;
 	}

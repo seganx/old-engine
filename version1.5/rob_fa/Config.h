@@ -19,7 +19,7 @@
 #define USE_HASH_LOCK		0
 #define USE_STEAM_LINK		0
 #define USE_CHEAT_CODE		0
-#define USE_SITE_STATS		0
+#define USE_SITE_STATS		1
 #define USE_STEAM_SDK		1
 
 
@@ -64,7 +64,11 @@
 #define GUIDE_UPGRADE						1
 #define GUIDE_GOLDFORPEOPLE					2
 #define GUIDE_DIFFICULTY					3
-#define GUIDE_SELLTOWERS					4
+#define GUIDE_GAMESPEED						4
+#define GUIDE_USESTARS						5
 
+#if USE_STEAM_SDK
+#define GUIDE_EFFICIENCY					6
+#endif
 
 #endif //GUARD_Config_HEADER_FILE

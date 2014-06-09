@@ -13,7 +13,7 @@
 #include "Mechanic.h"
 
 class Entity;
-class GameGuid;
+class GameGuide;
 
 namespace GM
 {
@@ -124,7 +124,7 @@ namespace GM
 		sx::gui::PPanelEx		m_nextWave;			//	gui to show next wave info
 		sx::gui::PProgressBar	m_startProgr;		//	progress bar to show the time
 
-		GameGuid*				m_guide;				//	use guid to show in game tutorial 
+		GameGuide*				m_guide;				//	use guid to show in game tutorial 
 	
 		sx::gui::PPanelEx		m_mapBack;			//	background for mini map
 

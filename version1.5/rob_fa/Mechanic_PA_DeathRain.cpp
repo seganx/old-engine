@@ -229,7 +229,7 @@ namespace GM
 					proj->m_killParty	= PARTY_ENEMY;
 					proj->m_target		= NULL;
 					proj->m_speed		= 0.5f;
-					proj->m_tag			= 10;
+					proj->m_tag			= EAT_Apocalypto;
 
 					proj->m_attack		= m_Attack;
 					proj->m_attack.targetType = GMT_BOTH;
@@ -375,34 +375,19 @@ namespace GM
 					m_Attack.rate = 1;
 
 #if USE_STEAM_SDK
+				g_game->m_steam.CallAchievement( EAT_Wrath_Of_Battle, ESC_OnStart );
 #else
-				if ( g_game->m_achievements[11].value < g_game->m_achievements[11].range )
-					g_game->m_achievements[11].value = 0;
+				if ( g_game->m_achievements[EAT_Wrath_Of_Battle].value < g_game->m_achievements[EAT_Wrath_Of_Battle].range )
+					g_game->m_achievements[EAT_Wrath_Of_Battle].value = 0;
 #endif
 			}
 			break;	//	GMT_GAME_START
-
-		case GMT_GAME_END:			/////////////////////////////////////////////////    END GAME
-			{						//////////////////////////////////////////////////////////////////////////
-#if USE_STEAM_SDK
-#else
-				if ( g_game->m_achievements[11].value < g_game->m_achievements[11].range )
-					g_game->m_achievements[11].value = 0;
-#endif
-			}
-			break;	//	GMT_GAME_END
 
 		case GMT_GAME_RESETING:
 			{
 				for ( int i=0; i<arrayBombRain.Count(); i++ )
 					sx_delete( arrayBombRain[i] );
 				arrayBombRain.Clear();
-
-#if USE_STEAM_SDK
-#else
-				if ( g_game->m_achievements[11].value < g_game->m_achievements[11].range )
-					g_game->m_achievements[11].value = 0;
-#endif
 			}
 			break;
 
@@ -475,8 +460,9 @@ namespace GM
 			g_game->m_mouseMode = MS_Null;
 
 #if USE_STEAM_SDK
+			g_game->m_steam.CallAchievement( EAT_Wrath_Of_Battle, ESC_InPlay );
 #else
-			g_game->m_achievements[11].AddValue();
+			g_game->m_achievements[EAT_Wrath_Of_Battle].AddValue();
 #endif
 		}
 	}

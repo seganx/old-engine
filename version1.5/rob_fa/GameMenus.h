@@ -14,7 +14,7 @@
 #include "GameTypes.h"
 #include "Config.h"
 
-class GameGuid;
+class GameGuide;
 
 class Menu: public sx::gui::Form
 {
@@ -129,7 +129,7 @@ public:
 	int					m_frame;
 	int					m_selectedLevel;
 
-	GameGuid*			m_guide;
+	GameGuide*			m_guide;
 };
 
 class MenuProfile: public Menu
@@ -303,6 +303,7 @@ public:
 	int					m_starCount;
 	sx::gui::PanelEx*	m_stars[3];
 	sx::gui::Panel*		m_stars_back[2];
+	sx::gui::Button*	m_upgrade;
 
 	int					m_goldCounter;
 	int					m_golds;
@@ -316,7 +317,7 @@ public:
 	float				m_starTime;
 	float				m_goldTime;
 	sx::gui::Button*	m_nextLevel;
-	GameGuid*			m_guide;
+	GameGuide*			m_guide;
 
 	struct APL
 	{

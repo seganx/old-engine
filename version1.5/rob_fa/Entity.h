@@ -100,7 +100,7 @@ public:
 	int						m_level;							//  level of the entity
 	int						m_maxLevel;							//  level of the entity
 	int						m_cost[NUM_LEVELS];					//  cost of his entity
-	int						m_costXP[NUM_LEVELS];				//  experience cost of his entity
+	int						m_costXP[NUM_LEVELS];				//  experience cost of this entity
 	prpMove					m_move;
 	prpHealth				m_health;
 	prpAttack				m_attackLevel[NUM_LEVELS];			//  attack levels optional

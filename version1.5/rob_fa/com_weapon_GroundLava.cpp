@@ -407,7 +407,7 @@ void com_weapon_GroundLava::UpdateHeadshot( float elpsTime )
 		m_owner->m_curAbility.stunValue,
 		m_owner->m_curAbility.stunTime,
 		m_owner,
-		14
+		EAT_Sniper
 		);
 	m_target->MsgProc( GMT_DAMAGE, &msgDmg );
 }

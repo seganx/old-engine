@@ -65,17 +65,25 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 {
 	sx_callstack();
 
-	if ( !g_game->m_game_paused )
+	if ( g_game->m_game_currentLevel )
 	{
-		m_camera_Pause.m_Activate = false;
-		m_camera_MBL.ProseccInput( inputHandled, elpsTime );
-
-		m_camera_RTS.m_Activate = !m_camera_MBL.m_Activate;
-		m_camera_RTS.ProseccInput( inputHandled, elpsTime );
-
-		if ( SEGAN_KEYDOWN(0, SX_INPUT_KEY_C) )
+		if ( !g_game->m_game_paused )
 		{
-			m_camera_MBL.m_Activate = !m_camera_MBL.m_Activate;
+			m_camera_Pause.m_Activate = false;
+			m_camera_MBL.ProseccInput( inputHandled, elpsTime );
+
+			m_camera_RTS.m_Activate = !m_camera_MBL.m_Activate;
+			m_camera_RTS.ProseccInput( inputHandled, elpsTime );
+
+			if ( m_camera_MBL.m_nodeCamera && SEGAN_KEYDOWN(0, SX_INPUT_KEY_C) )
+			{
+				m_camera_MBL.m_Activate = !m_camera_MBL.m_Activate;
+
+#if USE_STEAM_SDK
+				if ( m_camera_MBL.m_Activate )
+					g_game->m_steam.CallAchievement( EAT_Director, ESC_InPlay );
+#endif
+			}
 		}
 	}
 
@@ -83,15 +91,6 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 	{
 		m_Mechanics[i]->ProcessInput( inputHandled, elpsTime );
 	}
-
-	//  TEST
-#if 0
-	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_R) )
-	{
-		inputHandled = true;
-		g_game->Reset();
-	}
-#endif
 
 #if USE_CHEAT_CODE
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_L) )
@@ -116,7 +115,15 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 		m_profile.people = 1000;
 		m_people = 1000;
 	}
+#endif
 
+
+#if 0  	//  TEST
+	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_R) )
+	{
+		inputHandled = true;
+		g_game->Reset();
+	}
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_INSERT) )
 	{
 		switch ( Config::GetData()->display_Debug )
@@ -128,7 +135,6 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 		}
 	}
 #endif
-
 }
 
 void Player::Update( float elpsTime )
@@ -228,7 +234,6 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 					}
 				}
 			}
-
 		}
 		break;
 
@@ -346,6 +351,9 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 	case GMT_GAME_END:			/////////////////////////////////////////////////    END GAME
 		{						//////////////////////////////////////////////////////////////////////////
 			ClearMechanincs();
+#if USE_STEAM_SDK
+			g_game->m_steam.CallStat( EST_Score, ESC_OnEnd );
+#endif
 		}
 		break;	//	GMT_GAME_END
 
@@ -357,14 +365,19 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 			{
 				if ( pEntity->m_health.imax > 0 )
 				{
-					m_gold += pEntity->m_cost[0] + int( g_game->m_upgrades.general_gold_income * (float)pEntity->m_cost[0] );
+					int goldIncome = pEntity->m_cost[0] + int( g_game->m_upgrades.general_gold_income * (float)pEntity->m_cost[0] );
+					m_gold += goldIncome;
 
 #if USE_STEAM_SDK
+					g_game->m_steam.CallStat( EST_Slaughtered, ESC_InPlay );
+					g_game->m_steam.CallStat( EST_Gaining, ESC_InPlay, (float)goldIncome + 0.5f );
+
+					g_game->m_steam.CallAchievement( EAT_First_Blood, ESC_InPlay );
 #else
-					g_game->m_achievements[0].AddValue();
-					g_game->m_achievements[1].AddValue();
-					g_game->m_achievements[2].AddValue();
-					g_game->m_achievements[3].AddValue();
+					g_game->m_achievements[EAT_First_Blood].AddValue();
+					g_game->m_achievements[EAT_Slayer].AddValue();
+					g_game->m_achievements[EAT_Blood_lust].AddValue();
+					g_game->m_achievements[EAT_Terminator].AddValue();
 #endif
 				}
 				else
@@ -392,10 +405,12 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 					g_game->m_gui->m_gameOver->Show();
 				}
 			}
-			else
+#if USE_STEAM_SDK
+			else if ( pEntity->m_partyCurrent == PARTY_TOWER && pEntity->m_health.icur > ( HEALTH_SELL + 1000 ) )
 			{
-
+				g_game->m_steam.CallStat( EST_Destroyed, ESC_InPlay );
 			}
+#endif
 		}
 		break;
 	}
@@ -418,7 +433,7 @@ void Player::SyncPlayerAndGame( bool playerToGame )
 
 #if USE_STEAM_SDK
 #else
-		for ( int i=0; i<15; i++ )
+		for ( int i=0; i<Achievement_Count; i++ )
 			g_game->m_achievements[i].value = m_profile.achievements[i];
 #endif
 
@@ -437,7 +452,7 @@ void Player::SyncPlayerAndGame( bool playerToGame )
 
 #if USE_STEAM_SDK
 #else
-		for ( int i=0; i<15; i++ )
+		for ( int i=0; i<Achievement_Count; i++ )
 			m_profile.achievements[i] = g_game->m_achievements[i].value;
 #endif
 	}

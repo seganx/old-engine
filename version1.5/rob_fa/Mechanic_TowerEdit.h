@@ -13,7 +13,7 @@
 #include "Mechanic.h"
 
 class Entity;
-class GameGuid;
+class GameGuide;
 
 namespace GM
 {
@@ -59,7 +59,7 @@ namespace GM
 		sx::gui::Label*			m_lblDamage;
 		sx::gui::Label*			m_lblFireRate;
 
-		GameGuid*				m_guide;
+		GameGuide*				m_guide;
 
 		UINT					m_mode;				//  current editor mode
 	};

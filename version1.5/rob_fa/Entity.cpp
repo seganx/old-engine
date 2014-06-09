@@ -284,11 +284,14 @@ void Entity::SetLevel( int level )
 		msg_SoundPlay msgSound(true, 0, 0, L"upgrade", level);
 		m_node->MsgProc( MT_SOUND_PLAY, &msgSound );
 
-#if USE_STEAM_SDK
-#else
 		if ( level == 6 )
-			g_game->m_achievements[13].AddValue();
+		{
+#if USE_STEAM_SDK
+			g_game->m_steam.CallAchievement( EAT_Perfect_Battle, ESC_InPlay );
+#else
+			g_game->m_achievements[EAT_Perfect_Battle].AddValue();
 #endif
+		}
 	}
 }
 
@@ -641,20 +644,27 @@ void Entity::MsgProc( UINT msg, void* data )
 			//	compute experience
 			if ( damage->sender && damage->sender->m_partyCurrent == PARTY_TOWER )
 			{
+				float addXP;
 				if ( m_health.icur > 0 )
-					damage->sender->m_experience += damage->sender->test_onDamageXP * m_experience;
+					addXP = damage->sender->test_onDamageXP * m_experience;
 				else
-					damage->sender->m_experience += damage->sender->test_onDeadXP * m_experience;
-			}
+					addXP = damage->sender->test_onDeadXP * m_experience;
+				damage->sender->m_experience += addXP;
 
 #if USE_STEAM_SDK
-#else
+				g_game->m_steam.CallStat( EST_Score, ESC_InPlay, addXP );
+#endif
+			}
+
 			//	compute achievement values
 			if ( damage->tag && m_health.icur < 1 )
 			{
+#if USE_STEAM_SDK
+				g_game->m_steam.CallAchievement( damage->tag, ESC_InPlay );
+#else
 				g_game->m_achievements[ damage->tag ].AddValue();
-			}
 #endif
+			}
 			sx::core::PNode node = NULL;
 			if ( m_node->GetChildByName( L"_ondamage", node ) )
 			{

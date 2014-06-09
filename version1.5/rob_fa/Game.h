@@ -68,8 +68,9 @@ public:
 	GameGUI*				m_gui;						// GUI in the game
 	Upgrades				m_upgrades;					// upgrade structure
 #if USE_STEAM_SDK
+	Steam					m_steam;					//	using steam API
 #else
-	Achievement				m_achievements[15];			// achievements
+	Achievement				m_achievements[Achievement_Count];	// achievements
 #endif
 	MouseState				m_mouseMode;				// state mode of mouse
 

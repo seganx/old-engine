@@ -187,7 +187,7 @@ void GoldAndPeople::OnExit( sx::gui::PControl sender )
 //////////////////////////////////////////////////////////////////////////
 //	panel to show game guid
 //////////////////////////////////////////////////////////////////////////
-GameGuid::GameGuid( void ): m_time(0), m_pos(0,0)//, m_used(false)
+GameGuide::GameGuide( void ): m_time(0), m_pos(0,0)//, m_used(false)
 {
 	m_back = sx_new( sx::gui::PanelEx );
 	m_back->AddProperty( SX_GUI_PROPERTY_BLENDCHILDS );
@@ -233,14 +233,14 @@ GameGuid::GameGuid( void ): m_time(0), m_pos(0,0)//, m_used(false)
 	m_desc->GetElement(0)->Color() = D3DColor(0,0,0,0);
 }
 
-GameGuid::~GameGuid( void )
+GameGuide::~GameGuide( void )
 {
 	m_back->SetParent( null );
 	g_game->m_gui->Remove( m_back );
 	sx_delete_and_null( m_back );
 }
 
-void GameGuid::SetText( const wchar* str )
+void GameGuide::SetText( const wchar* str )
 {
 	m_hint = str;
 
@@ -277,7 +277,7 @@ void GameGuid::SetText( const wchar* str )
 }
 
 
-void GameGuid::Show( const CORNER corner, const float x, const float y, const float lifetime /*= 10*/ )
+void GameGuide::Show( const CORNER corner, const float x, const float y, const float lifetime /*= 10*/ )
 {
 	m_time = lifetime;
 
@@ -334,12 +334,12 @@ void GameGuid::Show( const CORNER corner, const float x, const float y, const fl
 	}
 }
 
-void GameGuid::Hide( void )
+void GameGuide::Hide( void )
 {
 	m_back->State_SetIndex(0);
 }
 
-void GameGuid::Update( const float elpsTime )
+void GameGuide::Update( const float elpsTime )
 {
 	if ( m_time > 0.0f )
 	{
@@ -349,6 +349,11 @@ void GameGuid::Update( const float elpsTime )
 			m_back->State_SetIndex(0);
 		}
 	}
+}
+
+bool GameGuide::IsVisible( void )
+{
+	return m_back->State_GetIndex() > 0;
 }
 
 
@@ -696,7 +701,7 @@ void GameGUI::Initialize( void )
 	m_gameSpeed->GetElement(1)->SetTextureSrc( L"gui_trkGameSpeed.txr" );
 	m_gameSpeed->Position().Set( 92.0f, 40.0f, 0.0f );
 	m_gameSpeed->SetMin(0.05f);
-	m_gameSpeed->SetMax(2.5f);
+	m_gameSpeed->SetMax(2.0f);
 	m_gameSpeed->SetValue( Config::GetData()->game_speed );
 	
 	//	create minimum and maximum value for game speed
@@ -724,6 +729,9 @@ void GameGUI::Initialize( void )
 	m_gameSpeedDefault->Position().y = - 24.0f;
 	m_gameSpeedDefault->SetUserTag(3);
 	SEGAN_GUI_SET_ONCLICK( m_gameSpeedDefault, GameGUI::OnClick );
+
+	m_guide = sx_new( GameGuide );
+	m_guide->m_back->SetParent( m_gameSpeed );
 
 	m_goldPeople = sx_new( GoldAndPeople );
 	m_hint = sx_new( GameHint );
@@ -766,6 +774,9 @@ void GameGUI::Initialize( void )
 
 void GameGUI::Finalize( void )
 {
+	m_guide->m_back->SetParent(null);
+	sx_delete_and_null( m_guide );
+
 	m_info->Finalize();
 	m_cinematic->Finalize();
 	m_gameOver->Finalize();
@@ -834,6 +845,10 @@ void GameGUI::ProcessInput( bool& inputHandled, float elpsTime )
 	{
 		m_gameSpeed->ProcessInput( inputHandled );
 	}
+	else
+	{
+		m_guide->Hide();
+	}
 
 	if ( !inputHandled )
 		m_powerAttaks->ProcessInput( inputHandled );
@@ -877,6 +892,10 @@ void GameGUI::Update( float elpsTime )
 	m_map->Update( elpsTime );
 	m_pause->Update( elpsTime );
 	m_powerAttaks->Update( elpsTime );
+	m_guide->Update( elpsTime );
+	
+	if ( m_guide->m_back->State_GetIndex() && sx_abs_f( m_gameSpeed->GetBlendingValue() - Config::GetData()->game_speed ) > 0.01f )
+		m_guide->Hide();
 
 	Config::GetData()->game_speed = m_gameSpeed->GetBlendingValue();
 	

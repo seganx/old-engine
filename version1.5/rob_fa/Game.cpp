@@ -8,6 +8,7 @@
 #include "ProjectileManager.h"
 #include "ComponentManager.h"
 #include "Scripter.h"
+#include "Entity.h"
 
 //  singleton pointer
 extern Game*			g_game = NULL;
@@ -21,6 +22,58 @@ static sx::d3d::Shader3D	shader_present;
 //  some internal variables
 static float gameTime = 0;
 
+
+#if USE_STEAM_SDK
+
+const char* s_SteamStatName[] = 
+{
+	"Constructions",
+	"Slaughtered",
+	"Destroyed",
+	"Gaining",
+	"Score",
+	"Efficiency_0",
+	"Efficiency_1",
+	"Efficiency_2",
+	"Efficiency_3",
+	"Efficiency_4",
+	"Efficiency_5",
+	"Efficiency_6",
+	"Efficiency_7",
+	"Efficiency_8",
+	"Efficiency_9"
+};
+
+const char* s_SteamAchievementsName[Achievement_Count] = 
+{
+	"Ach_First_Blood",
+	"Ach_Slayer",
+	"Ach_Blood_lust",
+	"Ach_Terminator",
+	"Ach_Constructor",
+	"Ach_Engineer",
+	"Ach_Architect",
+	"Ach_Tower_Dealer",
+	"Ach_Real_Estate",
+	"Ach_Death_Trap",
+	"Ach_Apocalypto",
+	"Ach_Wrath_Of_Battle",
+	"Ach_Agile_Warrior",
+	"Ach_Perfect_Battle",
+	"Ach_Sniper",
+	"Ach_Clever_Dealer",
+	"Ach_Redeemer",
+	"Ach_Normality",
+	"Ach_Dignified_Killer",
+	"Ach_Deadly_Serious",
+	"Ach_Fisherman",
+	"Ach_Stalwart",
+	"Ach_Star_Collector",
+	"Ach_Director",
+	"Ach_Gamepa"
+};
+
+#endif
 
 void Draw_Loading( int count, int index, const WCHAR* state, const WCHAR* name )
 {
@@ -162,6 +215,9 @@ Game::Game( void )
 	label->Position().y = ringPos.y - 20;
 
 	//  load achievements information
+#if USE_STEAM_SDK
+	m_steam.Initialize();
+#else
 	{
 		String str = sx::sys::FileManager::Project_GetDir();
 		str << L"Achievements.txt";
@@ -192,15 +248,13 @@ Game::Game( void )
 					if ( !script.GetInteger( i, L"value", v ) )
 						continue;
 
-#if USE_STEAM_SDK
-#else
-					if ( i < 15 )
+					if ( i < Achievement_Count )
 						m_achievements[i].Initialize( name, desc, tips, image, v );
-#endif
 				}
 			}
 		}
 	}
+#endif
 
 	//	load guid strings
 	{
@@ -237,16 +291,17 @@ Game::~Game( void )
 	sx_delete(m_panel_Loading);
 	sx_delete(m_panel_Cursor);
 
-	for ( int i=0; i<g_game->m_guides.Count(); ++i )
+	for ( int i=0; i<m_guides.Count(); ++i )
 	{
-		GuideText* guide = g_game->m_guides[i];
+		GuideText* guide = m_guides[i];
 		sx_delete(guide);
 	}
-	g_game->m_guides.Clear();
+	m_guides.Clear();
 
 #if USE_STEAM_SDK
+	m_steam.Finalize();
 #else
-	for ( int i=0; i<15; i++ )
+	for ( int i=0; i<Achievement_Count; i++ )
 		m_achievements[i].Finalize();
 #endif
 
@@ -790,7 +845,818 @@ void gameup_add_score( const uint reason )
 //	achievements implementation
 //////////////////////////////////////////////////////////////////////////
 #if USE_STEAM_SDK
+
+Steam::Steam()
+: m_CallbackUserStatsReceived(this, &Steam::OnUserStatsReceived)
+, m_CallbackUserStatsStored(this, &Steam::OnUserStatsStored)
+, m_CallbackAchievementStored(this, &Steam::OnAchievementStored)
+, m_GameID(0)
+, m_pSteamUser(NULL)
+, m_pSteamUserStats(NULL)
+, m_bStatsValid(false)
+, m_hEfficiencyLeaderboard(0)
+, m_hScoreLeaderboard(0)
+, m_real_estate(0)
+, m_death_trap(0)
+, m_apocalypto(0)
+, m_agile(0)
+, m_perfect(0)
+, m_sniper(0)
+, m_redeemer(0)
+, m_levels(0)
+, m_minilevels(0)
+, m_tower_dealer_temp(0)
+, m_wrath_temp(0)
+, m_clever_temp(false)
+{
+	memset(m_achievements, 0, sizeof(m_achievements));
+	memset(m_stats_helper, 0, sizeof(m_stats_helper));
+	memset(m_stats, 0, sizeof(m_stats));
+	memset(m_stat_efficiency, 0, sizeof(m_stat_efficiency));
+}
+
+void Steam::Initialize( void )
+{
+	if (SteamUtils())
+	{
+		m_GameID = CGameID(SteamUtils()->GetAppID()).ToUint64();
+	}
+
+	m_pSteamUser = SteamUser();
+	m_pSteamUserStats = SteamUserStats();
+
+	// Is Steam loaded? If not we can't get stats.
+	if (NULL == m_pSteamUser || NULL == m_pSteamUserStats)
+	{
+		return;
+	}
+
+	// Is the user logged on?  If not we can't get stats.
+	if (!m_pSteamUser->BLoggedOn())
+	{
+		return;
+	}
+
+	//m_pSteamUserStats->ResetAllStats(true);
+
+	// Request user stats.
+	m_pSteamUserStats->RequestCurrentStats();
+
+	FindLeaderboards();
+}
+
+void Steam::Finalize( void )
+{
+	//if (m_pSteamUserStats && m_bStatsValid)
+	//{
+		//m_pSteamUserStats->StoreStats();
+	//}
+}
+
+void Steam::CallAchievement( const int type, const SteamCallState state )
+{
+	if (!m_bStatsValid)
+	{
+		return;
+	}
+
+	switch ( type )
+	{
+	case EAT_First_Blood:// kill first enemy in the game 
+		{
+			if (!m_achievements[EAT_First_Blood])
+			{
+				m_achievements[EAT_First_Blood] = true;
+				m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_First_Blood]);
+				m_pSteamUserStats->StoreStats();
+			}
+
+			if (m_stats[EST_Slaughtered] >= 1000)
+			{
+				if (!m_achievements[EAT_Slayer])
+				{
+					m_achievements[EAT_Slayer] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Slayer]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+
+			if (m_stats[EST_Slaughtered] >= 2500)
+			{
+				if (!m_achievements[EAT_Blood_lust])
+				{
+					m_achievements[EAT_Blood_lust] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Blood_lust]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+
+			if (m_stats[EST_Slaughtered] >= 3500)
+			{
+				if (!m_achievements[EAT_Terminator])
+				{
+					m_achievements[EAT_Terminator] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Terminator]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	//case EAT_Slayer:// kill 1000 enemies through the game
+	//	break;
+	//case EAT_Blood_lust:// kill 2500 enemies through the game
+	//	break;
+	//case EAT_Terminator:// kill 3500 enemies through the game
+	//	break;
+
+	case EAT_Constructor:// create 30 towers through the game
+		{
+			if (m_stats[EST_Constructions] >= 30)
+			{
+				if (!m_achievements[EAT_Constructor])
+				{
+					m_achievements[EAT_Constructor] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Constructor]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+
+			if (m_stats[EST_Constructions] >= 100)
+			{
+				if (!m_achievements[EAT_Engineer])
+				{
+					m_achievements[EAT_Engineer] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Engineer]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+
+			if (m_stats[EST_Constructions] >= 250)
+			{
+				if (!m_achievements[EAT_Architect])
+				{
+					m_achievements[EAT_Architect] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Architect]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	//case EAT_Engineer:// create 100 towers through the game
+	//	break;
+	//case EAT_Architect:// build 250 towers through the game
+	//	break;
+
+	case EAT_Tower_Dealer:// sell 10 towers in one level
+		
+		if (!m_achievements[EAT_Tower_Dealer])// verify that the achievement is already given or not
+		{
+			if ( state == ESC_InPlay )
+			{
+				m_tower_dealer_temp += 1;
+				if ( m_tower_dealer_temp == 10 )
+				{
+					m_achievements[EAT_Tower_Dealer] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Tower_Dealer]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+			else
+			{
+				if ( m_tower_dealer_temp < 10 )
+					m_tower_dealer_temp = 0;
+			}
+		}
+		break;
+
+	case EAT_Real_Estate:// sell 100 towers through the game
+		{
+			m_real_estate += 1;
+			m_pSteamUserStats->SetStat("real_estate", m_real_estate);
+			m_pSteamUserStats->StoreStats();
+
+			if (!m_achievements[EAT_Real_Estate])
+			{
+				if (m_real_estate >= 100)
+				{
+					m_achievements[EAT_Real_Estate] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Real_Estate]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	case EAT_Death_Trap:// kill 100 enemies by trap through the game
+		{
+			m_death_trap += 1;
+			m_pSteamUserStats->SetStat("death_trap", m_death_trap);
+			m_pSteamUserStats->StoreStats();
+
+			if (!m_achievements[EAT_Death_Trap])
+			{
+				if (m_death_trap >= 100)
+				{
+					m_achievements[EAT_Death_Trap] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Death_Trap]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	case EAT_Apocalypto:// kill 1000 enemies by death rain through the game
+		{
+			m_apocalypto += 1;
+			m_pSteamUserStats->SetStat("apocalypto", m_apocalypto);
+			m_pSteamUserStats->StoreStats();
+
+			if (!m_achievements[EAT_Apocalypto])
+			{
+				if (m_apocalypto >= 1000)
+				{
+					m_achievements[EAT_Apocalypto] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Apocalypto]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	case EAT_Wrath_Of_Battle:// use death rain 10 times in the single level
+		
+		if (!m_achievements[EAT_Wrath_Of_Battle])// verify that the achievement is already given or not
+		{
+			if ( state == ESC_InPlay )
+			{
+				m_wrath_temp += 1;
+				if ( m_wrath_temp == 10 )
+				{
+					m_achievements[EAT_Wrath_Of_Battle] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Wrath_Of_Battle]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+			else
+			{
+				if ( m_wrath_temp < 10 )
+					m_wrath_temp = 0;
+			}
+		}
+		break;
+
+	case EAT_Agile_Warrior:// call 100 waves earlier through the game
+		{
+			m_agile += 1;
+			m_pSteamUserStats->SetStat("agile", m_agile);
+			m_pSteamUserStats->StoreStats();
+
+			if (!m_achievements[EAT_Agile_Warrior])
+			{
+				if (m_agile >= 100)
+				{
+					m_achievements[EAT_Agile_Warrior] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Agile_Warrior]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	case EAT_Perfect_Battle:// make 50 tower full upgrade with full ability through the game
+		{
+			m_perfect += 1;
+			m_pSteamUserStats->SetStat("perfect", m_perfect);
+			m_pSteamUserStats->StoreStats();
+
+			if (!m_achievements[EAT_Perfect_Battle])
+			{
+				if (m_perfect >= 50)
+				{
+					m_achievements[EAT_Perfect_Battle] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Perfect_Battle]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	case EAT_Sniper:// kill 100 enemies by sniper of ground lava through the game
+		{
+			m_sniper += 1;
+			m_pSteamUserStats->SetStat("sniper", m_sniper);
+			m_pSteamUserStats->StoreStats();
+
+			if (!m_achievements[EAT_Sniper])
+			{
+				if (m_sniper >= 100)
+				{
+					m_achievements[EAT_Sniper] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Sniper]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	case EAT_Clever_Dealer:// sell all towers after final wave
+		
+		if (!m_achievements[EAT_Clever_Dealer])// verify that the achievement is already given or not
+		{
+			if ( state == ESC_OnStart )
+			{
+				m_clever_temp = true;
+			}
+			else if ( state == ESC_InPlay )
+			{
+				if ( m_clever_temp )
+				{
+					bool allTowers = true;
+					for ( uint i=0; i<EntityManager::GetEntityCount(); ++i )
+					{
+						Entity* entity = EntityManager::GetEntityByIndex( i );
+						if ( entity->m_partyCurrent == PARTY_TOWER && entity->m_health.icur > 0 )
+						{
+							allTowers = false;
+							break;
+						}
+					}
+					if ( allTowers )
+					{
+						m_achievements[EAT_Clever_Dealer] = true;
+						m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Clever_Dealer]);
+						m_pSteamUserStats->StoreStats();
+					}
+				}
+			}
+			else m_clever_temp = false;			
+		}
+		break;
+
+	case EAT_Redeemer:// release people to reach 300 people
+		{
+			m_redeemer += 1;
+			m_pSteamUserStats->SetStat("redeemer", m_redeemer);
+			m_pSteamUserStats->StoreStats();
+
+			if (!m_achievements[EAT_Redeemer])
+			{
+				if (m_redeemer >= 300)
+				{
+					m_achievements[EAT_Redeemer] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Redeemer]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	case EAT_Normality:// play all levels in NORM difficulty mode
+		{
+			if (!m_achievements[EAT_Normality])
+			{
+				m_levels |= (1 << (g_game->m_game_currentLevel - 1));
+				m_pSteamUserStats->SetStat("levels", m_levels);
+				m_pSteamUserStats->StoreStats();
+
+				if ((m_levels & 0x3ff) == 0x3ff)
+				{
+					m_achievements[EAT_Normality] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Normality]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	case EAT_Dignified_Killer:// play all levels in HARD difficulty mode
+		{
+			if (!m_achievements[EAT_Dignified_Killer])
+			{
+				m_levels |= (1 << (g_game->m_game_currentLevel - 1 + 10));
+				m_pSteamUserStats->SetStat("levels", m_levels);
+				m_pSteamUserStats->StoreStats();
+
+				if ((m_levels & 0xffc00) == 0xffc00)
+				{
+					m_achievements[EAT_Dignified_Killer] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Dignified_Killer]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	case EAT_Deadly_Serious:// play all levels in INSANE difficulty mode
+		{
+			if (!m_achievements[EAT_Deadly_Serious])
+			{
+				m_levels |= (1 << (g_game->m_game_currentLevel - 1 + 20));
+				m_pSteamUserStats->SetStat("levels", m_levels);
+				m_pSteamUserStats->StoreStats();
+
+				if ((m_levels & 0x3ff00000) == 0x3ff00000)
+				{
+					m_achievements[EAT_Deadly_Serious] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Deadly_Serious]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+
+	case EAT_Fisherman:// get 10 stars through the game
+		
+		if (!m_achievements[EAT_Fisherman])// verify that the achievement is already given or not
+		{
+			int numStars = g_game->m_player->m_profile.GetNumStars();
+			if ( numStars == 10 )
+			{
+				m_achievements[EAT_Fisherman] = true;
+				m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Fisherman]);
+				m_pSteamUserStats->StoreStats();
+			}
+		}
+		break;
+
+	case EAT_Stalwart:// get 20 stars through the game
+
+		if (!m_achievements[EAT_Stalwart])// verify that the achievement is already given or not
+		{
+			int numStars = g_game->m_player->m_profile.GetNumStars();
+			if ( numStars == 20 )
+			{
+				m_achievements[EAT_Stalwart] = true;
+				m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Stalwart]);
+				m_pSteamUserStats->StoreStats();
+			}
+		}
+		break;
+
+	case EAT_Star_Collector:// get all 30 stars through the game
+
+		if (!m_achievements[EAT_Star_Collector])// verify that the achievement is already given or not
+		{
+			int numStars = g_game->m_player->m_profile.GetNumStars();
+			if ( numStars == 30 )
+			{
+				m_achievements[EAT_Star_Collector] = true;
+				m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Star_Collector]);
+				m_pSteamUserStats->StoreStats();
+			}
+		}
+		break;
+
+	case EAT_Director:// use cinematic camera for the first time
+		{
+			if (!m_achievements[EAT_Director])
+			{
+				m_achievements[EAT_Director] = true;
+				m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Director]);
+				m_pSteamUserStats->StoreStats();
+			}
+		}
+		break;
+
+	case EAT_Gamepa:// play all mini games
+		{
+			if (!m_achievements[EAT_Gamepa])
+			{
+				m_minilevels |= (1 << (g_game->m_game_currentLevel - 1));
+				m_pSteamUserStats->SetStat("minilevels", m_minilevels);
+				m_pSteamUserStats->StoreStats();
+
+				if (m_minilevels == 0x1ff)
+				{
+					m_achievements[EAT_Gamepa] = true;
+					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Gamepa]);
+					m_pSteamUserStats->StoreStats();
+				}
+			}
+		}
+		break;
+	}
+}
+
+void Steam::CallStat( const StatType type, const SteamCallState state, const float value /*= 0.0f*/ )
+{
+	if (!m_bStatsValid)
+	{
+		return;
+	}
+
+	switch ( type )
+	{
+	case EST_Constructions:// Number of towers have been constructed
+		{
+			++m_stats_helper[EST_Constructions];
+
+			++m_stats[EST_Constructions];
+
+			m_pSteamUserStats->SetStat(s_SteamStatName[EST_Constructions], m_stats[EST_Constructions]);
+			m_pSteamUserStats->StoreStats();
+		}
+		break;
+
+	case EST_Slaughtered:// Number of enemies have been dead
+		{
+			++m_stats_helper[EST_Slaughtered];
+
+			++m_stats[EST_Slaughtered];
+
+			m_pSteamUserStats->SetStat(s_SteamStatName[EST_Slaughtered], m_stats[EST_Slaughtered]);
+			m_pSteamUserStats->StoreStats();
+		}
+		break;
+
+	case EST_Destroyed:// Number of towers have been destroyed by enemies
+		{
+			++m_stats_helper[EST_Destroyed];
+
+			++m_stats[EST_Destroyed];
+
+			m_pSteamUserStats->SetStat(s_SteamStatName[EST_Destroyed], m_stats[EST_Destroyed]);
+			m_pSteamUserStats->StoreStats();
+		}
+		break;
+
+	case EST_Gaining:// Total gold have been earned through the game
+		{
+			if ( state == ESC_InPlay )
+			{
+				int goldIncome = int(value);
+				m_stats_helper[EST_Gaining] += goldIncome;
+
+				m_stats[EST_Gaining] += goldIncome;
+
+				m_pSteamUserStats->SetStat(s_SteamStatName[EST_Gaining], m_stats[EST_Gaining]);
+				m_pSteamUserStats->StoreStats();
+			}
+		}
+		break;
+
+	case EST_Efficiency:// Average of all levels efficiency 
+		{
+			if ( state == ESC_OnStart )
+			{
+				m_stats_helper[EST_Constructions] = 0;
+				m_stats_helper[EST_Slaughtered] = 0;
+				m_stats_helper[EST_Destroyed] = 0;
+				m_stats_helper[EST_Gaining] = 0;
+				m_stats_helper[EST_Helper_Enemies] = 0;
+			}
+			else if ( state == ESC_OnVictory )
+			{
+				//	compute efficiency for this level
+				{
+					float towers =		(float)m_stats_helper[EST_Constructions];
+					float destroyed =	(float)m_stats_helper[EST_Destroyed];
+					float killed =		(float)m_stats_helper[EST_Slaughtered];
+					float enemies =		(float)m_stats_helper[EST_Helper_Enemies];
+					float addgold =		(float)m_stats_helper[EST_Gaining];
+					float curgold =		(float)g_game->m_player->m_gold;
+					float addpeople =	curgold / 500.0f;
+					float deadpeople =	value;
+
+					float factor;
+					switch ( g_game->m_difficultyLevel )
+					{
+					case 0: factor = 500.0f; break;
+					case 1: factor = 750.0f; break;
+					case 2: factor = 1000.0f; break;
+					}
+
+					//	compute the efficiency on this level
+					float towervalue = ( 1.0f - ( destroyed / towers ) ) * factor;
+					float enemyvalue = ( killed / enemies ) * factor;
+					float goldvalue = ( curgold / addgold ) * factor;
+
+					float peoplevalu = 0.0f;
+					if ( addpeople > deadpeople )
+						peoplevalu = ( 1.0f - ( deadpeople / addpeople ) ) *  factor;
+					else if ( addpeople < deadpeople )
+						peoplevalu = - ( 1.0f - ( addpeople / deadpeople ) ) * factor;
+
+					const float efficiency = ( towervalue + enemyvalue + goldvalue + peoplevalu ) / 4.0f;
+
+					//	store efficiency for this level
+					const int efficiencyID = g_game->m_game_currentLevel - 1;
+					if (efficiency > m_stat_efficiency[efficiencyID])
+					{
+						m_stat_efficiency[efficiencyID] = efficiency;
+						m_pSteamUserStats->SetStat(s_SteamStatName[EST_Efficiency + efficiencyID], m_stat_efficiency[efficiencyID]);
+						m_pSteamUserStats->StoreStats();
+					}
+				}
+				
+				//	store efficiency average
+				{
+					float avr_efficiency = 0;
+					for ( int i=0; i<10; ++i )
+					{
+						avr_efficiency += m_stat_efficiency[i];
+					}
+					avr_efficiency /= 10;
+
+					m_pSteamUserStats->SetStat("Efficiency", avr_efficiency);
+					m_pSteamUserStats->StoreStats();
+
+					if (m_hEfficiencyLeaderboard)
+					{
+						SteamAPICall_t hSteamAPICall = SteamUserStats()->UploadLeaderboardScore(
+							m_hEfficiencyLeaderboard, k_ELeaderboardUploadScoreMethodKeepBest, static_cast<int>(avr_efficiency), NULL, 0);
+
+						m_SteamCallResultUploadScore.Set(hSteamAPICall, this, &Steam::OnUploadScore);
+					}
+				}
+			}
+		}
+		break;
+
+	case EST_Score:// Total score of the player - computed by Tower Experiences
+		{
+			if ( state == ESC_InPlay )
+			{
+				float addScore = value * 10;
+				m_stats[EST_Score] += int(addScore);
+			}
+			else if ( state == ESC_OnEnd )
+			{
+				m_pSteamUserStats->SetStat(s_SteamStatName[EST_Score], m_stats[EST_Score]);
+				m_pSteamUserStats->StoreStats();
+
+				if (m_hScoreLeaderboard)
+				{
+					SteamAPICall_t hSteamAPICall = SteamUserStats()->UploadLeaderboardScore(
+						m_hScoreLeaderboard, k_ELeaderboardUploadScoreMethodKeepBest, m_stats[EST_Score], NULL, 0);
+
+					m_SteamCallResultUploadScore.Set(hSteamAPICall, this, &Steam::OnUploadScore);
+				}
+			}
+		}
+		break;
+
+	case EST_Helper_Enemies:// count the number of enemies have been created
+		{
+			++m_stats_helper[EST_Helper_Enemies];
+		}
+		break;
+	}
+}
+
+void Steam::FindLeaderboards()
+{
+	if (!m_hEfficiencyLeaderboard)
+	{
+		SteamAPICall_t hSteamAPICall = SteamUserStats()->FindLeaderboard("Level Efficiency");
+		m_SteamCallResultCreateLeaderboard.Set(hSteamAPICall, this, &Steam::OnFindLeaderboard);
+	}
+}
+
+void Steam::OnUserStatsReceived(UserStatsReceived_t *pCallback)
+{
+	if (!m_pSteamUserStats)
+	{
+		return;
+	}
+
+	// we may get callbacks for other games' stats arriving, ignore them
+	if (m_GameID == pCallback->m_nGameID)
+	{
+		if (k_EResultOK == pCallback->m_eResult)
+		{
+			//log_file << "Received stats and achievements from Steam\n";
+
+			m_bStatsValid = true;
+
+			// load achievements
+			for (int i = 0; i < Achievement_Count; ++i)
+			{
+				m_pSteamUserStats->GetAchievement(s_SteamAchievementsName[i], &m_achievements[i]);
+			}
+
+			// load stats
+			m_pSteamUserStats->GetStat(s_SteamStatName[EST_Constructions], &m_stats[EST_Constructions]);
+			m_pSteamUserStats->GetStat(s_SteamStatName[EST_Slaughtered], &m_stats[EST_Slaughtered]);
+			m_pSteamUserStats->GetStat(s_SteamStatName[EST_Destroyed], &m_stats[EST_Destroyed]);
+			m_pSteamUserStats->GetStat(s_SteamStatName[EST_Gaining], &m_stats[EST_Gaining]);
+			m_pSteamUserStats->GetStat(s_SteamStatName[EST_Score], &m_stats[EST_Score]);
+
+			for ( int i=0; i<10; ++i )
+				m_pSteamUserStats->GetStat(s_SteamStatName[EST_Efficiency + i], &m_stat_efficiency[i]);
+
+			m_pSteamUserStats->GetStat("real_estate", &m_real_estate);
+			m_pSteamUserStats->GetStat("death_trap", &m_death_trap);
+			m_pSteamUserStats->GetStat("apocalypto", &m_apocalypto);
+			m_pSteamUserStats->GetStat("agile", &m_agile);
+			m_pSteamUserStats->GetStat("perfect", &m_perfect);
+			m_pSteamUserStats->GetStat("sniper", &m_sniper);
+			m_pSteamUserStats->GetStat("redeemer", &m_redeemer);
+			m_pSteamUserStats->GetStat("levels", &m_levels);
+			m_pSteamUserStats->GetStat("minilevels", &m_minilevels);
+		}
+		else
+		{
+			//char buffer[64] = {0};
+			//sprintf_s(buffer, "RequestStats - failed, %d\n", pCallback->m_eResult);
+			//log_file << buffer;
+		}
+	}
+}
+
+void Steam::OnUserStatsStored(UserStatsStored_t *pCallback)
+{
+	// we may get callbacks for other games' stats arriving, ignore them
+	if (m_GameID == pCallback->m_nGameID)
+	{
+		if (k_EResultOK == pCallback->m_eResult)
+		{
+			//log_file << "StoreStats - success\n";
+		}
+		else if ( k_EResultInvalidParam == pCallback->m_eResult )
+		{
+			// One or more stats we set broke a constraint. They've been reverted,
+			// and we should re-iterate the values now to keep in sync.
+			//log_file << "StoreStats - some failed to validate\n";
+
+			// Fake up a callback here so that we re-load the values.
+			UserStatsReceived_t callback;
+			callback.m_eResult = k_EResultOK;
+			callback.m_nGameID = m_GameID;
+			OnUserStatsReceived(&callback);
+		}
+		else
+		{
+			//char buffer[64] = {0};
+			//sprintf_s(buffer, "StoreStats - failed, %d\n", pCallback->m_eResult);
+			//log_file << buffer;
+		}
+	}
+}
+
+void Steam::OnAchievementStored(UserAchievementStored_t *pCallback)
+{
+	// we may get callbacks for other games' stats arriving, ignore them
+	if (m_GameID == pCallback->m_nGameID)
+	{
+		if (0 == pCallback->m_nMaxProgress)
+		{
+			//char buffer[128] = {0};
+			//sprintf_s(buffer, "Achievement '%s' unlocked!\n", pCallback->m_rgchAchievementName);
+			//log_file << buffer;
+		}
+		else
+		{
+			//char buffer[128] = {0};
+			//sprintf_s(buffer, "Achievement '%s' progress callback, (%d,%d)\n", 
+			//	pCallback->m_rgchAchievementName, pCallback->m_nCurProgress, pCallback->m_nMaxProgress);
+		}
+	}
+}
+
+void Steam::OnFindLeaderboard( LeaderboardFindResult_t *pFindLeaderboardResult, bool bIOFailure )
+{
+	// see if we encountered an error during the call
+	if (!pFindLeaderboardResult->m_bLeaderboardFound || bIOFailure)
+	{
+		return;
+	}
+
+	// check to see which leader board handle we just retrieved
+	const char *pchName = SteamUserStats()->GetLeaderboardName(pFindLeaderboardResult->m_hSteamLeaderboard);
+	if (strcmp(pchName, "Level Efficiency") == 0)
+	{
+		m_hEfficiencyLeaderboard = pFindLeaderboardResult->m_hSteamLeaderboard;
+
+		if (!m_hScoreLeaderboard)
+		{
+			SteamAPICall_t hSteamAPICall = SteamUserStats()->FindLeaderboard("Player_Score");
+			m_SteamCallResultCreateLeaderboard.Set(hSteamAPICall, this, &Steam::OnFindLeaderboard);
+		}
+	}
+	else if (strcmp( pchName, "Player_Score" ) == 0)
+	{
+		m_hScoreLeaderboard = pFindLeaderboardResult->m_hSteamLeaderboard;
+	}
+}
+
+void Steam::OnUploadScore(LeaderboardScoreUploaded_t *pFindLeaderboardResult, bool bIOFailure)
+{
+	if (!pFindLeaderboardResult->m_bSuccess || bIOFailure)
+	{
+		//OutputDebugString( "Score could not be uploaded to Steam\n" );
+		return;
+	}
+	else
+	{
+
+	}
+}
+
 #else
+
 void Achievement::Initialize( const WCHAR* cname, const WCHAR* cdesc, const WCHAR* ctips, const WCHAR* cicon, int irange )
 {
 	if ( !cname || !cdesc || !cicon || !ctips )
@@ -823,7 +1689,7 @@ void Achievement::AddValue( int val /*= 1 */ )
 	g_game->m_gui->m_main->m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 
 	//	copy achievements values
-	for ( int i=0; i<15; i++ )
+	for ( int i=0; i<Achievement_Count; i++ )
 		g_game->m_player->m_profile.achievements[i] = g_game->m_achievements[i].value;
 
 #if USE_GAMEUP

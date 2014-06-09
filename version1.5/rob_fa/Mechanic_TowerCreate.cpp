@@ -11,6 +11,11 @@
 static sx::core::PNode	towerNode = NULL;
 static float3			towerPos;
 
+float3 snap_tower_pos( float3& pos )
+{
+	return float3( sx_round( pos.x ), pos.y + 0.5f, sx_round( pos.z ) );
+}
+
 namespace GM
 {
 
@@ -151,36 +156,43 @@ namespace GM
 
 			//  set tower spirit position
 			if ( m_Tower )
-			{				
+			{			
 				sx::math::Ray ray = sx::core::Renderer::GetCamera()->GetRay( SEGAN_MOUSE_ABSX(0), SEGAN_MOUSE_ABSY(0) );
-				msg_IntersectRay msgRay(NMT_MESH, ray, msg_IntersectRay::BOX, NULL);
-				sx::core::Scene::GetNodeByRay(msgRay);
+				msg_IntersectRay contact_box(NMT_MESH, ray, msg_IntersectRay::BOX, null);
+				sx::core::Scene::GetNodeByRay(contact_box);
 
 				bool doCreate = false;
 				for ( int i=0; i<32; i++ )
 				{
-					if ( msgRay.results[i].node )
+					if ( contact_box.results[i].node )
 					{
-						sx::core::PNode node = sx::core::PNode( msgRay.results[i].node );
-						String str = node->GetName();
+						sx::core::PNode zone_node = sx::core::PNode( contact_box.results[i].node );
+						str16 str = zone_node->GetName();
 						if ( str == L"zone" )
 						{
+							towerPos = snap_tower_pos( contact_box.results[i].position );
+
 							//  now test geometry
-							msg_IntersectRay meshRay(NMT_MESH, ray, msg_IntersectRay::GEOMETRY, NULL);
-							node->MsgProc(MT_INTERSECT_RAY, &meshRay);
-							if ( meshRay.results[0].member )
+							ray.Set( towerPos, float3(0.0f, -1.0f, 0.0f) );
+							msg_IntersectRay contact_geo(NMT_MESH, ray, msg_IntersectRay::GEOMETRY, NULL);
+							zone_node->MsgProc(MT_INTERSECT_RAY, &contact_geo);
+							if ( contact_geo.results[0].member )
 							{
 								doCreate = true;
-								towerPos = meshRay.results[0].position;
+								towerPos = snap_tower_pos( contact_geo.results[0].position );
+								break;
 							}
 						}
 					}
+					else break;
 				}
 
 				if ( !doCreate )
 				{
-					Plane p; p.Make(sx::math::VEC3_ZERO, sx::math::VEC3_Y);
+					Plane p;
+					p.Make(sx::math::VEC3_ZERO, sx::math::VEC3_Y);
 					ray.Intersect_Plane(p, &towerPos);
+					towerPos = snap_tower_pos( towerPos );
 				}
 				else
 				{
@@ -214,9 +226,8 @@ namespace GM
 						}
 					}
 				}
-
-				towerPos.y += 0.5f;
 				m_Tower->SetPosition( towerPos );
+
 				if ( doCreate )
 				{
 					//  set tower direction
@@ -528,7 +539,7 @@ namespace GM
 		{
 			HidePanel();
 
-			// place scene node from 3D scene to show spirit tower
+			// place scene zone_node from 3D scene to show spirit tower
 			if ( towerType->m_node )
 			{
 				g_game->m_mouseMode = MS_CreateTower;
@@ -613,11 +624,14 @@ namespace GM
 				g_game->m_player->m_gold -= tower->m_cost[0];
 
 #if USE_STEAM_SDK
+				g_game->m_steam.CallStat( EST_Constructions, ESC_InPlay );
+
+				g_game->m_steam.CallAchievement( EAT_Constructor, ESC_InPlay );
 #else
 				//	achievement
-				g_game->m_achievements[4].AddValue();
-				g_game->m_achievements[5].AddValue();
-				g_game->m_achievements[6].AddValue();
+				g_game->m_achievements[EAT_Constructor].AddValue();
+				g_game->m_achievements[EAT_Engineer].AddValue();
+				g_game->m_achievements[EAT_Architect].AddValue();
 #endif
 			}
 		}

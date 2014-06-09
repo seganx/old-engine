@@ -483,7 +483,7 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 	case 1: // profile
 		{
 			m_slantBack->State_SetIndex(0);
-			for ( int i=0; i<6; i++ )
+			for ( int i=0; i<MAIN_MENU_COUNT; i++ )
 			{
 				m_btn[i]->GetChild(0)->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
 				m_btn[i]->State_SetIndex(0);
@@ -837,7 +837,7 @@ void MenuMap::Initialize( void )
 	panel->Position().x = m_diff_scroll->GetSize().x * 0.5f;
 	SEGAN_GUI_SET_ONCLICK( panel, MenuMap::OnScroll );
 
-	m_guide = sx_new( GameGuid );
+	m_guide = sx_new( GameGuide );
 	m_guide->m_back->SetParent( panel );
 
 	panel = sx_new( sx::gui::Panel );
@@ -961,12 +961,20 @@ void MenuMap::Update( float elpsTime )
 			if ( m_frame == 90 ) { for ( int i=0; i<3 && i<g_game->m_player->m_profile.stars[8]; i++)	m_levels[8].m_star[i]->State_SetIndex(1); }
 			if ( m_frame == 95 ) { for ( int i=0; i<3 && i<g_game->m_player->m_profile.stars[9]; i++)	m_levels[9].m_star[i]->State_SetIndex(1); }
 		}
-		else if ( g_game->m_player->m_profile.level_played > 1 && g_game->m_player->m_profile.GetNumStars() < 4 && m_selectedLevel > 2 && 
-				  g_game->m_guides[GUIDE_DIFFICULTY]->m_fresh && g_game->m_player->m_profile.curDifficulty < 2 )
+		else if ( g_game->m_player->m_profile.level_played > 1 && g_game->m_player->m_profile.GetNumStars() < 4 && 
+				  m_selectedLevel > 2 && g_game->m_guides[GUIDE_DIFFICULTY]->m_fresh )
 		{
 			m_guide->SetText( g_game->m_guides[GUIDE_DIFFICULTY]->Use() );
-			m_guide->Show( GameGuid::TOPLEFT, 0.0f, 15.0f, 30 );	
+			m_guide->Show( GameGuide::TOPLEFT, 0.0f, 15.0f, 30 );	
 		}
+#if USE_STEAM_SDK
+		else if ( g_game->m_player->m_profile.level_played > 4 && g_game->m_player->m_profile.GetNumStars() < 6 && 
+			m_selectedLevel > 5 && g_game->m_guides[GUIDE_EFFICIENCY]->m_fresh )
+		{
+			m_guide->SetText( g_game->m_guides[GUIDE_EFFICIENCY]->Use() );
+			m_guide->Show( GameGuide::TOPLEFT, 0.0f, 15.0f, 30 );	
+		}
+#endif
 	}
 
 	{
@@ -1619,7 +1627,7 @@ void MenuProfile::SyncAchievements( void )
 #if USE_GAMEUP
 	if ( g_gameup->get_info(0) >= 0 )
 	{
-		for ( uint i=0; i<15; ++i )
+		for ( uint i=0; i<Achievement_Count; ++i )
 		{
 			g_gameup->set_data_i( i, achievements[i] );
 			float curval = (float)achievements[i];
@@ -1766,7 +1774,7 @@ void MenuAchievements::Initialize( void )
 	m_desc->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
 
 	//	create achievement icons
-	for ( int i=0; i<15; i++ )
+	for ( int i=0; i<Achievement_Count; i++ )
 	{
 		m_icon[i] = sx_new( sx::gui::Panel );
 		m_icon[i]->SetParent( m_back );
@@ -2775,6 +2783,7 @@ void MenuVictory::Initialize( void )
 			btn->GetElement(1)->SetTextureSrc( L"gui_victory_upgrades.txr" );
 			btn->GetElement(2)->SetTextureSrc( L"gui_victory_upgrades.txr" );
 			btn->Position().Set( 9.0f, -69.0f, 0.0f );
+			m_upgrade = btn;
 			break;
 
 		case 3:
@@ -2796,13 +2805,13 @@ void MenuVictory::Initialize( void )
 	}
 
 
-	m_guide = sx_new( GameGuid );
-	m_guide->m_back->SetParent( m_goldLabel );
+	m_guide = sx_new( GameGuide );
 }
 
 void MenuVictory::Finalize( void )
 {
 	Hide();
+	m_guide->m_back->SetParent( null );
 	sx_delete_and_null(m_guide);
 	Menu::Finalize();
 }
@@ -2835,8 +2844,9 @@ void MenuVictory::Update( float elpsTime )
 	{
 		if ( g_game->m_guides[GUIDE_GOLDFORPEOPLE]->m_fresh && g_game->m_player->m_profile.level_played == 0 )
 		{
+			m_guide->m_back->SetParent( m_goldLabel );
 			m_guide->SetText( g_game->m_guides[GUIDE_GOLDFORPEOPLE]->Use() );
-			m_guide->Show( GameGuid::BOTTOMLEFT, 0.0f, 0.0f, 120 );
+			m_guide->Show( GameGuide::BOTTOMLEFT, 0.0f, 0.0f, 120 );
 		}
 	}
 
@@ -2873,6 +2883,15 @@ void MenuVictory::Update( float elpsTime )
 			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 
 			m_shakeTime = 200;
+		}
+	}
+	else if ( m_starAdd )
+	{
+		if ( g_game->m_guides[GUIDE_USESTARS]->m_fresh && g_game->m_player->m_profile.level_played > 0 && g_game->m_player->m_profile.GetNumStars() < 4 )
+		{
+			m_guide->m_back->SetParent( m_upgrade );
+			m_guide->SetText( g_game->m_guides[GUIDE_USESTARS]->Use() );
+			m_guide->Show( GameGuide::BOTTOMLEFT, 0.0f, 0.0f, 30 );
 		}
 	}
 
@@ -3017,6 +3036,21 @@ void MenuVictory::Show( void )
 
 	m_time = 800;
 	Menu::Show();
+
+#if USE_STEAM_SDK
+	if ( g_game->m_miniGame == false )
+	{
+		switch ( g_game->m_difficultyLevel )
+		{
+		case 0: g_game->m_steam.CallAchievement( EAT_Normality, ESC_OnVictory );		break;
+		case 1: g_game->m_steam.CallAchievement( EAT_Dignified_Killer, ESC_OnVictory );	break;
+		case 2: g_game->m_steam.CallAchievement( EAT_Deadly_Serious, ESC_OnVictory );	break;
+		}
+
+		g_game->m_steam.CallStat( EST_Efficiency, ESC_OnVictory, float(g_game->m_player->m_profile.people - g_game->m_player->m_people) );
+	}
+	else g_game->m_steam.CallAchievement( EAT_Gamepa, ESC_OnVictory );
+#endif
 }
 
 void MenuVictory::Hide( void )
@@ -3077,6 +3111,13 @@ void MenuVictory::ApplyChangesToProfile( void )
 	// save profile
 	g_game->m_gui->m_profile->SaveProfile();
 	g_game->m_player->SyncPlayerAndGame( true );
+
+#if USE_STEAM_SDK
+	g_game->m_steam.CallAchievement( EAT_Redeemer, ESC_OnVictory );
+	g_game->m_steam.CallAchievement( EAT_Fisherman, ESC_OnVictory );
+	g_game->m_steam.CallAchievement( EAT_Stalwart, ESC_OnVictory );
+	g_game->m_steam.CallAchievement( EAT_Star_Collector, ESC_OnVictory );
+#endif
 }
 
 void MenuVictory::OnClick( sx::gui::PControl sender )
@@ -3097,10 +3138,6 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 
 			//	go ahead
 			g_game->m_game_nextLevel = usertag ? 0 : g_game->m_game_currentLevel + 1;
-			g_game->m_player->m_profile.level_selected = g_game->m_game_nextLevel;
-
-			//	apply changes
-			ApplyChangesToProfile();
 
 #if USE_8_LEVELS
 			if ( g_game->m_game_currentLevel > 7 )
@@ -3109,9 +3146,14 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 			if ( g_game->m_game_currentLevel > 9 )
 				g_game->m_game_nextLevel = 0;
 #endif
+			if ( g_game->m_game_nextLevel )
+				g_game->m_player->m_profile.level_selected = g_game->m_game_nextLevel;
 
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+
+			//	apply changes
+			ApplyChangesToProfile();
 
 			Hide();
 		}
@@ -3146,6 +3188,8 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+
+			m_guide->Hide();
 
 			return;
 		}
@@ -3231,6 +3275,8 @@ void MenuGameOver::Show( void )
 
 	msg_SoundPlay msg( true, 0, 0, L"gameOver" );
 	m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+
+
 }
 
 void MenuGameOver::OnClick( sx::gui::PControl sender )
@@ -3252,6 +3298,9 @@ void MenuGameOver::OnClick( sx::gui::PControl sender )
 
 	case 1:		//	main menu
 		{
+			//	notify that game has been end
+			g_game->PostMessage( 0, GMT_GAME_END, NULL );
+
 			g_game->m_player->SyncPlayerAndGame( true );
 			g_game->m_game_nextLevel = 0;
 
@@ -3440,11 +3489,13 @@ void MenuInfo::ProcessInput( bool& inputHandled, float elpsTime )
 	if (g_game->m_gui->m_pause->IsVisible() || g_game->m_gui->m_settings->IsVisible() || 
 		g_game->m_gui->m_victory->IsVisible() || g_game->m_gui->m_gameOver->IsVisible() ) return;
 
+#if 0
 	if ( m_delayTime > 0 )
 	{
 		inputHandled = true;
 		return;
 	}
+#endif
 
 	if ( !m_back->State_GetIndex() ) return;
 	if ( inputHandled ) return;
@@ -3541,7 +3592,7 @@ void MenuInfo::Update( float elpsTime )
 		m_helper.back->State_SetIndex( 0 );
 	}
 
-	if ( m_delayTime > 0 )
+	if ( m_delayTime > 0 && g_game->m_mouseMode == MS_Null )
 	{
 		m_delayTime -= elpsTime;
 		if ( m_delayTime <= 0 )
@@ -3597,6 +3648,14 @@ void MenuInfo::Hide( void )
 	{
 		g_game->m_gui->m_main->Show();
 		m_go_to_menu = false;
+	}
+	else
+	{
+		if ( g_game->m_guides[GUIDE_GAMESPEED]->m_fresh && g_game->m_player->m_profile.level_played == 1 )
+		{
+			g_game->m_gui->m_guide->SetText( g_game->m_guides[GUIDE_GAMESPEED]->Use() );
+			g_game->m_gui->m_guide->Show( GameGuide::BOTTOMLEFT, -60.0f, 0.0f, 30 );
+		}
 	}
 }
 

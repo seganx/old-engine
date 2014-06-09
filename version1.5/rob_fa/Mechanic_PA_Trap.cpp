@@ -240,7 +240,7 @@ namespace GM
 					m_attack.stunValue, 
 					m_attack.stunTime, 
 					NULL,
-					9
+					EAT_Death_Trap
 					);
 				enemy->MsgProc( GMT_DAMAGE, &damage );
 
