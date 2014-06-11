@@ -35,6 +35,13 @@
 #endif
 
 
+#if USE_STEAM_SDK
+//#define STEAM_APP_ID	k_uAppIdInvalid
+#define STEAM_APP_ID	303470
+#endif
+
+
+
 #define FONT_STATUS							L"Font_17.fnt"
 #define FONT_MAP_DIFFICULTY					L"Font_20_l.fnt"
 #define FONT_PROFILE						L"Font_30_l.fnt"

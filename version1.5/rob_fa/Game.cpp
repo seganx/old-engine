@@ -9,6 +9,7 @@
 #include "ComponentManager.h"
 #include "Scripter.h"
 #include "Entity.h"
+#include "GameStrings.h"
 
 //  singleton pointer
 extern Game*			g_game = NULL;
@@ -128,6 +129,7 @@ void Draw_Loading( int count, int index, const WCHAR* state, const WCHAR* name )
 
 Game::Game( void )
 :	m_gamePlay(0)
+,	m_strings(0)
 ,	m_player(0)
 ,	m_gui(0)
 ,	m_mouseMode(MS_Null)
@@ -214,9 +216,24 @@ Game::Game( void )
 	label->Position().x = ringPos.x + 250 + ringSize.x * 0.5f;
 	label->Position().y = ringPos.y - 20;
 
+	//	strings used in game
+	m_strings = sx_new( GameStrings );
+
 	//  load achievements information
 #if USE_STEAM_SDK
 	m_steam.Initialize();
+
+	{
+		str1024 path = sx::sys::FileManager::Project_GetDir();
+		path << "localization/";
+		const char* language = SteamApps()->GetCurrentGameLanguage();
+		if ( strcmp(language, "german") == 0 )
+			path << L"german.txt";
+		else
+			path << L"english.txt";
+		m_strings->Load( path );
+	}
+
 #else
 	{
 		String str = sx::sys::FileManager::Project_GetDir();
@@ -1272,7 +1289,7 @@ void Steam::CallAchievement( const int type, const SteamCallState state )
 		if (!m_achievements[EAT_Fisherman])// verify that the achievement is already given or not
 		{
 			int numStars = g_game->m_player->m_profile.GetNumStars();
-			if ( numStars == 10 )
+			if ( numStars >= 10 )
 			{
 				m_achievements[EAT_Fisherman] = true;
 				m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Fisherman]);
@@ -1286,7 +1303,7 @@ void Steam::CallAchievement( const int type, const SteamCallState state )
 		if (!m_achievements[EAT_Stalwart])// verify that the achievement is already given or not
 		{
 			int numStars = g_game->m_player->m_profile.GetNumStars();
-			if ( numStars == 20 )
+			if ( numStars >= 20 )
 			{
 				m_achievements[EAT_Stalwart] = true;
 				m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Stalwart]);
@@ -1300,7 +1317,7 @@ void Steam::CallAchievement( const int type, const SteamCallState state )
 		if (!m_achievements[EAT_Star_Collector])// verify that the achievement is already given or not
 		{
 			int numStars = g_game->m_player->m_profile.GetNumStars();
-			if ( numStars == 30 )
+			if ( numStars >= 30 )
 			{
 				m_achievements[EAT_Star_Collector] = true;
 				m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Star_Collector]);

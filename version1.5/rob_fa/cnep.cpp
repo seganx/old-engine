@@ -279,7 +279,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	
 
 #if USE_STEAM_SDK
-	if (SteamAPI_RestartAppIfNecessary(k_uAppIdInvalid/*303470*/))
+	if (SteamAPI_RestartAppIfNecessary( k_uAppIdInvalid /*STEAM_APP_ID*/))
 	{
 		MessageBox( NULL, L"Can't initialize Steam !", L"Steam API", MB_OK | MB_ICONERROR );
 		return 0;
