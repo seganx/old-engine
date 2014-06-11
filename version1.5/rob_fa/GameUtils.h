@@ -121,4 +121,7 @@ public:
 	String	m_text;
 };
 
+
+sx::gui::Label* create_label( sx::gui::Control* parent, const wchar* font, const GUITextAlign align, const wchar* caption, const float& width, const float& height, const float& x, const float& y, const float& z );
+
 #endif	//	GUARD_GameUtils_HEADER_FILE

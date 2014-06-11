@@ -97,7 +97,6 @@ extern Game* g_game;
 
 #if USE_GAMEUP
 extern GameUp* g_gameup;
-
 void gameup_add_score( const uint reason );
 #endif
 

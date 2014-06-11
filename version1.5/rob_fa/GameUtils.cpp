@@ -403,3 +403,21 @@ namespace GU
 			m_Activate = false;
 	}
 } // namespace GU
+
+sx::gui::Label* create_label( sx::gui::Control* parent, const wchar* font, const GUITextAlign align, const wchar* caption, const float& width, const float& height, const float& x, const float& y, const float& z )
+{
+	sx::gui::Label* res =  sx_new( sx::gui::Label );
+	res->SetParent( parent );
+	res->SetSize( float2(width, height) );
+	res->SetAlign( align );
+	res->GetElement(0)->Color().a = 0.0f;
+	res->GetElement(1)->Color() = 0xffffffff;
+	res->SetFont( font );
+	res->AddProperty( SX_GUI_PROPERTY_MULTILINE );
+	res->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
+	res->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
+	res->RemProperty( SX_GUI_PROPERTY_PIXELALIGN );
+	res->Position().Set(x, y, z);
+	res->SetText(caption);
+	return res;
+}

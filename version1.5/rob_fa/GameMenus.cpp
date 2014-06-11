@@ -5,6 +5,7 @@
 #include "GameGUI.h"
 #include "GameConfig.h"
 #include "Scripter.h"
+#include "GameStrings.h"
 
 //////////////////////////////////////////////////////////////////////////
 //	menu 
@@ -114,7 +115,6 @@ void MenuMain::Initialize( void )
 {
 	Menu::Initialize();
 
-
 	m_time = 0;
 	m_back->SetSize( float2(1,1) );
 	m_back->State_GetByIndex(1).Color.Set( 0.0f, 0.0f, 0.0f, 0.1f );
@@ -204,6 +204,7 @@ void MenuMain::Initialize( void )
 		m_btn[i]->State_GetByIndex(0).Position.Set( 230.0f, -700.0f, 0 );
 		m_btn[i]->State_GetByIndex(2).Blender.Set( 0.1f, 0.6f );
 		m_btn[i]->State_GetByIndex(2).Color.Set( 1.0f, 0.78f, 0.0f, 1.0f );
+		m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_main_button.txr" );
 
 		switch ( i )
 		{
@@ -232,24 +233,25 @@ void MenuMain::Initialize( void )
 		case 4:	m_btn[i]->State_GetByIndex(2).Position.Set( 60.0f, -96.0f, 0 );		break;
 		}
 
-		switch ( i )
-		{
-		case 0:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainPlay.txr" );			break;
-		case 1:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainProfile.txr" );		break;
-		case 2:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainEncyclopedia.txr" );	break;
-		case 3:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainSettings.txr" );		break;
-		case 4:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainCredits.txr" );		break;
-		}
-
 		sx::gui::Panel* pnl = sx_new( sx::gui::Panel );
 		pnl->SetParent( m_btn[i] );
 		pnl->SetSize( float2( 252, 30 ) );
 		pnl->Position().x = -100.0f;
 		pnl->GetElement(0)->Color().a = 0.001f;
 		pnl->SetUserTag( i );
+		pnl->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 		SEGAN_GUI_SET_ONCLICK( pnl, MenuMain::OnClick );
 		SEGAN_GUI_SET_ONENTER( pnl, MenuMain::OnEnter );
 		SEGAN_GUI_SET_ONEXIT( pnl, MenuMain::OnExit );
+
+		switch ( i )
+		{
+		case 0:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+		case 1:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+		case 2:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+		case 3:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+		case 4:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+		}
 	}
 #else
 	for ( int i=0; i<MAIN_MENU_COUNT; ++i )
@@ -264,6 +266,16 @@ void MenuMain::Initialize( void )
 			m_btn[i]->State_GetByIndex(0).Position.Set( 230.0f, -700.0f, 0 );
 			m_btn[i]->State_GetByIndex(2).Blender.Set( 0.1f, 0.6f );
 			m_btn[i]->State_GetByIndex(2).Color.Set( 1.0f, 0.78f, 0.0f, 1.0f );
+			m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_main_button.txr" );
+
+			switch ( i )
+			{
+			case 0:	create_label( m_btn[i], FONT_MAIN_ROOT, GTA_LEFT, g_game->m_strings->Get(3), 200, 30, -90.0f, -5.0f, 0.0f );	break;
+			case 1:	create_label( m_btn[i], FONT_MAIN_ROOT, GTA_LEFT, g_game->m_strings->Get(4), 200, 30, -90.0f, -5.0f, 0.0f );	break;
+			case 2:	create_label( m_btn[i], FONT_MAIN_ROOT, GTA_LEFT, g_game->m_strings->Get(6), 200, 30, -90.0f, -5.0f, 0.0f );	break;
+			case 3:	create_label( m_btn[i], FONT_MAIN_ROOT, GTA_LEFT, g_game->m_strings->Get(7), 200, 30, -90.0f, -5.0f, 0.0f );	break;
+			case 4:	create_label( m_btn[i], FONT_MAIN_ROOT, GTA_LEFT, g_game->m_strings->Get(8), 200, 30, -90.0f, -5.0f, 0.0f );	break;
+			}
 
 			switch ( i )
 			{
@@ -293,16 +305,6 @@ void MenuMain::Initialize( void )
 			case 3:	m_btn[i]->State_GetByIndex(2).Position.Set( 52.0f, -48.5f, 0 );		break;
 			case 4:	m_btn[i]->State_GetByIndex(2).Position.Set( 60.0f, -96.0f, 0 );		break;
 			case 5:	m_btn[i]->State_GetByIndex(2).Position.Set( 72.0f, -144.0f, 0 );	break;
-			}
-
-			switch ( i )
-			{
-			case 0:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainPlay.txr" );			break;
-			case 1:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainProfile.txr" );		break;
-			case 2:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainAch.txr" );			break;
-			case 3:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainEncyclopedia.txr" );	break;
-			case 4:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainSettings.txr" );		break;
-			case 5:	m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_mainCredits.txr" );		break;
 			}
 
 			sx::gui::Panel* pnl = sx_new( sx::gui::Panel );
@@ -618,6 +620,8 @@ void MenuMap::Initialize( void )
 	m_back->State_GetByIndex(1).Position.Set( 0.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(1).Blender.Set( 0.07f, 0.6f );
 
+	create_label( m_back, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(14), 300.0f, 30.0f, -350.0f, 290.0f, 0 );
+
 	//	create level chooser
 	m_chooser = sx_new( sx::gui::PanelEx );
 	m_chooser->SetParent( m_back );
@@ -755,6 +759,10 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_playGame, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_playGame, MenuMap::OnClick );
 
+	sx::gui::Label* caption = create_label( m_playGame, FONT_35_OUTLINE_SHADOWED, GTA_CENTER, g_game->m_strings->Get(18), 100.0f, 40.0f, 60.0f, -5.0f, 0 );
+	caption->SetUserTag( 10 );
+	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	SEGAN_GUI_SET_ONCLICK( caption, MenuMap::OnClick );
 
 	m_miniGame = sx_new( sx::gui::PanelEx );
 	m_miniGame->SetUserTag( 11 );
@@ -770,6 +778,11 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_miniGame, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_miniGame, MenuMap::OnClick );
 
+	caption = create_label( m_miniGame, FONT_20_OUTLINE, GTA_CENTER, g_game->m_strings->Get(19), 100.0f, 30.0f, 60.0f, -5.0f, 0 );
+	caption->SetUserTag( 11 );
+	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	SEGAN_GUI_SET_ONCLICK( caption, MenuMap::OnClick );
+
 	m_upgrade = sx_new( sx::gui::PanelEx );
 	m_upgrade->SetUserTag( 12 );
 	m_upgrade->SetParent( m_back );
@@ -783,6 +796,11 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONENTER( m_upgrade, Menu::OnEnter );
 	SEGAN_GUI_SET_ONEXIT( m_upgrade, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_upgrade, MenuMap::OnClick );
+
+	caption = create_label( m_upgrade, FONT_20_OUTLINE, GTA_CENTER, g_game->m_strings->Get(20), 100.0f, 30.0f, 50.0f, -5.0f, 0 );
+	caption->SetUserTag( 12 );
+	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	SEGAN_GUI_SET_ONCLICK( caption, MenuMap::OnClick );
 
 	//	create back button
 	m_goback = sx_new( sx::gui::Button );
@@ -798,6 +816,7 @@ void MenuMap::Initialize( void )
 	m_goback->GetElement(2)->Color().a = 0.5f;
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuMap::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
+	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 50.0f, 30.0f, 22.0f, -2.0f, 0 );
 
 	//	create difficulty
 	m_diff_scroll = sx_new( sx::gui::TrackBar );
