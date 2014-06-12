@@ -65,6 +65,7 @@
 #define FONT_WAVE_CALL_GOLD					L"Font_30_l.fnt"
 #define FONT_PREVIEW						L"Font_25_l.fnt"
 #define FONT_HUD_TITLE						L"Font_25_l.fnt"
+#define FONT_45_OUTLINE_SHADOWED			L"font_45_l_sh.fnt"
 #define FONT_35_OUTLINE_SHADOWED			L"font_35_l_sh.fnt"
 #define FONT_30_OUTLINE						L"Font_30_l.fnt"
 #define FONT_25_OUTLINE						L"Font_25_l.fnt"
