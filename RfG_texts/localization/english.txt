@@ -1,0 +1,567 @@
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	MENU : ROOT
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+`0xfefefe`Play
+`0xfefefe`Profile
+`0xfefefe`Achievements
+`0xfefefe`Encyclopedia
+`0xfefefe`Settings
+`0xfefefe`Credits
+`0xfefefe`Exit
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	MENU : MAP
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+`0xffffff`Difficulty : 
+`0xffffff`norm
+`0xffff44`hard
+`0xff4444`insane
+`0xffffff`Play
+`0xffffff`Minigame
+`0xffffff`Upgrade
+`0xffffff`Back
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	Upgrade Panel
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Discharger Power
+Increases discharge power of Machinegun.
+Discharger Count
+Increases the time of discharging in Machinegun.
+Range
+Increases attack range of Machinegun.
+Fire Rate
+Increases fire rate of Machinegun.
+Damage
+Increases damage of tower per each fire.
+Chance
+Increases the chance of snower ability to make more errors on enemies path finding processor.
+Stun Time
+Increases the time of stunning enemies.
+Cool Time
+Less time to prepare especial ability of snower.
+Range
+Increases the range of the Snower.
+Fire Rate
+Increases the fire rate of Snower.
+Freeze Time
+Increases the time of freezing enemies.
+Chance
+Increases the chance of especial ability of Mortar.
+Splash Radius
+Increases the radius of splash damage of each bomb.
+Cluster Count
+more bombs will create when cluster bomb explodes.
+Cluster Range
+Increases the range of cluster bomb.
+Range
+Increases the attack range of Mortar.
+Damage
+Increases damage of tower per each fire.
+Cool Time
+Less time to prepare especial ability of Ground lava.
+Chance
+Increases the headshot chance of Ground lava.
+Head Shot Time
+Less time to focus on target for headshot.
+Range
+Increases the attack range of Ground lava.
+Fire Rate
+Increases the fire rate of Ground lava.
+Damage
+Increases damage of tower per each fire.
+Crazy Chance
+Increase the chance of being in crazy mode.
+Cool Time
+Less time to prepare especial ability.
+Crazy Range
+Increases the range of Flighter in crazy mode.
+Crazy Time
+Staying in crazy mode longer.
+Damage
+Increases damage of tower per each fire.
+Gold Income
+Catch more gold by killing enemies.
+Sell Income
+Increases your income after selling towers.
+People Resistance
+Improve people resistance against enemies.
+Time Keeper
+keeps your time to do more actions.
+Cool Time
+Less time to prepare Death rain
+Number of Bombs
+Increases the number of bombs of Death rain.
+Range
+Increases the range of Death rain bombs.
+Splash Radius
+Increases The splash radius of each bombs of Death rain.
+Cool Time
+Less time to prepare the Trap.
+Damage
+Increases the damage of each trap.
+Reusable
+Traps act more.
+Cool Time
+Less time to prepare the Goldentower.
+Golden Time
+Increases the golden time of towers when Goldentower used.
+Cool Time
+Less time to prepare the Freezer.
+Freeze Power
+Increase the power of Freezer.
+Freez Time
+Freeze enemies longer.
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	MENU : SETTINGS
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Settings
+Fullscreen
+Shader Quality
+Shadow
+Reflection
+Music
+Sound Effects
+Mouse Speed
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	MENU : PAUSE
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Pause
+Resume
+Restart
+Settings
+Menu
+Quit
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	MENU : VICTORY
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Victory
+Next
+Restart
+Upgrade
+Menu
+Quit
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	MENU : GAME OVER
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Gameover
+Next
+Restart
+Menu
+Quit
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	CONFIRM : TO MENU
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Leave the current level and return to menu ?
+Yes
+No
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	CONFIRM : EXIT
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Would you like to exit
+Yes
+No
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	IN GAME
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+`0xffffff`Upgrade [R] \n `0xffff55`Gold : %d / %d \n `0xff5555`XP : %d / %d
+`0xffffff`Repair [R] \n `0xffaaaa`Cost : %d \n Your Gold : %d
+`0xaaaaff`Sell [Y] \n Income : `0xffff55`%d
+The tower is fully upgraded!
+master
+fast
+medium
+slow
+none
+`0xffff33`LOCKED \n `0xffffff`This tower is not yet unlocked
+`0xffff33`LOCKED \n `0xffffff`This power attack is not yet unlocked
+coming from this way
+coming from this gate
+Start
+General
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	TOWERS
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Machinegun
+Attack with `0xff0000`bullet`0xffffff` to all enemy types. \n Cost = `0xffff00`%d \n `0xffffff`Gold = `0x00ff00`%d 
+Snower
+Slow down all enemy types and \n damage to enemies with `0x7777ff`Electrical`0xffffff` armor \n Cost = `0xffff00`%d \n `0xffffff`Gold = `0x00ff00`%d 
+Mortar
+Attack with `0xff0000`bomb and splash`0xffffff` damage to enemies \n which are moving on the ground. \n Cost = `0xffff00`%d \n `0xffffff`Gold = `0x00ff00`%d 
+Groundlava
+Very powerful tower with `0xff0000`high`0xffffff` fire rate. \n Can attack to enemies which are moving on ground. \n Cost = `0xffff00`%d \n `0xffffff`Gold = `0x00ff00`%d
+Flighter
+Powerful tower can attack to `0xff0000`flying`0xffffff` enemies. \n Cost = `0xffff00`%d \n `0xffffff`Gold = `0x00ff00`%d 
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	Power Attacks 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Trap
+Trap [1] \n place a trap on the road to kill enemies. \n Cost : `0xffff00`%d \n `0xffffff`Gold : `0x00ff00`%d
+Stunner
+Stunner [2] \n Stun all enemies for %.1f Second(s). \n Cost : `0xffff00`%d \n `0xffffff`Gold : `0x00ff00`%d
+Ambulance
+Ambulance [3] \n Repair all towers immediately. \n Cost : `0xffff00`%d \n `0xffffff`Gold : `0x00ff00`%d
+DeathRain
+DeathRain [4] \n place the Hotzone on the roads to destroy enemies by a rain of bombs \n Cost : `0xffff00`%d \n `0xffffff`Gold : `0x00ff00`%d
+Golden
+Golden [5] \n Exteremely powerful and bulletproof towers! \n Cost : `0xffff00`%d \n `0xffffff`Gold : `0x00ff00`%d
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	CINEMATICS
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Once upon a time there was a planet called Cnep. People of Cnep were living in peace and serenity. Suddenly the spacecraft of darkness casted its shadow over the planet.
+Iron men from the spacecraft landed on the planet and raided the people who were hiding in bunkers.
+At the same time, the commanders from all over the planet gathered together and formed a resistance movement. They had to resist the onslaught of aliens by tower defenses which were made by engineers.
+Eventually the aliens head’s spacecraft was destroyed during a hard battle. 
+Finally the fellowship of resistance returned to their planet with honor and glory, after defending against invaders and liberating the captives who were captured by aliens.
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	LOADINGS
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Village
+Cemetery
+Farm
+Mountain
+Desert
+Train Station
+Mmusement Park
+Airport
+Space
+Aerith
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	WAVES
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Wave 1 started. select a tower and put it on the ground.
+Wave 2 started.
+Wave 3 started.
+Wave 4 started.
+Wave 5 Started.
+This is the final wave. Upgrade your towers!
+First wave is coming. prepare you towers now
+Second wave is coming
+and the third wave !
+Take these things out !
+It seems that we have new company
+Take care of that healer !
+Ops. the wave of purples
+It's last one. take care of big things
+First wave is coming !
+and also the second
+great! keep resistance
+Take this housefly down
+So many flying machines. Use Flighter to scrap them
+what the ...
+Helicopters ...
+Keep resistance
+This is the last one. you can do it captain
+Waves incoming
+Healers are coming
+take them down !
+Airplans are coming ...
+Some tanks are coming, they can damage your towers
+wow ! they are coming ...
+Shoot them
+The boss is coming.
+Wave started
+Bad news. They are coming from second gate !
+Turbo planes ! they are fast
+New one is coming
+Some rocket launchers are coming
+Ops. houseflies again
+Turbos and houseflies ...
+keep these enemies away from people
+keep resistance captain. It's going to be finished
+This is finall. look at the boss 
+Enemies are coming
+A Healer. just finish him
+Turbo plans ...
+Helicopters
+oho ! what a rush 
+A wild enemy is coming. take care of towers
+they send housefly
+what ? they have hammer ?
+just stay alive
+This is the final. Don't let him kill people
+They are attacking
+They send flies
+Tanks are coming ...
+I can see a new plane !
+Keep them away from people
+I can hear new dangerous thing. be careful
+Take care of towers
+I hate turbos !
+Resist captain
+The final wave is coming
+Barbarians rushing
+Airplanes ...
+Healers again ! Ah
+Such a dangerous wave
+look at those rocket launchers
+Ops. turbos again
+What's happening ? 
+It's near to finish
+Shit ! houseflies again. kill them
+They are going to die. keep firing
+Resist captain
+This is the final wave. take care of people
+Waves started
+Such an odd place
+It's seem their space ship is going to crash
+Throw them out
+Our planet is really beautiful. Isn't It ?
+There is no new enemies. yeah !
+Bosses are coming
+Resist captain
+You are killing the nineteenth wave. just saying !
+What the hell is this ?
+It's goning to be finished !
+This is the final wave. Stay and Resistance
+Where is this place ?
+Who are they ?
+It is made of glass ?
+What ? How can they fly ?
+Don't let them scape !
+What the ... ! they are really wild
+look at the boss
+More bosses are coming !
+Such colorful enemies ! Lol
+Boss again ! I hate them
+This is the final !
+This is the big booosss. kill hiiiiim !
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	MINI GAMES
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+Trap skill
+By placing traps on the roads, stop enemies! \n You should act quickly.
+It's started !
+A mortar & Infinite traps
+You have a chance to build just one tower. \n Place Mortar in an appropriate location. then using traps \n you should destroy enemies.
+It's started !
+Place and Sell
+One pertinacious enemy will attack you. \n You should defeat it by placing Flighter and using Freezer (The power attack). \n Keep placing and selling towers till the enemy is defeated.
+Started !
+Set carefully
+You can build 5 towers. \n After that you should defeat enemies with your power attacks. \n Towers are upgradable!
+Started !
+One tower & One power attack
+One tower with one power attack. Enemies will attack in pairs continuously. \n Select the appropriate tower and keep building and selling towers until the enemies are defeated. \n Power attack can help you.
+Started !
+Two power attack no Tower !
+Freeze enemies and kill them by a rain of death...
+Started !
+What ? Why are they look like this ?
+It's freezing time...
+Build as many Snower towers as you can, then destroy enemies by your power attack.
+Started !
+What's happening ?
+A real challenge
+You can build one tower to defeat air type enemies. \n Use traps to kill ground type enemies. \n Keep building and selling towers till the enemies are destroyed.
+Attaaaack !
+Different challenge
+A different confrontation with a different race \n which are able to recover and regenerate their power! \n Don't let them escape.
+look at these !
+Why are these so huge ?
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	ACHIEVEMENTS
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+First Blood
+kill first enemy in the game
+'First Blood' unlocked !
+Slayer
+kill 1000 enemies through the game
+'Slayer' unlocked !
+Blood lust
+kill 2500 enemies through the game
+'Blood Lust' unlocked !
+Terminator
+kill 3500 enemies through the game
+'Terminator' unlocked !
+Constructor
+create 30 towers through the game
+'Constructor' unlocked !
+Engineer
+create 100 towers through the game
+'Engineer' unlocked !
+Architect
+build 250 towers through the game
+'Architect' unlocked !
+Tower Dealer
+sell 8 towers in one level
+'Tower Dealer' unlocked !
+Real Estate
+sell 100 towers through the game
+'Real Estate' unlocked !
+Death Trap
+kill 100 enemies by trap through the game
+'Death Trap' unlocked !
+Apocalypto
+kill 1000 enemies by death rain through the game
+'Apocalypto' unlocked !
+Wrath Of Battle
+use death rain 5 times in the single level
+'Wrath Of Battle' unlocked !
+Agile Warrior
+call 100 waves earlier through the game
+'Agile Warrior' unlocked !
+Perfect Battle
+make 50 tower full upgrade with full ability through the game
+'Perfect Battle' unlocked !
+Sniper
+kill 100 enemies by sniper of ground lava through the game
+'Sniper' unlocked !
+Clever Dealer
+sell all towers after final wave
+'Sniper' unlocked !
+Redeemer
+release people to reach 300 people
+'Sniper' unlocked !
+Normality
+play and win all levels in NORM difficulty mode
+'Sniper' unlocked !
+Dignified Killer
+play  and win all levels in HARD difficulty mode
+'Sniper' unlocked !
+Deadly Serious
+play  and win all levels in INSANE difficulty mode
+'Sniper' unlocked !
+Fisherman
+get 10 stars through the game
+'Sniper' unlocked !
+Stalwart
+get 20 stars through the game
+'Sniper' unlocked !
+Star Collector
+get all 30 stars through the game
+'Sniper' unlocked !
+Director
+use cinematic camera for the first time
+'Sniper' unlocked !
+Gamepa
+play and win all mini games
+'Sniper' unlocked !
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	TIPS
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+" CALL NEXT WAVE \n Call next wave to earn more `0xffff00`GOLD`0xffffff`. \n Click the button or press `0xffaaaa`SPACE`0xffffff`. "
+" UPGRADE THE TOWER \n When this shape appears on your tower \n it means that the tower is ready for `0xffaaaa`UPGRADE`0xffffff`. \n So just click on the button or press `0xffaaaa`R`0xffffff`. "
+" GOLD FOR PEOPLE \n Collect more `0xffff00`golds`0xffffff` to `0xffaaaa`free`0xffffff` more people. \n You can pay `0xffff00`500`0xffffff` golds in exchange for \n every `0x11ff11`1`0xffffff` people's life. "
+" GET MORE STARS \n Try the previous levels in difficult modes \n to get more `0xffff44`STARS`0xffffff` and also more `0xffaaaa`UPGRADES`0xffffff`. \n With `0xffaaaa`UPGRADES`0xffffff` you can continue easily. "
+" GAME SPEED \n Use this slider to increase or \n decrease the `0xffaaaa`SPEED`0xffffff` of the game. "
+" EFFICIENCY \n To increase your `0xffaaaa`EFFICIENCY`0xffffff` on the `0xffaaaa`STEAM`0xffffff`, play the \n game on the harder mode and get higher efficiency. "
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	TUTORIALS
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+`0xffff00`How to create a tower
+Right click on the screen, the tower panel will appear \n select one of the towers, then click on the location you want. \n You have made a tower now...!
+`0xffff00`Player Information Panel
+It shows how much gold and how many people you have and how many waves have been left. \n You can see notifications by clicking on the notification button or pressing the `0xff7a7a`I`0xffffff` button. \n NOTE: If you click or press `0xff0000`SPACE`0xffffff`, you will be able to summon the next wave and \n you will earn more Gold per each second.
+`0xffaaaa`Power Attacks
+You have 5 Power Attacks slots. They are powerful weapons but need time to prepare. \n Use time scroll to increase or decrease game speed.
+`0xffaaaa`Upgrade your towers
+When a tower gains enough experience and when you have enough Gold \n you can upgrade your Tower. \n More upgrades will be unlocked in the next levels.
+`0xffff7a`Controls
+Use `0xff7a7a`W A S D`0xffffff` keys to move in the map. \n Use `0xfeff83`Q E`0xffffff`keys to rotate the camera. \n Use `0x87ff2f`R`0xffffff` key to repair and upgrade the selected tower. \n Use `0xb769ff`Y`0xffffff` key to sell the selected tower. \n Use `0xff0000`SPACE`0xffffff` key to summon up the next wave
+`0xffff00`Machinegun The Tower
+This tower can attack all enemy types. \n Using both pipes helps the weapon cool down the system and prevents it from jamming.
+Machinegun `0xff1111`especial ability`0xffffff`
+Despite its normal damage, it can `0x7788ff`discharge`0xffffff` enemies for a limited time. \n They will lose their energy for a while.
+`0xffff00`Snower The Tower
+Snower is a weapon with an electrical base. \n This weapon disrupts enemies' signals and forces them to move more slowly.
+Snower `0xff1111`especial ability`0xffffff`
+You will have a chance to force ground type enemies to `0xff1111`retreats`0xffffff` \n and aircrafts to `0xff1111`fly near the ground`0xffffff` for a short time.
+`0xff2222`Mortar The Tower
+This tower attacks ground types within a small range \n it has splash damage and slow firing rate. \n But it massacres enemies.
+Mortar `0xff1111`special ability`0xffffff`
+By chance, mortar can launch more bombs in one shot...!
+Mortar `0xff1111`Cluster Bomb`0xffffff`
+There is a chance that the tower will launch a cluster bomb.
+`0xff1111`Flighter The Tower
+This tower just attacks air types. Use it to defeat them well.
+Flighter `0xff1111`especial ability`0xffffff`
+This tower goes `0xffaaaa`crazy`0xffffff` periodically. \n It causes a significant increase in the range and fire rate. \n Crazy Flighter is really fatal...!
+`0xff1111`Ground Lava
+It is a very powerful tower with a very high fire rate. \n It just attacks enemies which move on the ground.
+Groundlava `0xff1111`special ability`0xffffff`
+Ground lava has a chance to kill enemies with a fatal firing.
+`0xffaaaa`Brute Blue
+This type of enemies has physical Armor. \n `0xaaaaff`Snower`0xffffff` can hit them well. \n Use `0xaaaaff`Snower`0xffffff` to destroy them all.
+Purple
+This type of enemies wears purple suit. They repair themselves. \n They have `0xffaaaa`Health Regenerator `0xffffff`. \n Don't let them pass!
+Gladiator Healer
+This unit heals everybody around himself. \n Kill him as soon as possible, commander!
+Gladiator `0xff1111`Speedy
+This hasty type forces everybody around him to move `0xffaa11`faster`0xffffff`. \n It helps enemies escape from your firing range unhurt
+Fire Helicopter
+Helicopters can attack you. They can damage your towers severely. \n You should repair your towers to keep them working. \n `0xffff11`be careful commander
+`0xff1111`Arivan the Boss
+He, the Angry savage Boss, can launch missiles! Keep it away from your defenseless people. !
+`0xffff11`Gladiator Launcher
+Oops!!! He has a `0xffaa11`missile`0xffffff` launcher! He is a `0xff2222`dangerous`0xffffff` enemy. \n Kill him ASAP.
+`0xff1111`Arsenika the boss
+He is the boss of his own race! \n He can launch missiles! \n Keep him away from the people!
+`0xffff11`Gladiator Hammer
+Oops a Hammer...!  Beware him; he can damage your towers seriously. \n Try to kill him sooner...!
+`0xff1111`Arpiw the Boss
+Angry savage Boss, he can launch missiles! \n Keep it away from your defenseless people. !
+`0xff1111`Zipona
+This dangerous and powerful plane can destroy your allies! \n Make more Flighters to terminate it!
+                                                                                                     
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//	TUTORIALS IN PICTURE
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+At the first step just press the right button of the mouse
+Now choose your tower by clicking on it
+People & Gold : here you can see how many people nad gold you have
+Info Button : `0xffaaaa`Click`0xffffff` or press `0xffaaaa`I`0xffffff` to see your new notification
+Start Waves : `0xffaaaa`Click`0xffffff` or press `0xffaaaa`Space`0xffffff` to call waves and take more golds for early call
+Alarm : notify that enemies reach to you base
+Game Speed : Click and drag to change it
+Sell : Click or press `0xffaaaa`Y`0xffffff` to sell selected tower
+Upgrade : Click or press `0xffaaaa`R`0xffffff` to repair/upgrade selected tower
+Experience, Damage, Firerate of the selected unit. Also health is expelicit :D
+Power Attacks, Upgrade/Repair, Sell, Camera Rotate, Camera Move, Call Next Wave
+Machinegun
+Fires on all enemies
+Machinegun ability
+Discharges enemies
+Weapon needs to be `0xaaaaff`cool`0xffffff`
+Weapon operates with a `0xffaaaa`chance`0xffffff`
+Snower
+Fires on all enemies and freezes them
+Snower ability
+Make enemies `0xffaaaa`dizzy`0xffffff`
+Weapon needs to be `0xaaaaff`cool`0xffffff`
+Weapon operates with a `0xffaaaa`chance`0xffffff`
+Mortar
+Fires on ground enemies
+Mortar ability
+Launch more bombs
+Mortar ability
+Launch cluster bombs
+Flighter
+Fires on aircrafts
+Flighter ability
+Fires on aircrafts
+Weapon needs to be `0xaaaaff`cool`0xffffff`
+Weapon operates with a `0xffaaaa`chance`0xffffff`
+Groundlava
+Fires on ground enemies
+Groundlava ability
+Headshot walking enemies
+Weapon needs to be `0xaaaaff`cool`0xffffff`
+Weapon operates with a `0xffaaaa`chance`0xffffff`
+                                                                                                     
