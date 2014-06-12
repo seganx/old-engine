@@ -16,65 +16,61 @@ void InitLogger(void)
 	sxLog::SetFileName(logfile);
 	sxLog::SetMode(LM_FILE | LM_WINDOW);
 
-	String sysString = L"SeganX Engine 0.1.0.1 \r\n\r\n";
+	sxLog::Log_(L"SeganX Engine 0.1.0.1 \r\n\r\n");
 
 	SystemInfo sysinfo;
 	sx::sys::GetSystemInfo(sysinfo);
-	if (sysinfo.LidPresent)		sysString << L"------- Running on Laptop PC --------\r\n\r\n";
-	else						sysString << L"------- Running on Desktop PC -------\r\n\r\n";
+	if (sysinfo.LidPresent)		sxLog::Log_(L"------- Running on Laptop PC --------\r\n\r\n");
+	else						sxLog::Log_(L"------- Running on Desktop PC -------\r\n\r\n");
 
 	OSInfo osinfo;
-	sx::sys::GetOSInfo(osinfo);	
-// 	sysString << osinfo.Description	<< L"\r\n\r\n"					<<
-// 		L"CPU information:\r\n"		<<
-// 		L"\tBrand :\t\t"			<< sysinfo.CPU.BrandName		<< L"\r\n"		<<
-// 		L"\tClock :\t\t\t"			<< sysinfo.CPU.Clock			<< L" MHz\r\n"	<<
-// 		L"\tCache :\t\t\t"			<< sysinfo.CPU.Cache			<< L" KB\r\n"	<<
-// 		L"\tNumber of core(s):\t"	<< sysinfo.CPU.ProcessorCount	<< L"\r\n"		<<
-// 		L"\tFeatures:\t\t";
-	if (sysinfo.CPU.mmx) sysString << L"MMX ";
-	if (sysinfo.CPU.sse) sysString << L"SSE ";
-	if (sysinfo.CPU.sse2) sysString << L"SSE2 ";
-	if (sysinfo.CPU.now3d) sysString << L"3DNow ";
+	sx::sys::GetOSInfo(osinfo);
+	sxLog::Log_(L"%S \r\n\r\n CPU information:\r\n", osinfo.Description);
+	sxLog::Log_(L"\tBrand :\t\t%S\r\n", sysinfo.CPU.BrandName);
+	sxLog::Log_(L"\tClock :\t\t\t%d MHz\r\n", sysinfo.CPU.Clock);
+	sxLog::Log_(L"\tCache :\t\t\t%d KB\r\n", sysinfo.CPU.Cache);
+	sxLog::Log_(L"\tNumber of core(s):\t%d\r\n", sysinfo.CPU.ProcessorCount);
+	sxLog::Log_(L"\tFeatures:\t\t");
+	if (sysinfo.CPU.mmx) sxLog::Log_(L"MMX ");
+	if (sysinfo.CPU.sse) sxLog::Log_(L"SSE ");
+	if (sysinfo.CPU.sse2) sxLog::Log_(L"SSE2 ");
+	if (sysinfo.CPU.now3d) sxLog::Log_(L"3DNow ");
 
-// 	sysString << L"\r\n\r\n"				<<
-// 		L"Physical memory information:\r\n"	<<
-// 		L"\tTotal Memory:\t\t"				<< (int)sysinfo.MemorySize				<< L" KB\r\n"	<<
-// 		L"\tAvailable Memory :\t"			<< (int)sx::sys::GetAvailableMemory()	<< L" KB\r\n";
-
-	sxLog::Log_(sysString);
+	sxLog::Log_(L"\r\n\r\nPhysical memory information:\r\n");
+	sxLog::Log_(L"\tTotal Memory:\t\t%u KB\r\n",	sysinfo.MemorySize);
+	sxLog::Log_(L"\tAvailable Memory :\t%u KB\r\n",	sx::sys::GetAvailableMemory());
 }
 
-class Engine_internal
+
+void SEGAN_API sx_engine_init()
 {
-public:
+	InitLogger();
+	sx::core::Settings::Initialize();
+}
 
-	//! initialize the engine
-	static void Initialize(void)
-	{
-		InitLogger();
-		sx::core::Settings::Initialize();
-	}
+void SEGAN_API sx_engine_finit()
+{
+	sxLog::Log_(L"\r\nShutting down SeganX ...\r\n");
 
-	//! finalize the engine
-	static void Finalize(void){
-		sxLog::Log_(L"\r\nShutting down SeganX ...\r\n");
+	//  finalize some remain things
+	sx::core::Renderer::Finalize();
+	sx::core::Scene::Finalize();
+	sx::snd::Device::Destroy();
+	sx::io::Input::Finalize();
 
-		sx::io::Input::Finalize();
-		sx::core::Terrain::Manager::ClearrAll();
-		sx::d3d::Device3D::Destroy();
-		sx::gui::Font::Manager::ClearAll();
-		sx::d3d::Shader::Manager::ClearAll();
-		sx::d3d::Texture::Manager::ClearAll();
-		sx::d3d::Geometry::Manager::ClearAll();
-		sx::d3d::Animation::Manager::ClearAll();
-		
-		sx::snd::SoundData::Manager::ClearAll();
+	sx::core::Terrain::Manager::ClearrAll();
+	sx::d3d::Device3D::Destroy();
+	sx::gui::Font::Manager::ClearAll();
+	sx::d3d::Shader::Manager::ClearAll();
+	sx::d3d::Texture::Manager::ClearAll();
+	sx::d3d::Geometry::Manager::ClearAll();
+	sx::d3d::Animation::Manager::ClearAll();
 
-		sx::sys::TaskManager::Finalize();
-		sxLog::Log( L"SeganX terminated." );
-	}
-};
+	sx::snd::SoundData::Manager::ClearAll();
+
+	sx::sys::TaskManager::Finalize();
+	sxLog::Log( L"SeganX terminated." );
+}
 
 
 
@@ -87,17 +83,16 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	{
 	case DLL_PROCESS_ATTACH:
 		
-		Engine_internal::Initialize();
 
 		break;
 	case DLL_PROCESS_DETACH:
 		
-		//Engine_internal::Finalize();
 
 		break;
 	}
     return TRUE;
 }
+
 
 #ifdef _MANAGED
 #pragma managed(pop)

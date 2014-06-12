@@ -1048,14 +1048,12 @@ namespace sx { namespace d3d
 	{
 		if (TextureMap.IsEmpty()) return;
 
-		String str = L"Releasing remains Texture(s) :\r\n\t\t\t";
+		sx_callstack();
 
 		for (sxMapTexture::Iterator it = TextureMap.First(); !it.IsLast(); it++)
 		{
 			DerivedTexture* g = (DerivedTexture*)(*it);
-			str << (g->GetSource()!=NULL ? g->GetSource() : L" ??? no name ???") << L"\r\n\t\t\t";
-				//<< L" [ " << g->m_RefCount << L" refCount ]\r\n\t\t\t";
-			
+
 			//  remove any tasks exist in task list
 			sx::sys::TaskManager::RemoveTask(&g->m_LoaderTask[0]);
 			sx::sys::TaskManager::RemoveTask(&g->m_LoaderTask[1]);
@@ -1080,8 +1078,6 @@ namespace sx { namespace d3d
 			}
 		}
 		TextureMap.Clear();
-
-		sxLog::Log(str);
 	}
 
 	void Texture::Manager::SetLOD( UINT LOD )

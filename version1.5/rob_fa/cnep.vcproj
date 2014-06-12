@@ -225,6 +225,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GameSteam.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GameSteam.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GameStrings.cpp"
 				>
 			</File>

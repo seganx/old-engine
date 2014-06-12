@@ -253,6 +253,8 @@ void MainLoop(float elpsTime)
 
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
+	sx_engine_init();
+
 	sx_callstack();
 
 #if USE_GAMEUP
@@ -273,7 +275,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	String mutexName = L"SeganX Game :: "; mutexName << GAME_TITLE;
 	HANDLE mutex = CreateMutex(NULL, TRUE, *mutexName);
 	if ( !mutex || GetLastError() == ERROR_ALREADY_EXISTS )
+	{
+		sx_engine_finit();
 		return 0;
+	}
 #endif
 	sx::cmn::Randomize();
 	
@@ -282,12 +287,13 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	if (SteamAPI_RestartAppIfNecessary( k_uAppIdInvalid /*STEAM_APP_ID*/))
 	{
 		MessageBox( NULL, L"Can't initialize Steam !", L"Steam API", MB_OK | MB_ICONERROR );
+		sx_engine_finit();
 		return 0;
 	}
 	if (!SteamAPI_Init())
 	{
 		MessageBox( NULL, L"Can't initialize Steam !", L"Steam API", MB_OK | MB_ICONERROR );
-		//OutputDebugString( "SteamAPI_Init() failed\n" );
+		sx_engine_finit();
 		return 0;
 	}
 
@@ -332,36 +338,42 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		hashlockmain = 1;
 	else
 		hashlockmain = show_hash_lock( hInstance, hash_lock_code );
-	if ( !hashlockmain ) return 0;
+	if ( !hashlockmain )
+	{
+		sx_engine_finit();
+		return 0;
+	}
 #endif
 
 	//  load configuration
+	{
 #if USE_GAMEUP
-	bool b1 = ( g_gameup->get_lock_code(0) == g_gameup->get_lock_code(5) );
-	if ( b1 )
+		bool b1 = ( g_gameup->get_lock_code(0) == g_gameup->get_lock_code(5) );
+		if ( b1 )
 #endif
 
 #if USE_HASH_LOCK
-	if ( hashlockmain )
+		if ( hashlockmain )
 #endif
-		Config::LoadConfig();
+			Config::LoadConfig();
+	}
 
 #if USE_HASH_LOCK
 	uint verified_hash_lock_code = verify_hash_lock_code( hash_systime, hash_lock_code, hash_res );
 #endif
 
-
-	// TEST
-	String str = sx::sys::GetAppFolder();
-	str.MakePathStyle();
+	{
+		String str = sx::sys::GetAppFolder();
+		str.MakePathStyle();
 #if USE_GAMEUP
-	if ( g_gameup->get_lock_code(1) == g_gameup->get_lock_code(2) )
+		if ( g_gameup->get_lock_code(1) == g_gameup->get_lock_code(2) )
 #endif
 #if USE_HASH_LOCK
-	if ( hash_res[0] == HASH_VERIFY_RES1(hash_systime) )
+		if ( hash_res[0] == HASH_VERIFY_RES1(hash_systime) )
 #endif
 		str << L"project1";
-	sx::sys::FileManager::Project_Open(str, FMM_ARCHIVE);
+		sx::sys::FileManager::Project_Open(str, FMM_ARCHIVE);
+	}
 
 #if USE_HASH_LOCK
 	if ( verified_hash_lock_code )
@@ -369,27 +381,28 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 #endif
 
 	//  create application window
-	WindowRect wr;
-	wr.Width = Config::GetData()->display_Size.x;
-	wr.Height = Config::GetData()->display_Size.y;
-	wr.Left = (sx::sys::GetDesktopWidth() - wr.Width) / 2;
-	wr.Top = (sx::sys::GetDesktopHeight() - wr.Height) / 4;
-	s_window.SetRect(wr);
-	s_window.SetBorder( WBT_ORDINARY );
-	s_window.SetTitle( GAME_TITLE );
-	s_window.SetIcon( LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GAME)) );
-	s_window.SetCursor( LoadCursor(hInstance, MAKEINTRESOURCE(IDC_CURSOR_EMPTY)) );
-	s_window.SetVisible( true );
+	{
+		WindowRect wr;
+		wr.Width = Config::GetData()->display_Size.x;
+		wr.Height = Config::GetData()->display_Size.y;
+		wr.Left = (sx::sys::GetDesktopWidth() - wr.Width) / 2;
+		wr.Top = (sx::sys::GetDesktopHeight() - wr.Height) / 4;
+		s_window.SetRect(wr);
+		s_window.SetBorder( WBT_ORDINARY );
+		s_window.SetTitle( GAME_TITLE );
+		s_window.SetIcon( LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GAME)) );
+		s_window.SetCursor( LoadCursor(hInstance, MAKEINTRESOURCE(IDC_CURSOR_EMPTY)) );
+		s_window.SetVisible( true );
 #if USE_GAMEUP
-	if ( g_gameup->get_lock_code(6) == g_gameup->get_lock_code(3) )
+		if ( g_gameup->get_lock_code(6) == g_gameup->get_lock_code(3) )
 #endif
 #if USE_HASH_LOCK
-		if ( hash_res[1] == HASH_VERIFY_RES2(hash_systime) )
+			if ( hash_res[1] == HASH_VERIFY_RES2(hash_systime) )
 #endif
-		sx::sys::Application::Create_Window(&s_window);
-	SetForegroundWindow( s_window.GetHandle() );
-	ShowCursor( FALSE );
-
+				sx::sys::Application::Create_Window(&s_window);
+		SetForegroundWindow( s_window.GetHandle() );
+		ShowCursor( FALSE );
+	}
 
 	//  initialize scene manager
 	sx::core::Scene::Initialize( sx_new( sx::core::SceneManager_SBVH ) );
@@ -404,23 +417,26 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	sx::snd::Device::Create( s_window.GetHandle(), SX_SND_3D /*| SX_SND_SYNC*/ );
 
 	//  at first connect keyboard
-	sx::io::PInputDeviceBase newDevice = sx_new( sx::io::Keyboard(0) );
+	{
+		sx::io::PInputDeviceBase newDevice = sx_new( sx::io::Keyboard(0) );
 
 #if USE_GAMEUP
-	if ( g_gameup->get_lock_code(0) == g_gameup->get_lock_code(7) )
+		if ( g_gameup->get_lock_code(0) == g_gameup->get_lock_code(7) )
 #endif
 #if USE_HASH_LOCK
 		if ( verified_hash_lock_code == HASH_VERIFY_RES3(hash_systime) )
 #endif
-		sx::io::Input::Attach( newDevice );
+			sx::io::Input::Attach( newDevice );
 
-	//  connect mouse
-	if ( newDevice )
-		newDevice = sx_new( sx::io::Mouse(0) );
-	sx::io::Input::Attach( newDevice );
+		//  connect mouse
+		if ( newDevice )
+			newDevice = sx_new( sx::io::Mouse(0) );
+
+		sx::io::Input::Attach( newDevice );
+	}
 
 	//  initialize IO services
-	if ( s_window.GetHandle())
+	if ( s_window.GetHandle() )
 	sx::io::Input::Initialize( s_window.GetHandle() );
 
 	//  turn screen saver off
@@ -436,7 +452,11 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		int b = g_gameup->get_lock_code(1) * 3;
 		Game::Initialize( (a == (b * 3)) ? &s_window : null );
 
-		if ( !b1 ) return 0;
+		if ( !b1 )
+		{
+			sx_engine_finit();
+			return 0;
+		}
 	}
 #elif USE_HASH_LOCK
 	{ 
@@ -447,12 +467,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 #else
 	Game::Initialize( &s_window );
 #endif
-
-	//  TEST 
-	g_game->m_game_nextLevel = 0;	//  set level to first test
-	//g_game->m_upgrades.trap_cooltime = 8.0f;
-	//g_game->m_upgrades.trap_count = 5;
-
 
 	//	show presents
 #if 1
@@ -476,12 +490,8 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	}
 #endif
 
-
 	//  run the game
 	sx::sys::Application::Run( MainLoop, MainMsgProc );
-
-	//  clear the game
-	g_game->ClearLevel();
 
 	//  finalize game object to destroy created resources
 	Game::Finalize();
@@ -490,12 +500,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 #if USE_STEAM_SDK
 	SteamAPI_Shutdown();
-#else
-	//  finalize some remain things
-	sx::core::Renderer::Finalize();
-	sx::core::Scene::Finalize();
-	sx::snd::Device::Destroy();
-	sx::io::Input::Finalize();
 #endif
 
 	//  turn screen saver off
@@ -532,5 +536,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	}
 #endif
 
+	sx_engine_finit();
 	return 0;
 }

@@ -19,4 +19,9 @@
 #include "sxCore/sxCore.h"
 #include "sxSound/sxSound.h"
 
+
+void SEGAN_API sx_engine_init();
+void SEGAN_API sx_engine_finit();
+
+
 #endif	//	GUARD_sxEngine_HEADER_FILE

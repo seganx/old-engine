@@ -362,20 +362,13 @@ namespace sx { namespace d3d {
 	void Shader::Manager::ClearAll( void )
 	{
 		if (ShaderMap.IsEmpty()) return;
-
-		String str = L"Releasing remains Shader(s) :\r\n\t\t\t";
-
+		sx_callstack();
 		for (sxMapShader::Iterator it = ShaderMap.First(); !it.IsLast(); it++)
 		{
 			DerivedShader* g = (DerivedShader*)(*it);
-			str << (g->GetSource()!=NULL ? g->GetSource() : L" ??? no name ???") << L"\r\n\t\t\t";
-			//<< L" [ " << g->m_RefCount << L" refCount ]\r\n\t\t\t";
-
 			sx_delete_and_null(g);
 		}
 		ShaderMap.Clear();
-
-		sxLog::Log(str);
 	}
 
 	void Shader::Manager::SetShaderQuality( ShaderQuality quality )

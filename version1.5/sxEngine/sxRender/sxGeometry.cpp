@@ -1052,14 +1052,12 @@ namespace sx { namespace d3d
 	void Geometry::Manager::ClearAll( void )
 	{
 		if (GeometryMap.IsEmpty()) return;
-
-		String str = L"Releasing remains Geometry(s) :\r\n\t\t\t";
+		sx_callstack();
 
 		for (sxMapGeometry::Iterator it = GeometryMap.First(); !it.IsLast(); it++)
 		{
 			DrivedGeometry* g = (DrivedGeometry*)(*it);
-			str << (g->GetSource()!=NULL ? g->GetSource() : L" ??? no name ???") << L"\r\n\t\t\t";
-			
+	
 			//  remove any tasks exist in task list
 			sx::sys::TaskManager::RemoveTask(&g->m_LoaderTask[0]);
 			sx::sys::TaskManager::RemoveTask(&g->m_LoaderTask[1]);
@@ -1084,8 +1082,6 @@ namespace sx { namespace d3d
 			}
 		}
 		GeometryMap.Clear();
-
-		sxLog::Log(str);
 	}
 
 	Map<UINT, sx::d3d::PGeometry>::Iterator& Geometry::Manager::GetFirst( void )

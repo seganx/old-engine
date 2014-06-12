@@ -282,20 +282,14 @@ namespace sx { namespace d3d {
 	void Animation::Manager::ClearAll( void )
 	{
 		if ( AnimationMap.IsEmpty() ) return;
-
-		String str = L"Releasing remains Animation(s) :\r\n\t\t\t";
+		sx_callstack();
 
 		for (sxMapAnimation::Iterator it = AnimationMap.First(); !it.IsLast(); it++)
 		{
 			DerivedAnimation* a = (DerivedAnimation*)(*it);
-			str << (a->GetSource()!=NULL ? a->GetSource() : L" ??? no name ???") << L"\r\n\t\t\t";
-			//<< L" [ " << a->m_RefCount << L" refCount ]\r\n\t\t\t";
-
 			sx_delete_and_null(a);
 		}
 		AnimationMap.Clear();
-
-		sxLog::Log(str);
 	}
 
 	Map<UINT, sx::d3d::PAnimation>::Iterator& Animation::Manager::GetFirst( void )

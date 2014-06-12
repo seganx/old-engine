@@ -233,6 +233,59 @@ Game::Game( void )
 			path << L"english.txt";
 		m_strings->Load( path );
 	}
+#else
+
+#endif
+
+}
+
+Game::~Game( void )
+{
+	sx_delete(m_panel_Loading);
+	sx_delete(m_panel_Cursor);
+
+	for ( int i=0; i<m_guides.Count(); ++i )
+	{
+		GuideText* guide = m_guides[i];
+		sx_delete(guide);
+	}
+	m_guides.Clear();
+
+#if USE_STEAM_SDK
+	m_steam.Finalize();
+#else
+	for ( int i=0; i<Achievement_Count; i++ )
+		m_achievements[i].Finalize();
+#endif
+
+	sx_delete_and_null(m_strings);
+
+	sx::d3d::Texture::Manager::Release(texture_post);
+	sx::d3d::Texture::Manager::Release(texture_scene);
+}
+
+UINT Game::GetNewID( void )
+{
+	return s_idCounter++;
+}
+
+const WCHAR* Game::GetLevelPath( void )
+{
+	sx_callstack();
+
+	static str1024 mainPath;
+	mainPath = sx::sys::FileManager::Project_GetDir();
+	mainPath << L"level" << g_game->m_game_currentLevel << L"/";
+	return mainPath;
+}
+
+void Game::Initialize( sx::sys::Window* win )
+{
+	if ( g_game ) return;
+	g_game = sx_new( Game );
+	g_game->m_window = win;
+
+#if USE_STEAM_SDK
 
 #else
 	{
@@ -260,7 +313,7 @@ Game::Game( void )
 
 					if ( !script.GetString( i, L"tips", tips ) )
 						continue;
-					
+
 					int v = 0;
 					if ( !script.GetInteger( i, L"value", v ) )
 						continue;
@@ -293,59 +346,14 @@ Game::Game( void )
 
 					GuideText* guide = sx_new( GuideText );
 					guide->m_text.SetText( tips );
-					m_guides.PushBack( guide );
+					g_game->m_guides.PushBack( guide );
 				}
 			}
 		}
 	}
 
 	//	initialize upgrades
-	m_upgrades.LoadDefaults();
-}
-
-Game::~Game( void )
-{
-	sx_delete(m_panel_Loading);
-	sx_delete(m_panel_Cursor);
-
-	for ( int i=0; i<m_guides.Count(); ++i )
-	{
-		GuideText* guide = m_guides[i];
-		sx_delete(guide);
-	}
-	m_guides.Clear();
-
-#if USE_STEAM_SDK
-	m_steam.Finalize();
-#else
-	for ( int i=0; i<Achievement_Count; i++ )
-		m_achievements[i].Finalize();
-#endif
-
-	sx::d3d::Texture::Manager::Release(texture_post);
-	sx::d3d::Texture::Manager::Release(texture_scene);
-}
-
-UINT Game::GetNewID( void )
-{
-	return s_idCounter++;
-}
-
-const WCHAR* Game::GetLevelPath( void )
-{
-	sx_callstack();
-
-	static str1024 mainPath;
-	mainPath = sx::sys::FileManager::Project_GetDir();
-	mainPath << L"level" << g_game->m_game_currentLevel << L"/";
-	return mainPath;
-}
-
-void Game::Initialize( sx::sys::Window* win )
-{
-	if ( g_game ) return;
-	g_game = sx_new( Game );
-	g_game->m_window = win;
+	g_game->m_upgrades.LoadDefaults();
 
 	//  game play
 	g_game->m_gamePlay = sx_new( GamePlay );
@@ -360,11 +368,17 @@ void Game::Initialize( sx::sys::Window* win )
 	g_game->m_gui->Initialize();
 	g_game->m_gamePlay->Initialize();
 	g_game->m_player->Initialize();
+
+	//	guide the game to the main menu
+	g_game->m_game_nextLevel = 0;
 }
 
 void Game::Finalize( void )
 {
 	if ( !g_game ) return;
+	
+	//  clear the game
+	g_game->ClearLevel();
 
 	//  finalize objects before closing game
 	ProjectileManager::ClearTypes();

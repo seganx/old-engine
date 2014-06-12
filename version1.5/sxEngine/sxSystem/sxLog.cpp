@@ -200,15 +200,8 @@ void sxLog::Log_( const WCHAR* format, ... )
 		SendMessage(_logger._window, WM_SX_LOGGER, (WPARAM)_logger.m_buffer, 0);
 
 	if (SEGAN_SET_HAS(_logger._mode, LM_FILE))
-	{
-		// fill end of line
-		_logger.m_buffer[len++] = '\r';
-		_logger.m_buffer[len++] = '\n';
-		_logger.m_buffer[len] = 0;
-
 		_logger._filestream->Write(_logger.m_buffer, len*sizeof(WCHAR));
-	}
-
+	
 	_logger._cs.Leave();
 }
 

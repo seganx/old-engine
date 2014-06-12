@@ -455,19 +455,12 @@ namespace sx { namespace snd {
 	void SoundData::Manager::ClearAll( void )
 	{
 		if ( s_mapSoundData.IsEmpty() ) return;
-
-		String str = L"Releasing remains Sound(s) :\r\n\t\t\t";
-
 		for (sxMapSoundData::Iterator it = s_mapSoundData.First(); !it.IsLast(); it++)
 		{
 			DerivedSoundData* s = (DerivedSoundData*)(*it);
-			str << (s->GetSource()!=NULL ? s->GetSource() : L" ??? no name ???") << L"\r\n\t\t\t";
-
 			sx_delete_and_null(s);
 		}
 		s_mapSoundData.Clear();
-
-		sxLog::Log(str);	
 	}
 
 

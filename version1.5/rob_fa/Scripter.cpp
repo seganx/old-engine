@@ -1,4 +1,6 @@
 #include "Scripter.h"
+#include "Game.h"
+#include "GameStrings.h"
 
 
 UINT _GetKey(int sectionID, const WCHAR* str)
@@ -146,6 +148,39 @@ bool Scripter::GetString( const int sectionID, const WCHAR* name, str512& value 
 	if ( !name ) return false;
 	UINT id = _GetKey(sectionID, name);
 
-	return m_mapString.Find(id, value);
+	if ( m_mapString.Find(id, value) )
+	{
+#if 0
+		if ( value.Length() < 4 )
+		{
+			bool isreference = true;
+			for ( int i=0; i<value.Length(); ++i )
+			{
+				if ( iswdigit( value[i] ) == 0 )
+				{
+					isreference = false;
+					break;
+				}
+			}
+			if ( isreference )
+			{
+				int sid = value.ToInt();
+				value = g_game->m_strings->Get( sid );
+			}
+		}
+#endif
+		return true;
+	}
+	else  //	search through integers
+	{
+		float v = 0;
+		if ( m_mapValue.Find(id, v) )
+		{
+			int sid = int( v + 0.2f );
+			value = g_game->m_strings->Get( sid );
+			return true;
+		}
+		else return false;
+	}
 }
 

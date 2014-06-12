@@ -259,19 +259,14 @@ namespace sx { namespace gui {
 	void Font::Manager::ClearAll( void )
 	{
 		if (FontMap.IsEmpty()) return;
-
-		String str = L"Releasing remains Fonts(s) :\r\n\t\t\t";
+		sx_callstack();
 
 		for (sxMapFont::Iterator it = FontMap.First(); !it.IsLast(); it++)
 		{
 			PFont f = *it;
-			str << (f->GetSource()!=NULL ? f->GetSource() : L" ??? no name ???") << L"\r\n\t\t\t";
-
 			sx_delete_and_null(f);
 		}
 		FontMap.Clear();
-
-		sxLog::Log(str);
 	}
 
 }}	//	namespace sx { namespace gui {
