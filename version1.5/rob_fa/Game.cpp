@@ -222,7 +222,6 @@ Game::Game( void )
 	//  load achievements information
 #if USE_STEAM_SDK
 	m_steam.Initialize();
-
 	{
 		str1024 path = sx::sys::FileManager::Project_GetDir();
 		path << "localization/";

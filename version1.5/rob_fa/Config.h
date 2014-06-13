@@ -36,8 +36,8 @@
 
 
 #if USE_STEAM_SDK
-//#define STEAM_APP_ID	k_uAppIdInvalid
-#define STEAM_APP_ID	303470
+#define STEAM_APP_ID	k_uAppIdInvalid
+//#define STEAM_APP_ID	303470
 #endif
 
 

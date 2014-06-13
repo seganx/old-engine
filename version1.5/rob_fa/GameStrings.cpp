@@ -15,6 +15,7 @@ void GameStrings::Load( const wchar* stringsfile )
 	if ( !stringsfile || !sx::sys::FileExist(stringsfile) )
 		return;
 
+	m_strlist.Clear();
 	{
 		sx::sys::FileStream MyFile;
 		if ( !MyFile.Open( stringsfile, FM_OPEN_READ | FM_SHARE_READ) ) return;

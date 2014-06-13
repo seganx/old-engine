@@ -365,6 +365,7 @@ public:
 	struct Tutorial
 	{
 		String				title;
+		String				insides;
 		String				desc;
 		sx::gui::PPanel		image;
 	};

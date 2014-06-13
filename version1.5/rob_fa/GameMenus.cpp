@@ -2516,38 +2516,11 @@ void MenuPause::Initialize( void )
 		SEGAN_GUI_SET_ONENTER( butn, Menu::OnEnter );
 		butn->SetSize( float2( 256, 64 ) );
 		butn->SetUserTag( i );
-
-		switch ( i )
-		{
-		case 0:
-			butn->Position().Set( 95.0f, 141.0f, 0 );
-			butn->GetElement(1)->SetTextureSrc( L"gui_pause_resume.txr" );
-			butn->GetElement(2)->SetTextureSrc( L"gui_pause_resume.txr" );
-			break;
-		case 1:
-			butn->Position().Set( 110.0f, 80.0f, 0 );
-			butn->GetElement(1)->SetTextureSrc( L"gui_pause_reset.txr" );
-			butn->GetElement(2)->SetTextureSrc( L"gui_pause_reset.txr" );
-			break;
-		case 2:
-			butn->Position().Set( 124.0f, 16.0f, 0 );
-			butn->GetElement(1)->SetTextureSrc( L"gui_pause_settings.txr" );
-			butn->GetElement(2)->SetTextureSrc( L"gui_pause_settings.txr" );
-			break;
-		case 3:
-			butn->Position().Set( 146.0f, -46.0f, 0 );
-			butn->GetElement(1)->SetTextureSrc( L"gui_pause_menu.txr" );
-			butn->GetElement(2)->SetTextureSrc( L"gui_pause_menu.txr" );
-			break;
-		case 4:
-			butn->Position().Set( 165.0f, -112.0f, 0 );
-			butn->GetElement(1)->SetTextureSrc( L"gui_pause_quit.txr" );
-			butn->GetElement(2)->SetTextureSrc( L"gui_pause_quit.txr" );
-			break;
-		}
-
-		butn->GetElement(0)->Color().a = 0;
-		butn->GetElement(2)->Color().a = 0.5f;
+		butn->GetElement(0)->Color().a = 0.0f;
+		butn->GetElement(1)->SetTextureSrc( L"gui_pause_button.txr" );
+		butn->GetElement(2)->SetTextureSrc( L"gui_pause_button.txr" );
+		butn->Position().Set( 90.0f + i * 15.0f, 130.0f - i * 60.0f, 0 );
+		create_label( butn, FONT_45_OUTLINE_SHADOWED, GTA_RIGHT, g_game->m_strings->Get(131 + i), 250.0f, 50.0f, 0.0f, 0.0f, 0 );
 	}
 
 	m_confirmMenu.Initialize();
@@ -2792,51 +2765,19 @@ void MenuVictory::Initialize( void )
 		sx::gui::Button* btn = sx_new( sx::gui::Button );
 		btn->SetParent( m_back );
 		btn->SetSize( float2( 256, 64 ) );
-		btn->GetElement(0)->Color() = D3DColor( 1.0f, 1.0f, 0.0f, 0.0f );
-		btn->GetElement(1)->Color() = D3DColor( 1.0f, 1.0f, 1.0f, 1.0f );
-		btn->GetElement(2)->Color() = D3DColor( 1.0f, 1.0f, 1.0f, 0.0f );
 		btn->SetUserTag( i );
-		switch ( i )
-		{
-		case 0:
-			btn->GetElement(0)->SetTextureSrc( L"gui_victory_next.txr" );
-			btn->GetElement(1)->SetTextureSrc( L"gui_victory_next.txr" );
-			btn->GetElement(2)->SetTextureSrc( L"gui_victory_next.txr" );
-			btn->Position().Set( -15.0f, 41.0f, 0.0f );
-			m_nextLevel = btn;
-			break;
-
-		case 1:
-			btn->GetElement(0)->SetTextureSrc( L"gui_victory_restart.txr" );
-			btn->GetElement(1)->SetTextureSrc( L"gui_victory_restart.txr" );
-			btn->GetElement(2)->SetTextureSrc( L"gui_victory_restart.txr" );
-			btn->Position().Set( -5.0f, -13.0f, 0.0f );
-			break;
-
-		case 2:
-			btn->GetElement(0)->SetTextureSrc( L"gui_victory_upgrades.txr" );
-			btn->GetElement(1)->SetTextureSrc( L"gui_victory_upgrades.txr" );
-			btn->GetElement(2)->SetTextureSrc( L"gui_victory_upgrades.txr" );
-			btn->Position().Set( 9.0f, -69.0f, 0.0f );
-			m_upgrade = btn;
-			break;
-
-		case 3:
-			btn->GetElement(0)->SetTextureSrc( L"gui_victory_menu.txr" );
-			btn->GetElement(1)->SetTextureSrc( L"gui_victory_menu.txr" );
-			btn->GetElement(2)->SetTextureSrc( L"gui_victory_menu.txr" );
-			btn->Position().Set( 23.0f, -132.0f, 0.0f );
-			break;
-
-		case 4:
-			btn->GetElement(0)->SetTextureSrc( L"gui_victory_quit.txr" );
-			btn->GetElement(1)->SetTextureSrc( L"gui_victory_quit.txr" );
-			btn->GetElement(2)->SetTextureSrc( L"gui_victory_quit.txr" );
-			btn->Position().Set( 45.0f, -190.0f, 0.0f );
-			break;
-		}		
+		btn->GetElement(0)->Color().a = 0.0f;
+		btn->GetElement(1)->SetTextureSrc( L"gui_victory_button.txr" );
+		btn->GetElement(2)->SetTextureSrc( L"gui_victory_button.txr" );
+		btn->Position().Set( -15.0f + i * 20.0f, 40.0f - i * 60.0f, 0 );
+		create_label( btn, FONT_45_OUTLINE_SHADOWED, GTA_LEFT, g_game->m_strings->Get(141 + i), 250.0f, 50.0f, 30.0f, -5.0f, 0 );
 		SEGAN_GUI_SET_ONCLICK( btn, MenuVictory::OnClick );
 		SEGAN_GUI_SET_ONENTER( btn, Menu::OnEnter );
+		switch ( i )
+		{
+		case 0:	m_nextLevel = btn;	break;
+		case 2: m_upgrade = btn;	break;
+		}
 	}
 
 
@@ -3256,38 +3197,18 @@ void MenuGameOver::Initialize( void )
 	m_back->GetElement(0)->SetTextureSrc( L"gui_gameoverBack.txr" );
 	m_back->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 
+	create_label( m_back, FONT_45_OUTLINE_SHADOWED, GTA_LEFT, g_game->m_strings->Get(151), 250.0f, 50.0f, 15.0f, 35.0f, 0 )->GetElement(1)->Color() = 0xaaaaaaaa;
 	for ( int i=0; i<3; i++ )
 	{
 		sx::gui::Button* btn = sx_new( sx::gui::Button );
 		btn->SetParent( m_back );
 		btn->SetSize( float2( 256, 64 ) );
-		btn->GetElement(0)->Color() = D3DColor( 1.0f, 1.0f, 0.0f, 0.0f );
-		btn->GetElement(1)->Color() = D3DColor( 1.0f, 1.0f, 1.0f, 1.0f );
-		btn->GetElement(2)->Color() = D3DColor( 1.0f, 1.0f, 1.0f, 0.5f );
 		btn->SetUserTag( i );
-		switch ( i )
-		{
-		case 0:
-			btn->GetElement(0)->SetTextureSrc( L"gui_gameover_restart.txr" );
-			btn->GetElement(1)->SetTextureSrc( L"gui_gameover_restart.txr" );
-			btn->GetElement(2)->SetTextureSrc( L"gui_gameover_restart.txr" );
-			btn->Position().Set( -16.0f, -31.0f, 0.0f );
-			break;
-
-		case 1:
-			btn->GetElement(0)->SetTextureSrc( L"gui_gameover_menu.txr" );
-			btn->GetElement(1)->SetTextureSrc( L"gui_gameover_menu.txr" );
-			btn->GetElement(2)->SetTextureSrc( L"gui_gameover_menu.txr" );
-			btn->Position().Set( 5.0f, -99.0f, 0.0f );
-			break;
-
-		case 2:
-			btn->GetElement(0)->SetTextureSrc( L"gui_gameover_quit.txr" );
-			btn->GetElement(1)->SetTextureSrc( L"gui_gameover_quit.txr" );
-			btn->GetElement(2)->SetTextureSrc( L"gui_gameover_quit.txr" );
-			btn->Position().Set( 28.0f, -167.0f, 0.0f );
-			break;
-		}	
+		btn->GetElement(0)->Color().a = 0.0f;
+		btn->GetElement(1)->SetTextureSrc( L"gui_victory_button.txr" );
+		btn->GetElement(2)->SetTextureSrc( L"gui_victory_button.txr" );
+		btn->Position().Set( 5.0f + i * 20.0f, -20.0f - i * 60.0f, 0 );
+		create_label( btn, FONT_45_OUTLINE_SHADOWED, GTA_LEFT, g_game->m_strings->Get(152 + i), 250.0f, 50.0f, 30.0f, -5.0f, 0 );
 		SEGAN_GUI_SET_ONCLICK( btn, MenuGameOver::OnClick );
 		SEGAN_GUI_SET_ONENTER( btn, Menu::OnEnter );
 	}
@@ -3413,7 +3334,7 @@ void MenuInfo::Initialize( void )
 
 	m_indicator = sx_new( sx::gui::Label );
 	m_indicator->SetParent( m_back );
-	m_indicator->GetElement(0)->Color() = 0x00010000;
+	m_indicator->GetElement(0)->Color() = 0x00ff0000;
 	m_indicator->SetSize( float2( 512, 64 ) );
 	m_indicator->SetFont( FONT_INFO_INDICATOR );
 	m_indicator->SetAlign( GTA_CENTER );
@@ -3421,19 +3342,20 @@ void MenuInfo::Initialize( void )
 
 	m_title = sx_new( sx::gui::Label );
 	m_title->SetParent( m_back );
-	m_title->GetElement(0)->Color() = 0x00010000;
-	m_title->SetSize( float2( 512, 64 ) );
-	m_title->SetFont( FONT_INFO_TITLE );
+	m_title->GetElement(0)->Color() = 0x0044ff44;
+	m_title->SetSize( float2( 1000, 64 ) );
+	m_title->SetFont( FONT_35_OUTLINE_SHADOWED );
 	m_title->SetAlign( GTA_CENTER );
 	m_title->Position().y = 230.0f;
+	create_label( m_title, FONT_45_OUTLINE_SHADOWED, GTA_CENTER, null, 1000, 380, 0, -200.0f, 0 );
 
 	m_desc = sx_new( sx::gui::Label );
 	m_desc->SetParent( m_back );
-	m_desc->GetElement(0)->Color() = 0x00001000;
-	m_desc->SetSize( float2( 1000, 200 ) );
+	m_desc->GetElement(0)->Color() = 0x00aaaa00;
+	m_desc->SetSize( float2( 1000, 350 ) );
 	m_desc->SetFont( FONT_INFO_DESC );
 	m_desc->SetAlign( GTA_CENTER );
-	m_desc->Position().y = -260.0f;
+	m_desc->Position().y = -120.0f;
 	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 
 	m_next = sx_new( sx::gui::Button );
@@ -3538,6 +3460,17 @@ void MenuInfo::ProcessInput( bool& inputHandled, float elpsTime )
 	{
 		Hide();
 	}
+
+#if 1
+	if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_M ) )
+	{
+		str1024 path = sx::sys::FileManager::Project_GetDir();
+		path << "localization/english.txt";
+		g_game->m_strings->Load( path );
+		g_game->m_gui->m_main->MsgProc(0, GMT_LEVEL_LOADED, null);
+	}
+#endif
+
 	m_back->ProcessInput( inputHandled );
 }
 
@@ -3720,6 +3653,7 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 		curr = m_tutorial[++m_Index];
 		curr->image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
 		m_title->SetText( curr->title );
+		sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
 		m_desc->SetText( curr->desc );
 
 		//	update label
@@ -3749,6 +3683,7 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 		curr = m_tutorial[--m_Index];
 		curr->image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
 		m_title->SetText( curr->title );
+		sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
 		m_desc->SetText( curr->desc );
 
 		//	update label
@@ -3787,6 +3722,7 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 	//	create tutorial
 	Tutorial* tutor = sx_new( Tutorial );
 	tutor->title = title;
+	tutor->insides = title;
 	tutor->desc = desc;
 	tutor->desc.Replace( L"\\n", L"\n" );
 	tutor->image = sx_new( sx::gui::Panel );
@@ -3794,6 +3730,15 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 	tutor->image->SetSize( float2(1024, 1024) );
 	tutor->image->GetElement(0)->SetTextureSrc( image );
 	tutor->image->Position().y = 64.0f;
+
+	int returnpos = tutor->insides.Find(L"\n") + 1;
+	if ( returnpos > 0 )
+	{
+		tutor->title.Delete( returnpos, 999 );
+		tutor->insides.Delete( 0, returnpos);
+	}
+	else
+		tutor->insides.Clear();
 
 	if ( tutor->image->GetElement(0)->GetTexture() )
 	{
@@ -3812,6 +3757,7 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 
 		Tutorial* curr = m_tutorial[m_Index];
 		m_title->SetText( curr->title );
+		sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
 		m_desc->SetText( curr->desc );
 	}
 

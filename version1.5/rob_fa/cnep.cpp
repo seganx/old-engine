@@ -284,13 +284,13 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	
 
 #if USE_STEAM_SDK
-	if (SteamAPI_RestartAppIfNecessary( k_uAppIdInvalid /*STEAM_APP_ID*/))
+	if ( SteamAPI_RestartAppIfNecessary(STEAM_APP_ID) )
 	{
 		MessageBox( NULL, L"Can't initialize Steam !", L"Steam API", MB_OK | MB_ICONERROR );
 		sx_engine_finit();
 		return 0;
 	}
-	if (!SteamAPI_Init())
+	if ( !SteamAPI_Init() )
 	{
 		MessageBox( NULL, L"Can't initialize Steam !", L"Steam API", MB_OK | MB_ICONERROR );
 		sx_engine_finit();
