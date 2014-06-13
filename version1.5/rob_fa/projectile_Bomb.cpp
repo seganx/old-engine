@@ -110,7 +110,8 @@ void Projectile_BOMB::Update( float elpsTime )
 							m_attack.electricalArmor * val,
 							m_attack.stunValue * val,
 							m_attack.stunTime * val,
-							m_sender
+							m_sender,
+							m_tag
 							);
 						pe->MsgProc( GMT_DAMAGE, &damage );
 					}					
