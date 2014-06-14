@@ -5,7 +5,7 @@
 #include "Entity.h"
 #include "GameGUI.h"
 #include "EntityManager.h"
-
+#include "GameStrings.h"
 
 
 
@@ -25,12 +25,15 @@ FirstPresents::~FirstPresents()
 	}
 }
 
-void FirstPresents::AddPresents( const WCHAR* texture, const float size )
+void FirstPresents::AddPresents( const WCHAR* texture, const float size, const wchar* story, const float x, const float y )
 {
 	sx::gui::Panel* panel = (sx::gui::Panel*)sx::gui::Create( GUI_PANEL );
 	panel->SetSize( float2( size, size ) );
 	panel->GetElement(0)->SetTextureSrc( texture );
 	panel->GetElement(0)->Color().a = 0.0f;
+
+	if ( story )
+		create_label( panel, FONT_25_OUTLINE, GTA_LEFT, story, size/3, size/3, x * size/2, y * size/2, 0 );
 
 	m_list.PushBack( panel );
 }
@@ -74,6 +77,9 @@ void FirstPresents::Update( float elpstime )
 			pc->GetElement(0)->Color().a -= elpstime * 0.001f;
 			if ( pc->GetElement(0)->Color().a < 0.0f )
 				pc->GetElement(0)->Color().a = 0.0f;
+
+			if ( pc->GetChildCount() )
+				pc->GetChild(0)->GetElement(1)->Color().a = pc->GetElement(0)->Color().a;
 
 			pc->Update( elpstime );
 		}
@@ -123,6 +129,9 @@ void FirstPresents::Update( float elpstime )
 			if ( pc->GetElement(0)->Color().a < 0.0f )
 				pc->GetElement(0)->Color().a = 0.0f;
 		}
+
+		if ( pc->GetChildCount() )
+			pc->GetChild(0)->GetElement(1)->Color().a = pc->GetElement(0)->Color().a;
 
 		pc->Update( elpstime );
 	}
@@ -197,10 +206,10 @@ namespace GM
 					m_soundNode->MsgProc( MT_SOUND_PLAY, &sndplay );
 
 					FirstPresents *presents = sx_new( FirstPresents );
-					presents->AddPresents( L"gui_intro_level1_0.txr", SEGAN_VP_WIDTH );
-					presents->AddPresents( L"gui_intro_level1_1.txr", SEGAN_VP_WIDTH );
-					presents->AddPresents( L"gui_intro_level1_2.txr", SEGAN_VP_WIDTH );
-					presents->m_maxtime = 10000.0f;
+					presents->AddPresents( L"gui_intro_level1_0.txr", SEGAN_VP_WIDTH, g_game->m_strings->Get(220), -0.6f, 0.05f );
+					presents->AddPresents( L"gui_intro_level1_1.txr", SEGAN_VP_WIDTH, g_game->m_strings->Get(221), -0.5f, 0.1f );
+					presents->AddPresents( L"gui_intro_level1_2.txr", SEGAN_VP_WIDTH, g_game->m_strings->Get(222),  0.5f, 0.1f );
+					presents->m_maxtime = 15000.0f;
 					presents->m_soundNode = m_soundNode;
 					presents->m_soundVolume = sndplay.volume;
 
@@ -247,9 +256,9 @@ namespace GM
 					m_soundNode->MsgProc( MT_SOUND_PLAY, &sndplay );
 
 					FirstPresents *presents = sx_new( FirstPresents );
-					presents->AddPresents( L"gui_intro_level10_0.txr", SEGAN_VP_WIDTH );
-					presents->AddPresents( L"gui_intro_level10_1.txr", SEGAN_VP_WIDTH );
-					presents->m_maxtime = 10000.0f;
+					presents->AddPresents( L"gui_intro_level10_0.txr", SEGAN_VP_WIDTH, g_game->m_strings->Get(223), -0.6f, 0.05f );
+					presents->AddPresents( L"gui_intro_level10_1.txr", SEGAN_VP_WIDTH, g_game->m_strings->Get(224),  0.5f, -0.4f );
+					presents->m_maxtime = 12000.0f;
 					presents->m_soundNode = m_soundNode;
 					presents->m_soundVolume = sndplay.volume;
 

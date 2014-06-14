@@ -886,6 +886,7 @@ public:
 		if ( _where < 0 ) _where = 0;
 		else if ( _where > m_len ) _where = m_len;
 		sint slen = (sint)wcslen(str);
+		if ( slen < 1 ) return;
 		if ( m_len + slen > count ) return;
 		for ( sint i = m_len; i >= _where; m_text[i+slen] = m_text[i], i-- );
 		for ( sint i = 0; i < slen; m_text[i+_where] = str[i], i++ );
@@ -899,6 +900,7 @@ public:
 		if ( _where < 0 ) _where = 0;
 		else if ( _where > m_len ) _where = m_len;
 		sint slen = (sint)strlen(str);
+		if ( slen < 1 ) return;
 		if ( m_len + slen > count ) return;
 		for ( sint i = m_len; i >= _where; m_text[i+slen] = m_text[i], i-- );
 		for ( sint i = 0; i < slen; m_text[i+_where] = str[i], i++ );

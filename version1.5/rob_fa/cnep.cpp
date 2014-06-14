@@ -473,8 +473,8 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	{
 		FirstPresents *presents;
 		presents = sx_new( FirstPresents );
-		presents->AddPresents( L"gui_parseh.txr", 512 );
-		presents->AddPresents( L"gui_esra.txr", 1024 );
+		presents->AddPresents( L"gui_parseh.txr", 512, null, 0, 0 );
+		presents->AddPresents( L"gui_esra.txr", 1024, null, 0, 0 );
 
 		float initTime = sx::sys::GetSysTime();
 		float elpsTime = 0;

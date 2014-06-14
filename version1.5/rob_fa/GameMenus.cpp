@@ -759,7 +759,7 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_playGame, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_playGame, MenuMap::OnClick );
 
-	sx::gui::Label* caption = create_label( m_playGame, FONT_35_OUTLINE_SHADOWED, GTA_CENTER, g_game->m_strings->Get(18), 100.0f, 40.0f, 60.0f, -5.0f, 0 );
+	sx::gui::Label* caption = create_label( m_playGame, FONT_35_OUTLINE_SHADOWED, GTA_CENTER, g_game->m_strings->Get(18), 150.0f, 40.0f, 60.0f, -5.0f, 0 );
 	caption->SetUserTag( 10 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	SEGAN_GUI_SET_ONCLICK( caption, MenuMap::OnClick );
@@ -816,7 +816,7 @@ void MenuMap::Initialize( void )
 	m_goback->GetElement(2)->Color().a = 0.5f;
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuMap::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, FONT_25_OUTLINE, GTA_LEFT, g_game->m_strings->Get(21), 70.0f, 30.0f, 22.0f, -2.0f, 0 );
+	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	//	create difficulty
 	m_diff_scroll = sx_new( sx::gui::TrackBar );
@@ -1363,8 +1363,7 @@ void MenuProfile::Initialize( void )
 	m_goback->GetElement(2)->Color().a = 0.5f;
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuProfile::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, FONT_25_OUTLINE, GTA_LEFT, g_game->m_strings->Get(21), 70.0f, 30.0f, 22.0f, -2.0f, 0 );
-
+	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	//	prepare profile
 	String::Copy( m_profiles[0].name, 32, L"Player1" );
@@ -2002,7 +2001,7 @@ void MenuSettings::Initialize( void )
 	m_goback->GetElement(2)->Color().a = 0.5f;
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuSettings::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, FONT_25_OUTLINE, GTA_LEFT, g_game->m_strings->Get(21), 70.0f, 30.0f, 22.0f, -2.0f, 0 );
+	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 }
 
 void MenuSettings::ProcessInput( bool& inputHandled, float elpsTime )
@@ -2166,8 +2165,7 @@ void MenuCredits::Initialize( void )
 	m_goback->GetElement(2)->Color().a = 0.5f;
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuCredits::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, FONT_25_OUTLINE, GTA_LEFT, g_game->m_strings->Get(21), 70.0f, 30.0f, 22.0f, -2.0f, 0 );
-
+	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 }
 
 void MenuCredits::Finalize( void )
@@ -3461,11 +3459,11 @@ void MenuInfo::ProcessInput( bool& inputHandled, float elpsTime )
 		Hide();
 	}
 
-#if 1
+#if 0
 	if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_M ) )
 	{
 		str1024 path = sx::sys::FileManager::Project_GetDir();
-		path << "localization/english.txt";
+		path << "localization/german.txt";
 		g_game->m_strings->Load( path );
 		g_game->m_gui->m_main->MsgProc(0, GMT_LEVEL_LOADED, null);
 	}
@@ -3484,13 +3482,12 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 		if ( g_game->m_player->m_profile.level_played < g_game->m_game_currentLevel )
 			g_game->m_player->m_profile.level_played = g_game->m_game_currentLevel;
 
-		m_helper.showTime = 0;
-
 	case GMT_GAME_RESETING:
 	case GMT_LEVEL_CLEAR:
 		ClearTutorial();
 		m_helper.showTime = 0;
 		m_time = 0;
+		m_delayTime = 0;
 		break;
 
 	case GMT_GAME_RESET:
@@ -3560,7 +3557,7 @@ void MenuInfo::Update( float elpsTime )
 		m_helper.back->State_SetIndex( 0 );
 	}
 
-	if ( m_delayTime > 0 && g_game->m_mouseMode == MS_Null )
+	if ( m_delayTime > 0 && g_game->m_mouseMode == MS_Null && !g_game->m_game_paused )
 	{
 		m_delayTime -= elpsTime;
 		if ( m_delayTime <= 0 )
@@ -3797,8 +3794,11 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 
 	if ( settoCurrent )
 	{
-		m_helper.title->SetText( title );
-		m_helper.desc->SetText( tutor->desc );
+		str512 helperdesc = tutor->desc;
+		helperdesc.Replace( L"\n", L"" );
+		helperdesc.Replace( L"   ", L"" );
+		m_helper.title->SetText( tutor->title );
+		m_helper.desc->SetText( helperdesc );
 		m_helper.showTime = ( showNow != 2 ) ? 7000.0f : 0.0f;
 	}
 }
@@ -3816,6 +3816,7 @@ void MenuInfo::ClearTutorial( void )
 	}
 	m_tutorial.Clear();
 	m_Index = -1;
+	m_delayTime = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -3823,6 +3824,7 @@ void MenuInfo::ClearTutorial( void )
 //////////////////////////////////////////////////////////////////////////
 void MenuUpgrade::Initialize( void )
 {
+	D3DColor titleColor = 0xffffcc77;
 	Menu::Initialize();
 	m_points = 0;
 
@@ -3839,6 +3841,14 @@ void MenuUpgrade::Initialize( void )
 	m_border->SetSize( float2( 1024, 1024 ) );
 	m_border->GetElement(0)->SetTextureSrc( L"gui_menu_upgrade.txr" );
 	m_border->Position().y = 150.0f;
+
+	for ( int i=0; i<5; ++i )
+		create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(192 + i * 2), 150, 25, -315 + i * 180.0f, 90, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(187), 150, 25, -320, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(212), 150, 25, -125, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(206), 150, 25,   55, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(214), 150, 25,  240, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(208), 150, 25,  420, -180, 0 )->GetElement(1)->Color() = titleColor;
 
 	for ( int i=0; i<44; i++ )
 	{
@@ -3926,6 +3936,7 @@ void MenuUpgrade::Initialize( void )
 	m_goback->GetElement(2)->Color().a = 0.5f;
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuUpgrade::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
+	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	m_desc = sx_new( sx::gui::Label );
 	m_desc->SetParent( m_back );

@@ -170,7 +170,7 @@ namespace GM
 		//  update hint of buttons
 		str1024 strHint;
 		if ( m_Hint.Text() )
-			strHint.Format(m_Hint.Text(), m_Cost, g_game->m_player->m_gold);
+			strHint.Format(m_Hint.Text(), (m_index+1), m_Cost, g_game->m_player->m_gold);
 		m_panelEx->SetHint( strHint );
 		m_progBar->SetHint( strHint );
 
