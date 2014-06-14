@@ -892,7 +892,6 @@ Steam::Steam()
 , m_agile(0)
 , m_perfect(0)
 , m_sniper(0)
-, m_redeemer(0)
 , m_levels(0)
 , m_minilevels(0)
 , m_tower_dealer_temp(0)
@@ -1227,13 +1226,9 @@ void Steam::CallAchievement( const int type, const SteamCallState state )
 
 	case EAT_Redeemer:// release people to reach 300 people
 		{
-			m_redeemer += 1;
-			m_pSteamUserStats->SetStat("redeemer", m_redeemer);
-			m_pSteamUserStats->StoreStats();
-
 			if (!m_achievements[EAT_Redeemer])
 			{
-				if (m_redeemer >= 300)
+				if (g_game->m_player->m_people >= 300)
 				{
 					m_achievements[EAT_Redeemer] = true;
 					m_pSteamUserStats->SetAchievement(s_SteamAchievementsName[EAT_Redeemer]);
@@ -1583,7 +1578,6 @@ void Steam::OnUserStatsReceived(UserStatsReceived_t *pCallback)
 			m_pSteamUserStats->GetStat("agile", &m_agile);
 			m_pSteamUserStats->GetStat("perfect", &m_perfect);
 			m_pSteamUserStats->GetStat("sniper", &m_sniper);
-			m_pSteamUserStats->GetStat("redeemer", &m_redeemer);
 			m_pSteamUserStats->GetStat("levels", &m_levels);
 			m_pSteamUserStats->GetStat("minilevels", &m_minilevels);
 		}

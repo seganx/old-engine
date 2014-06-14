@@ -396,7 +396,6 @@ private:
 	int		m_agile;
 	int		m_perfect;
 	int		m_sniper;
-	int		m_redeemer;
 	int		m_levels;
 	int		m_minilevels;
 	int		m_tower_dealer_temp;
