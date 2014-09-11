@@ -177,7 +177,7 @@ namespace GU
 		float3 shaking( 0, 0, 0 );
 		if ( m_shaking > 0.01f )
 		{
-			const float zoom = sx_sqrt( m_Rad ) * 0.1f;
+			const float zoom = sx_sqrt( m_Rad ) * 0.07f;
 			shaking.x = ( sx::cmn::Random( 1.0f ) - sx::cmn::Random( 1.0f ) ) * zoom;
 			shaking.y = ( sx::cmn::Random( 1.0f ) - sx::cmn::Random( 1.0f ) ) * zoom;
 			shaking.z = ( sx::cmn::Random( 1.0f ) - sx::cmn::Random( 1.0f ) ) * zoom;

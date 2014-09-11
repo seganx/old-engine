@@ -402,7 +402,7 @@ namespace GM
 			g_game->m_mouseMode = MS_CreateTrap;
 			m_node->SetRotation( 0, sx::cmn::Random(6.12f), 0 );
 
-			msg_SoundPlay msg( false, 0, 0, L"powerAttack", m_index + 1 );
+			msg_SoundPlay msg( false, 0, 0, L"powerAttack", 1 );
 			g_game->m_gui->m_main->m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 		}
 		else

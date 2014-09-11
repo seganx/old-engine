@@ -37,6 +37,61 @@ public:
 	sx::gui::PPanelEx	m_back;
 };
 
+class MenuConfirmProfile: public Menu
+{
+public:
+	virtual void Initialize(void);
+	virtual void Finalize(void);
+	virtual void ProcessInput(bool& inputHandled, float elpsTime);
+
+	virtual void Show(void);
+	virtual void Hide(void);
+
+	void OnClick(sx::gui::PControl sender);
+
+public:
+	sx::gui::PanelEx*	m_form;
+	sx::gui::Button*	m_yes;
+	sx::gui::Button*	m_no;
+};
+
+class MenuConfirmMenu: public Menu
+{
+public:
+	virtual void Initialize(void);
+	virtual void Finalize(void);
+	virtual void ProcessInput(bool& inputHandled, float elpsTime);
+
+	virtual void Show(void);
+	virtual void Hide(void);
+
+	void OnClick(sx::gui::PControl sender);
+
+public:
+	sx::gui::PanelEx*	m_form;
+	sx::gui::Button*	m_yes;
+	sx::gui::Button*	m_no;
+};
+
+class MenuConfirmExit: public Menu
+{
+public:
+	virtual void Initialize(void);
+	virtual void Finalize(void);
+	virtual void ProcessInput(bool& inputHandled, float elpsTime);
+
+	virtual void Show( bool cancelPause = true );
+	virtual void Hide(void);
+
+	void OnClick(sx::gui::PControl sender);
+
+public:
+	bool				m_cancelPause;
+	sx::gui::PanelEx*	m_form;
+	sx::gui::Button*	m_yes;
+	sx::gui::Button*	m_no;
+};
+
 class MenuMain: public Menu
 {
 public:
@@ -140,6 +195,7 @@ public:
 	void ProcessInput(bool& inputHandled, float elpsTime);
 	void MsgProc(UINT recieverID, UINT msg, void* data);
 	void Update(float elpsTime);
+	void Draw(DWORD flag);
 	void Show(void);
 	void Hide(void);
 
@@ -147,12 +203,15 @@ public:
 	void OnEnter( sx::gui::PControl sender );
 	void OnExit( sx::gui::PControl sender );
 	void OnKey(sx::gui::PControl sender);
+	void OnDeleteProfile(void);
 
 	void SyncAchievements( void );
 	void SyncProfileAndPlayer( bool profileToPlayer );
 	void SaveProfile(void);
 
 public:
+	MenuConfirmProfile	m_confirm;
+
 	sx::gui::TextEdit*	m_profileName;
 	sx::gui::Button*	m_rename;
 	sx::gui::Button*	m_delete;
@@ -217,43 +276,6 @@ public:
 	void OnClick(sx::gui::PControl sender);
 };
 
-class MenuConfirmMenu: public Menu
-{
-public:
-	virtual void Initialize(void);
-	virtual void Finalize(void);
-	virtual void ProcessInput(bool& inputHandled, float elpsTime);
-
-	virtual void Show(void);
-	virtual void Hide(void);
-
-	void OnClick(sx::gui::PControl sender);
-
-public:
-	sx::gui::PanelEx*	m_form;
-	sx::gui::Button*	m_yes;
-	sx::gui::Button*	m_no;
-};
-
-class MenuConfirmExit: public Menu
-{
-public:
-	virtual void Initialize(void);
-	virtual void Finalize(void);
-	virtual void ProcessInput(bool& inputHandled, float elpsTime);
-
-	virtual void Show( bool cancelPause = true );
-	virtual void Hide(void);
-
-	void OnClick(sx::gui::PControl sender);
-
-public:
-	bool				m_cancelPause;
-	sx::gui::PanelEx*	m_form;
-	sx::gui::Button*	m_yes;
-	sx::gui::Button*	m_no;
-};
-
 class MenuStatus: public Menu
 {
 public:
@@ -304,6 +326,7 @@ public:
 	sx::gui::PanelEx*	m_stars[3];
 	sx::gui::Panel*		m_stars_back[2];
 	sx::gui::Button*	m_upgrade;
+	bool				m_upgrade_exist;
 
 	int					m_goldCounter;
 	int					m_golds;

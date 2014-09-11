@@ -532,6 +532,12 @@ namespace GM
 				msg_SoundPlay msgSnd( false, 0, 0, L"repair" );
 				selectedTower->m_node->MsgProc( MT_SOUND_PLAY, &msgSnd );
 			}
+
+			float repairParam = (float)neededBlood / (float)selectedTower->m_health.imax;
+			if ( repairParam < 0.3f )
+			{
+				OnButtonClick( m_pnlButton[0] );
+			}
 		}
 		
 		else if ( Sender == m_pnlButton[0] )////////////////////////////////////	upgrade tower

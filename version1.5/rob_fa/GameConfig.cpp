@@ -37,7 +37,7 @@ Config::GameConfig::GameConfig( void )
 , soundVolume( 1 )
 , mouseSpeed( 1 )
 {
-	
+	//language[0]=0;
 }
 
 void Config::LoadConfig( void )

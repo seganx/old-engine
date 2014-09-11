@@ -480,6 +480,17 @@ namespace GM
 				}
 				m_pnlCreate1->SetParent( m_pnlCreate0 );
 				m_pnlArrow->SetParent( m_pnlCreate0 );
+
+				//	find zone
+				{
+					sx::core::ArrayPNode nodes;
+					sx::core::Scene::GetNodesByName(L"zone", nodes);
+					if ( nodes.Count() )
+					{
+						m_zone = (sx::core::Mesh*)nodes[0]->GetMemberByIndex(0);
+						m_zone->AddOption(SX_MESH_INVISIBLE);
+					}
+				}
 			}
 			break;	//	GMT_LEVEL_LOAD
 
@@ -552,6 +563,8 @@ namespace GM
 
 				Entity::SetSelected( m_Tower );
 				m_ShowRange.SetOwner( m_Tower );
+
+				m_zone->RemOption(SX_MESH_INVISIBLE);
 			}
 		}
 		else	//  player can not buy this tower. say him by the way
@@ -572,6 +585,7 @@ namespace GM
 		m_ShowRange.SetOwner( NULL );
 		towerNode = NULL;
 		m_Tower = NULL;
+		m_zone->AddOption(SX_MESH_INVISIBLE);
 	}
 
 	void Mechanic_TowerCreate::CreateTower( float3 pos )

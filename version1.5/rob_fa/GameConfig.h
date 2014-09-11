@@ -27,6 +27,7 @@ public:
 		float		musicVolume;
 		float		soundVolume;
 		float		mouseSpeed;
+		//wchar		language[128];
 
 
 		GameConfig(void);

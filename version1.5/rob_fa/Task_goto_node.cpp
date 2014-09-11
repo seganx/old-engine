@@ -161,9 +161,18 @@ void Task_goto_node::Update( float elpstime, DWORD& status )
 
 	//	compute traveling value
 	{
-		const float maxdistance = (float)m_Path.Count(); //m_startNode->GetPosition_world().Distance_sqr( m_endNode->GetPosition_world() );
-		const float curdistance = (float)m_targetNode; //curPos.Distance_sqr( m_endNode->GetPosition_world() );
-		m_owner->m_traveling = sx_clamp_f( 1.0f - (curdistance / maxdistance), 0.0f, 1.0f );
+		const int path_count = m_Path.Count() - 3;
+		const float maxdistance = (float)path_count - 3; //m_startNode->GetPosition_world().Distance_sqr( m_endNode->GetPosition_world() );
+		const float curdistance = (float)m_targetNode - 3; //curPos.Distance_sqr( m_endNode->GetPosition_world() );
+		if ( m_targetNode > 3 && m_targetNode < path_count )
+		{
+			m_owner->m_travelingGUI->AddProperty( SX_GUI_PROPERTY_VISIBLE );
+			m_owner->m_traveling = sx_clamp_f( 1.0f - (curdistance / maxdistance), 0.0f, 1.0f );
+		}
+		else
+		{
+			m_owner->m_travelingGUI->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+		}
 	}
 }
 

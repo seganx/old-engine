@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "GameGUI.h"
 #include "GameConfig.h"
+#include "GameStrings.h"
 #include "Scripter.h"
 #include "EntityManager.h"
 #include "ProjectileManager.h"
@@ -118,7 +119,18 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 #endif
 
 
-#if 0  	//  TEST
+#if USE_DEVKIT
+#if USE_STEAM_SDK
+	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYUP( 0, SX_INPUT_KEY_M ) )
+	{		
+		str1024 path = sx::sys::FileManager::Project_GetDir();
+		path << "localization/";
+		const char* language = SteamApps()->GetCurrentGameLanguage();
+		path << language << L".txt";
+		g_game->m_strings->Load( path );
+		g_game->m_gui->m_main->MsgProc(0, GMT_LEVEL_LOADED, null);
+	}
+#endif
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_R) )
 	{
 		inputHandled = true;

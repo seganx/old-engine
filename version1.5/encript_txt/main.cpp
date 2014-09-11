@@ -97,5 +97,6 @@ int main( int argc, char* argv[] )
 			decrypt_file( argv[2] );
 	}
 
+	sx_detect_crash();
 	return 0;
 }

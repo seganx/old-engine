@@ -113,7 +113,19 @@ void sx_web_request( uint* receivedsize, wchar* result, const uint resultsize, c
 		return;
 	}
 
-	if ( HttpSendRequest( hRequest, L"Content-Type: application/x-www-form-urlencoded", 48, (char*)data, sizeinbytes ) == FALSE )
+	wchar httpHeader[128] = {0};
+	int lenhttpHeader = swprintf_s( httpHeader, 128, 
+		//L"Host : %s\n"
+		L"Accept: text/html, application/xhtml+xml, */*\n"
+		//L"Accept-Language: en-US\n"
+		//L"User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko\n"
+		//L"Accept-Encoding: gzip, deflate\n"
+		//L"DNT: 1\n"
+		//L"Connection: Keep-Alive\n"
+		L"Content-Type: application/x-www-form-urlencoded\n"
+		//, host
+		);
+	if ( HttpSendRequest( hRequest, httpHeader, lenhttpHeader, (char*)data, sizeinbytes ) == FALSE )
 	{
 		DWORD errcode = GetLastError();
 		swprintf_s( result, 64, L"Internet sending request failed! code : %d ", errcode );
@@ -526,12 +538,14 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 	sx_detect_crash();
 
+
 #if USE_SITE_STATS
 	{
+		uint tag = SITE_STATS_TAG;
 		uint ressize = 0;
-		char res[256] = {0};
+		char res[128] = {0};
 		char post[256] = {0};
-		uint postlen = sprintf_s(post, 256, "cpuid=%lu", sx_sys_id());
+		uint postlen = sprintf_s(post, 256, "cpuid=%lu&tag=%u", sx_sys_id(), tag);
 		sx_web_request( &ressize, (wchar*)res, 128, L"info.rushforglorygame.com", L"foo.php", post, postlen );
 	}
 #endif

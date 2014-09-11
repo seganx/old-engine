@@ -246,7 +246,7 @@ namespace GM
 				}
 			}
 
-			msg_SoundPlay msg( false, 0, 0, L"powerAttack", m_index + 1 );
+			msg_SoundPlay msg( false, 0, 0, L"powerAttack", 5 );
 			g_game->m_gui->m_main->m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 		}
 		else

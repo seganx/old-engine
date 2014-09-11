@@ -113,7 +113,7 @@ GoldAndPeople::~GoldAndPeople( void )
 
 void GoldAndPeople::ProcessInput( bool& inputHandled, float elpsTime )
 {
-	if ( !g_game->m_game_currentLevel || g_game->m_game_paused || g_game->m_app_Loading ) return;
+	if ( !g_game->m_game_currentLevel || g_game->m_game_paused || g_game->m_app_Loading || g_game->m_mouseMode != MS_Null ) return;
 	sx_callstack();
 
 	if ( !inputHandled && SEGAN_KEYUP( 0, SX_INPUT_KEY_I ) )

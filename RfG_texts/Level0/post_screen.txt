@@ -1,3 +1,0 @@
-float3 c = tex2D( samp0, tex0 ).rgb;
-return float4( c, 1.0f );
-

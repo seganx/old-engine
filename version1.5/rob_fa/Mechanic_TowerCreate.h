@@ -71,6 +71,7 @@ namespace GM
 		int					m_towerIndex;		//  index of tower type
 		Entity*				m_Tower;			//  tower entity to place
 		com_ShowRange		m_ShowRange;		//  use to show the range of tower
+		sx::core::Mesh*		m_zone;				//	zone mesh
 	};
 
 

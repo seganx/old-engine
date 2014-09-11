@@ -226,14 +226,23 @@ Game::Game( void )
 		str1024 path = sx::sys::FileManager::Project_GetDir();
 		path << "localization/";
 		const char* language = SteamApps()->GetCurrentGameLanguage();
+		path << language << L".txt";
+
+		/*str1024 path = sx::sys::FileManager::Project_GetDir();
+		path << "localization/";
+		const char* language = SteamApps()->GetCurrentGameLanguage();
 		if ( strcmp(language, "german") == 0 )
 			path << L"german.txt";
 		else
-			path << L"english.txt";
+			path << L"english.txt";*/
 		m_strings->Load( path );
 	}
 #else
-
+	{
+		str1024 path = sx::sys::FileManager::Project_GetDir();
+		path << "localization/strings.txt";
+		m_strings->Load( path );
+	}
 #endif
 
 }
@@ -301,7 +310,7 @@ void Game::Initialize( sx::sys::Window* win )
 			{
 				if ( tmp == L"Achievement" )
 				{
-					if ( !script.GetString( i, L"Name", name ) )
+					if ( !script.GetString( i, L"title", name ) )
 						continue;
 
 					if ( !script.GetString( i, L"desc", desc ) )
@@ -318,7 +327,7 @@ void Game::Initialize( sx::sys::Window* win )
 						continue;
 
 					if ( i < Achievement_Count )
-						m_achievements[i].Initialize( name, desc, tips, image, v );
+						g_game->m_achievements[i].Initialize( name, desc, tips, image, v );
 				}
 			}
 		}
@@ -1445,7 +1454,7 @@ void Steam::CallStat( const StatType type, const SteamCallState state, const flo
 					float addpeople =	curgold / 500.0f;
 					float deadpeople =	value;
 
-					float factor;
+					float factor = 500.0f;
 					switch ( g_game->m_difficultyLevel )
 					{
 					case 0: factor = 500.0f; break;
@@ -1454,17 +1463,18 @@ void Steam::CallStat( const StatType type, const SteamCallState state, const flo
 					}
 
 					//	compute the efficiency on this level
-					float towervalue = ( 1.0f - ( destroyed / towers ) ) * factor;
-					float enemyvalue = ( killed / enemies ) * factor;
-					float goldvalue = ( curgold / addgold ) * factor;
+					float towervalue = sx_clamp_f( ( 1.0f - ( destroyed / towers ) ) * factor, 0.0f, factor ) ;
+					float enemyvalue = sx_clamp_f( ( killed / enemies ) * factor, 0.0f, factor );
+					float goldvalue = sx_clamp_f( ( curgold / addgold ) * factor, 0.0f, factor );
 
 					float peoplevalu = 0.0f;
 					if ( addpeople > deadpeople )
 						peoplevalu = ( 1.0f - ( deadpeople / addpeople ) ) *  factor;
 					else if ( addpeople < deadpeople )
 						peoplevalu = - ( 1.0f - ( addpeople / deadpeople ) ) * factor;
+					peoplevalu = sx_clamp_f( peoplevalu, -factor, factor );
 
-					const float efficiency = ( towervalue + enemyvalue + goldvalue + peoplevalu ) / 4.0f;
+					const float efficiency = sx_clamp_f( ( towervalue + enemyvalue + goldvalue + peoplevalu ) / 4.0f, 0.0f, factor );
 
 					//	store efficiency for this level
 					const int efficiencyID = g_game->m_game_currentLevel - 1;
@@ -1483,7 +1493,7 @@ void Steam::CallStat( const StatType type, const SteamCallState state, const flo
 					{
 						avr_efficiency += m_stat_efficiency[i];
 					}
-					avr_efficiency /= 10;
+					avr_efficiency = sx_clamp_f( avr_efficiency / 10.0f, 0.0f, 1000.0f );
 
 					m_pSteamUserStats->SetStat("Efficiency", avr_efficiency);
 					m_pSteamUserStats->StoreStats();
@@ -1719,6 +1729,13 @@ void Achievement::AddValue( int val /*= 1 */ )
 #if USE_GAMEUP
 	gameup_add_score( GAME_SCORE_ACHIV );
 #endif
+	{
+		int achievements[Achievement_Count] = {0};
+		memcpy( g_game->m_gui->m_profile->m_profiles[0].achievements, g_game->m_player->m_profile.achievements, sizeof(achievements) );
+		memcpy( g_game->m_gui->m_profile->m_profiles[1].achievements, g_game->m_player->m_profile.achievements, sizeof(achievements) );
+		memcpy( g_game->m_gui->m_profile->m_profiles[2].achievements, g_game->m_player->m_profile.achievements, sizeof(achievements) );
+		memcpy( g_game->m_gui->m_profile->m_profiles[3].achievements, g_game->m_player->m_profile.achievements, sizeof(achievements) );
+	}
 }
 
 

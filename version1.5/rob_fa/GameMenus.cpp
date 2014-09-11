@@ -268,14 +268,6 @@ void MenuMain::Initialize( void )
 			m_btn[i]->State_GetByIndex(2).Color.Set( 1.0f, 0.78f, 0.0f, 1.0f );
 			m_btn[i]->GetElement(0)->SetTextureSrc( L"gui_main_button.txr" );
 
-			switch ( i )
-			{
-			case 0:	create_label( m_btn[i], FONT_MAIN_ROOT, GTA_LEFT, g_game->m_strings->Get(3), 200, 30, -90.0f, -5.0f, 0.0f );	break;
-			case 1:	create_label( m_btn[i], FONT_MAIN_ROOT, GTA_LEFT, g_game->m_strings->Get(4), 200, 30, -90.0f, -5.0f, 0.0f );	break;
-			case 2:	create_label( m_btn[i], FONT_MAIN_ROOT, GTA_LEFT, g_game->m_strings->Get(6), 200, 30, -90.0f, -5.0f, 0.0f );	break;
-			case 3:	create_label( m_btn[i], FONT_MAIN_ROOT, GTA_LEFT, g_game->m_strings->Get(7), 200, 30, -90.0f, -5.0f, 0.0f );	break;
-			case 4:	create_label( m_btn[i], FONT_MAIN_ROOT, GTA_LEFT, g_game->m_strings->Get(8), 200, 30, -90.0f, -5.0f, 0.0f );	break;
-			}
 
 			switch ( i )
 			{
@@ -313,9 +305,20 @@ void MenuMain::Initialize( void )
 			pnl->Position().x = -100.0f;
 			pnl->GetElement(0)->Color().a = 0.001f;
 			pnl->SetUserTag( i );
+			pnl->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 			SEGAN_GUI_SET_ONCLICK( pnl, MenuMain::OnClick );
 			SEGAN_GUI_SET_ONENTER( pnl, MenuMain::OnEnter );
 			SEGAN_GUI_SET_ONEXIT( pnl, MenuMain::OnExit );
+
+			switch ( i )
+			{
+			case 0:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 1:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 2:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(5), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 3:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 4:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 5:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			}
 		}
 #endif
 
@@ -762,6 +765,8 @@ void MenuMap::Initialize( void )
 	sx::gui::Label* caption = create_label( m_playGame, FONT_35_OUTLINE_SHADOWED, GTA_CENTER, g_game->m_strings->Get(18), 150.0f, 40.0f, 60.0f, -5.0f, 0 );
 	caption->SetUserTag( 10 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
+	SEGAN_GUI_SET_ONEXIT( caption, MenuMap::OnExit_ );
 	SEGAN_GUI_SET_ONCLICK( caption, MenuMap::OnClick );
 
 	m_miniGame = sx_new( sx::gui::PanelEx );
@@ -781,6 +786,8 @@ void MenuMap::Initialize( void )
 	caption = create_label( m_miniGame, FONT_20_OUTLINE, GTA_CENTER, g_game->m_strings->Get(19), 100.0f, 30.0f, 60.0f, -5.0f, 0 );
 	caption->SetUserTag( 11 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
+	SEGAN_GUI_SET_ONEXIT( caption, MenuMap::OnExit_ );
 	SEGAN_GUI_SET_ONCLICK( caption, MenuMap::OnClick );
 
 	m_upgrade = sx_new( sx::gui::PanelEx );
@@ -800,6 +807,8 @@ void MenuMap::Initialize( void )
 	caption = create_label( m_upgrade, FONT_20_OUTLINE, GTA_CENTER, g_game->m_strings->Get(20), 100.0f, 30.0f, 50.0f, -5.0f, 0 );
 	caption->SetUserTag( 12 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
+	SEGAN_GUI_SET_ONEXIT( caption, MenuMap::OnExit_ );
 	SEGAN_GUI_SET_ONCLICK( caption, MenuMap::OnClick );
 
 	//	create back button
@@ -1227,6 +1236,12 @@ void MenuMap::OnScroll( sx::gui::PControl sender )
 
 void MenuMap::OnEnter_( sx::gui::PControl sender )
 {
+	if ( sender->GetParent() == m_playGame || sender->GetParent() == m_miniGame || sender->GetParent() == m_upgrade )
+	{
+		Menu::OnEnter( sender->GetParent() );
+		return;
+	}
+
 	m_levels[sender->GetUserTag()].m_area->State_SetIndex(1);
 
 	msg_SoundPlay msg( true, 0, 0, L"mouseHover" );
@@ -1235,6 +1250,12 @@ void MenuMap::OnEnter_( sx::gui::PControl sender )
 
 void MenuMap::OnExit_( sx::gui::PControl sender )
 {
+	if ( sender->GetParent() == m_playGame || sender->GetParent() == m_miniGame || sender->GetParent() == m_upgrade )
+	{
+		Menu::OnExit( sender->GetParent() );
+		return;
+	}
+
 	m_levels[sender->GetUserTag()].m_area->State_SetIndex(0);
 }
 
@@ -1252,7 +1273,7 @@ void MenuProfile::Initialize( void )
 	m_back->State_GetByIndex(0).Blender.Set( 0.2f, 0.3f );
 	m_back->State_GetByIndex(1).Position.Set( 90.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(1).Blender.Set( 0.03f, 0.85f );
-	create_label( m_back, FONT_45_OUTLINE_SHADOWED, GTA_CENTER, g_game->m_strings->Get(4), 200.0f, 50.0f, -260.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
+	create_label( m_back, FONT_45_OUTLINE_SHADOWED, GTA_CENTER, g_game->m_strings->Get(4), 250.0f, 50.0f, -260.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
 
 	//	create text edit
 	m_profileName = sx_new( sx::gui::TextEdit );
@@ -1462,16 +1483,21 @@ void MenuProfile::Initialize( void )
 #endif
 
 	SyncProfileAndPlayer( true );
+
+	m_confirm.Initialize();
 }
 
 void MenuProfile::Finalize( void )
 {
+	m_confirm.Finalize();
 	Menu::Finalize();
 }
 
 void MenuProfile::ProcessInput( bool& inputHandled, float elpsTime )
 {
 	if ( !m_back->State_GetIndex() ) return;
+	m_confirm.ProcessInput( inputHandled, elpsTime );
+
 	if ( inputHandled ) return;
 	sx_callstack();
 
@@ -1498,7 +1524,9 @@ void MenuProfile::ProcessInput( bool& inputHandled, float elpsTime )
 
 void MenuProfile::Update( float elpsTime )
 {
+	m_confirm.Update( elpsTime );
 	Menu::Update( elpsTime );
+
 	if ( g_game->m_game_currentLevel ) return;
 
 	str512 name = m_profiles[m_profIndex].name;
@@ -1514,6 +1542,12 @@ void MenuProfile::Update( float elpsTime )
 	case 2:		m_delete->Position().Set( 354.0f, 80.5f, 0.0 );		break;
 	case 3:		m_delete->Position().Set( 367.0f, 33.0f, 0.0 );		break;
 	}
+}
+
+void MenuProfile::Draw( DWORD flag )
+{
+	Menu::Draw( flag );
+	m_confirm.Draw( flag );
 }
 
 void MenuProfile::Show( void )
@@ -1535,7 +1569,6 @@ void MenuProfile::OnClick( sx::gui::PControl sender )
 
 	if ( sender == m_goback )
 	{
-		//g_game->m_gui->m_main->MsgProc( 0, GMT_LEVEL_LOADED, null );
 		Hide();
 		g_game->m_gui->m_main->Show();
 	}
@@ -1556,15 +1589,7 @@ void MenuProfile::OnClick( sx::gui::PControl sender )
 	}
 	else if ( sender == m_delete )
 	{
-		m_profiles[m_profIndex].Reset();
-
-		switch ( m_profIndex )
-		{
-		case 0:	String::Copy( m_profiles[0].name, 32, L"Player1" ); break;
-		case 1:	String::Copy( m_profiles[1].name, 32, L"Player2" ); break;
-		case 2:	String::Copy( m_profiles[2].name, 32, L"Player3" ); break;
-		case 3:	String::Copy( m_profiles[3].name, 32, L"Player4" ); break;
-		}
+		m_confirm.Show();
 	}
 
 	for ( int i=0; i<4; i++ )
@@ -1632,6 +1657,22 @@ void MenuProfile::OnKey( sx::gui::PControl sender )
 
 	msg_SoundPlay msg( true, 0, 0, L"typist" );
 	m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+}
+
+void MenuProfile::OnDeleteProfile( void )
+{
+	m_profiles[m_profIndex].Reset();
+
+	switch ( m_profIndex )
+	{
+	case 0:	String::Copy( m_profiles[0].name, 32, L"Player1" ); break;
+	case 1:	String::Copy( m_profiles[1].name, 32, L"Player2" ); break;
+	case 2:	String::Copy( m_profiles[2].name, 32, L"Player3" ); break;
+	case 3:	String::Copy( m_profiles[3].name, 32, L"Player4" ); break;
+	}
+
+	SyncProfileAndPlayer( true );
+	g_game->m_player->SyncPlayerAndGame( true );
 }
 
 void MenuProfile::SyncAchievements( void )
@@ -1743,6 +1784,7 @@ void MenuAchievements::Initialize( void )
 	m_back->State_GetByIndex(0).Blender.Set( 0.2f, 0.3f );
 	m_back->State_GetByIndex(1).Position.Set( 90.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(1).Blender.Set( 0.03f, 0.85f );
+	create_label( m_back, FONT_45_OUTLINE_SHADOWED, GTA_LEFT, g_game->m_strings->Get(5), 300.0f, 50.0f, -180.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
 
 	//	create back button
 	m_goback = sx_new( sx::gui::Button );
@@ -1757,6 +1799,7 @@ void MenuAchievements::Initialize( void )
 	m_goback->GetElement(2)->Color().a = 0.5f;
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuAchievements::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
+	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	//	create panel to show selected achievement
 	m_image = sx_new( sx::gui::Panel );
@@ -1918,7 +1961,7 @@ void MenuSettings::Initialize( void )
 	m_back->State_GetByIndex(2).Position.Set( -250.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(2).Blender.Set( 0.03f, 0.85f );
 	m_back->State_GetByIndex(2).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
-	create_label( m_back, FONT_45_OUTLINE_SHADOWED, GTA_CENTER, g_game->m_strings->Get(7), 200.0f, 50.0f, -260.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
+	create_label( m_back, FONT_45_OUTLINE_SHADOWED, GTA_CENTER, g_game->m_strings->Get(7), 300.0f, 50.0f, -240.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
 
 	//	create full screen check box 
 	m_fullscreen = sx_new( sx::gui::CheckBox );
@@ -1941,7 +1984,7 @@ void MenuSettings::Initialize( void )
 		scroll->GetElement(1)->SetTextureSrc( L"gui_settings_trackbar.txr" );
 		SEGAN_GUI_SET_ONSCROLL( scroll, MenuSettings::OnScroll );
 
-		create_label( scroll, FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(120 + i), 200.0f, 40.0f, 240.0f, 0, 0 )->GetElement(1)->Color().a = 0.8f;
+		create_label( scroll, FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(120 + i), 250.0f, 40.0f, 240.0f, 0, 0 )->GetElement(1)->Color().a = 0.8f;
 
 		switch ( i )
 		{
@@ -2197,6 +2240,102 @@ void MenuCredits::OnClick( sx::gui::PControl sender )
 }
 
 //////////////////////////////////////////////////////////////////////////
+//	delete confirmation for profile
+//////////////////////////////////////////////////////////////////////////
+void MenuConfirmProfile::Initialize( void )
+{
+	Menu::Initialize();
+
+	m_back->SetSize( float2( 3000, 3000 ) );
+	m_back->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_back->RemProperty( SX_GUI_PROPERTY_BLENDCHILDS );
+	m_back->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
+	m_back->State_GetByIndex(1).Color.Set( 0, 0, 0, 0.7f );
+
+	//	create confirmation form
+	m_form = sx_new( sx::gui::PanelEx );
+	m_form->SetParent( m_back );
+	m_form->AddProperty( SX_GUI_PROPERTY_BLENDCHILDS );
+	m_form->SetSize( float2( 512, 256 ) );
+	m_form->GetElement(0)->SetTextureSrc( L"gui_confirmMenu.txr" );
+	m_form->State_Add();
+	m_form->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
+	m_form->State_GetByIndex(1).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
+	create_label( m_form, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(525), 425.0f, 60.0f, 0, 10.0f, 0 );
+
+	//	create button yes
+	m_yes = sx_new( sx::gui::Button );
+	m_yes->SetParent( m_back );
+	m_yes->SetSize( float2(128, 32) );
+	m_yes->Position().Set( -75.0f, -30.0f, 0.0f );
+	m_yes->GetElement(0)->Color().a = 0;
+	m_yes->GetElement(1)->SetTextureSrc( L"gui_exitYes.txr" );
+	m_yes->GetElement(2)->Color().a = 0;
+	SEGAN_GUI_SET_ONCLICK( m_yes, MenuConfirmProfile::OnClick );
+	SEGAN_GUI_SET_ONENTER( m_yes, Menu::OnEnter );
+	create_label( m_yes, FONT_25_OUTLINE, GTA_RIGHT, g_game->m_strings->Get(526), 120.0f, 30.0f, 0, -5.0f, 0 );
+
+	//	create button no
+	m_no = sx_new( sx::gui::Button );
+	m_no->SetParent( m_back );
+	m_no->SetSize( float2(128, 32) );
+	m_no->Position().Set( 75.0f, -30.0f, 0.0f );
+	m_no->GetElement(0)->Color().a = 0;
+	m_no->GetElement(1)->SetTextureSrc( L"gui_exitNo.txr" );
+	m_no->GetElement(2)->Color().a = 0;
+	SEGAN_GUI_SET_ONCLICK( m_no, MenuConfirmProfile::OnClick );
+	SEGAN_GUI_SET_ONENTER( m_no, Menu::OnEnter );
+	create_label( m_no, FONT_25_OUTLINE, GTA_LEFT, g_game->m_strings->Get(527), 120.0f, 30.0f, 0, -5.0f, 0 );
+}
+
+void MenuConfirmProfile::Finalize( void )
+{
+	Menu::Finalize();
+}
+
+void MenuConfirmProfile::Show( void )
+{
+	m_yes->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_no->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_form->State_SetIndex(1);
+	Menu::Show();
+}
+
+void MenuConfirmProfile::Hide( void )
+{
+	m_yes->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_no->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
+	m_form->State_SetIndex(0);
+	Menu::Hide();
+}
+
+void MenuConfirmProfile::OnClick( sx::gui::PControl sender )
+{
+	Hide();
+
+	if ( sender == m_yes )
+	{
+		g_game->m_gui->m_profile->OnDeleteProfile();
+	}
+
+	msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
+	m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+}
+
+void MenuConfirmProfile::ProcessInput( bool& inputHandled, float elpsTime )
+{
+	sx_callstack();
+	if ( inputHandled ) return;
+	Menu::ProcessInput( inputHandled, elpsTime );
+	if ( !m_back->State_GetIndex() ) return;
+	if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_ESCAPE ) )
+	{
+		Hide();
+		inputHandled = true;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
 //	exit confirmation menu
 //////////////////////////////////////////////////////////////////////////
 void MenuConfirmMenu::Initialize( void )
@@ -2286,6 +2425,7 @@ void MenuConfirmMenu::ProcessInput( bool& inputHandled, float elpsTime )
 	if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_ESCAPE ) )
 	{
 		Hide();
+		inputHandled = true;
 	}
 }
 
@@ -2404,6 +2544,7 @@ void MenuConfirmExit::ProcessInput( bool& inputHandled, float elpsTime )
 	if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_ESCAPE ) )
 	{
 		Hide();
+		inputHandled = true;
 	}
 }
 
@@ -2518,7 +2659,7 @@ void MenuPause::Initialize( void )
 		butn->GetElement(1)->SetTextureSrc( L"gui_pause_button.txr" );
 		butn->GetElement(2)->SetTextureSrc( L"gui_pause_button.txr" );
 		butn->Position().Set( 90.0f + i * 15.0f, 130.0f - i * 60.0f, 0 );
-		create_label( butn, FONT_45_OUTLINE_SHADOWED, GTA_RIGHT, g_game->m_strings->Get(131 + i), 250.0f, 50.0f, 0.0f, 0.0f, 0 );
+		create_label( butn, FONT_45_OUTLINE_SHADOWED, GTA_RIGHT, g_game->m_strings->Get(131 + i), 300.0f, 50.0f, -20.0f, 0, 0 );
 	}
 
 	m_confirmMenu.Initialize();
@@ -2699,6 +2840,7 @@ void MenuVictory::Initialize( void )
 	m_shakeTime = 0;
 	m_starTime = 0;
 	m_goldTime = 0;
+	m_upgrade_exist = false;
 	Menu::Initialize();
 
 	m_back->SetSize( float2( 1024, 1024 ) );
@@ -3009,6 +3151,7 @@ void MenuVictory::Show( void )
 	m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 
 	m_time = 800;
+	m_upgrade_exist = true;
 	Menu::Show();
 
 #if USE_STEAM_SDK
@@ -3157,7 +3300,11 @@ void MenuVictory::OnClick( sx::gui::PControl sender )
 					stars += g_game->m_player->m_profile.stars[i];
 			}
 
-			g_game->m_gui->m_upgradePanel->SetData( g_game->m_game_currentLevel+1, stars, g_game->m_player->m_profile.upgrades );
+			if ( m_upgrade_exist )
+			{
+				g_game->m_gui->m_upgradePanel->SetData( g_game->m_game_currentLevel+1, stars, g_game->m_player->m_profile.upgrades );
+				m_upgrade_exist = false;
+			}
 			g_game->m_gui->m_upgradePanel->Show();
 
 			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
@@ -3384,6 +3531,7 @@ void MenuInfo::Initialize( void )
 	//	create additional helper notifier
 	m_helper.showTime = 0;
 	m_helper.back = sx_new( sx::gui::PanelEx );
+	m_helper.back->AddProperty(SX_GUI_PROPERTY_ACTIVATE);
 	m_helper.back->SetSize( float2( 300.0f, 45.0f ) );
 	m_helper.back->State_GetByIndex(0).Align.Set( -0.5f, 0.5f );
 	m_helper.back->State_GetByIndex(0).Center.Set( 0.5f, -0.5f, 0.0f );
@@ -3392,6 +3540,8 @@ void MenuInfo::Initialize( void )
 	m_helper.back->State_GetByIndex(0).Blender.Set( 0.2f, 0.6f );
 	m_helper.back->State_Add();
 	m_helper.back->State_GetByIndex(1).Position.Set( 0.0f, -30.0f, 0.0f );
+	SEGAN_GUI_SET_ONCLICK( m_helper.back, MenuInfo::OnClick );
+
 
 	m_helper.image = sx_new( sx::gui::Panel );
 	m_helper.image->SetParent( m_helper.back );
@@ -3452,22 +3602,17 @@ void MenuInfo::ProcessInput( bool& inputHandled, float elpsTime )
 	}
 #endif
 
-	if ( !m_back->State_GetIndex() ) return;
+	if ( !m_back->State_GetIndex() ) 
+	{
+		m_helper.back->ProcessInput( inputHandled );
+		return;
+	}
+
 	if ( inputHandled ) return;
 	if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_ESCAPE ) || SEGAN_KEYUP( 0, SX_INPUT_KEY_SPACE ) )
 	{
 		Hide();
 	}
-
-#if 0
-	if ( SEGAN_KEYUP( 0, SX_INPUT_KEY_M ) )
-	{
-		str1024 path = sx::sys::FileManager::Project_GetDir();
-		path << "localization/german.txt";
-		g_game->m_strings->Load( path );
-		g_game->m_gui->m_main->MsgProc(0, GMT_LEVEL_LOADED, null);
-	}
-#endif
 
 	m_back->ProcessInput( inputHandled );
 }
@@ -3583,11 +3728,16 @@ void MenuInfo::Update( float elpsTime )
 
 	//////////////////////////////////////////////////////////////////////////
 	//	helper
-	m_helper.showTime -= elpsTime;
-	if ( m_helper.showTime < 0 )
-		m_helper.back->State_SetIndex( 0 );
-	else
-		m_helper.back->State_SetIndex( 1 );
+	if ( g_game->m_mouseMode == MS_Null )
+	{
+		m_helper.showTime -= elpsTime;
+		if ( m_helper.showTime < 0 )
+			m_helper.back->State_SetIndex( 0 );
+		else
+			m_helper.back->State_SetIndex( 1 );
+	} 
+	else m_helper.back->State_SetIndex( 0 );
+
 	m_helper.back->Update( elpsTime );
 }
 
@@ -3603,6 +3753,7 @@ void MenuInfo::Show( bool gamepaused )
 	Menu::Show();
 	g_game->m_game_paused = gamepaused;
 	m_time = 0;
+	m_helper.showTime = 0;
 }
 
 void MenuInfo::Hide( void )
@@ -3626,6 +3777,12 @@ void MenuInfo::Hide( void )
 
 void MenuInfo::OnClick( sx::gui::PControl sender )
 {
+	if ( sender == m_helper.back )
+	{
+		Show();
+		return;
+	}
+
 	if ( sender == m_back )
 	{
 		Hide();
@@ -3799,7 +3956,7 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 		helperdesc.Replace( L"   ", L"" );
 		m_helper.title->SetText( tutor->title );
 		m_helper.desc->SetText( helperdesc );
-		m_helper.showTime = ( showNow != 2 ) ? 7000.0f : 0.0f;
+		m_helper.showTime = ( showNow != 2 ) ? 15000.0f : 0.0f;
 	}
 }
 

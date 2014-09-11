@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
 #endif
 
 
-#if 0
+#if 1
 	{
 		Table<int> table;
 
@@ -283,7 +283,7 @@ int main(int argc, char* argv[])
 #endif
 
 
-#if 1
+#if 0
 	{
 		String tmp;
 		sx_load_string( tmp, L"D:/test.txt" );

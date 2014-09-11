@@ -24,6 +24,19 @@ void CopyString( WCHAR* dest, int destSize, const WCHAR* src )
 	dest[h] = 0;
 }
 
+D3DColor s_wave_colors[] =
+{
+	0xff4444ff,
+	0xff22ff22,
+	0xffff3333,
+	0xff22ffff,
+	0xffffff22,
+	0xffff22ff,
+	0xffffffff,
+};
+
+
+
 namespace GM
 {
 
@@ -203,9 +216,11 @@ namespace GM
 				{
 					const float targetx = 225.0f - e->m_traveling * 450.0f;
 					e->m_travelingGUI->Position().x += ( targetx - e->m_travelingGUI->Position().x ) * 0.02f;
+#if 0
 					const float colorhealth = (float)e->m_health.icur / (float)e->m_health.imax;
 					e->m_travelingGUI->GetElement(0)->Color().r = sx_clamp_f( colorhealth * 2.0f, 0.0f, 1.0f );
 					e->m_travelingGUI->GetElement(0)->Color().g = sx_clamp_f( ( 1.0f - colorhealth ) * 2.0f, 0.0f, 1.0f );
+#endif
 				}
 			}
 		}
@@ -350,9 +365,8 @@ namespace GM
 				entity->m_travelingGUI->GetElement(0)->SetTextureSrc( L"gui_w_ground.txr" );
 			else
 				entity->m_travelingGUI->GetElement(0)->SetTextureSrc( pWave->tipsStartIcon );
-			entity->m_travelingGUI->GetElement(0)->Color().b = 0;
-			entity->m_travelingGUI->GetElement(0)->Color().g = 0;
-			entity->m_travelingGUI->GetElement(0)->Color().a = 0.8f;
+			entity->m_travelingGUI->GetElement(0)->Color() = s_wave_colors[m_waveIndex % 6];
+			entity->m_travelingGUI->RemProperty( SX_GUI_PROPERTY_VISIBLE );
 
 			//  add entity to game
 			EntityManager::AddEntity( entity );
