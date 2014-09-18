@@ -427,7 +427,10 @@ void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
 					max_level = g_game->m_gui->m_profile->m_profiles[i].level_played;
 			}
 			++max_level;
-
+#if USE_DEVKIT
+			int info_index = m_info->m_Index + 1;
+			int info_counter = 0;
+#endif
 			m_info->ClearTutorial();
 
 			String str = sx::sys::FileManager::Project_GetDir();
@@ -455,8 +458,19 @@ void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
 							continue;
 						if ( !script.GetString( i, L"image", image	) )
 							continue;
-
+#if USE_DEVKIT
+						if (data)
+						{
+							++info_counter;
+							m_info->AddTutorial( title, desc, image, false, info_index == info_counter );
+						}
+						else
+						{
+							m_info->AddTutorial( title, desc, image, false, false );
+						}
+#else
 						m_info->AddTutorial( title, desc, image, false, false );
+#endif
 					}
 				}
 			}

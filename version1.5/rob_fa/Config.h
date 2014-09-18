@@ -18,12 +18,12 @@
 #define USE_8_LEVELS		0
 #define USE_HASH_LOCK		0
 #define USE_STEAM_LINK		0
-#define USE_DEVKIT			0		//	development cheats
-#define USE_CHEAT_CODE		0		//	player cheats
+#define USE_DEVKIT			1		//	development cheats
+#define USE_CHEAT_CODE		1		//	player cheats
 #define USE_SITE_STATS		1
 #define USE_STEAM_SDK		0
 
-#define SITE_STATS_TAG		2
+#define SITE_STATS_TAG		3
 
 
 #if VER_USERDEMO
