@@ -125,7 +125,13 @@ void MenuMain::Initialize( void )
 	m_mainBack = sx_new( sx::gui::PanelEx );
 	m_mainBack->SetParent( m_back );
 	m_mainBack->SetSize( float2( 1024.0f, 1024.0f ) );
+#if USE_POLAND_LOGO
+	m_mainBack->GetElement(0)->SetTextureSrc( L"gui_root_pl.txr" );
+#elif USE_CZESH_LOGO
+	m_mainBack->GetElement(0)->SetTextureSrc( L"gui_root_czech.txr" );
+#else
 	m_mainBack->GetElement(0)->SetTextureSrc( L"gui_mainBack.txr" );
+#endif
 	m_mainBack->State_Add();
 	m_mainBack->State_Add();
 	m_mainBack->State_Add();

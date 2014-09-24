@@ -485,6 +485,11 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	{
 		FirstPresents *presents;
 		presents = sx_new( FirstPresents );
+
+#if USE_ALAWAR_LOGO
+		presents->AddPresents( L"gui_alawar.txr", 512, null, 0, 0 );
+#endif
+
 		presents->AddPresents( L"gui_parseh.txr", 512, null, 0, 0 );
 		presents->AddPresents( L"gui_esra.txr", 1024, null, 0, 0 );
 

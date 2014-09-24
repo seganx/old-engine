@@ -18,12 +18,16 @@
 #define USE_8_LEVELS		0
 #define USE_HASH_LOCK		0
 #define USE_STEAM_LINK		0
-#define USE_DEVKIT			1		//	development cheats
-#define USE_CHEAT_CODE		1		//	player cheats
+#define USE_DEVKIT			0		//	development cheats
+#define USE_CHEAT_CODE		0		//	player cheats
 #define USE_SITE_STATS		1
 #define USE_STEAM_SDK		0
 
-#define SITE_STATS_TAG		3
+#define USE_ALAWAR_LOGO		1		//	display Alawar spash screen
+#define USE_POLAND_LOGO		0		//	display logo for Polish version
+#define USE_CZESH_LOGO		1		//	display logo for Czech version
+
+#define SITE_STATS_TAG		4		//	0:Steam - 1:USA/UK - 2:Germany - 3:Poland - 4:Czech
 
 
 #if VER_USERDEMO
