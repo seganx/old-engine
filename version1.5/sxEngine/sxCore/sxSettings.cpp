@@ -17,7 +17,14 @@ namespace sx { namespace core {
 
 	FORCEINLINE bool Settings::Option::HasPermission( void )
 	{
+#if _DEBUG
+		int by_system	= (value & OPT_BY_SYSTEM);
+		int by_artist	= (value & OPT_BY_ARTIST);
+		int by_user		= (value & OPT_BY_USER);
+		return by_system && by_artist && by_user;
+#else
 		return (value & OPT_BY_SYSTEM) && (value & OPT_BY_ARTIST) && (value & OPT_BY_USER);
+#endif
 	}
 
 	FORCEINLINE void Settings::Option::AddPermission( OptionPermissionType OPT_ who )

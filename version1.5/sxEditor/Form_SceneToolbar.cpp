@@ -545,6 +545,11 @@ void Form_SceneToolbar::OnPopupSelectType( sx::gui::PControl Sender )
 
 void Form_SceneToolbar::SaveScene( const WCHAR* fileName )
 {
+	sx::core::Settings::GetOption_Reflection()->RemPermission( OPT_BY_SYSTEM );
+	sx::core::Settings::GetOption_Reflection()->RemPermission( OPT_BY_USER );
+	sx::core::Settings::GetOption_Shadow()->RemPermission( OPT_BY_SYSTEM );
+	sx::core::Settings::GetOption_Shadow()->RemPermission( OPT_BY_USER );
+
 	sx::sys::FileStream file;
 	if ( file.Open(fileName, FM_CREATE) )
 	{
@@ -558,6 +563,11 @@ void Form_SceneToolbar::SaveScene( const WCHAR* fileName )
 
 		file.Close();
 	}
+
+	sx::core::Settings::GetOption_Reflection()->AddPermission( OPT_BY_SYSTEM );
+	sx::core::Settings::GetOption_Reflection()->AddPermission( OPT_BY_USER );
+	sx::core::Settings::GetOption_Shadow()->AddPermission( OPT_BY_SYSTEM );
+	sx::core::Settings::GetOption_Shadow()->AddPermission( OPT_BY_USER );
 }
 
 void Form_SceneToolbar::LoadScene( const WCHAR* fileName )
@@ -584,6 +594,11 @@ void Form_SceneToolbar::LoadScene( const WCHAR* fileName )
 		}
 
 		file.Close();
-	}	
+	}
+
+	sx::core::Settings::GetOption_Reflection()->AddPermission( OPT_BY_SYSTEM );
+	sx::core::Settings::GetOption_Reflection()->AddPermission( OPT_BY_USER );
+	sx::core::Settings::GetOption_Shadow()->AddPermission( OPT_BY_SYSTEM );
+	sx::core::Settings::GetOption_Shadow()->AddPermission( OPT_BY_USER );
 }
 

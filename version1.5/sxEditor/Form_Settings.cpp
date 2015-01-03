@@ -213,6 +213,8 @@ Form_Settings::Form_Settings( void ): BaseForm()
 	m_pBack->State_GetByIndex(0).Position.Set(0,0,0);
 	m_pBack->State_GetByIndex(1).Position.Set(0,0,0);
 
+//	sx::core::Settings::GetOption_Reflection().AddPermission( OPT_BY_USER | OPT_BY_SYSTEM );
+
 }
 
 Form_Settings::~Form_Settings( void )

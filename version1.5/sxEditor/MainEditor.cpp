@@ -607,6 +607,8 @@ void Editor::RenderCompass( float elpsTime )
 
 void Editor::SetSpace( EditorWorkingSpace wSpace )
 {
+	if ( g_CurSpace == wSpace ) return;
+
 	//  operate on old space
 	switch ( g_CurSpace )
 	{
