@@ -252,11 +252,19 @@ void MenuMain::Initialize( void )
 
 		switch ( i )
 		{
-		case 0:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-		case 1:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-		case 2:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-		case 3:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-		case 4:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+#if USE_UPDATE_1
+			case 0:	create_label( m_btn[i], g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 1:	create_label( m_btn[i], g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 2:	create_label( m_btn[i], g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 3:	create_label( m_btn[i], g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 4:	create_label( m_btn[i], g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+#else
+			case 0:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 1:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 2:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 3:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 4:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+#endif
 		}
 	}
 #else
@@ -318,12 +326,21 @@ void MenuMain::Initialize( void )
 
 			switch ( i )
 			{
+#if USE_UPDATE_1
+			case 0:	create_label( m_btn[i], g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 1:	create_label( m_btn[i], g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 2:	create_label( m_btn[i], g_game->m_strings->Get(5), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 3:	create_label( m_btn[i], g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 4:	create_label( m_btn[i], g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 5:	create_label( m_btn[i], g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+#else
 			case 0:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 1:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 2:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(5), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 3:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 4:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 5:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+#endif
 			}
 		}
 #endif
@@ -433,7 +450,7 @@ void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
 					max_level = g_game->m_gui->m_profile->m_profiles[i].level_played;
 			}
 			++max_level;
-#if USE_DEVKIT
+#if USE_DEV_CHEAT
 			int info_index = m_info->m_Index + 1;
 			int info_counter = 0;
 #endif
@@ -464,7 +481,7 @@ void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
 							continue;
 						if ( !script.GetString( i, L"image", image	) )
 							continue;
-#if USE_DEVKIT
+#if USE_DEV_CHEAT
 						if (data)
 						{
 							++info_counter;
@@ -643,7 +660,7 @@ void MenuMap::Initialize( void )
 	m_back->State_GetByIndex(1).Position.Set( 0.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(1).Blender.Set( 0.07f, 0.6f );
 
-	create_label( m_back, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(14), 300.0f, 30.0f, -350.0f, 290.0f, 0 );
+	create_label( m_back, g_game->m_strings->Get(14), 300.0f, 30.0f, -350.0f, 290.0f, 0 );
 
 	//	create level chooser
 	m_chooser = sx_new( sx::gui::PanelEx );
@@ -782,7 +799,7 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_playGame, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_playGame, MenuMap::OnClick );
 
-	sx::gui::Label* caption = create_label( m_playGame, FONT_35_OUTLINE_SHADOWED, GTA_CENTER, g_game->m_strings->Get(18), 150.0f, 40.0f, 60.0f, -5.0f, 0 );
+	sx::gui::Label* caption = create_label( m_playGame, g_game->m_strings->Get(18), 150.0f, 40.0f, 60.0f, -5.0f, 0 );
 	caption->SetUserTag( 10 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
@@ -803,7 +820,7 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_miniGame, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_miniGame, MenuMap::OnClick );
 
-	caption = create_label( m_miniGame, FONT_20_OUTLINE, GTA_CENTER, g_game->m_strings->Get(19), 100.0f, 30.0f, 60.0f, -5.0f, 0 );
+	caption = create_label( m_miniGame, g_game->m_strings->Get(19), 100.0f, 30.0f, 60.0f, -5.0f, 0 );
 	caption->SetUserTag( 11 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
@@ -824,7 +841,7 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_upgrade, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_upgrade, MenuMap::OnClick );
 
-	caption = create_label( m_upgrade, FONT_20_OUTLINE, GTA_CENTER, g_game->m_strings->Get(20), 100.0f, 30.0f, 50.0f, -5.0f, 0 );
+	caption = create_label( m_upgrade, g_game->m_strings->Get(20), 100.0f, 30.0f, 50.0f, -5.0f, 0 );
 	caption->SetUserTag( 12 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
@@ -845,7 +862,7 @@ void MenuMap::Initialize( void )
 	m_goback->GetElement(2)->Color().a = 0.5f;
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuMap::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
+	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	//	create difficulty
 	m_diff_scroll = sx_new( sx::gui::TrackBar );
@@ -865,17 +882,8 @@ void MenuMap::Initialize( void )
 	panel->GetElement(0)->SetTextureSrc( L"gui_menu_map_diff.txr" );
 
 	//	create label to show people
-	m_diff_label = sx_new( sx::gui::Label );
-	m_diff_label->SetParent( panel );
-	m_diff_label->SetSize( float2(80, 32) );
-	m_diff_label->SetAlign( GTA_CENTER );
-	m_diff_label->GetElement(0)->Color().a = 0.0f;
-	m_diff_label->GetElement(1)->Color() = 0xaaffffff;
-	m_diff_label->SetFont( FONT_MAP_DIFFICULTY );
-	m_diff_label->AddProperty( SX_GUI_PROPERTY_MULTILINE );
-	m_diff_label->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
-	m_diff_label->Position().y = -5.0f;
-
+	m_diff_label = create_label( panel, g_game->m_strings->Get(15), 80, 32, 0.0f, -5.0f, 0.0f );
+	
 	panel = sx_new( sx::gui::Panel );
 	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	panel->SetParent( m_diff_scroll );
@@ -1239,15 +1247,15 @@ void MenuMap::OnScroll( sx::gui::PControl sender )
 	switch ( g_game->m_player->m_profile.curDifficulty )
 	{
 	case 0:
-		m_diff_label->SetText( m_diff_norm_text );
+		update_label( m_diff_label, g_game->m_strings->Get(15) );
 		g_game->m_difficultyLevel = 0;
 		break;
 	case 1:
-		m_diff_label->SetText( m_diff_hard_text );
+		update_label( m_diff_label, g_game->m_strings->Get(16) );
 		g_game->m_difficultyLevel = 1;
 		break;
 	case 2:
-		m_diff_label->SetText( m_diff_insane_text );
+		update_label( m_diff_label, g_game->m_strings->Get(17) );
 		g_game->m_difficultyLevel = 2;
 		break;
 	}
@@ -1293,7 +1301,9 @@ void MenuProfile::Initialize( void )
 	m_back->State_GetByIndex(0).Blender.Set( 0.2f, 0.3f );
 	m_back->State_GetByIndex(1).Position.Set( 90.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(1).Blender.Set( 0.03f, 0.85f );
-	create_label( m_back, FONT_45_OUTLINE_SHADOWED, GTA_CENTER, g_game->m_strings->Get(4), 250.0f, 50.0f, -260.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
+
+	//	profile label
+	create_label( m_back, g_game->m_strings->Get(22), 250.0f, 50.0f, -260.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
 
 	//	create text edit
 	m_profileName = sx_new( sx::gui::TextEdit );
@@ -1404,7 +1414,8 @@ void MenuProfile::Initialize( void )
 	m_goback->GetElement(2)->Color().a = 0.5f;
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuProfile::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
+
+	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	//	prepare profile
 	String::Copy( m_profiles[0].name, 32, L"Player1" );

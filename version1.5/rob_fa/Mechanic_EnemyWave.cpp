@@ -335,7 +335,7 @@ namespace GM
 				//	compute balancer health
 				int balancerHealth = int( maxHelath * balanceValue );
 
-				entity->m_health.SetMax( maxHelath - balancerHealth );
+				entity->m_health.SetMax( int(maxHelath) - balancerHealth );
 			}
 
 			//  set enemy material

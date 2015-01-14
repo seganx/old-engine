@@ -11,6 +11,7 @@
 
 #include "ImportEngine.h"
 
+struct GameString;
 class Entity;
 
 namespace GU
@@ -123,5 +124,7 @@ public:
 
 
 sx::gui::Label* create_label( sx::gui::Control* parent, const wchar* font, const GUITextAlign align, const wchar* caption, const float& width, const float& height, const float& x, const float& y, const float& z );
+sx::gui::Label* create_label( sx::gui::Control* parent, const GameString* gameString, const float& width, const float& height, const float& x, const float& y, const float& z );
+sx::gui::Label* update_label( sx::gui::Label* label, const GameString* gameString );
 
 #endif	//	GUARD_GameUtils_HEADER_FILE

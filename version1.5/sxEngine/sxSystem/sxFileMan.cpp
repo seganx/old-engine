@@ -20,9 +20,9 @@ this class can create and hold some static functions and help me to easy access 
 class FileMan_internal
 {
 public:
-	static bool							m_ProjectIsOpen;
+	static bool							m_projectIsOpen;
 	static FileManMode					m_fMode;
-	static String				m_Dir_Root;
+	static String				m_rootDir;
 	static Array<Package*>		m_Packs;
 
 	static bool FindPackage(const WCHAR* packName, OUT PPackage& package){
@@ -37,9 +37,9 @@ public:
 		return false;
 	}
 };
-bool						FileMan_internal::m_ProjectIsOpen = false;
+bool						FileMan_internal::m_projectIsOpen = false;
 FileManMode					FileMan_internal::m_fMode = FMM_ARCHIVE;
-String				FileMan_internal::m_Dir_Root;
+String				FileMan_internal::m_rootDir;
 Array<Package*>	FileMan_internal::m_Packs;
 
 namespace sx { namespace sys
@@ -58,40 +58,40 @@ namespace sx { namespace sys
 
 		FileMan_internal::m_fMode = fMode;
 		
-		FileMan_internal::m_Dir_Root = ProjectDir;
-		FileMan_internal::m_Dir_Root.MakePathStyle();
+		FileMan_internal::m_rootDir = ProjectDir;
+		FileMan_internal::m_rootDir.MakePathStyle();
 
 		if (fMode == FMM_ARCHIVE)
 		{
-			String	path = FileMan_internal::m_Dir_Root;
+			String	path = FileMan_internal::m_rootDir;
 			path << SEGAN_PACKAGENAME_GEOMETRY;
 			sx::sys::MakeFolder(path);
 
-			path = FileMan_internal::m_Dir_Root;
+			path = FileMan_internal::m_rootDir;
 			path << SEGAN_PACKAGENAME_ANIMATION;
 			sx::sys::MakeFolder(path);
 
-			path = FileMan_internal::m_Dir_Root;
+			path = FileMan_internal::m_rootDir;
 			path << SEGAN_PACKAGENAME_TEXTURE;
 			sx::sys::MakeFolder(path);
 
-			path = FileMan_internal::m_Dir_Root;
+			path = FileMan_internal::m_rootDir;
 			path << SEGAN_PACKAGENAME_EFFECT;
 			sx::sys::MakeFolder(path);
 
-			path = FileMan_internal::m_Dir_Root;
+			path = FileMan_internal::m_rootDir;
 			path << SEGAN_PACKAGENAME_PHYSICS;
 			sx::sys::MakeFolder(path);
 
-			path = FileMan_internal::m_Dir_Root;
+			path = FileMan_internal::m_rootDir;
 			path << SEGAN_PACKAGENAME_MEIDA;
 			sx::sys::MakeFolder(path);
 
-			path = FileMan_internal::m_Dir_Root;
+			path = FileMan_internal::m_rootDir;
 			path << SEGAN_PACKAGENAME_COMMON;
 			sx::sys::MakeFolder(path);
 
-			path = FileMan_internal::m_Dir_Root;
+			path = FileMan_internal::m_rootDir;
 			path << SEGAN_PACKAGENAME_DRAFT;
 			sx::sys::MakeFolder(path);
 		}
@@ -102,7 +102,7 @@ namespace sx { namespace sys
 			//  ...
 		}
 
-		FileMan_internal::m_ProjectIsOpen = true;
+		FileMan_internal::m_projectIsOpen = true;
 		return true;
 	}
 
@@ -112,18 +112,18 @@ namespace sx { namespace sys
 		//  codes to close the opened packages will be here
 		//  ...
 
-		FileMan_internal::m_Dir_Root.SetText((char*)NULL);
-		FileMan_internal::m_ProjectIsOpen = false;
+		FileMan_internal::m_rootDir.SetText((char*)NULL);
+		FileMan_internal::m_projectIsOpen = false;
 	}
 
 	const WCHAR* FileManager::Project_GetDir( void )
 	{
-		return FileMan_internal::m_Dir_Root;
+		return FileMan_internal::m_rootDir;
 	}
 
 	bool FileManager::Package_Create( const WCHAR* PackageName )
 	{
-		if (!FileMan_internal::m_ProjectIsOpen) return false;
+		if (!FileMan_internal::m_projectIsOpen) return false;
 
 		if (FileMan_internal::m_fMode == FMM_ARCHIVE)
 		{
@@ -138,7 +138,7 @@ namespace sx { namespace sys
 			newPack->m_Name = PackageName;
 			FileMan_internal::m_Packs.PushBack(newPack);
 
-			String path = FileMan_internal::m_Dir_Root;
+			String path = FileMan_internal::m_rootDir;
 			path << PackageName;
 			return sx::sys::MakeFolder(path);
 		}
@@ -151,7 +151,7 @@ namespace sx { namespace sys
 
 	bool FileManager::Package_Delete( const WCHAR* PackageName )
 	{
-		if (!FileMan_internal::m_ProjectIsOpen) return false;
+		if (!FileMan_internal::m_projectIsOpen) return false;
 		
 		if (FileMan_internal::m_fMode == FMM_ARCHIVE)
 		{
@@ -165,7 +165,7 @@ namespace sx { namespace sys
 			FileMan_internal::m_Packs.Remove(curPack);
 			sx_delete_and_null(curPack);
 
-			String path = FileMan_internal::m_Dir_Root;
+			String path = FileMan_internal::m_rootDir;
 			path << PackageName;
 			return sx::sys::RemoveFolder(path);
 		}
@@ -178,11 +178,11 @@ namespace sx { namespace sys
 
 	bool FileManager::Package_GetPath( const WCHAR* PackageName, OUT String& outPath )
 	{
-		if (!FileMan_internal::m_ProjectIsOpen) return false;
+		if (!FileMan_internal::m_projectIsOpen) return false;
 		
 		if ( FileMan_internal::m_fMode == FMM_ARCHIVE )
 		{
-			outPath = FileMan_internal::m_Dir_Root;
+			outPath = FileMan_internal::m_rootDir;
 			outPath << PackageName << PATH_PART;
 			return true;
 		}
@@ -190,7 +190,7 @@ namespace sx { namespace sys
 		PPackage pkg = NULL;
 		if (FileMan_internal::FindPackage(PackageName, pkg))
 		{
-			outPath = FileMan_internal::m_Dir_Root;
+			outPath = FileMan_internal::m_rootDir;
 			outPath << PackageName;
 			return true;
 		}
@@ -213,10 +213,10 @@ namespace sx { namespace sys
 		}
 		else
 		{
-			if (!FileMan_internal::m_ProjectIsOpen) return false;
+			if (!FileMan_internal::m_projectIsOpen) return false;
 			if (FileMan_internal::m_fMode == FMM_ARCHIVE)
 			{
-				String path = FileMan_internal::m_Dir_Root;
+				String path = FileMan_internal::m_rootDir;
 				path << PackageName << PATH_PART << FileName;
 				res = sx::sys::FileExist(path);
 
@@ -233,22 +233,22 @@ namespace sx { namespace sys
 		return res;
 	}
 
-	bool FileManager::File_Open( const WCHAR* FileName, const WCHAR* PackageName, PStream& OutStream )
+	bool FileManager::File_Open( const WCHAR* fileName, const WCHAR* packageName, PStream& outStream )
 	{
-		sx_callstack_param(FileManager::File_Open(FileName=%s, PackageName=%s), FileName, PackageName);
+		sx_callstack_param(FileManager::File_Open(fileName=%s, packageName=%s), fileName, packageName);
 
-		OutStream = NULL;
-		if (!FileName) return false;
+		outStream = NULL;
+		if (!fileName) return false;
 
-		//  check to see if FileName was full file path then open the file directly
-		String path = FileName;
-		if (String::IsFullPath(FileName))
+		//  check to see if fileName was full file path then open the file directly
+		String path = fileName;
+		if (String::IsFullPath(fileName))
 		{
 			sx::sys::PFileStream sfile = sx_new(sx::sys::FileStream);
 			if (sfile->Open(path, FM_OPEN_READ | FM_SHARE_READ))
 			{
 				sfile->Seek(ST_BEGIN);
-				OutStream = (PStream)sfile;
+				outStream = (PStream)sfile;
 
 				return true;
 			}
@@ -256,25 +256,25 @@ namespace sx { namespace sys
 			{
 				sxLog::Log(L"File manager said : the request to open file [%s] failed !", *path);
 				sx_delete_and_null(sfile);
-				OutStream = NULL;
+				outStream = NULL;
 
 				return false;
 			}
 		}
 
 		//  new we are sure that file name is a related file name
-		if (!FileMan_internal::m_ProjectIsOpen) return false;
+		if (!FileMan_internal::m_projectIsOpen) return false;
 
-		path = FileMan_internal::m_Dir_Root;
+		path = FileMan_internal::m_rootDir;
 		if (FileMan_internal::m_fMode == FMM_ARCHIVE)
 		{
-			path << PackageName << PATH_PART << FileName;
+			path << packageName << PATH_PART << fileName;
 
 			sx::sys::PFileStream sfile = sx_new(sx::sys::FileStream);
 			if (sfile->Open(path, FM_OPEN_READ | FM_SHARE_READ))
 			{
 				sfile->Seek(ST_BEGIN);
-				OutStream = (PStream)sfile;
+				outStream = (PStream)sfile;
 
 				return true;
 			}
@@ -282,7 +282,7 @@ namespace sx { namespace sys
 			{
 				sxLog::Log(L"File manager said : the request to open file [%s] failed !", *path);
 				sx_delete_and_null(sfile);
-				OutStream = NULL;
+				outStream = NULL;
 				
 				return false;
 			}
@@ -303,9 +303,9 @@ namespace sx { namespace sys
 	bool FileManager::File_Save( const WCHAR* FileName, const WCHAR* PackageName, Stream& srcStream )
 	{
 		if ( !FileName ) return false;
-		if ( FileMan_internal::m_ProjectIsOpen && !PackageName ) return false;
+		if ( FileMan_internal::m_projectIsOpen && !PackageName ) return false;
 
-		String path = FileMan_internal::m_Dir_Root;
+		String path = FileMan_internal::m_rootDir;
 
 		if (FileMan_internal::m_fMode == FMM_ARCHIVE)
 		{
@@ -331,7 +331,7 @@ namespace sx { namespace sys
 				return false;
 			}
 		}
-		if ( !FileMan_internal::m_ProjectIsOpen ) return false;
+		if ( !FileMan_internal::m_projectIsOpen ) return false;
 
 		String els = L"File manager said : I'm in Zipped mode and the requested to save file [";
 		els << PackageName << PATH_PART << FileName << L"] can not be established !";
@@ -341,9 +341,9 @@ namespace sx { namespace sys
 
 	bool FileManager::File_GetPath( const WCHAR* FileName, const WCHAR* PackageName, OUT String& outPath )
 	{
-		if (!FileMan_internal::m_ProjectIsOpen || !FileName) return false;
+		if (!FileMan_internal::m_projectIsOpen || !FileName) return false;
 
-		String path = FileMan_internal::m_Dir_Root;
+		String path = FileMan_internal::m_rootDir;
 
 		if (FileMan_internal::m_fMode == FMM_ARCHIVE)
 		{

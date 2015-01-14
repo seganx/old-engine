@@ -285,7 +285,7 @@ namespace sx { namespace gui {
 		d3d::Device3D::Matrix_World_Set(matScl);
 
 		//  prepare API to draw text
-		m_Font->m_Texture->SetToDevice(0);
+		m_Font->m_texture->SetToDevice(0);
 		d3d::Device3D::SetVertexBuffer(0, m_VB0, SEGAN_SIZE_VERTEX_0);
 		d3d::Device3D::SetVertexBuffer(1, m_VB1, SEGAN_SIZE_VERTEX_1);
 		d3d::Device3D::SetIndexBuffer(m_IB);
@@ -728,7 +728,7 @@ namespace sx { namespace gui {
 
 	bool Label::CanBurnBuffer( void )
 	{
-		return m_Font && m_Font->m_Texture && !m_Lines.IsEmpty();
+		return m_Font && m_Font->m_texture && !m_Lines.IsEmpty();
 	}
 
 	void Label::BurnBuffer( void )
@@ -741,7 +741,7 @@ namespace sx { namespace gui {
 
 		GUIFontDesc fontDesc = m_Font->GetDesc();
 		TextureDesc	txurDesc;
-		m_Font->m_Texture->GetDesc(txurDesc);
+		m_Font->m_texture->GetDesc(txurDesc);
 		if ( txurDesc.Width<2 || m_Size.y < fontDesc.LineHeight || m_Size.x < fontDesc.Size )
 		{
 			ReleaseBuffer();

@@ -898,7 +898,7 @@ namespace sx { namespace gui {
 
 		GUIFontDesc	fontDesc = m_Font->GetDesc();
 		TextureDesc	txurDesc;
-		m_Font->m_Texture->GetDesc(txurDesc);
+		m_Font->m_texture->GetDesc(txurDesc);
 		if (txurDesc.Width<2 || m_Size.y < fontDesc.LineHeight || m_Size.x < fontDesc.Size)
 		{
 			ReleaseBuffer();

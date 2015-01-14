@@ -132,8 +132,8 @@ TaskManager
 
 d3dDevice --| Initialize()
 			| Finalize()
-			| CreateDevice()
-			| DestroyDevice()
+			| CreateDevice()	// depricated
+			| DestroyDevice()	// depricated
 			| CreateGeometry()
 			| CreateTexture()
 			| CreateShader()

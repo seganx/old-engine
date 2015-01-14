@@ -153,7 +153,7 @@ namespace sx { namespace cmn
 
 			if (*_pointer == '=' || *_pointer == '+' || *_pointer == '-' || *_pointer == '*' || *_pointer == '/' ||
 				*_pointer == '{' || *_pointer == '}' || *_pointer == '[' || *_pointer == ']' ||
-				*_pointer == '(' || *_pointer == ')')
+				*_pointer == '(' || *_pointer == ')' || *_pointer == ':' || *_pointer == ',' )
 			{
 				if ( *_pointer == '-' )
 				{
@@ -221,7 +221,7 @@ namespace sx { namespace cmn
 
 			if (*m_pointer == '=' || *m_pointer == '+' || *m_pointer == '-' || *m_pointer == '*' || *m_pointer == '/' ||
 				*m_pointer == '{' || *m_pointer == '}' || *m_pointer == '[' || *m_pointer == ']' ||
-				*m_pointer == '(' || *m_pointer == ')')
+				*m_pointer == '(' || *m_pointer == ')' || *m_pointer == ':' || *m_pointer == ',' )
 			{
 				if ( *m_pointer == '-' )
 				{

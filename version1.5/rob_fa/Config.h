@@ -18,16 +18,20 @@
 #define USE_8_LEVELS		0
 #define USE_HASH_LOCK		0
 #define USE_STEAM_LINK		0
-#define USE_DEVKIT			1		//	development cheats
+#define USE_DEV_CHEAT		0		//	development cheats
 #define USE_CHEAT_CODE		0		//	player cheats
-#define USE_SITE_STATS		0
+
 #define USE_STEAM_SDK		0
 
-#define USE_ALAWAR_LOGO		0		//	display Alawar spash screen
+#define USE_ALAWAR_LOGO		0		//	display Alawar splash screen
 #define USE_POLAND_LOGO		0		//	display logo for Polish version
 #define USE_CZESH_LOGO		0		//	display logo for Czech version
 
-#define SITE_STATS_TAG		4		//	0:Steam - 1:USA/UK - 2:Germany - 3:Poland - 4:Czech
+#define USE_SITE_STATS		0
+#define SITE_STATS_TAG		0		//	0:Steam - 1:USA/UK - 2:Germany - 3:Poland - 4:Czech
+
+#define USE_UPDATE_1		1		//	switch to first update of the game
+#define USE_ENCRPT_STR		0		//	force to use encrypted text
 
 
 #if VER_USERDEMO

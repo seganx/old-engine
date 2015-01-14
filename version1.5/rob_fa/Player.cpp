@@ -119,7 +119,7 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 #endif
 
 
-#if USE_DEVKIT
+#if USE_DEV_CHEAT
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYUP( 0, SX_INPUT_KEY_M ) )
 	{		
 		str1024 path = sx::sys::FileManager::Project_GetDir();

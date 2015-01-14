@@ -3,7 +3,7 @@
 
 namespace sx { namespace gui {
 
-	Font::Font( void ): m_RefCount(1), m_Texture(NULL)
+	Font::Font( void ): m_refCount(1), m_texture(NULL)
 	{
 	}
 
@@ -28,17 +28,17 @@ namespace sx { namespace gui {
 
 		//  now write the texture name
 		String txSrc;
-		if (m_Texture) txSrc = m_Texture->GetSource();
+		if (m_texture) txSrc = m_texture->GetSource();
 		cmn::String_Save(txSrc, &stream);
 		
 		//  write the number of characters and finally all characters
-		int n = m_Chars.Count();
+		int n = m_chars.Count();
 		SEGAN_STREAM_WRITE(stream, n);
 
 		if(n>0)
 		{	
 			//  write all of the character information to the stream
-			for (GUICharacterMap::Iterator it = m_Chars.First(); !it.IsLast(); it++)
+			for (GUICharacterMap::Iterator it = m_chars.First(); !it.IsLast(); it++)
 			{
 				GUIFontChar *ch = *it;
 				stream.Write( ch, sizeof(GUIFontChar) );
@@ -74,8 +74,8 @@ namespace sx { namespace gui {
 			}
 			
 			txPath << txSrc;
-			if (d3d::Texture::Manager::Get(m_Texture, txPath))
-				m_Texture->Activate();
+			if (d3d::Texture::Manager::Get(m_texture, txPath))
+				m_texture->Activate();
 
 			//  read the number of characters and finally all characters
 			int n = 0;
@@ -88,7 +88,7 @@ namespace sx { namespace gui {
 				{
 					GUIFontChar* fchar = (GUIFontChar*)sx_mem_alloc( sizeof(GUIFontChar) );
 					stream.Read( fchar, sizeof(GUIFontChar) );
-					m_Chars.Insert(fchar->ID, fchar);
+					m_chars.Insert(fchar->ID, fchar);
 				}
 			}
 		}
@@ -113,13 +113,13 @@ namespace sx { namespace gui {
 
 	bool Font::GetChar( const DWORD charID, OUT PGUIFontChar& pchar )
 	{
-		return m_Chars.Find(charID, pchar);
+		return m_chars.Find(charID, pchar);
 	}
 
 	bool Font::GetChar( const WCHAR* string, const int charIndex, OUT PGUIFontChar& pchar, bool reversed /*= false*/ )
 	{
 		sx_assert(string); sx_assert(charIndex>-1);
-		if (string[charIndex]<1000) return m_Chars.Find(string[charIndex], pchar);
+		if (string[charIndex]<1000) return m_chars.Find(string[charIndex], pchar);
 
 
 		WCHAR prvCh = 0, nxtCh = 0;
@@ -178,21 +178,21 @@ namespace sx { namespace gui {
 		default:	charID = string[charIndex];
 		}
 
-		return m_Chars.Find(charID, pchar);
+		return m_chars.Find(charID, pchar);
 	}
 
 	void Font::CleanUp( void )
 	{
-		for ( GUICharacterMap::Iterator it = m_Chars.First(); !it.IsLast(); it++ )
+		for ( GUICharacterMap::Iterator it = m_chars.First(); !it.IsLast(); it++ )
 		{
 			GUIFontChar *ch = *it;
 			sx_delete( ch );
 		}
-		m_Chars.Clear();
-		if(m_Texture)
+		m_chars.Clear();
+		if(m_texture)
 		{
-			m_Texture->Deactivate();
-			d3d::Texture::Manager::Release(m_Texture);
+			m_texture->Deactivate();
+			d3d::Texture::Manager::Release(m_texture);
 		}
 	}
 
@@ -200,27 +200,27 @@ namespace sx { namespace gui {
 	//	MANAGER
 	//////////////////////////////////////////////////////////////////////////
 	typedef Map<UINT, sx::gui::PFont> sxMapFont;
-	static 	sxMapFont FontMap;		//  hold the created font objects
+	static 	sxMapFont s_fontMap;		//  hold the created font objects
 
 	bool Font::Manager::Exist( OUT PFont& pFont, const WCHAR* src )
 	{
 		UINT key = sx::cmn::GetCRC32(src);
-		return FontMap.Find(key, pFont);
+		return s_fontMap.Find(key, pFont);
 	}
 
 	bool Font::Manager::Get( OUT PFont& pFont, const WCHAR* src )
 	{
 		UINT key = sx::cmn::GetCRC32(src);
 
-		if (FontMap.Find(key, pFont))
+		if (s_fontMap.Find(key, pFont))
 		{
-			pFont->m_RefCount++;
+			pFont->m_refCount++;
 		}
 		else
 		{
 			if (Create(pFont, src))
 			{
-				FontMap.Insert(key, pFont);
+				s_fontMap.Insert(key, pFont);
 			}
 			else return false;
 		}
@@ -245,28 +245,28 @@ namespace sx { namespace gui {
 		PFont font = pFont;
 		pFont = NULL;
 
-		font->m_RefCount--;
-		if (font->m_RefCount!=0) return;
+		font->m_refCount--;
+		if (font->m_refCount!=0) return;
 
 		//  remove from font map
 		PFont fn = NULL; UINT fID = sx::cmn::GetCRC32(font->m_Src);
-		if (FontMap.Find(fID, fn) && fn==font)
-			FontMap.Remove(fID);
+		if (s_fontMap.Find(fID, fn) && fn==font)
+			s_fontMap.Remove(fID);
 
 		sx_delete_and_null(font);
 	}
 
 	void Font::Manager::ClearAll( void )
 	{
-		if (FontMap.IsEmpty()) return;
+		if (s_fontMap.IsEmpty()) return;
 		sx_callstack();
 
-		for (sxMapFont::Iterator it = FontMap.First(); !it.IsLast(); it++)
+		for (sxMapFont::Iterator it = s_fontMap.First(); !it.IsLast(); it++)
 		{
 			PFont f = *it;
 			sx_delete_and_null(f);
 		}
-		FontMap.Clear();
+		s_fontMap.Clear();
 	}
 
 }}	//	namespace sx { namespace gui {

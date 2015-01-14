@@ -421,3 +421,17 @@ sx::gui::Label* create_label( sx::gui::Control* parent, const wchar* font, const
 	res->SetText(caption);
 	return res;
 }
+
+sx::gui::Label* create_label( sx::gui::Control* parent, const GameString* gameString, const float& width, const float& height, const float& x, const float& y, const float& z )
+{
+	sx::gui::Label* res = create_label( parent, gameString->font, gameString->align, gameString->text, width, height, x, y, z );
+	res->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
+}
+
+sx::gui::Label* update_label( sx::gui::Label* label, const GameString* gameString )
+{
+	label->SetAlign( gameString->align );
+	label->SetFont( gameString->font );
+	label->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
+	label->SetText( gameString->text );
+}

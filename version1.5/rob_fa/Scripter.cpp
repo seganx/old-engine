@@ -45,7 +45,11 @@ void Scripter::Load( const WCHAR* scriptFile )
 		if ( encrypted )
 			fsize -= 2;
 		else
+#if USE_ENCRPT_STR
+			return;
+#else
 			MyFile.SetPos(0);
+#endif
 
 		wchar* buffer = (wchar*)sx_mem_alloc( fsize + 2 );
 		MyFile.Read( buffer, fsize );
@@ -177,7 +181,7 @@ bool Scripter::GetString( const int sectionID, const WCHAR* name, str512& value 
 		if ( m_mapValue.Find(id, v) )
 		{
 			int sid = int( v + 0.2f );
-			value = g_game->m_strings->Get( sid );
+			value = g_game->m_strings->Get( sid )->text;
 			return true;
 		}
 		else return false;

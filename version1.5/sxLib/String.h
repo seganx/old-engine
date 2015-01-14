@@ -58,6 +58,14 @@ SEGAN_LIB_INLINE sint sx_str_copy( wchar* dest, const sint dest_size_in_word, co
 	return res;
 }
 
+SEGAN_LIB_INLINE uint sx_str_to_uint( const wchar* str )
+{
+	if ( !str ) return 0;
+	uint res = 0;
+	swscanf_s( str, L"%u", &res, sizeof(res) );
+	return res;
+}
+
 
 /*! 
 string class stores strings of wide characters

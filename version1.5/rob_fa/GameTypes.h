@@ -118,6 +118,17 @@ enum GameMessageType
 	GMT_SCREEN_RESIZED,		//	notify that the screen has been resized
 };
 
+struct GameString
+{
+	uint			id;			//	id of the text
+	wchar			font[48];	//	font name of the string
+	GUITextAlign	align;		//	alignment of the text
+	float			x;			//	x offset
+	float			y;			//	y offset
+	wchar			text[512];	//	text of the string
+
+	GameString(void): id(0), align(GTA_CENTER), x(0), y(0) { font[0] = 0; text[0] = 0; }
+};
 
 struct Mission
 {

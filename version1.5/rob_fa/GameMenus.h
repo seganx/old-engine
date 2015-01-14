@@ -178,9 +178,6 @@ public:
 	sx::gui::PanelEx*	m_chooser;
 	sx::gui::TrackBar*	m_diff_scroll;
 	sx::gui::Label*		m_diff_label;
-	str512				m_diff_norm_text;
-	str512				m_diff_hard_text;
-	str512				m_diff_insane_text;
 	int					m_frame;
 	int					m_selectedLevel;
 

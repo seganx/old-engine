@@ -62,12 +62,12 @@ namespace sx { namespace gui {
 
 
 		String				m_Src;			//  source file of the font
-		GUICharacterMap			m_Chars;		//  map of the characters
-		d3d::PTexture			m_Texture;		//  texture of the font
+		GUICharacterMap			m_chars;		//  map of the characters
+		d3d::PTexture			m_texture;		//  texture of the font
 
 		GUIFontDesc				m_FontDesc;		//  description of the font
 
-		int						m_RefCount;		//  internal reference counter
+		int						m_refCount;		//  internal reference counter
 
 	public:
 		class SEGAN_API Manager
