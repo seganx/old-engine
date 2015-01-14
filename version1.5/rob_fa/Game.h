@@ -74,6 +74,7 @@ public:
 #endif
 	MouseState				m_mouseMode;				// state mode of mouse
 
+	float					m_balancerFactor;			//	balancer factor used to auto balance of the game
 	float					m_difficultyValue;			//	difficulty value
 	int						m_difficultyLevel;			//	difficulty level 0 = norm , 1 = hard , 2 = insane
 	int						m_game_currentLevel;		//  index of current level. 0 = GUI mode

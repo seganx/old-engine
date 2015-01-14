@@ -321,9 +321,22 @@ namespace GM
 
 			entity->m_curAttack = entity->m_curAttackLevel = entity->m_attackLevel[0];
 
-			//	apply difficulty value
-			float maxHelath = g_game->m_difficultyValue * (float)entity->m_health.icur;
-			entity->m_health.SetMax( int( maxHelath + 0.5f) );
+			//  test my new idea about addapting the enemy's health with player skill
+			{
+				//	perform difficulty value
+				float maxHelath = g_game->m_difficultyValue * (float)entity->m_health.icur;
+
+				//	compute player skill 0 ~ +1
+				float playerSkill = g_game->m_player->m_people * 0.01f;
+
+				//	compute balance value -b ~ +b
+				float balanceValue = ( 1.0f - playerSkill ) * g_game->m_balancerFactor;
+
+				//	compute balancer health
+				int balancerHealth = int( maxHelath * balanceValue );
+
+				entity->m_health.SetMax( maxHelath - balancerHealth );
+			}
 
 			//  set enemy material
 			if ( entity->m_mesh )
@@ -367,6 +380,8 @@ namespace GM
 				entity->m_travelingGUI->GetElement(0)->SetTextureSrc( pWave->tipsStartIcon );
 			entity->m_travelingGUI->GetElement(0)->Color() = s_wave_colors[m_waveIndex % 6];
 			entity->m_travelingGUI->RemProperty( SX_GUI_PROPERTY_VISIBLE );
+
+			
 
 			//  add entity to game
 			EntityManager::AddEntity( entity );
