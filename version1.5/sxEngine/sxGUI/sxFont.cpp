@@ -14,7 +14,7 @@ namespace sx { namespace gui {
 
 	GUIFontDesc& Font::GetDesc( void )
 	{
-		return m_FontDesc;
+		return m_desc;
 	}
 
 	void Font::Save( Stream& stream )
@@ -24,7 +24,7 @@ namespace sx { namespace gui {
 		SEGAN_STREAM_WRITE(stream, ver);
 
 		//  write font information
-		SEGAN_STREAM_WRITE(stream, m_FontDesc);
+		SEGAN_STREAM_WRITE(stream, m_desc);
 
 		//  now write the texture name
 		String txSrc;
@@ -58,7 +58,7 @@ namespace sx { namespace gui {
 		if(ver == 1)
 		{
 			//  read font information
-			SEGAN_STREAM_READ(stream, m_FontDesc);
+			SEGAN_STREAM_READ(stream, m_desc);
 
 			//  now read the texture name
 			String txSrc;
@@ -66,9 +66,9 @@ namespace sx { namespace gui {
 			String txPath;
 
 			//  check to see if the source font was full path then correct texture path
-			if (String::IsFullPath(m_Src)) 
+			if (String::IsFullPath(m_src)) 
 			{
-				txPath = m_Src;
+				txPath = m_src;
 				txPath.ExtractFilePath();
 				txPath.MakePathStyle();
 			}
@@ -96,10 +96,10 @@ namespace sx { namespace gui {
 
 	void Font::SetSource( const WCHAR* src )
 	{
-		m_Src = src;
+		m_src = src;
 
 		PStream stream = NULL;
-		if( sys::FileManager::File_Open(m_Src, SEGAN_PACKAGENAME_COMMON, stream) )
+		if( sys::FileManager::File_Open(m_src, SEGAN_PACKAGENAME_COMMON, stream) )
 		{
 			Load(*stream);
 			sys::FileManager::File_Close(stream);
@@ -108,7 +108,7 @@ namespace sx { namespace gui {
 
 	const WCHAR* Font::GetSource( void )
 	{
-		return m_Src;
+		return m_src;
 	}
 
 	bool Font::GetChar( const DWORD charID, OUT PGUIFontChar& pchar )
@@ -199,16 +199,16 @@ namespace sx { namespace gui {
 	//////////////////////////////////////////////////////////////////////////
 	//	MANAGER
 	//////////////////////////////////////////////////////////////////////////
-	typedef Map<UINT, sx::gui::PFont> sxMapFont;
+	typedef Map<UINT, sx::gui::Font*> sxMapFont;
 	static 	sxMapFont s_fontMap;		//  hold the created font objects
 
-	bool Font::Manager::Exist( OUT PFont& pFont, const WCHAR* src )
+	bool Font::Manager::Exist( OUT Font*& pFont, const WCHAR* src )
 	{
 		UINT key = sx::cmn::GetCRC32(src);
 		return s_fontMap.Find(key, pFont);
 	}
 
-	bool Font::Manager::Get( OUT PFont& pFont, const WCHAR* src )
+	bool Font::Manager::Get( OUT Font*& pFont, const WCHAR* src )
 	{
 		UINT key = sx::cmn::GetCRC32(src);
 
@@ -228,7 +228,7 @@ namespace sx { namespace gui {
 		return true;
 	}
 
-	bool Font::Manager::Create( OUT PFont& pFont, const WCHAR* src )
+	bool Font::Manager::Create( OUT Font*& pFont, const WCHAR* src )
 	{
 		pFont = sx_new( Font );
 		if (pFont)
@@ -239,17 +239,17 @@ namespace sx { namespace gui {
 		else return false;
 	}
 
-	void Font::Manager::Release( PFont& pFont )
+	void Font::Manager::Release( Font*& pFont )
 	{
 		if (!pFont) return;
-		PFont font = pFont;
+		Font* font = pFont;
 		pFont = NULL;
 
 		font->m_refCount--;
 		if (font->m_refCount!=0) return;
 
 		//  remove from font map
-		PFont fn = NULL; UINT fID = sx::cmn::GetCRC32(font->m_Src);
+		Font* fn = NULL; UINT fID = sx::cmn::GetCRC32(font->m_src);
 		if (s_fontMap.Find(fID, fn) && fn==font)
 			s_fontMap.Remove(fID);
 
@@ -263,7 +263,7 @@ namespace sx { namespace gui {
 
 		for (sxMapFont::Iterator it = s_fontMap.First(); !it.IsLast(); it++)
 		{
-			PFont f = *it;
+			Font* f = *it;
 			sx_delete_and_null(f);
 		}
 		s_fontMap.Clear();

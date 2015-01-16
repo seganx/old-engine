@@ -23,7 +23,7 @@ namespace sx { namespace gui {
 		m_oldState.Rotation	= math::Vector3(0.0f, 0.0f, 0.0f);
 		m_oldState.Scale	= math::Vector3(1.0f, 1.0f, 1.0f);
 		m_oldState.Blender	= math::Vector2(0.02f, 0.73f);
-		m_oldState.Color	= math::Vector4(m_Elements[0]->Color().r, m_Elements[0]->Color().g,	m_Elements[0]->Color().b, 1.0f);
+		m_oldState.Color	= math::Vector4(m_elements[0]->Color().r, m_elements[0]->Color().g,	m_elements[0]->Color().b, 1.0f);
 		m_curState = m_oldState;
 
 		m_States.PushBack(m_oldState);
@@ -93,7 +93,7 @@ namespace sx { namespace gui {
 	{
 		Control::SetSize(S);
 		RectF rc = Control::GetRect();
-		m_Elements[0]->SetRect(rc);
+		m_elements[0]->SetRect(rc);
 	}
 
 	FORCEINLINE Vector3& PanelEx::Position( void )
@@ -173,7 +173,7 @@ namespace sx { namespace gui {
 				m_Shader.SetValue(m_pColor, &m_curState.Color, sizeof(math::Vector4));
 				m_Shader.SetToDevice();
 
-				for (int i=0; i<m_Elements.Count(); i++) m_Elements[i]->Draw(m_Option | option);
+				for (int i=0; i<m_elements.Count(); i++) m_elements[i]->Draw(m_Option | option);
 			}
 			else
 			{
@@ -193,7 +193,7 @@ namespace sx { namespace gui {
 				m_Shader.SetValue(m_pColor, &m_curState.Color, sizeof(math::Vector4));
 				m_Shader.SetToDevice();
 
-				for (int i=0; i<m_Elements.Count(); i++) m_Elements[i]->Draw(m_Option | option);
+				for (int i=0; i<m_elements.Count(); i++) m_elements[i]->Draw(m_Option | option);
 			}
 
 			d3d::Device3D::SetEffect(NULL);
@@ -429,10 +429,10 @@ namespace sx { namespace gui {
 		else
 		{
 			//  Apply color ...
-			m_Elements[0]->Color().r = m_curState.Color[0];
-			m_Elements[0]->Color().g = m_curState.Color[1];
-			m_Elements[0]->Color().b = m_curState.Color[2];
-			m_Elements[0]->Color().a = m_curState.Color[3];
+			m_elements[0]->Color().r = m_curState.Color[0];
+			m_elements[0]->Color().g = m_curState.Color[1];
+			m_elements[0]->Color().b = m_curState.Color[2];
+			m_elements[0]->Color().a = m_curState.Color[3];
 		}
 	}
 

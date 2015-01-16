@@ -59,7 +59,7 @@ private:
 	sx::gui::PButton		m_btnLink;			//  use to link path
 	sx::gui::PButton		m_btnUnlink;		//  use to unlink path
 	sx::gui::PButton		m_btnFinish;		//  use to finish job
-	sx::gui::PListBox		m_lsbLayer;			//  layer of path
+	sx::gui::ListBox*		m_lsbLayer;			//  layer of path
 	sx::core::PPathNode		m_path;				//  path to edit
 
 	//! additional parameters

@@ -44,6 +44,7 @@ Form_SetName::Form_SetName( void ): BaseForm(), m_pMember(0), m_pNode(0)
 	//  stop moving and resizing
 	SEGAN_SET_REM(m_Option, FORM_OPTION_RESIZABLE);
 	SEGAN_SET_REM(m_Option, FORM_OPTION_MOVABLE);
+	SEGAN_SET_ADD(m_Option, FORM_OPTION_ONTOP);
 
 	SetSize( FORM_SETNAME_WIDTH, FORM_SETNAME_HEIGHT );
 }
@@ -72,16 +73,8 @@ void Form_SetName::SetSize( float width, float height )
 	BaseForm::SetSize( width, height );
 }
 
-void Form_SetName::ProcessInput( bool& inputHandled )
-{
-	if ( !IsVisible() || inputHandled ) return;
-	BaseForm::ProcessInput(inputHandled);
-}
-
 void Form_SetName::Update( float elpsTime )
 {
-	if ( !IsVisible() ) return;
-
 	if ( m_ch_newNode->Checked() )
 	{
 		m_lb_nodName->AddProperty(SX_GUI_PROPERTY_VISIBLE);

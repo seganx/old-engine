@@ -1,6 +1,6 @@
 #include "sxProgressBar.h"
 
-#define CLEANUP_BUFFER() {d3d::Resource3D::ReleaseVertexBuffer(m_VB0); d3d::Resource3D::ReleaseVertexBuffer(m_VB1);}
+#define CLEANUP_BUFFER() {d3d::Resource3D::ReleaseVertexBuffer(m_vertexBuffer0); d3d::Resource3D::ReleaseVertexBuffer(m_vertexBuffer1);}
 
 namespace sx { namespace gui {
 
@@ -8,8 +8,8 @@ namespace sx { namespace gui {
 		m_Max(1.0f), 
 		m_Value(0.0f), 
 		m_ValueScroll(1.0f), 
-		m_VB0(NULL),
-		m_VB1(NULL)
+		m_vertexBuffer0(NULL),
+		m_vertexBuffer1(NULL)
 	{
 		m_Type = GUI_PROGRESSBAR;
 
@@ -59,9 +59,9 @@ namespace sx { namespace gui {
 	{
 		Control::SetSize(S);
 		RectF rc = Control::GetRect();
-		m_Elements[0]->SetRect(rc);
-		m_Elements[1]->SetRect(rc);
-		//m_Elements[1]->Matrix()._43 = SX_GUI_Z_BIAS;
+		m_elements[0]->SetRect(rc);
+		m_elements[1]->SetRect(rc);
+		//m_elements[1]->Matrix()._43 = SX_GUI_Z_BIAS;
 	}
 
 	float ProgressBar::GetMax( void )
@@ -111,14 +111,14 @@ namespace sx { namespace gui {
 
 			if ( m_Option & SX_GUI_PROPERTY_PROGRESSUV )
 			{
-				RectF rc = m_Elements[1]->GetRect();
+				RectF rc = m_elements[1]->GetRect();
 				rc.x2 = rc.x1 + m_Size.x * val;
-				m_Elements[1]->SetRect( rc, float2(0, 0), float2(val, 0), float2(0, 1), float2(val, 1) );
+				m_elements[1]->SetRect( rc, float2(0, 0), float2(val, 0), float2(0, 1), float2(val, 1) );
 			}
 			else
 			{
-				m_Elements[1]->Matrix().Scale( val, 1.0f, 1.0f );
-				m_Elements[1]->Matrix()._41 = (val - 1) * m_Size.x * 0.5f;
+				m_elements[1]->Matrix().Scale( val, 1.0f, 1.0f );
+				m_elements[1]->Matrix()._41 = (val - 1) * m_Size.x * 0.5f;
 			}
 		}
 	}
@@ -178,14 +178,14 @@ namespace sx { namespace gui {
 
 	void ProgressBar::BurnVB( void )
 	{
-		if ( !m_VB0 && !d3d::Resource3D::CreateVertexBuffer(182 * SEGAN_SIZE_VERTEX_0, m_VB0) ) return;
-		if ( !m_VB1 && !d3d::Resource3D::CreateVertexBuffer(182 * SEGAN_SIZE_VERTEX_1, m_VB1) ) return;
+		if ( !m_vertexBuffer0 && !d3d::Resource3D::CreateVertexBuffer(182 * SEGAN_SIZE_VERTEX_0, m_vertexBuffer0) ) return;
+		if ( !m_vertexBuffer1 && !d3d::Resource3D::CreateVertexBuffer(182 * SEGAN_SIZE_VERTEX_1, m_vertexBuffer1) ) return;
 		
 		PD3DVertex0 v0;
-		if ( SUCCEEDED( m_VB0->Lock(0, 0, (void**)&v0, 0) ) )
+		if ( SUCCEEDED( m_vertexBuffer0->Lock(0, 0, (void**)&v0, 0) ) )
 		{
 			PD3DVertex1 v1;
-			if ( SUCCEEDED ( m_VB1->Lock(0, 0, (void**)&v1, 0) ) )
+			if ( SUCCEEDED ( m_vertexBuffer1->Lock(0, 0, (void**)&v1, 0) ) )
 			{
 				v0[0].pos	= Vector3(0.0f, 0.0f, 0.0f);
 				v1[0].txc	= Vector2(0.5f, 0.5f);
@@ -214,45 +214,45 @@ namespace sx { namespace gui {
 					v1[i].col1	= 0xFFFFFFFF;
 				}
 
-				m_VB1->Unlock();
+				m_vertexBuffer1->Unlock();
 			}
-			else d3d::Resource3D::ReleaseVertexBuffer(m_VB1);
+			else d3d::Resource3D::ReleaseVertexBuffer(m_vertexBuffer1);
 
-			m_VB0->Unlock();
-		} else d3d::Resource3D::ReleaseVertexBuffer(m_VB0);
+			m_vertexBuffer0->Unlock();
+		} else d3d::Resource3D::ReleaseVertexBuffer(m_vertexBuffer0);
 	}
 
 	void ProgressBar::DrawProgress( DWORD option )
 	{
 		if ( m_Option & SX_GUI_PROPERTY_PROGRESSCIRCLE )
 		{
-			if ( !m_VB0 || !m_VB1 )
+			if ( !m_vertexBuffer0 || !m_vertexBuffer1 )
 				BurnVB();
 
 			//  draw background
-			m_Elements[0]->Draw(option);
+			m_elements[0]->Draw(option);
 
 			//  draw progress 
 			if (m_Max)
 			{
-				m_Elements[1]->SetTextureToDevice(0);
+				m_elements[1]->SetTextureToDevice(0);
 				
 				d3d::Device3D::Matrix_World_Set(m_Mtrx);
-				d3d::Device3D::SetMaterialColor( m_Elements[1]->Color() );
+				d3d::Device3D::SetMaterialColor( m_elements[1]->Color() );
 				d3d::Device3D::SetIndexBuffer(NULL);
-				d3d::Device3D::SetVertexBuffer(0, m_VB0,	SEGAN_SIZE_VERTEX_0);
-				d3d::Device3D::SetVertexBuffer(1, m_VB1,	SEGAN_SIZE_VERTEX_1);
+				d3d::Device3D::SetVertexBuffer(0, m_vertexBuffer0,	SEGAN_SIZE_VERTEX_0);
+				d3d::Device3D::SetVertexBuffer(1, m_vertexBuffer1,	SEGAN_SIZE_VERTEX_1);
 				d3d::Device3D::DrawPrimitive(D3DPT_TRIANGLEFAN, 0, (UINT)int(181 * (m_ValueScroll / m_Max)));	
 			}
 		}
 		else
 		{
-			if ( m_VB0 || m_VB1 )
+			if ( m_vertexBuffer0 || m_vertexBuffer1 )
 			{
 				CLEANUP_BUFFER();
 			}
 
-			for (int i=0; i<m_Elements.Count(); i++) m_Elements[i]->Draw(option);
+			for (int i=0; i<m_elements.Count(); i++) m_elements[i]->Draw(option);
 		}
 
 	}

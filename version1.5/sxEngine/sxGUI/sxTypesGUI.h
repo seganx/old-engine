@@ -111,13 +111,13 @@ enum GUIInputLanguage {
 //! describe font information
 typedef struct GUIFontDesc
 {
-	int		Size;			//  size of the font
-	int		CharCount;		//  number of characters
-	int		Outline;		//  outline thickness
-	int		LineHeight;		//	distance in pixels between each line of text  
-	int		Base;			//	number of pixels from the absolute top of the line to the base of the characters
+	int		size;			//  size of the font
+	int		charCount;		//  number of characters
+	int		outline;		//  outline thickness
+	int		lineHeight;		//	distance in pixels between each line of text  
+	int		base;			//	number of pixels from the absolute top of the line to the base of the characters
 
-	GUIFontDesc(): Size(0), CharCount(0), Outline(0), LineHeight(0), Base(0) {};
+	GUIFontDesc(): size(0), charCount(0), outline(0), lineHeight(0), base(0) {};
 }
 *PGUIFontDesc;
 

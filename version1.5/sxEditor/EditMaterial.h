@@ -46,7 +46,7 @@ public:
 private:
 
 	sx::gui::PTrackBar guiCreateTrakbar(sx::d3d::PMaterial mtrl, ShaderAnnotation& shDesc, void* paramInfo	);
-	sx::gui::PTextEdit guiCreateTextEdit(sx::d3d::PMaterial mtrl, ShaderAnnotation& shDesc, void* paramInfo	);
+	sx::gui::TextEdit* guiCreateTextEdit(sx::d3d::PMaterial mtrl, ShaderAnnotation& shDesc, void* paramInfo	);
 	sx::gui::PButton   guiCreateButton(sx::d3d::PMaterial mtrl, ShaderAnnotation& shDesc, void* paramInfo	);
 
 	float guiHeight(sx::gui::PControl gui);			//  return height of the gui
@@ -73,7 +73,7 @@ private:
 
 	sx::gui::PPanel			m_pBack;			//  back ground of editor. just for origin
 	sx::gui::PLabel			m_pMtrlListTitle;	//  title of material list
-	sx::gui::PListBox		m_pMtrlList;		//	list of materials
+	sx::gui::ListBox*		m_pMtrlList;		//	list of materials
 	sx::gui::PButton		m_pMtrlAdd;			//  add a material to list
 	sx::gui::PButton		m_pMtrlRemove;		//  remove a material from list
 	sx::gui::Button*		m_copy;				//	copy material

@@ -159,7 +159,7 @@ namespace GM
 
 						if ( tmpStr == L"Stunner" )
 						{
-							script.GetInteger(i, L"cost", m_Cost);
+							script.GetInt(i, L"cost", m_Cost);
 							script.GetFloat(i, L"coolTime", m_coolTime);
 							script.GetFloat(i, L"stunTime", m_stunTime);
 							script.GetFloat(i, L"stunValue", m_stunValue);

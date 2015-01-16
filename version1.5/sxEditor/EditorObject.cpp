@@ -189,6 +189,7 @@ void EditorObject::Update( float elpsTime, bool& inputHandled )
 		}
 	}
 
+#if 1
 	pop_Menu1->ProcessInput(inputHandled);
 	frm_Toolbar->ProcessInput(inputHandled);
 	frm_EditParticle->ProcessInput(inputHandled);
@@ -196,6 +197,7 @@ void EditorObject::Update( float elpsTime, bool& inputHandled )
 	frm_EditSound->ProcessInput(inputHandled);
 	frm_EditAnimator->ProcessInput(inputHandled);
 	frm_EditNode->ProcessInput(inputHandled);
+#endif
 
 	cam[camIndex].Update(elpsTime, inputHandled, selectedNode, selectedMember);
 
@@ -257,6 +259,7 @@ void EditorObject::Update( float elpsTime, bool& inputHandled )
 	//Editor::frm_SetName->UpdateEditorData(selectedNode, selectedMember);
 
 	//  update gui
+#if 1
 	pop_Menu1->Update(elpsTime);
 	frm_Toolbar->Update(elpsTime);
 	frm_EditMesh->Update(elpsTime);
@@ -264,6 +267,7 @@ void EditorObject::Update( float elpsTime, bool& inputHandled )
 	frm_EditSound->Update(elpsTime);
 	frm_EditAnimator->Update(elpsTime);
 	frm_EditNode->Update(elpsTime);
+#endif
 
 	// TEST
 	{
@@ -403,6 +407,7 @@ void EditorObject::Render( float elpsTime )
 	Editor::RenderCompass(elpsTime);
 
 	// draw forms
+#if 1
 	frm_EditNode->Draw(0);
 	frm_EditSound->Draw(0);
 	frm_EditAnimator->Draw(0);
@@ -410,6 +415,7 @@ void EditorObject::Render( float elpsTime )
 	frm_EditParticle->Draw(0);
 	frm_Toolbar->Draw(0);
 	pop_Menu1->Draw(0);
+#endif
 	
 }
 

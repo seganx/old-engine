@@ -160,7 +160,7 @@ namespace GM
 
 						if ( tmpStr == L"GoldenTowers" )
 						{
-							script.GetInteger(i, L"cost", m_Cost);
+							script.GetInt(i, L"cost", m_Cost);
 							script.GetFloat(i, L"coolTime", m_coolTime);
 							script.GetFloat(i, L"goldenTime", m_goldenTime);
 							m_Time = m_coolTime;

@@ -226,7 +226,7 @@ namespace sx { namespace gui {
 		DWORD				m_Option;			//  as I said before! It's really helpful
 
 		float2				m_Size;				//  control's dimension
-		PElementArray		m_Elements;			//  array of elements
+		PElementArray		m_elements;			//  array of elements
 		int					m_SelectedElement;	//  selected element
 
 		math::Vector3		m_Pos;				//  position of this control

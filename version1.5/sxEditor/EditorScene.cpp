@@ -23,6 +23,7 @@ PForm_EditPath			EditorScene::frm_EditPath		= NULL;
 PForm_EditTerrain		EditorScene::frm_EditTrrn		= NULL;
 PForm_EditSound			EditorScene::frm_EditSound		= NULL;
 PForm_EditParticle		EditorScene::frm_EditParticle	= NULL;
+Form_NodeList*			EditorScene::frm_NodeList		= NULL;
 PPopupMenu				EditorScene::pop_RightClick		= NULL;
 
 sx::core::PNodeMember	EditorScene::selectedMember		= NULL;
@@ -199,6 +200,7 @@ void EditorScene::Initialize( void )
 	frm_EditTrrn =		sx_new( Form_EditTerrain );
 	frm_EditSound =		sx_new( Form_EditSound );
 	frm_EditParticle =	sx_new( Form_EditParticle );
+	frm_NodeList =		sx_new( Form_NodeList );
 
 	//  set functions
 	frm_EditNode->GetNodeExplorer()->m_Listbox.SetOnMouseClick( &frm_Internal, (GUICallbackEvent)&Internal_Form_Scene::OnNodeExplorerSelect );
@@ -227,6 +229,7 @@ void EditorScene::Finalize( void )
 	sx_delete( frm_EditTrrn );
 	sx_delete( frm_EditSound );
 	sx_delete( frm_EditParticle );
+	sx_delete( frm_NodeList );
 }
 
 void EditorScene::Resize( int width, int height )
@@ -322,15 +325,17 @@ void EditorScene::Update( float elpsTime, bool& inputHandled )
 		}
 	}
 
+#if 1
 	pop_RightClick->ProcessInput(inputHandled);
 	frm_Toolbar->ProcessInput(inputHandled);
+	frm_NodeList->ProcessInput(inputHandled);
 	frm_EditMesh->ProcessInput(inputHandled);
 	frm_EditParticle->ProcessInput(inputHandled);
 	frm_EditSound->ProcessInput(inputHandled);
 	frm_EditPath->ProcessInput(inputHandled);
 	frm_EditTrrn->ProcessInput(inputHandled);
 	frm_EditNode->ProcessInput(inputHandled);
-
+#endif
 
 	cam[camIndex].Update_multi(elpsTime, inputHandled, selectedNodes, selectedMember);
 	
@@ -417,6 +422,7 @@ void EditorScene::Update( float elpsTime, bool& inputHandled )
 	}
 
 	//  update gui
+#if 1
 	pop_RightClick->Update(elpsTime);
 	frm_Toolbar->Update(elpsTime);
 	frm_EditMesh->Update(elpsTime);
@@ -425,6 +431,8 @@ void EditorScene::Update( float elpsTime, bool& inputHandled )
 	frm_EditTrrn->Update(elpsTime);
 	frm_EditSound->Update(elpsTime);
 	frm_EditParticle->Update(elpsTime);
+	frm_NodeList->Update(elpsTime);
+#endif
 
 	// TEST
 	{
@@ -509,14 +517,17 @@ void EditorScene::Render( float elpsTime )
 	Editor::RenderCompass(elpsTime);
 
 	// draw forms
+#if 1
 	frm_EditNode->Draw(0);
 	frm_EditSound->Draw(0);
 	frm_EditParticle->Draw(0);
 	frm_EditMesh->Draw(0);
 	frm_EditPath->Draw(0);
 	frm_EditTrrn->Draw(0);
+	frm_NodeList->Draw(0);
 	frm_Toolbar->Draw(0);
 	pop_RightClick->Draw(0);
+#endif
 
 	static UINT iTime = 0;
 	iTime++;

@@ -55,25 +55,25 @@ private:
 	sx::gui::PCheckBox		m_ch_reflect;		//	draw this to reflection
 	sx::gui::PCheckBox		m_ch_rndTime;		//	use random function in delay time
 
-	sx::gui::PTextEdit		m_flow;				//  use to change particle flow
-	sx::gui::PTextEdit		m_quadCount;		//  use to change quad count
-	sx::gui::PTextEdit		m_lifeTime;			//  use to change life time
-	sx::gui::PTextEdit		m_angleBase;		//  angle base
-	sx::gui::PTextEdit		m_angleSpeed;		//  change angle speed
-	sx::gui::PTextEdit		m_scaleBaseX;		//	X scale base 
-	sx::gui::PTextEdit		m_scaleBaseY;		//	Y scale base 
-	sx::gui::PTextEdit		m_scaleSpeed;		//	scale speed
-	sx::gui::PTextEdit		m_moveDepend;		//	movement independence
-	sx::gui::PTextEdit		m_delayTime;		//	spray delay time
-	sx::gui::PTextEdit		m_rndParam1;		//	a random parameter is useful in some effects
+	sx::gui::TextEdit*		m_flow;				//  use to change particle flow
+	sx::gui::TextEdit*		m_quadCount;		//  use to change quad count
+	sx::gui::TextEdit*		m_lifeTime;			//  use to change life time
+	sx::gui::TextEdit*		m_angleBase;		//  angle base
+	sx::gui::TextEdit*		m_angleSpeed;		//  change angle speed
+	sx::gui::TextEdit*		m_scaleBaseX;		//	X scale base 
+	sx::gui::TextEdit*		m_scaleBaseY;		//	Y scale base 
+	sx::gui::TextEdit*		m_scaleSpeed;		//	scale speed
+	sx::gui::TextEdit*		m_moveDepend;		//	movement independence
+	sx::gui::TextEdit*		m_delayTime;		//	spray delay time
+	sx::gui::TextEdit*		m_rndParam1;		//	a random parameter is useful in some effects
 
 	sx::gui::PLabel			m_lbl_speed;		//  label of move speed
 	sx::gui::PLabel			m_lbl_range;		//  label of init range
 	sx::gui::PLabel			m_lbl_gravity;		//  label of gravity force
 
-	sx::gui::PTextEdit		m_moveSpeed[3];		//  move speed
-	sx::gui::PTextEdit		m_initRange[3];		//  initial range
-	sx::gui::PTextEdit		m_gravity[3];		//  gravity
+	sx::gui::TextEdit*		m_moveSpeed[3];		//  move speed
+	sx::gui::TextEdit*		m_initRange[3];		//  initial range
+	sx::gui::TextEdit*		m_gravity[3];		//  gravity
 
 	EditMaterial			m_EditMaterial;		//  material editor
 

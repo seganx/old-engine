@@ -25,7 +25,7 @@ public:
 
 	void LoadFromFile( const WCHAR* FileName ){
 		//  clear current font
-		m_Chars.Clear();
+		m_chars.Clear();
 
 		//	texture file name
 		String		 textureFile;
@@ -73,7 +73,7 @@ public:
 					sx::cmn::String_GetValue(*slist[i], L"page", tmp);
 					pCharInfo->page = tmp.StrToInt(tmp);
 
-					m_Chars.Insert(pCharInfo->ID, pCharInfo);
+					m_chars.Insert(pCharInfo->ID, pCharInfo);
 				} 
 				else if ( isFirstWord(slist[i]->Text(), L"page") )
 				{
@@ -82,23 +82,23 @@ public:
 				else if ( isFirstWord(slist[i]->Text(), L"info") )
 				{
 					sx::cmn::String_GetValue(*slist[i], L"size", tmp);
-					m_FontDesc.Size = tmp.StrToInt(tmp);
+					m_desc.size = tmp.StrToInt(tmp);
 
 					sx::cmn::String_GetValue(*slist[i], L"outline", tmp);
-					m_FontDesc.Outline = tmp.StrToInt(tmp);
+					m_desc.outline = tmp.StrToInt(tmp);
 				} 
 				else if ( isFirstWord(slist[i]->Text(), L"common") )
 				{
 					sx::cmn::String_GetValue(*slist[i], L"lineHeight", tmp);
-					m_FontDesc.LineHeight = tmp.StrToInt(tmp);
+					m_desc.lineHeight = tmp.StrToInt(tmp);
 
 					sx::cmn::String_GetValue(*slist[i], L"base", tmp);
-					m_FontDesc.Base = tmp.StrToInt(tmp);
+					m_desc.base = tmp.StrToInt(tmp);
 				} 
 				else if ( isFirstWord(slist[i]->Text(), L"chars") )
 				{
 					sx::cmn::String_GetValue(*slist[i], L"count", tmp);
-					m_FontDesc.CharCount = tmp.StrToInt(tmp);
+					m_desc.charCount = tmp.StrToInt(tmp);
 				}
 			}
 		}
@@ -107,16 +107,16 @@ public:
 		str1024 texfile = textureFile;
 		texfile.ExcludeFileExtension();
 		texfile << L".txr";
-		sx::d3d::Texture::Manager::Create(m_Texture, texfile);
+		sx::d3d::Texture::Manager::Create(m_texture, texfile);
 		
 		texfile = FileName;
 		texfile.ExtractFilePath();
 		texfile.MakePathStyle();
 		texfile << textureFile;
-		m_Texture->LoadFromImageFile( texfile, D3DFMT_A8R8G8B8 );
+		m_texture->LoadFromImageFile( texfile, D3DFMT_A8R8G8B8 );
 
 		MemoryStream mem;
-		m_Texture->Save(mem);
+		m_texture->Save(mem);
 
 		texfile = textureFile;
 		texfile.ExcludeFileExtension();
@@ -130,7 +130,7 @@ bool ImportFontToLibrary(const WCHAR* SrcFilePath)
 {
 	str1024 tmp = SrcFilePath;
 	tmp.ExtractFileName();
-	sx::gui::PFont font;
+	sx::gui::Font* font;
 	sx::gui::Font::Manager::Create(font, tmp);
 	((DrivedFont*)font)->LoadFromFile(SrcFilePath);
 

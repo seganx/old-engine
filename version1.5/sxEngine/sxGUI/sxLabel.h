@@ -13,8 +13,7 @@
 
 namespace sx { namespace gui {
 
-	//! forward declaration
-	typedef class	Font		*PFont;
+	class Font;
 
 	//! line structure used to hold line data in the label and text editors
 	class SEGAN_API GUITextLine
@@ -30,10 +29,10 @@ namespace sx { namespace gui {
 		bool IsColorCode(const WCHAR* str);
 
 		//! recalculate the width of the line
-		int UpdateWidth(PFont textFont, bool reversed);
+		int UpdateWidth(Font* textFont, bool reversed);
 
 		//! compute number of characters committed to buffer
-		int GetNumCharToBuffer(PFont textFont);
+		int GetNumCharToBuffer(Font* textFont);
 
 	public:
 		str1024		text;
@@ -128,20 +127,20 @@ namespace sx { namespace gui {
 		//! prepare and form the buffers by texts
 		virtual void BurnBuffer(void);
 		
-		GUILineList		m_Lines;
-		String			m_Text;
-		PFont			m_Font;
-		GUITextAlign	m_Align;
-		PointI			m_Scroll;					//	scroll of X axis and Y axis
+		GUILineList		m_lines;
+		String			m_text;
+		Font*			m_font;
+		GUITextAlign	m_align;
+		PointI			m_scroll;					//	scroll of X axis and Y axis
 
-		GUICallbackFuncPtr		m_OnTextChange;		//  call back function will call when text has been changed
-		GUICallbackFuncPtr		m_OnScrollChange;	//  call back function will call when vertical/horizontal scrolled
+		GUICallbackFuncPtr		m_onTextChange;		//  call back function will call when text has been changed
+		GUICallbackFuncPtr		m_onScrollChange;	//  call back function will call when vertical/horizontal scrolled
 
 		int						m_numBuffer;
 		int						m_numChar;
-		PDirect3DVertexBuffer	m_VB0;
-		PDirect3DVertexBuffer	m_VB1;
-		PDirect3DIndexBuffer	m_IB;
+		PDirect3DVertexBuffer	m_vertexBuffer0;
+		PDirect3DVertexBuffer	m_vertexBuffer1;
+		PDirect3DIndexBuffer	m_indexBuffer;
 	};
 	typedef Label *PLabel;
 

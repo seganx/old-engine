@@ -332,10 +332,10 @@ sx::gui::PTrackBar EditorUI::CreateTrackbar( sx::gui::PControl parent, const flo
 	return gui;
 }
 
-sx::gui::PTextEdit EditorUI::CreateEditBox( sx::gui::PControl parent, const float left, const float width, const WCHAR* text /*= NULL*/ )
+sx::gui::TextEdit* EditorUI::CreateEditBox( sx::gui::PControl parent, const float left, const float width, const WCHAR* text /*= NULL*/ )
 {
 	//  create control
-	sx::gui::PTextEdit gui = sx_new( sx::gui::TextEdit );
+	sx::gui::TextEdit* gui = sx_new( sx::gui::TextEdit );
 	gui->SetParent(parent);
 	gui->SetSize( float2(width, 18.0f) );
 	gui->SetFont( EditorUI::GetDefaultFont(8) );
@@ -349,10 +349,10 @@ sx::gui::PTextEdit EditorUI::CreateEditBox( sx::gui::PControl parent, const floa
 	return gui;
 }
 
-sx::gui::PTextEdit EditorUI::CreateLabeldEditBox( sx::gui::PControl parent, float left, float textWidth, float labelWidth, const WCHAR* caption /*= NULL*/, const WCHAR* text /*= NULL*/ )
+sx::gui::TextEdit* EditorUI::CreateLabeldEditBox( sx::gui::PControl parent, float left, float textWidth, float labelWidth, const WCHAR* caption /*= NULL*/, const WCHAR* text /*= NULL*/ )
 {
 	//  create control
-	sx::gui::PTextEdit gui = CreateEditBox(parent, left + labelWidth + textWidth/2, textWidth, text);
+	sx::gui::TextEdit* gui = CreateEditBox(parent, left + labelWidth + textWidth/2, textWidth, text);
 	sx::gui::PLabel lbl = CreateLabel( gui, labelWidth, 8, caption );
 	lbl->Position().x = -(labelWidth + textWidth) * 0.5f;
 

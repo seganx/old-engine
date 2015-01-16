@@ -227,7 +227,7 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 
 						if ( tmpStr == L"NORMAL" )
 						{
-							script.GetInteger( i, L"gold", m_gold );
+							script.GetInt( i, L"gold", m_gold );
 
 							g_game->m_balancerFactor = 0.25f;
 							script.GetFloat( i, L"balancer_factor", g_game->m_balancerFactor );
@@ -284,7 +284,7 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 
 						if ( tmpStr == L"NORMAL" )
 						{
-							script.GetInteger( i, L"gold", m_gold );
+							script.GetInt( i, L"gold", m_gold );
 
 							g_game->m_balancerFactor = 0.25f;
 							script.GetFloat( i, L"balancer_factor", g_game->m_balancerFactor );

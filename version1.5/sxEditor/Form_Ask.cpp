@@ -53,6 +53,7 @@ Form_Ask::Form_Ask( void ): BaseForm(), m_Sender(0)
 
 	//  stop moving and resizing
 	SEGAN_SET_REM(m_Option, FORM_OPTION_RESIZABLE);
+	SEGAN_SET_ADD(m_Option, FORM_OPTION_ONTOP );
 
 	SetSize( ASK_WIDTH, ASK_HEIGHT );
 }

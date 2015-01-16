@@ -333,7 +333,7 @@ void Form_EditParticle::OnMouseWheel( sx::gui::PControl Sender )
 	{
 	case GUI_TEXTEDIT:
 		{
-			sx::gui::PTextEdit pEdit = (sx::gui::PTextEdit)Sender;
+			sx::gui::TextEdit* pEdit = (sx::gui::TextEdit*)Sender;
 			if ( pEdit->GetFocused() )
 			{
 				if ( pEdit == m_quadCount || pEdit == m_rndParam1 )

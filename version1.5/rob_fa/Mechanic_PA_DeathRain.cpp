@@ -288,7 +288,7 @@ namespace GM
 
 						if ( tmpStr == L"DeathRain" )
 						{
-							script.GetInteger(i, L"cost", m_Cost);
+							script.GetInt(i, L"cost", m_Cost);
 							script.GetFloat(i, L"coolTime", m_coolTime);
 							m_Time = m_coolTime;
 

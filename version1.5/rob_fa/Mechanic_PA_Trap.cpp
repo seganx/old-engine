@@ -293,7 +293,7 @@ namespace GM
 
 						if ( tmpStr == L"Trap" )
 						{
-							script.GetInteger(i, L"cost", m_Cost);
+							script.GetInt(i, L"cost", m_Cost);
 							script.GetFloat(i, L"coolTime", m_coolTime);
 							m_Time = m_coolTime;
 
@@ -323,8 +323,8 @@ namespace GM
 							script.GetFloat(i, L"stunTime",			m_attack.stunTime );
 							script.GetFloat(i, L"stunValue",		m_attack.stunValue );
 							script.GetFloat(i, L"actionTime",		m_attack.actionTime );
-							script.GetInteger(i, L"damageCount",	m_attack.actionCount );
-							script.GetInteger(i, L"actionCount",	m_attack.actionCount );
+							script.GetInt(i, L"damageCount",	m_attack.actionCount );
+							script.GetInt(i, L"actionCount",	m_attack.actionCount );
 
 							m_coolTime					-= g_game->m_upgrades.trap_cooltime;
 							m_attack.actionCount		= m_attack.actionCount + int(g_game->m_upgrades.trap_count+0.5f);

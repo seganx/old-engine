@@ -53,11 +53,11 @@ namespace sx { namespace gui {
 		}
 
 		//  clear current elements
-		for (int i=0; i<m_Elements.Count(); i++)
+		for (int i=0; i<m_elements.Count(); i++)
 		{
-			sx_delete_and_null(m_Elements[i]);
+			sx_delete_and_null(m_elements[i]);
 		}
-		m_Elements.Clear();
+		m_elements.Clear();
 
 		SetParent(NULL);
 	}
@@ -102,9 +102,9 @@ namespace sx { namespace gui {
 		SEGAN_STREAM_WRITE(S, m_Rot);
 
 		//  save each element
-		for (int i=0; i<m_Elements.Count(); i++)
+		for (int i=0; i<m_elements.Count(); i++)
 		{
-			m_Elements[i]->Save(S);
+			m_elements[i]->Save(S);
 		}
 
 		//  version 2 : add hint
@@ -124,9 +124,9 @@ namespace sx { namespace gui {
 			SEGAN_STREAM_READ(S, m_Pos);
 			SEGAN_STREAM_READ(S, m_Rot);
 
-			for (int i=0; i<m_Elements.Count(); i++)
+			for (int i=0; i<m_elements.Count(); i++)
 			{
-				m_Elements[i]->Load(S);
+				m_elements[i]->Load(S);
 			}
 
 			//  apply loaded data
@@ -288,17 +288,17 @@ namespace sx { namespace gui {
 
 	FORCEINLINE int Control::GetElementCount( void )
 	{
-		return m_Elements.Count();
+		return m_elements.Count();
 	}
 
 	FORCEINLINE sx::gui::PElement Control::GetElement( int index )
 	{
 		sx_callstack();
 
-		if (index<0 || index>=m_Elements.Count())
+		if (index<0 || index>=m_elements.Count())
 			return NULL;
 		else
-			return m_Elements[index];
+			return m_elements[index];
 	}
 
 	FORCEINLINE sx::gui::PElement Control::GetSelectedElement( void )
@@ -506,7 +506,7 @@ namespace sx { namespace gui {
 		if ( inSpace3D )
 		{
 			d3d::Device3D::RS_ZEnabled(true);
-			for (int i=0; i<m_Elements.Count(); i++) m_Elements[i]->Draw(m_Option | option);
+			for (int i=0; i<m_elements.Count(); i++) m_elements[i]->Draw(m_Option | option);
 		}
 		else
 		{
@@ -526,7 +526,7 @@ namespace sx { namespace gui {
 			d3d::Device3D::Matrix_Project_Set(matProj);
 			
 			d3d::Device3D::RS_ZEnabled(false);
-			for (int i=0; i<m_Elements.Count(); i++) m_Elements[i]->Draw(m_Option | option);
+			for (int i=0; i<m_elements.Count(); i++) m_elements[i]->Draw(m_Option | option);
 
 			if (option & SX_GUI_DRAW_SAVEMATRIX)
 			{
@@ -547,7 +547,7 @@ namespace sx { namespace gui {
 		if (SEGAN_SET_HAS(m_Option, _SX_GUI_IN_3DSPACE_))
 		{
 			d3d::Device3D::RS_ZEnabled(true);
-			for (int i=0; i<m_Elements.Count(); i++) m_Elements[i]->DrawOutline(Globals::Draw_Line_Offset());	
+			for (int i=0; i<m_elements.Count(); i++) m_elements[i]->DrawOutline(Globals::Draw_Line_Offset());	
 		}
 		else
 		{
@@ -556,7 +556,7 @@ namespace sx { namespace gui {
 			d3d::Device3D::Camera_Projection(Globals::Golden_FOV());
 
 			d3d::Device3D::RS_ZEnabled(false);
-			for (int i=0; i<m_Elements.Count(); i++) m_Elements[i]->DrawOutline(Globals::Draw_Line_Offset());
+			for (int i=0; i<m_elements.Count(); i++) m_elements[i]->DrawOutline(Globals::Draw_Line_Offset());
 
 			d3d::Device3D::Matrix_Project_Set(mat_proj_last);
 		}
@@ -666,9 +666,9 @@ namespace sx { namespace gui {
 			d3d::Device3D::Matrix_View_Get(matView);
 			d3d::Device3D::Matrix_Project_Get(matProjection);
 
-			for (int i=m_Elements.Count()-1; i>-1; i--)
+			for (int i=m_elements.Count()-1; i>-1; i--)
 			{
-				if (m_Elements[i]->CheckCursor(absX, absY, matView, matProjection))
+				if (m_elements[i]->CheckCursor(absX, absY, matView, matProjection))
 				{
 					result = i;
 					break;
@@ -684,9 +684,9 @@ namespace sx { namespace gui {
 				0.1f, 
 				1000.0f);
 
-			for (int i=m_Elements.Count()-1; i>-1; i--)
+			for (int i=m_elements.Count()-1; i>-1; i--)
 			{
-				if (m_Elements[i]->CheckCursor(absX, absY, matView, matProjection))
+				if (m_elements[i]->CheckCursor(absX, absY, matView, matProjection))
 				{
 					result = i;
 					break;
@@ -733,15 +733,15 @@ namespace sx { namespace gui {
 
 			if ( element == -1 )
 			{
-				for (int i=m_Elements.Count()-1; i>-1; i--)
+				for (int i=m_elements.Count()-1; i>-1; i--)
 				{
-					if (m_Elements[i]->CheckCursor(absX, absY, matView, matProjection, uv))
+					if (m_elements[i]->CheckCursor(absX, absY, matView, matProjection, uv))
 						return i;
 				}
 			}
 			else
 			{
-				if ( m_Elements[element]->CheckCursor(absX, absY, matView, matProjection, uv) )
+				if ( m_elements[element]->CheckCursor(absX, absY, matView, matProjection, uv) )
 					return element;
 			}			
 		}
@@ -754,15 +754,15 @@ namespace sx { namespace gui {
 
 			if ( element == -1 )
 			{
-				for (int i=m_Elements.Count()-1; i>-1; i--)
+				for (int i=m_elements.Count()-1; i>-1; i--)
 				{
-					if (m_Elements[i]->CheckCursor(absX, absY, matView, matProjection, uv))
+					if (m_elements[i]->CheckCursor(absX, absY, matView, matProjection, uv))
 						return i;
 				}
 			}
 			else
 			{
-				if ( m_Elements[element]->CheckCursor(absX, absY, matView, matProjection, uv) )
+				if ( m_elements[element]->CheckCursor(absX, absY, matView, matProjection, uv) )
 					return element;
 			}
 		}
@@ -933,16 +933,16 @@ namespace sx { namespace gui {
 	void Control::SetElementCount( int count )
 	{
 		//  clear last elements
-		for (int i=0; i<m_Elements.Count(); i++)
+		for (int i=0; i<m_elements.Count(); i++)
 		{
-			sx_delete_and_null(m_Elements[i]);
+			sx_delete_and_null(m_elements[i]);
 		}
-		m_Elements.Clear();
+		m_elements.Clear();
 
 		//  create new elements
 		for (int i=0; i<count; i++)
 		{
-			m_Elements.PushBack( sx_new( Element(this) ) );
+			m_elements.PushBack( sx_new( Element(this) ) );
 		}
 	}
 
@@ -955,9 +955,9 @@ namespace sx { namespace gui {
 		{
 			for (int i=0; i<m_Child.Count(); i++) 
 			{
-				m_Elements[0]->BeginAsClipSpace();
+				m_elements[0]->BeginAsClipSpace();
 				m_Child[i]->Draw(Option);
-				m_Elements[0]->EndAsClipSpace();
+				m_elements[0]->EndAsClipSpace();
 			}
 		}
 		else

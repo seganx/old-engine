@@ -13,13 +13,15 @@
 
 #include "ImportEngine.h"
 
-#define NET_ACTIVATE	1
+#define NET_ACTIVATE	0
 #define NET_DELAY_TIME	60
 #define NET_TIMEOUT		60000
 
 //////////////////////////////////////////////////////////////////////////
 //  SOME GLOBAL VARIABLES
+#if NET_ACTIVATE
 extern Client* g_client;
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //  some global functions

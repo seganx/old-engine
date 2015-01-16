@@ -66,6 +66,11 @@ namespace sx { namespace gui {
 		return Text	== t.Text && UserData == t.UserData && Option == t.Option && Level == t.Level;
 	}
 
+	bool ListBox::Item::IsSelected( void )
+	{
+		return SEGAN_SET_HAS(Option, ITEM_SELECTED);
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	//	LIST BOX
 	//////////////////////////////////////////////////////////////////////////

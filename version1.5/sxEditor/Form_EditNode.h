@@ -72,15 +72,15 @@ private:
 	sx::core::PNode			m_pNode;			// pointer to selected node to edit it
 	sx::core::PNodeMember	m_pMember;			// pointer to selected member
 	sx::gui::PLabel			m_pTitle;			// Title of the form
-	sx::gui::PTextEdit		m_pEditName;		// text editor to edit name
+	sx::gui::TextEdit*		m_pEditName;		// text editor to edit name
 
-	sx::gui::PTextEdit		m_drawOrder;		// text editor to edit draw order
+	sx::gui::TextEdit*		m_drawOrder;		// text editor to edit draw order
 
 	sx::gui::PLabel			m_pLabelPos;		// position label
-	sx::gui::PTextEdit		m_pEditPos[3];		// Text edits to edit position
+	sx::gui::TextEdit*		m_pEditPos[3];		// Text edits to edit position
 
 	sx::gui::PLabel			m_pLabelRot;		// rotation label
-	sx::gui::PTextEdit		m_pEditRot[3];		// Text edits to edit rotation
+	sx::gui::TextEdit*		m_pEditRot[3];		// Text edits to edit rotation
 
 	sx::gui::PButton		m_playSound;		// play all sounds
 	sx::gui::PButton		m_sprayParticle;	// spray all particles

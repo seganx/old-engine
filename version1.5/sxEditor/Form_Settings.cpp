@@ -207,6 +207,7 @@ Form_Settings::Form_Settings( void ): BaseForm()
 	//  stop moving or resizing
 	SEGAN_SET_REM(m_Option, FORM_OPTION_RESIZABLE);
 	//SEGAN_SET_REM(m_Option, FORM_OPTION_MOVABLE);
+	SEGAN_SET_ADD(m_Option, FORM_OPTION_ONTOP);
 
 	SetSize( FORM_SETTINGS_WIDTH, FORM_SETTINGS_HEIGHT);
 

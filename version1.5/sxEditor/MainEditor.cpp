@@ -390,6 +390,7 @@ void Editor::Loop( float elpsTime )
 	sx::gui::Control::GetCapturedControl() = NULL;
 
 	//  explorer will use in other scenes so should updated here
+#if 1
 	frm_Ask->ProcessInput(inputHandled);
 	frm_SetName->ProcessInput(inputHandled);
 	frm_importSound->ProcessInput(inputHandled);
@@ -397,6 +398,9 @@ void Editor::Loop( float elpsTime )
 	frm_importModel->ProcessInput(inputHandled);
 	dbg_Lable->ProcessInput(inputHandled);
 	frm_Settings->ProcessInput(inputHandled);
+#else
+	BaseForm::Manager::ProcessInput(inputHandled);
+#endif
 
 	//  update other editors
 	switch (g_CurSpace)
@@ -439,6 +443,7 @@ void Editor::Loop( float elpsTime )
 
 	//////////////////////////////////////////////////////////////////////////
 	//  update objects in this scene
+#if 1
 	frm_importModel->Update(elpsTime);
 	frm_importSound->Update(elpsTime);
 	frm_Ask->Update(elpsTime);
@@ -446,6 +451,9 @@ void Editor::Loop( float elpsTime )
 	frm_SetName->Update(elpsTime);
 	frm_Settings->Update(elpsTime);
 	frm_Explorer->Update(elpsTime);
+#else
+	BaseForm::Manager::Update(elpsTime);
+#endif
 
 	g_panelObject->Update(elpsTime);
 	g_panelScene->Update(elpsTime);
@@ -550,6 +558,7 @@ void Editor::Loop( float elpsTime )
 	if ( g_panelCurSpace )	g_panelCurSpace->Draw(0);
 
 	//  draw forms
+#if 1
 	frm_Settings->Draw(0);
 	frm_importModel->Draw(0);
 	frm_Explorer->Draw(0);
@@ -557,6 +566,9 @@ void Editor::Loop( float elpsTime )
 	frm_SetName->Draw(0);
 	frm_Ask->Draw(0);
 	frm_Hint->Draw(0);
+#else
+	BaseForm::Manager::Draw(0);
+#endif
 
 	//frm_Hint->Show();
 	//frm_Settings->Show();
@@ -676,6 +688,7 @@ void Editor::SetLabelTips( const WCHAR* strTips, const float tipTime )
 	g_strTips = strTips;
 	g_tipsTime = tipTime;
 
+#if NET_ACTIVATE
 	if ( !strTips || !g_client ) return;
 
 	char msg[512] = {0};
@@ -690,7 +703,8 @@ void Editor::SetLabelTips( const WCHAR* strTips, const float tipTime )
 	}
 	msg[i++]=0;
 
- 	g_client->Send( msg, i, false );
- 	g_client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
+	g_client->Send( msg, i, false );
+	g_client->Update( 0, NET_DELAY_TIME, NET_TIMEOUT );
+#endif
 }
 

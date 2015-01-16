@@ -69,6 +69,8 @@ Form_ImportModel::Form_ImportModel( void ): BaseForm()
 	m_btn_Cancel	= EditorUI::CreateButton( m_pBack, 128, L"Cancel" );
 	SEGAN_GUI_SET_ONCLICK( m_btn_Cancel, Form_ImportModel::OnParamChange );
 
+	SEGAN_SET_ADD(m_Option, FORM_OPTION_ONTOP);
+
 	SetSize( IMPORTOBJ_WIDTH, IMPORTOBJ_HEIGHT );
 }
 

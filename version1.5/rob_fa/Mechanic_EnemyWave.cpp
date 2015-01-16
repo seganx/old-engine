@@ -645,17 +645,15 @@ namespace GM
 					ZeroMemory( ew, sizeof(EnemyWave) );
 					m_wavesSrc.PushBack(ew);
 
-					CopyString( ew->name, 64, tmpStr );
-
-					if ( script.GetString( i, L"tipsStart", tmpStr ) )
+					if ( script.GetInt( i, L"tipsStart", tmpStr ) )
 						CopyString( ew->tipsStart, 512, tmpStr );
+
+					if ( script.GetString( i, L"tipsEnd", tmpStr ) )
+						CopyString( ew->tipsEnd, 512, tmpStr );
 
 					if ( script.GetString( i, L"tipsStartIcon", tmpStr ) )
 						CopyString( ew->tipsStartIcon, 64, tmpStr );
-					
-					if ( script.GetString( i, L"tipsEnd", tmpStr ) )
-						CopyString( ew->tipsEnd, 512, tmpStr );
-					
+										
 					if ( script.GetString( i, L"tipsEndIcon", tmpStr ) )
 						CopyString( ew->tipsEndIcon, 64, tmpStr );
 
@@ -688,8 +686,8 @@ namespace GM
 					else
 						ew->tipsStartNode[0] = 0;
 
-					script.GetInteger(i, L"addGold",		ew->addGold);
-					script.GetInteger(i, L"addHealth",		ew->addHealth);
+					script.GetInt(i, L"addGold",		ew->addGold);
+					script.GetInt(i, L"addHealth",		ew->addHealth);
 					script.GetFloat(i, L"addFireRate",		ew->addFireRate);
 					script.GetFloat(i, L"addMoveSpeed",		ew->addMoveSpeed);
 					script.GetFloat(i, L"addAnimSpeed",		ew->addAnimSpeed);
@@ -745,17 +743,17 @@ namespace GM
 						script.GetFloat(i, tmpStr, ew->subWave[j].startTime);
 
 						tmpStr.Format(L"%d_count", j);
-						script.GetInteger(i, tmpStr, ew->subWave[j].count);
+						script.GetInt(i, tmpStr, ew->subWave[j].count);
 
 						tmpStr.Format(L"%d_matIndex", j);
-						if ( !script.GetInteger(i, tmpStr, ew->subWave[j].matIndex) )
+						if ( !script.GetInt(i, tmpStr, ew->subWave[j].matIndex) )
 							ew->subWave[j].matIndex = -1;
 
 						tmpStr.Format(L"%d_addGold", j);
-						script.GetInteger(i, tmpStr, ew->subWave[j].addGold);
+						script.GetInt(i, tmpStr, ew->subWave[j].addGold);
 
 						tmpStr.Format(L"%d_addHealth", j);
-						script.GetInteger(i, tmpStr, ew->subWave[j].addHealth);
+						script.GetInt(i, tmpStr, ew->subWave[j].addHealth);
 
 						tmpStr.Format(L"%d_addDamage", j);
 						script.GetFloat( i, tmpStr, ew->subWave[j].addPhysicalDamage	);
@@ -806,7 +804,7 @@ namespace GM
 								CopyString( ew->subWave[j].infoImage, 64,  image );
 
 								tmpStr.Format( L"%d_infoShowNow", j );
-								script.GetInteger( i, tmpStr, ew->subWave[j].infoShowNow );
+								script.GetInt( i, tmpStr, ew->subWave[j].infoShowNow );
 							}
 						}
 

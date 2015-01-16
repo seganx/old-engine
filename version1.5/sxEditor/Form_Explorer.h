@@ -88,7 +88,7 @@ private:
 	sx::gui::PPanel			m_pHardware;		// system icon
 	sx::gui::PPanel			m_pClipper;			// use this panel to clip lists
 	sx::gui::PTrackBar		m_pScroll;			// the lateral scroll let me to traverse between the other lists
-	sx::gui::PTextEdit		m_pLabelPath;		// the text edit to display the path
+	sx::gui::TextEdit*		m_pLabelPath;		// the text edit to display the path
 	sx::gui::PButton		m_btnOK;			// ok button of the form
 
 	sx::gui::PButton		m_btnProject;		//  goto project folder

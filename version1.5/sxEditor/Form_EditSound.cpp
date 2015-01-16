@@ -408,7 +408,7 @@ void Form_EditSound::OnMouseWheel( sx::gui::PControl Sender )
 	{
 	case GUI_TEXTEDIT:
 		{
-			sx::gui::PTextEdit pEdit = (sx::gui::PTextEdit)Sender;
+			sx::gui::TextEdit* pEdit = (sx::gui::TextEdit*)Sender;
 			if ( pEdit->GetFocused() )
 			{
 				float ceoff = 1.0f;

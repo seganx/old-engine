@@ -126,13 +126,13 @@ void EntityManager::LoadTypes( Callback_Draw_Loading drawLoading )
 				for (int l=0; l<NUM_LEVELS; l++)
 				{
 					tmpStr.Format(L"%d_cost", l);
-					script.GetInteger(i, tmpStr, pe->m_cost[l]);
+					script.GetInt(i, tmpStr, pe->m_cost[l]);
 
 					tmpStr.Format(L"%d_unlockXP", l);
-					script.GetInteger(i, tmpStr, pe->m_costXP[l]);
+					script.GetInt(i, tmpStr, pe->m_costXP[l]);
 
 					tmpStr.Format(L"%d_health", l);
-					script.GetInteger(i, tmpStr, pe->m_health.level[l]);
+					script.GetInt(i, tmpStr, pe->m_health.level[l]);
 
 					tmpStr.Format(L"%d_physicalDamage", l);
 					script.GetFloat(i, tmpStr, pe->m_attackLevel[l].physicalDamage);
@@ -168,7 +168,7 @@ void EntityManager::LoadTypes( Callback_Draw_Loading drawLoading )
 					script.GetFloat(i, tmpStr, pe->m_attackLevel[l].goldenValue);
 
 					tmpStr.Format(L"%d_actionCount", l);
-					script.GetInteger(i, tmpStr, pe->m_attackLevel[l].actionCount);
+					script.GetInt(i, tmpStr, pe->m_attackLevel[l].actionCount);
 
 					tmpStr.Format(L"%d_actionTime", l);
 					script.GetFloat(i, tmpStr, pe->m_attackLevel[l].actionTime);
@@ -217,24 +217,24 @@ void EntityManager::LoadTypes( Callback_Draw_Loading drawLoading )
 				}
 
 				int matIndex = -1;
-				if ( script.GetInteger(i, L"matIndex", matIndex) && pe->m_node )
+				if ( script.GetInt(i, L"matIndex", matIndex) && pe->m_node )
 				{
 					msg_Mesh msgmesh(0, 0, 0, matIndex);
 					pe->m_node->MsgProc( MT_MESH, &msgmesh );
 				}
 
-				script.GetInteger(i, L"gold", pe->m_cost[0]);
+				script.GetInt(i, L"gold", pe->m_cost[0]);
 				script.GetFloat(i, L"xp", pe->m_experience);
 				script.GetFloat(i, L"moveSpeed", pe->m_move.moveSpeed);
 				script.GetFloat(i, L"animSpeed", pe->m_move.animSpeed);
-				script.GetInteger(i, L"health", pe->m_health.level[0]);
+				script.GetInt(i, L"health", pe->m_health.level[0]);
 				script.GetFloat(i, L"damage", pe->m_attackLevel[0].physicalDamage);
 				script.GetFloat(i, L"physicalArmor", pe->m_attackLevel[0].physicalArmor);
 				script.GetFloat(i, L"electricalArmor", pe->m_attackLevel[0].electricalArmor);
 				script.GetFloat(i, L"fireRange", pe->m_attackLevel[0].maxRange);
 				script.GetFloat(i, L"fireRate", pe->m_attackLevel[0].rate);
 				script.GetFloat(i, L"splashRadius", pe->m_attackLevel[0].splashRadius);
-				script.GetInteger(i, L"killPeople", pe->m_attackLevel[0].killPeople);
+				script.GetInt(i, L"killPeople", pe->m_attackLevel[0].killPeople);
 				if ( script.GetString(i, L"bullet", tmpStr) )
 					String::Copy( pe->m_attackLevel[0].bullet, 64, tmpStr );
 

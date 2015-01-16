@@ -323,7 +323,7 @@ void Game::Initialize( sx::sys::Window* win )
 						continue;
 
 					int v = 0;
-					if ( !script.GetInteger( i, L"value", v ) )
+					if ( !script.GetInt( i, L"value", v ) )
 						continue;
 
 					if ( i < Achievement_Count )
@@ -1787,7 +1787,7 @@ void Upgrades::LoadDefaults( void )
 					String::Copy( desc[j], 512, tmpStr );
 
 				tmpStr.Format( L"%d_unlock", j );
-				script.GetInteger(i, tmpStr, unlock[j] );
+				script.GetInt(i, tmpStr, unlock[j] );
 			}
 		}
 	}

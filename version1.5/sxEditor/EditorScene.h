@@ -17,6 +17,7 @@
 #include "Form_EditTerrain.h"
 #include "Form_EditSound.h"
 #include "Form_EditParticle.h"
+#include "Form_NodeList.h"
 #include "EditorUndo.h"
 
 class EditorScene
@@ -55,6 +56,7 @@ public:
 	static PForm_EditTerrain		frm_EditTrrn;			//  use path editor to edit terrain nodes
 	static PForm_EditSound			frm_EditSound;			//	use to edit sounds
 	static PForm_EditParticle		frm_EditParticle;		//	use to edit particle
+	static Form_NodeList*			frm_NodeList;			//	list of nodes in the scene
 
 	static PPopupMenu				pop_RightClick;			//  popup menu will show in right click
 

@@ -48,6 +48,8 @@ Form_ImportSound::Form_ImportSound( void ): BaseForm()
 
 	m_ch_Sample->Checked() = true;
 	
+	SEGAN_SET_ADD(m_Option, FORM_OPTION_ONTOP);
+
 	SetSize( IMPORTSOUND_WIDTH, IMPORTSOUND_HEIGHT );
 }
 

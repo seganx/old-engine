@@ -7,7 +7,9 @@
 #include "EditorScene.h"
 #include "EditorObject.h"
 
+#if NET_ACTIVATE
 extern Client* g_client = null;
+#endif
 
 
 //! if LM_WINDOWS activated a pointer of this structure will post in WPARAM
@@ -142,7 +144,9 @@ void MainLoop(float elpsTime)
 {
 	sx_callstack();
 
+#if NET_ACTIVATE
 	g_client->Update( elpsTime, NET_DELAY_TIME, NET_TIMEOUT );
+#endif
 
 	//	force to fast task update
 	for ( int i=0; i<60; i++ )

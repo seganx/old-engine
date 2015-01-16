@@ -34,7 +34,7 @@ namespace sx { namespace gui {
 	{
 		Control::SetSize(S);
 		RectF rc = Control::GetRect();
-		m_Elements[0]->SetRect(rc);
+		m_elements[0]->SetRect(rc);
 	}
 
 	void Panel::Draw( DWORD option )

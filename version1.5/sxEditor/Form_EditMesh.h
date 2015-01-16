@@ -53,7 +53,7 @@ private:
 	sx::gui::PCheckBox		m_Invisible;		//  the mesh will not render
 	sx::gui::PCheckBox		m_hasReflect;		//  the mesh will render to reflectors
 	sx::gui::PButton		m_EditGeometry;		//  edit geometry mesh
-	sx::gui::PTextEdit		m_scale;			//	edit box to set scale value
+	sx::gui::TextEdit*		m_scale;			//	edit box to set scale value
 	EditMaterial			m_EditMaterial;		//  material editor
 
 	sx::core::PMesh			m_mesh;				//  mesh to edit

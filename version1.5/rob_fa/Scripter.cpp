@@ -132,15 +132,30 @@ bool Scripter::GetFloat( const int sectionID, const WCHAR* name, float& value )
 	return m_mapValue.Find(id, value);
 }
 
-bool Scripter::GetInteger( const int sectionID, const WCHAR* name, int& value )
+bool Scripter::GetInt( const int objectIndex, const WCHAR* name, int& value )
 {
 	if ( !name ) return false;
-	UINT id = _GetKey(sectionID, name);
+	UINT id = _GetKey(objectIndex, name);
 
 	float v = 0;
 	if ( m_mapValue.Find(id, v) )
 	{
-		value = int( v + 0.2f );
+		value = int( v + 0.001f );
+		return true;
+	}
+	else
+		return false;
+}
+
+bool Scripter::GetUint( const int objectIndex, const WCHAR* name, uint& value )
+{
+	if ( !name ) return false;
+	UINT id = _GetKey(objectIndex, name);
+
+	float v = 0;
+	if ( m_mapValue.Find(id, v) )
+	{
+		value = uint( v + 0.001f );
 		return true;
 	}
 	else
@@ -154,29 +169,11 @@ bool Scripter::GetString( const int sectionID, const WCHAR* name, str512& value 
 
 	if ( m_mapString.Find(id, value) )
 	{
-#if 0
-		if ( value.Length() < 4 )
-		{
-			bool isreference = true;
-			for ( int i=0; i<value.Length(); ++i )
-			{
-				if ( iswdigit( value[i] ) == 0 )
-				{
-					isreference = false;
-					break;
-				}
-			}
-			if ( isreference )
-			{
-				int sid = value.ToInt();
-				value = g_game->m_strings->Get( sid );
-			}
-		}
-#endif
 		return true;
 	}
 	else  //	search through integers
 	{
+#if 0
 		float v = 0;
 		if ( m_mapValue.Find(id, v) )
 		{
@@ -185,6 +182,9 @@ bool Scripter::GetString( const int sectionID, const WCHAR* name, str512& value 
 			return true;
 		}
 		else return false;
+#else
+		return false;
+#endif
 	}
 }
 

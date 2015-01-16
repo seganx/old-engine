@@ -51,6 +51,7 @@ Form_SceneToolbar::Form_SceneToolbar( void ): BaseForm()
 	ADD_BUTTON(m_btnMove, L"ObjectMove");			SEGAN_GUI_SET_ONCLICK( m_btnMove,	Form_SceneToolbar::OnButtonClick );
 	ADD_BUTTON(m_btnRotate, L"ObjectRotate");		SEGAN_GUI_SET_ONCLICK( m_btnRotate, Form_SceneToolbar::OnButtonClick );
 	ADD_BUTTON(m_btnView, L"View");					SEGAN_GUI_SET_ONCLICK( m_btnView, Form_SceneToolbar::OnButtonClick );
+	ADD_BUTTON(m_viewList, L"Database");			SEGAN_GUI_SET_ONCLICK( m_viewList, Form_SceneToolbar::OnButtonClick );
 	ADD_BUTTON(m_btnBack, L"Back");					SEGAN_GUI_SET_ONCLICK( m_btnBack, Form_SceneToolbar::OnButtonClick );
 	m_btnBack->SetSize( float2(48.0f, 28.0f) );
 
@@ -203,6 +204,7 @@ void Form_SceneToolbar::OnResize( int EditorWidth, int EditorHeight )
 	m_btnRotate->Position().Set(	l, t, 0.0f	);	l += 50.0f;
 
 	m_btnView->Position().Set(		l, t, 0.0f	);	l += 36.0f;
+	m_viewList->Position().Set(		l, t, 0.0f	);	l += 36.0f;
 
 	m_btnBack->Position().Set( width/2 - 42.0f, t, 0.0f	);
 }
@@ -293,6 +295,10 @@ void Form_SceneToolbar::OnButtonClick( sx::gui::PControl Sender )
 		case 2:		EditorScene::draw_Option = SX_DRAW_WIRED;							wmode++;	break;
 		case 3:		EditorScene::draw_Option = 0;										wmode=0;	break;
 		}
+	}
+	else if ( Sender == m_viewList )
+	{
+		EditorScene::frm_NodeList->Show();
 	}
 	else if ( Sender == m_btnBack )
 		Editor::SetSpace( EWS_NULL );

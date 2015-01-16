@@ -28,7 +28,7 @@ Form_EditNode::Form_EditNode( void ): BaseForm(), m_applyChanges(true), m_mouseS
 	m_pTitle->SetText(L"Edit Node");
 
 	//  create name text editor
-	m_pEditName = (sx::gui::PTextEdit)sx::gui::Create(GUI_TEXTEDIT);
+	m_pEditName = (sx::gui::TextEdit*)sx::gui::Create(GUI_TEXTEDIT);
 	m_pEditName->SetParent(m_pBack);
 	m_pEditName->SetAlign(GTA_CENTER);
 	m_pEditName->SetFont( EditorUI::GetFormCaptionFont() );
@@ -622,7 +622,7 @@ void Form_EditNode::OnMouseWheel( sx::gui::PControl Sender )
 		{
 			for (int i=0; i<3; i++)
 			{
-				sx::gui::PTextEdit pEdit = m_pEditRot[i];
+				sx::gui::TextEdit* pEdit = m_pEditRot[i];
 				if ( Sender == pEdit && pEdit->GetFocused() )
 				{
 					float r = str128::StrToFloat( pEdit->GetText() );

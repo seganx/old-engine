@@ -43,10 +43,10 @@ namespace sx { namespace gui {
 		Control::SetSize(S);
 		RectF rc = GetRect();
 
-		m_Elements[0]->SetRect(rc);
+		m_elements[0]->SetRect(rc);
 
-		m_Elements[1]->SetRect(rc);
-		//m_Elements[1]->Matrix()._43 = SX_GUI_Z_BIAS;
+		m_elements[1]->SetRect(rc);
+		//m_elements[1]->Matrix()._43 = SX_GUI_Z_BIAS;
 	}
 
 	int CheckBox::MouseUp( float absX, float absY )
@@ -69,9 +69,9 @@ namespace sx { namespace gui {
 			return;
 
 		if (!m_Checked)
-			m_Elements[1]->Matrix().Scale(SX_GUI_MINIMUM_SCALE, SX_GUI_MINIMUM_SCALE, 1.0f);
+			m_elements[1]->Matrix().Scale(SX_GUI_MINIMUM_SCALE, SX_GUI_MINIMUM_SCALE, 1.0f);
 		else
-			m_Elements[1]->Matrix().Scale(1.0f, 1.0f, 1.0f);
+			m_elements[1]->Matrix().Scale(1.0f, 1.0f, 1.0f);
 
 		Control::Draw(option);
 

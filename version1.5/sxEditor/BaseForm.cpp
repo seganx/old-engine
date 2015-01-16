@@ -8,11 +8,7 @@
 static Array<PBaseForm> s_formNormal;		//  normal forms
 static Array<PBaseForm> s_formOnTop;		//  always on top forms
 
-BaseForm::BaseForm( void ): sx::gui::Form(), 
-m_Option(FORM_OPTION_MOVABLE | FORM_OPTION_RESIZABLE),
-m_MaxSize(9999.0f, 9999.0f), 
-m_MinSize(20.0f, 15.0f),
-m_pBack(NULL)
+BaseForm::BaseForm( void ): sx::gui::Form(), m_Option(FORM_OPTION_MOVABLE | FORM_OPTION_RESIZABLE), m_MaxSize(9999.0f, 9999.0f), m_MinSize(20.0f, 15.0f), m_pBack(NULL)
 {
 	using namespace sx::gui;
 
@@ -268,16 +264,34 @@ void BaseForm::Manager::ProcessInput( bool& inputHandled )
 	}
 
 	//  process input for always on top forms
+	int first = -1;
 	for (int i=0; i<s_formOnTop.Count(); i++)
 	{
-		s_formOnTop[i]->ProcessInput(inputHandled);
+		BaseForm* form = s_formOnTop[i];
+		if ( form->IsVisible() )
+		{
+			form->ProcessInput(inputHandled);
+			if ( inputHandled && first < 0 )
+				first = i;
+		}
 	}
+	if ( first > 0 )
+		s_formOnTop.Move(first, 0);
 
 	//  process input for normal forms
+	first = -1;
 	for (int i=0; i<s_formNormal.Count(); i++)
 	{
-		s_formNormal[i]->ProcessInput(inputHandled);
+		BaseForm* form = s_formNormal[i];
+		if ( form->IsVisible() )
+		{
+			form->ProcessInput(inputHandled);
+			if ( inputHandled && first < 0 )
+				first = i;
+		}
 	}
+	if ( first > 0 )
+		s_formNormal.Move(first, 0);
 }
 
 void BaseForm::Manager::Update( float elpsTime )
@@ -313,9 +327,10 @@ void BaseForm::Manager::Operate( float elpsTime, bool& inputHandled )
 void BaseForm::Manager::Draw( DWORD flag )
 {
 	//  draw normal forms
-	for (int i=s_formNormal.Count()-1; i>=0; i--)
+	int i = s_formNormal.Count() - 1;
+	while ( i >= 0 )
 	{
-		s_formNormal[i]->Draw(flag);
+		s_formNormal[i--]->Draw(flag);
 	}
 
 	//  draw always on top forms

@@ -115,6 +115,20 @@ public:
 		m_item[index2] = _tmp;
 	}
 
+	SEGAN_LIB_INLINE void Move( sint fromIndex, sint toIndex )
+	{
+		sx_assert(fromIndex>=0 && fromIndex<m_count && toIndex>=0 && toIndex<m_count);
+		if ( fromIndex == toIndex ) return;
+		while ( fromIndex != toIndex )
+		{
+			int nextIndex = fromIndex + (fromIndex < toIndex ? 1 : -1 );
+			T _tmp = m_item[fromIndex];
+			m_item[fromIndex] = m_item[nextIndex];
+			m_item[nextIndex] = _tmp;
+			fromIndex = nextIndex;
+		}		
+	}
+
 	SEGAN_LIB_INLINE void Sort( compFunc cmpFunc = null )
 	{
 		if ( m_count > 1 ) QuickSort( cmpFunc, 0, m_count-1 );

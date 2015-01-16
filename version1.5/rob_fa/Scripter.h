@@ -33,7 +33,10 @@ public:
 	bool GetFloat(const int objectIndex, const WCHAR* name, float& value);
 
 	//! return true if named parameter founded and fill value by parameter
-	bool GetInteger(const int objectIndex, const WCHAR* name, int& value);
+	bool GetInt(const int objectIndex, const WCHAR* name, int& value);
+
+	//! return true if named parameter founded and fill value by parameter
+	bool GetUint(const int objectIndex, const WCHAR* name, uint& value);
 
 	//! return true if named parameter founded and fill value by parameter
 	bool GetString(const int objectIndex, const WCHAR* name, str512& value);

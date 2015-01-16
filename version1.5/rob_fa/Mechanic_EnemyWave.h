@@ -42,20 +42,19 @@ namespace GM
 			float				addAnimSpeed;
 			float				addExperience;
 
-			WCHAR				infoTitle[128];
-			WCHAR				infoDesc[512];
-			WCHAR				infoImage[64];
+			uint				infoTitle;
+			uint				infoDesc;
+			uint				infoImage;
 			int					infoShowNow;
 		};
 
 		SubWave					subWave[WAVE_ENEMY_MAXTYPE];
 
-		WCHAR					name[64];
 		WCHAR					tipsStartNode[64];
-		WCHAR					tipsStart[512];
-		WCHAR					tipsEnd[512];
 		WCHAR					tipsStartIcon[64];
 		WCHAR					tipsEndIcon[64];
+		uint					tipsStart;
+		uint					tipsEnd;
 		
 		int						addGold;
 		int						addHealth;

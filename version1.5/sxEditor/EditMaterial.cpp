@@ -302,11 +302,11 @@ sx::gui::PTrackBar EditMaterial::guiCreateTrakbar( sx::d3d::PMaterial mtrl, Shad
 	return tr;
 }
 
-sx::gui::PTextEdit EditMaterial::guiCreateTextEdit( sx::d3d::PMaterial mtrl, ShaderAnnotation& shDesc, void* paramInfo )
+sx::gui::TextEdit* EditMaterial::guiCreateTextEdit( sx::d3d::PMaterial mtrl, ShaderAnnotation& shDesc, void* paramInfo )
 {
 	float width = m_Size.x - 30.0f;
 	PParameterInfo pInfo	= (PParameterInfo)paramInfo;
-	sx::gui::PTextEdit ed	= NULL;
+	sx::gui::TextEdit* ed	= NULL;
 
 	//  traverse through list of gui to find last created gui which is match our request
 	for (int i=0; i<m_arrayGUI.Count(); i++)
@@ -320,7 +320,7 @@ sx::gui::PTextEdit EditMaterial::guiCreateTextEdit( sx::d3d::PMaterial mtrl, Sha
 				//  release allocated memory as user data
 				sx_mem_free( pInfoGUI );
 
-				ed = (sx::gui::PTextEdit)pGUI;
+				ed = (sx::gui::TextEdit*)pGUI;
 				break;
 			}
 		}
@@ -806,7 +806,7 @@ void EditMaterial::OnParamChange( sx::gui::PControl Sender )
 
 	case GUI_TEXTEDIT:
 		{
-			sx::gui::PTextEdit ed = (sx::gui::PTextEdit)Sender;
+			sx::gui::TextEdit* ed = (sx::gui::TextEdit*)Sender;
 
 			if (pInfo->pAnnot->Type == SPT_FLOAT)
 			{
@@ -863,7 +863,7 @@ void EditMaterial::OnMouseWheel( sx::gui::PControl Sender )
 	{
 	case GUI_TEXTEDIT:
 		{
-			sx::gui::PTextEdit pEdit = (sx::gui::PTextEdit)Sender;
+			sx::gui::TextEdit* pEdit = (sx::gui::TextEdit*)Sender;
 			if ( pEdit->GetFocused() )
 			{
 				float r = str128::StrToFloat( pEdit->GetText() );

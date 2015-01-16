@@ -6,10 +6,10 @@
 #define IncreaseCaretX( p )									\
 	{														\
 		p.x++;												\
-		if (p.x>m_Lines[p.y]->text.Length())				\
+		if (p.x>m_lines[p.y]->text.Length())				\
 		{													\
-			p.y += (m_Align == GTA_RIGHT) ?	-1 : 1;			\
-			if (p.y>=0 && p.y<m_Lines.Count())				\
+			p.y += (m_align == GTA_RIGHT) ?	-1 : 1;			\
+			if (p.y>=0 && p.y<m_lines.Count())				\
 				p.x = 0;									\
 		}													\
 	}														\
@@ -19,9 +19,9 @@
 		p.x--;												\
 		if (p.x<0)											\
 		{													\
-			p.y += (m_Align == GTA_RIGHT) ?	1 : -1;			\
-			if (p.y>=0 && p.y<m_Lines.Count())				\
-				p.x = m_Lines[p.y]->text.Length();		\
+			p.y += (m_align == GTA_RIGHT) ?	1 : -1;			\
+			if (p.y>=0 && p.y<m_lines.Count())				\
+				p.x = m_lines[p.y]->text.Length();		\
 		}													\
 		if (p.x<0) p.x=0;									\
 		if (p.y<0) p.y=0;									\
@@ -86,12 +86,12 @@ namespace sx { namespace gui {
 		
 	}
 
-	void TextEdit::SetSize( float2 S )
+	void TextEdit::SetSize( float2 sz )
 	{
-		Label::SetSize(S);
-		S *= 0.5f;
-		m_Elements[0]->SetRect( RectF(-S.x, S.y + 2.0f, S.x, -S.y + 1.0f) );
-		m_Elements[2]->SetRect( RectF(-1.0f, 1.0f, 0.0f, -1.0f) );
+		Label::SetSize(sz);
+		sz *= 0.5f;
+		m_elements[0]->SetRect( RectF(-sz.x, sz.y + 2.0f, sz.x, -sz.y + 1.0f) );
+		m_elements[2]->SetRect( RectF(-1.0f, 1.0f, 0.0f, -1.0f) );
 	}
 
 	void TextEdit::Update( float elpsTime )
@@ -102,9 +102,9 @@ namespace sx { namespace gui {
 		if ( GetFocusedControl() == this )
 		{
 			fTime += elpsTime;
-			math::Vector3 pos(m_Elements[2]->Matrix()._41, m_Elements[2]->Matrix()._42, m_Elements[2]->Matrix()._43);
-			m_Elements[2]->Matrix().Scale(1.0f, 0.5f * abs(sin(fTime/100)) * (float)m_Font->GetDesc().LineHeight , 1.0f);
-			m_Elements[2]->Matrix().SetTranslation(pos.x, pos.y, pos.z);
+			math::Vector3 pos(m_elements[2]->Matrix()._41, m_elements[2]->Matrix()._42, m_elements[2]->Matrix()._43);
+			m_elements[2]->Matrix().Scale(1.0f, 0.5f * abs(sin(fTime/100)) * (float)m_font->GetDesc().lineHeight , 1.0f);
+			m_elements[2]->Matrix().SetTranslation(pos.x, pos.y, pos.z);
 		}
 	}
 
@@ -128,7 +128,7 @@ namespace sx { namespace gui {
 		if ( inSpace3D )
 		{
 			d3d::Device3D::RS_ZEnabled(true);
-			m_Elements[0]->Draw(option);
+			m_elements[0]->Draw(option);
 			DrawSelection(option);
 			Label::DrawText(option);
 			DrawCaret(option);
@@ -152,7 +152,7 @@ namespace sx { namespace gui {
 			d3d::Device3D::Matrix_Project_Set(matProj);
 
 			d3d::Device3D::RS_ZEnabled(false);
-			m_Elements[0]->Draw(option);
+			m_elements[0]->Draw(option);
 			DrawSelection(option);
 			Label::DrawText(option);
 			DrawCaret(option);
@@ -178,7 +178,7 @@ namespace sx { namespace gui {
 		if (SEGAN_SET_HAS(m_Option, _SX_GUI_IN_3DSPACE_))
 		{
 			d3d::Device3D::RS_ZEnabled(true);
-			m_Elements[0]->DrawOutline(Globals::Draw_Line_Offset());
+			m_elements[0]->DrawOutline(Globals::Draw_Line_Offset());
 		}
 		else
 		{
@@ -191,7 +191,7 @@ namespace sx { namespace gui {
 
 
 			d3d::Device3D::RS_ZEnabled(false);
-			m_Elements[0]->DrawOutline(Globals::Draw_Line_Offset());
+			m_elements[0]->DrawOutline(Globals::Draw_Line_Offset());
 
 			d3d::Device3D::Matrix_Project_Set(mat_proj_last);
 			d3d::Device3D::Matrix_View_Set(mat_view_last);
@@ -206,19 +206,19 @@ namespace sx { namespace gui {
 
 	void TextEdit::DrawCaret( DWORD option )
 	{
-		if ( GetFocusedControl() != this || !m_Font) return;
+		if ( GetFocusedControl() != this || !m_font) return;
 
 		RectF rc = GetRect();
-		if (m_Elements[2]->Matrix()._41 < rc.x1	|| 
-			m_Elements[2]->Matrix()._41 > rc.x2	||
-			m_Elements[2]->Matrix()._42 > GetRect().y1 - (m_Font->GetDesc().LineHeight*0.5f)	||
-			m_Elements[2]->Matrix()._42 < GetRect().y2 + (m_Font->GetDesc().LineHeight*0.5f)	)
+		if (m_elements[2]->Matrix()._41 < rc.x1	|| 
+			m_elements[2]->Matrix()._41 > rc.x2	||
+			m_elements[2]->Matrix()._42 > GetRect().y1 - (m_font->GetDesc().lineHeight*0.5f)	||
+			m_elements[2]->Matrix()._42 < GetRect().y2 + (m_font->GetDesc().lineHeight*0.5f)	)
 		{
 			return;
 		}
 
 		d3d::Device3D::Alpha_Function(D3DBLEND_INVDESTCOLOR, D3DBLEND_INVDESTCOLOR);
-		m_Elements[2]->Draw(option);
+		m_elements[2]->Draw(option);
 		d3d::Device3D::Alpha_Reset();
 	}
 
@@ -226,42 +226,42 @@ namespace sx { namespace gui {
 	{
 		if (!m_selCount) return;
 
-		if (!m_VB0 || !m_IB)
+		if (!m_vertexBuffer0 || !m_indexBuffer)
 		{
 			BurnBuffer();
 			return;
 		}
 
 		d3d::Device3D::SetTexture(0, NULL);
-		d3d::Device3D::SetVertexBuffer(0, m_VB0, SEGAN_SIZE_VERTEX_0);
-		d3d::Device3D::SetVertexBuffer(1, m_VB1, SEGAN_SIZE_VERTEX_1);
-		d3d::Device3D::SetIndexBuffer(m_IB);
+		d3d::Device3D::SetVertexBuffer(0, m_vertexBuffer0, SEGAN_SIZE_VERTEX_0);
+		d3d::Device3D::SetVertexBuffer(1, m_vertexBuffer1, SEGAN_SIZE_VERTEX_1);
+		d3d::Device3D::SetIndexBuffer(m_indexBuffer);
 
 		d3d::Device3D::SetMaterialColor(D3DColor(
-			1 - m_Elements[1]->Color().r, 
-			1 - m_Elements[1]->Color().g, 
-			1 - m_Elements[1]->Color().b, 
-			m_Elements[1]->Color().a));
+			1 - m_elements[1]->Color().r, 
+			1 - m_elements[1]->Color().g, 
+			1 - m_elements[1]->Color().b, 
+			m_elements[1]->Color().a));
 		
 		//  start drawing text with clip plane enabled
-		m_Elements[0]->BeginAsClipSpace();
+		m_elements[0]->BeginAsClipSpace();
 
 		//  apply text scrolling before render
 		math::Matrix matScl = math::MTRX_IDENTICAL;
-		matScl._41 = -(float)m_Scroll.x;
+		matScl._41 = -(float)m_scroll.x;
 		matScl.Multiply(matScl, m_Mtrx);
 		d3d::Device3D::Matrix_World_Set(matScl);
 		d3d::Device3D::DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, m_numChar*4, m_selCount*4, m_numChar*6, m_selCount*2);
 
-		m_Elements[0]->EndAsClipSpace();
+		m_elements[0]->EndAsClipSpace();
 	}
 
 	void TextEdit::SetCaretPos( int Ln, int Col )
 	{
-		if (m_Lines.Count()) 
+		if (m_lines.Count()) 
 		{
-			SEGAN_CLAMP(Ln,	 0, m_Lines.Count()-1);
-			SEGAN_CLAMP(Col, 0, m_Lines[Ln]->text.Length());
+			SEGAN_CLAMP(Ln,	 0, m_lines.Count()-1);
+			SEGAN_CLAMP(Col, 0, m_lines[Ln]->text.Length());
 		}
 		else
 		{
@@ -298,23 +298,23 @@ namespace sx { namespace gui {
 		UpdateCaretOnPixel();
 
 		// well now update scroll system when the caret goes out side of the rect
-		if (m_Font && m_CaretPos.y >= (m_Scroll.y + int(m_Size.y / (float)m_Font->GetDesc().LineHeight)))
+		if (m_font && m_CaretPos.y >= (m_scroll.y + int(m_Size.y / (float)m_font->GetDesc().lineHeight)))
 		{
-			SetScrollValue(m_Scroll.x, m_CaretPos.y - int(m_Size.y / (float)m_Font->GetDesc().LineHeight) + 1);
+			SetScrollValue(m_scroll.x, m_CaretPos.y - int(m_Size.y / (float)m_font->GetDesc().lineHeight) + 1);
 		} 
-		else if (m_CaretPos.y < m_Scroll.y)
+		else if (m_CaretPos.y < m_scroll.y)
 		{
-			SetScrollValue(m_Scroll.x, m_CaretPos.y);
+			SetScrollValue(m_scroll.x, m_CaretPos.y);
 		}
 
 		RectF rc = GetRect(); rc.x1 += 2.0f;
-		if (m_Elements[2]->Matrix()._41 < rc.x1)
+		if (m_elements[2]->Matrix()._41 < rc.x1)
 		{
-			SetScrollValue(int(m_Scroll.x + m_Elements[2]->Matrix()._41 - rc.x1), m_Scroll.y);
+			SetScrollValue(int(m_scroll.x + m_elements[2]->Matrix()._41 - rc.x1), m_scroll.y);
 		}
-		else if (m_Elements[2]->Matrix()._41 > rc.x2)
+		else if (m_elements[2]->Matrix()._41 > rc.x2)
 		{
-			SetScrollValue(int(m_Scroll.x + m_Elements[2]->Matrix()._41 - rc.x2), m_Scroll.y);
+			SetScrollValue(int(m_scroll.x + m_elements[2]->Matrix()._41 - rc.x2), m_scroll.y);
 		}
 
 	}
@@ -334,13 +334,13 @@ namespace sx { namespace gui {
 	void TextEdit::TextInsert( PointI& p, const WCHAR* text )
 	{
 		if (!text) return;
-		if (m_Lines.Count()<1) m_Lines.PushBack( sx_new(GUITextLine) );
-		SEGAN_CLAMP(p.y, 0, m_Lines.Count()-1);
+		if (m_lines.Count()<1) m_lines.PushBack( sx_new(GUITextLine) );
+		SEGAN_CLAMP(p.y, 0, m_lines.Count()-1);
 
 		while (*text)
 		{
 			PGUIFontChar pfnch = NULL;
-			if (m_Font->GetChar(*text, pfnch) || *text == '\n')
+			if (m_font->GetChar(*text, pfnch) || *text == '\n')
 			{
 				//  verify multi line support
 				if (*text == '\n' && !SEGAN_SET_HAS(m_Option, SX_GUI_PROPERTY_MULTILINE))
@@ -351,7 +351,7 @@ namespace sx { namespace gui {
 
 				//  add character to the text editor
 				int x = p.x + 1; int y = p.y;
-				m_Lines[p.y]->text.Insert(*text, p.x);
+				m_lines[p.y]->text.Insert(*text, p.x);
 				UpdateLine(p.y);
 
 				p.x = 0;
@@ -366,36 +366,36 @@ namespace sx { namespace gui {
 		s_exKey = 0;
 		SetCaretPos(p.y, p.x);
 
-		m_OnTextChange(this);
+		m_onTextChange(this);
 	}
 
 	void TextEdit::TextDelete( PointI& p )
 	{
-		if (m_Lines.Count()<1) m_Lines.PushBack( sx_new(GUITextLine) );
-		SEGAN_CLAMP(p.y, 0, m_Lines.Count()-1);
-		int len = m_Lines[p.y]->text.Length();
+		if (m_lines.Count()<1) m_lines.PushBack( sx_new(GUITextLine) );
+		SEGAN_CLAMP(p.y, 0, m_lines.Count()-1);
+		int len = m_lines[p.y]->text.Length();
 		if (len < 1) return;
 
 		int x = p.x; int y = p.y;
 		if (p.x == len)
 		{
 			//  verify that this line terminated with return character
-			if (m_Lines[p.y]->text[len-1] == '\n')
+			if (m_lines[p.y]->text[len-1] == '\n')
 			{
-				m_Lines[p.y]->text.Delete(len-1);
+				m_lines[p.y]->text.Delete(len-1);
 				x--;
 			}
-			else if (p.y+1 < m_Lines.Count())
-				m_Lines[p.y+1]->text.Delete(0);
+			else if (p.y+1 < m_lines.Count())
+				m_lines[p.y+1]->text.Delete(0);
 		}
 		else
-			m_Lines[p.y]->text.Delete(p.x);
+			m_lines[p.y]->text.Delete(p.x);
 
-		if (p.y+1 < m_Lines.Count())
+		if (p.y+1 < m_lines.Count())
 		{
-			m_Lines[p.y]->text << m_Lines[p.y+1]->text;
-			sx_delete_and_null( m_Lines[p.y+1] );
-			m_Lines.RemoveByIndex(p.y+1);
+			m_lines[p.y]->text << m_lines[p.y+1]->text;
+			sx_delete_and_null( m_lines[p.y+1] );
+			m_lines.RemoveByIndex(p.y+1);
 		}
 		
 		UpdateLine(p.y);
@@ -405,16 +405,16 @@ namespace sx { namespace gui {
 		for (int i=0; i<x; i++)	IncreaseCaretX(p);
 		if (y != p.y) IncreaseCaretX(p);
 
-		m_OnTextChange(this);
+		m_onTextChange(this);
 	}
 
 	void TextEdit::TextDelete( PointI from, PointI to )
 	{
-		if (m_Lines.Count()<1) m_Lines.PushBack( sx_new(GUITextLine) );
-		SEGAN_CLAMP(from.y, 0, m_Lines.Count()-1);
-		SEGAN_CLAMP(from.x, 0, m_Lines[from.y]->text.Length());
-		SEGAN_CLAMP(to.y, 0, m_Lines.Count()-1);
-		SEGAN_CLAMP(to.x, 0, m_Lines[to.y]->text.Length());
+		if (m_lines.Count()<1) m_lines.PushBack( sx_new(GUITextLine) );
+		SEGAN_CLAMP(from.y, 0, m_lines.Count()-1);
+		SEGAN_CLAMP(from.x, 0, m_lines[from.y]->text.Length());
+		SEGAN_CLAMP(to.y, 0, m_lines.Count()-1);
+		SEGAN_CLAMP(to.x, 0, m_lines[to.y]->text.Length());
 
 		if ( to.y < from.y || (to.y == from.y && to.x < from.x) )
 		{
@@ -427,8 +427,8 @@ namespace sx { namespace gui {
 		while (to.y - from.y > 1)
 		{
 			to.y--;
-			sx_delete_and_null( m_Lines[to.y] );
-			m_Lines.RemoveByIndex(to.y);
+			sx_delete_and_null( m_lines[to.y] );
+			m_lines.RemoveByIndex(to.y);
 		}
 
 		//  remove remain characters
@@ -440,29 +440,29 @@ namespace sx { namespace gui {
 			if (to.x!=charIndex || to.y>0)
 			{
 				//TextDelete(to);
-				int len = m_Lines[to.y]->text.Length();
+				int len = m_lines[to.y]->text.Length();
 				if (len < 1) break;
 
 				int x = to.x; int y = to.y;
 				if (to.x == len)
 				{
 					//  verify that this line terminated with return character
-					if (m_Lines[to.y]->text[len-1] == '\n')
+					if (m_lines[to.y]->text[len-1] == '\n')
 					{
-						m_Lines[to.y]->text.Delete(len-1);
+						m_lines[to.y]->text.Delete(len-1);
 						x--;
 					}
-					else if (to.y+1 < m_Lines.Count())
-						m_Lines[to.y+1]->text.Delete(0);
+					else if (to.y+1 < m_lines.Count())
+						m_lines[to.y+1]->text.Delete(0);
 				}
 				else
-					m_Lines[to.y]->text.Delete(to.x);
+					m_lines[to.y]->text.Delete(to.x);
 
-				if (to.y+1 < m_Lines.Count())
+				if (to.y+1 < m_lines.Count())
 				{
-					m_Lines[to.y]->text << m_Lines[to.y+1]->text;
-					sx_delete_and_null( m_Lines[to.y+1] );
-					m_Lines.RemoveByIndex(to.y+1);
+					m_lines[to.y]->text << m_lines[to.y+1]->text;
+					sx_delete_and_null( m_lines[to.y+1] );
+					m_lines.RemoveByIndex(to.y+1);
 				}
 
 				UpdateLine(to.y);
@@ -477,7 +477,7 @@ namespace sx { namespace gui {
 		SetCaretPos(to.y, to.x);
 		BurnBuffer();
 
-		m_OnTextChange(this);
+		m_onTextChange(this);
 	}
 
 	int TextEdit::MouseOver( float absX, float absY )
@@ -520,7 +520,7 @@ namespace sx { namespace gui {
 			return 0;
 		}
 
-		GUIFontDesc desc = m_Font->GetDesc();
+		GUIFontDesc desc = m_font->GetDesc();
 		PointI p = m_CaretPos;
 		int charIndex = p.x;
 		WCHAR pch = 0;
@@ -529,7 +529,7 @@ namespace sx { namespace gui {
 		case VK_RETURN:
 			if ( ! SEGAN_SET_HAS(m_Option, SX_GUI_PROPERTY_MULTILINE) )
 			{
-				m_OnTextChange(this);
+				m_onTextChange(this);
 
 				return 0;
 			}
@@ -541,11 +541,11 @@ namespace sx { namespace gui {
 
 			if (s_exKey & SX_GUI_KEY_CTRL )
 			{
-				pch = p.x>0 ? m_Lines[p.y]->text[p.x-1] : m_Lines[p.y]->text[p.x];
+				pch = p.x>0 ? m_lines[p.y]->text[p.x-1] : m_lines[p.y]->text[p.x];
 				while (p.x && (pch > 1000 || (pch!=0 && pch!=' ' && pch!='\t' && pch!='.' && pch!=',' && pch!='\r' && pch!='\n')))
 				{
 					DecreaseCaretX(p);
-					pch = p.x>0 ? m_Lines[p.y]->text[p.x-1] : m_Lines[p.y]->text[p.x];
+					pch = p.x>0 ? m_lines[p.y]->text[p.x-1] : m_lines[p.y]->text[p.x];
 				}
 			}
 
@@ -557,11 +557,11 @@ namespace sx { namespace gui {
 
 			if (s_exKey & SX_GUI_KEY_CTRL )
 			{
-				pch = p.y<m_Lines.Count() ? m_Lines[p.y]->text[p.x] : 0;
+				pch = p.y<m_lines.Count() ? m_lines[p.y]->text[p.x] : 0;
 				while ((pch > 1000 || (pch!=0 && pch!=' ' && pch!='\t' && pch!='.' && pch!=',' && pch!='\r' && pch!='\n')))
 				{
 					IncreaseCaretX(p);
-					pch = p.y<m_Lines.Count() ? m_Lines[p.y]->text[p.x] : 0;
+					pch = p.y<m_lines.Count() ? m_lines[p.y]->text[p.x] : 0;
 				}
 			}
 
@@ -572,14 +572,14 @@ namespace sx { namespace gui {
 
 		case VK_UP:
 
-			p = GetCaretFromPixel(m_Elements[2]->Matrix()._41, m_Elements[2]->Matrix()._42 + desc.LineHeight);
+			p = GetCaretFromPixel(m_elements[2]->Matrix()._41, m_elements[2]->Matrix()._42 + desc.lineHeight);
 			SetCaretPos(p.y, p.x);
 
 			return 0;
 
 		case VK_DOWN:	
 
-			p = GetCaretFromPixel(m_Elements[2]->Matrix()._41, m_Elements[2]->Matrix()._42 - desc.LineHeight);
+			p = GetCaretFromPixel(m_elements[2]->Matrix()._41, m_elements[2]->Matrix()._42 - desc.lineHeight);
 			SetCaretPos(p.y, p.x);
 
 			return 0;
@@ -589,7 +589,7 @@ namespace sx { namespace gui {
 			return 0;
 
 		case VK_END:
-			SetCaretPos(p.y, m_Lines[p.y]->text.Length());
+			SetCaretPos(p.y, m_lines[p.y]->text.Length());
 			return 0;
 
 		case VK_BACK:
@@ -728,7 +728,7 @@ namespace sx { namespace gui {
 	void TextEdit::UpdateLine( int LineIndex )
 	{
 		str1024 extraText;
-		PGUITextLine pline	= m_Lines[LineIndex];
+		PGUITextLine pline	= m_lines[LineIndex];
 
 		pline->width = 0;
 		for (int i=0; i<pline->text.Length(); i++)
@@ -737,27 +737,27 @@ namespace sx { namespace gui {
 			{
 				pline->text.CopyTo(extraText, i+1, pline->text.Length());
 				pline->text.Delete(i+1, pline->text.Length());
-				pline->UpdateWidth(m_Font, false);
+				pline->UpdateWidth(m_font, false);
 
 				//  verify that next line is exist
 				LineIndex++;
-				if (LineIndex < m_Lines.Count())
+				if (LineIndex < m_lines.Count())
 				{
-					m_Lines[LineIndex]->text.Insert(extraText);
+					m_lines[LineIndex]->text.Insert(extraText);
 				}
 				else
 				{
 					//  now add new line in the string list
 					pline = sx_new( GUITextLine );
 					pline->text = extraText;
-					m_Lines.PushBack(pline);
+					m_lines.PushBack(pline);
 				}
 				UpdateLine(LineIndex);
 				return;
 			}
 
 			PGUIFontChar pfnch = NULL;
-			if ( !m_Font->GetChar(pline->text, i, pfnch, true) ) continue;
+			if ( !m_font->GetChar(pline->text, i, pfnch, true) ) continue;
 			pline->width += pfnch->xAdvance;
 			
 			if ( pline->width >= m_Size.x && (m_Option & SX_GUI_PROPERTY_WORDWRAP) && (m_Option & SX_GUI_PROPERTY_MULTILINE))
@@ -770,21 +770,21 @@ namespace sx { namespace gui {
 				} i++;
 				pline->text.CopyTo(extraText, i, pline->text.Length());
 				pline->text.Delete(i, pline->text.Length());
-				pline->UpdateWidth(m_Font, false);
+				pline->UpdateWidth(m_font, false);
 
 				//  verify that next line is exist
 				LineIndex++;
-				if (LineIndex < m_Lines.Count())
+				if (LineIndex < m_lines.Count())
 				{
-					m_Lines[LineIndex]->text.Insert(extraText);
+					m_lines[LineIndex]->text.Insert(extraText);
 				}
 				else
 				{
 					//  now add new line in the string list
 					pline = sx_new( GUITextLine );
 					pline->text = extraText;
-					pline->UpdateWidth(m_Font, true);
-					m_Lines.PushBack(pline);
+					pline->UpdateWidth(m_font, true);
+					m_lines.PushBack(pline);
 				}
 				UpdateLine(LineIndex);
 				return;
@@ -802,29 +802,29 @@ namespace sx { namespace gui {
 
 	PointI TextEdit::GetCaretFromPixel( float px, float py )
 	{
-		if(m_Lines.Count()<1)
+		if(m_lines.Count()<1)
 			return PointI(0, 0);
 
-		GUIFontDesc desc = m_Font->GetDesc();
-		int y = int( (GetRect().y1 - py + m_Scroll.y*desc.LineHeight) / (float)desc.LineHeight );
-		SEGAN_CLAMP(y, 0, m_Lines.Count()-1);
+		GUIFontDesc desc = m_font->GetDesc();
+		int y = int( (GetRect().y1 - py + m_scroll.y*desc.lineHeight) / (float)desc.lineHeight );
+		SEGAN_CLAMP(y, 0, m_lines.Count()-1);
 
 		float w = m_Size.x;
-		float x = GetRect().x1 - m_Scroll.x + 2.0f;
-		switch (m_Align)
+		float x = GetRect().x1 - m_scroll.x + 2.0f;
+		switch (m_align)
 		{
-		case GTA_CENTER:	x += (w - m_Lines[y]->width) * 0.5f;	break;
-		case GTA_RIGHT:		x += (w - m_Lines[y]->width);			break;
+		case GTA_CENTER:	x += (w - m_lines[y]->width) * 0.5f;	break;
+		case GTA_RIGHT:		x += (w - m_lines[y]->width);			break;
 		}
 		x = (float)int(x);
 
-		str1024 text = m_Lines[y]->text;
+		str1024 text = m_lines[y]->text;
 		ReverseRTLText(text);
 		PointI result(-1, 0);
 		for (int i=0; i<text.Length(); i++)
 		{
 			PGUIFontChar pfnch = NULL;
-			if (m_Font->GetChar(text, i, pfnch, true))
+			if (m_font->GetChar(text, i, pfnch, true))
 			{
 				if (px>=x && px<=x+pfnch->xAdvance)
 				{
@@ -852,16 +852,16 @@ namespace sx { namespace gui {
 		if (px<x)
 			return PointI(0, y);
 		else
-			return PointI(m_Lines[y]->text.Length(), y);
+			return PointI(m_lines[y]->text.Length(), y);
 	}
 
 	bool TextEdit::CaretIsOnRTLText( PointI& p, OUT int& fromIndex, OUT int& toIndex )
 	{
-		if (m_Lines.Count()<1) return false;
-		SEGAN_CLAMP(p.y, 0, m_Lines.Count()-1);
+		if (m_lines.Count()<1) return false;
+		SEGAN_CLAMP(p.y, 0, m_lines.Count()-1);
 
 		//  check that the caret is inside of RTL part of the text
-		PGUITextLine pLine = m_Lines[p.y];
+		PGUITextLine pLine = m_lines[p.y];
 		for (int i=0; i<pLine->text.Length(); i++)
 		{
 			if (pLine->text[i]>1000)
@@ -893,22 +893,22 @@ namespace sx { namespace gui {
 			return;
 		}
 
-		D3DColor color = m_Elements[1]->Color();
+		D3DColor color = m_elements[1]->Color();
 		//color.a *= Element::AlphaPercent();
 
-		GUIFontDesc	fontDesc = m_Font->GetDesc();
+		GUIFontDesc	fontDesc = m_font->GetDesc();
 		TextureDesc	txurDesc;
-		m_Font->m_texture->GetDesc(txurDesc);
-		if (txurDesc.Width<2 || m_Size.y < fontDesc.LineHeight || m_Size.x < fontDesc.Size)
+		m_font->m_texture->GetDesc(txurDesc);
+		if (txurDesc.Width<2 || m_Size.y < fontDesc.lineHeight || m_Size.x < fontDesc.size)
 		{
 			ReleaseBuffer();
 			return;
 		}
 
 		RectF rect		= GetRect();
-		int lineTop		= m_Scroll.y;
-		int lineBottom	= lineTop + int(m_Size.y / (float)fontDesc.LineHeight);
-		if (lineBottom > m_Lines.Count()) lineBottom = m_Lines.Count();
+		int lineTop		= m_scroll.y;
+		int lineBottom	= lineTop + int(m_Size.y / (float)fontDesc.lineHeight);
+		if (lineBottom > m_lines.Count()) lineBottom = m_lines.Count();
 
 		//  sort caret to check the selection
 		PointI p1 = m_selStart, p2 = m_selEnd;
@@ -918,14 +918,14 @@ namespace sx { namespace gui {
 		int charCount=0; int selCount=0;
 		for (int i=lineTop; i<lineBottom; i++)
 		{
-			PGUITextLine pline = m_Lines[i];
+			PGUITextLine pline = m_lines[i];
 			if (pline)
 			{
 				for (int j=0; j<(int)pline->text.Length(); j++)
 				{
 					PGUIFontChar fch = NULL;
 					WCHAR ch = pline->text[j];
-					if (ch=='\t' || ch=='\n' || !m_Font->GetChar(ch, fch))
+					if (ch=='\t' || ch=='\n' || !m_font->GetChar(ch, fch))
 						continue;
 
 					if (isInSelection(i, j, p1, p2)) selCount++;
@@ -945,34 +945,34 @@ namespace sx { namespace gui {
 		m_selCount= selCount;
 
 		PD3DVertex0 v0;
-		if ( m_VB0 && SUCCEEDED ( m_VB0->Lock(0, 0, (void**)&v0, 0) ) )
+		if ( m_vertexBuffer0 && SUCCEEDED ( m_vertexBuffer0->Lock(0, 0, (void**)&v0, 0) ) )
 		{
 			PD3DVertex1 v1;
-			if ( SUCCEEDED ( m_VB1->Lock(0, 0, (void**)&v1, 0) ) )
+			if ( SUCCEEDED ( m_vertexBuffer1->Lock(0, 0, (void**)&v1, 0) ) )
 			{
 				PDWORD indx;
-				if ( SUCCEEDED ( m_IB->Lock(0, 0, (void**)&indx, 0) ) )
+				if ( SUCCEEDED ( m_indexBuffer->Lock(0, 0, (void**)&indx, 0) ) )
 				{
 					str1024 text; int textwidth = 0, j = 0;
 
 					//  at first burn the characters to the buffers
 					for (int iline=lineTop; iline<lineBottom; iline++)
 					{
-						text		= m_Lines[iline]->text;
-						textwidth	= m_Lines[iline]->width;
+						text		= m_lines[iline]->text;
+						textwidth	= m_lines[iline]->width;
 						ReverseRTLText(text);
 
 						//  setup buffer by list of characters
 						float h = m_Size.y;
 						float w = m_Size.x;
 						float x = rect.x1 + 2.0f;
-						switch (m_Align)
+						switch (m_align)
 						{
 						case GTA_CENTER:	x += (w - textwidth) * 0.5f;	break;
 						case GTA_RIGHT:		x += (w - textwidth);			break;
 						}
 						x = (float)int(x);
-						float y = rect.y1 - fontDesc.LineHeight * (iline - lineTop);
+						float y = rect.y1 - fontDesc.lineHeight * (iline - lineTop);
 						float z = 0.0f;
 						float u, v, u2, v2;
 						PGUIFontChar ch = NULL;
@@ -980,7 +980,7 @@ namespace sx { namespace gui {
 
 						for (int i = 0; i<(int)text.Length(); i++)
 						{
-							if ( !m_Font->GetChar(text, i, ch, true) ) continue;
+							if ( !m_font->GetChar(text, i, ch, true) ) continue;
 
 							//  ignore space and return characters from buffer
 							if (ch->ID==' ' || ch->ID=='\t' || ch->ID=='\n' || ch->ID=='\r')
@@ -1058,20 +1058,20 @@ namespace sx { namespace gui {
 					//  now burn the selected characters
 					for (int iline=lineTop; m_selCount>0 && iline<lineBottom; iline++)
 					{
-						text		= m_Lines[iline]->text;
-						textwidth	= m_Lines[iline]->width;
+						text		= m_lines[iline]->text;
+						textwidth	= m_lines[iline]->width;
 
 						//  setup buffer by list of characters
 						float h = m_Size.y;
 						float w = m_Size.x;
 						float x = rect.x1 + 2.0f;
-						switch (m_Align)
+						switch (m_align)
 						{
 						case GTA_CENTER:	x += (w - textwidth) * 0.5f;	break;
 						case GTA_RIGHT:		x += (w - textwidth);			break;
 						}
 						x = (float)int(x);
-						float y = rect.y1 - fontDesc.LineHeight * (iline - lineTop);
+						float y = rect.y1 - fontDesc.lineHeight * (iline - lineTop);
 						float z = 0.0f;
 						PGUIFontChar ch = NULL;
 						int curLine = 0;
@@ -1079,7 +1079,7 @@ namespace sx { namespace gui {
 
 						for (int i = 0; i<(int)text.Length(); i++)
 						{
-							if ( !m_Font->GetChar(text, i, ch, false) ) continue;
+							if ( !m_font->GetChar(text, i, ch, false) ) continue;
 
 							//  ignore space and return characters from buffer
 							if (ch->ID=='\t' || ch->ID=='\n' || ch->ID=='\r')
@@ -1098,7 +1098,7 @@ namespace sx { namespace gui {
 									for (int k=0; k<rtlBegin; k++)
 									{
 										PGUIFontChar pfnch = NULL;
-										if (m_Font->GetChar(text, k, pfnch, false))
+										if (m_font->GetChar(text, k, pfnch, false))
 										{
 											rtlX += pfnch->xAdvance;
 										}
@@ -1107,7 +1107,7 @@ namespace sx { namespace gui {
 									for (int k=rtlBegin; k<=rtlEnd; k++)
 									{
 										PGUIFontChar pfnch = NULL;
-										if (m_Font->GetChar(text, k, pfnch, false))
+										if (m_font->GetChar(text, k, pfnch, false))
 										{
 											rtlX += pfnch->xAdvance;
 										}
@@ -1116,7 +1116,7 @@ namespace sx { namespace gui {
 									for (int k=rtlBegin; k<i+1; k++)
 									{
 										PGUIFontChar pfnch = NULL;
-										if (m_Font->GetChar(text, k, pfnch, false))
+										if (m_font->GetChar(text, k, pfnch, false))
 										{
 											rtlX -= pfnch->xAdvance;
 										}
@@ -1138,8 +1138,8 @@ namespace sx { namespace gui {
 
 								v0[j*4+0].pos.y = y;
 								v0[j*4+1].pos.y = y;
-								v0[j*4+2].pos.y = y - fontDesc.LineHeight;
-								v0[j*4+3].pos.y = y - fontDesc.LineHeight;
+								v0[j*4+2].pos.y = y - fontDesc.lineHeight;
+								v0[j*4+3].pos.y = y - fontDesc.lineHeight;
 
 								v0[j*4+0].pos.z = z;
 								v0[j*4+1].pos.z = z;
@@ -1175,11 +1175,11 @@ namespace sx { namespace gui {
 						}
 					}
 
-					m_IB->Unlock();
+					m_indexBuffer->Unlock();
 				}
-				m_VB1->Unlock();
+				m_vertexBuffer1->Unlock();
 			}
-			m_VB0->Unlock();
+			m_vertexBuffer0->Unlock();
 		}
 	}
 
@@ -1211,18 +1211,18 @@ namespace sx { namespace gui {
 
 	void TextEdit::UpdateCaretOnPixel( void )
 	{
-		if ( !m_Lines.Count() ) return;
+		if ( !m_lines.Count() ) return;
 		
 		int Ln	= m_CaretPos.y;
 		int Col = m_CaretPos.x;
 
-		GUIFontDesc desc = m_Font->GetDesc();
+		GUIFontDesc desc = m_font->GetDesc();
 		float w = m_Size.x;
 		float x = GetRect().x1 + 2.0f;
-		switch (m_Align)
+		switch (m_align)
 		{
-		case GTA_CENTER:	x += (w - m_Lines[Ln]->width) * 0.5f;		break;
-		case GTA_RIGHT:		x += (w - m_Lines[Ln]->width);			break;
+		case GTA_CENTER:	x += (w - m_lines[Ln]->width) * 0.5f;		break;
+		case GTA_RIGHT:		x += (w - m_lines[Ln]->width);			break;
 		}
 		x = (float)int(x);
 
@@ -1234,7 +1234,7 @@ namespace sx { namespace gui {
 			for (int i=0; i<rtlBegin; i++)
 			{
 				PGUIFontChar pfnch = NULL;
-				if (m_Font->GetChar(m_Lines[Ln]->text, i, pfnch, false))
+				if (m_font->GetChar(m_lines[Ln]->text, i, pfnch, false))
 				{
 					x += pfnch->xAdvance;
 				}
@@ -1243,7 +1243,7 @@ namespace sx { namespace gui {
 			for (int i=rtlBegin; i<=rtlEnd; i++)
 			{
 				PGUIFontChar pfnch = NULL;
-				if (m_Font->GetChar(m_Lines[Ln]->text, i, pfnch, false))
+				if (m_font->GetChar(m_lines[Ln]->text, i, pfnch, false))
 				{
 					x += pfnch->xAdvance;
 				}
@@ -1252,7 +1252,7 @@ namespace sx { namespace gui {
 			for (int i=rtlBegin; i<Col; i++)
 			{
 				PGUIFontChar pfnch = NULL;
-				if (m_Font->GetChar(m_Lines[Ln]->text, i, pfnch, false))
+				if (m_font->GetChar(m_lines[Ln]->text, i, pfnch, false))
 				{
 					x -= pfnch->xAdvance;
 				}
@@ -1263,15 +1263,15 @@ namespace sx { namespace gui {
 			for (int i=0; i<Col; i++)
 			{
 				PGUIFontChar pfnch = NULL;
-				if (m_Font->GetChar(m_Lines[Ln]->text, i, pfnch, false))
+				if (m_font->GetChar(m_lines[Ln]->text, i, pfnch, false))
 				{
 					x += pfnch->xAdvance;
 				}
 			}
 		}
 
-		float y = GetRect().y1 - (desc.LineHeight*0.5f) - ( (Ln - m_Scroll.y) * desc.LineHeight);
-		m_Elements[2]->Matrix().SetTranslation(x - m_Scroll.x, y, m_Elements[1]->Matrix()._43);
+		float y = GetRect().y1 - (desc.lineHeight*0.5f) - ( (Ln - m_scroll.y) * desc.lineHeight);
+		m_elements[2]->Matrix().SetTranslation(x - m_scroll.x, y, m_elements[1]->Matrix()._43);
 	}
 
 

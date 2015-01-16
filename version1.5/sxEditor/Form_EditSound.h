@@ -56,15 +56,15 @@ private:
 	sx::gui::PCheckBox		m_ch_is3D;		//	manage sound 3d flag
 	sx::gui::PCheckBox		m_ch_loop;		//	manage sound loop flag
 	sx::gui::PCheckBox		m_ch_onload;	//	play sound on load
-	sx::gui::PTextEdit		m_tx_freq;		//  frequency of sound
-	sx::gui::PTextEdit		m_tx_volm;		//  sound volume
+	sx::gui::TextEdit*		m_tx_freq;		//  frequency of sound
+	sx::gui::TextEdit*		m_tx_volm;		//  sound volume
 	sx::gui::PTrackBar		m_tr_pan;		//  pan the sound to the left / right
-	sx::gui::PTextEdit		m_tx_mindis;	//  minimum distance of the sound
-	sx::gui::PTextEdit		m_tx_maxdis;	//  maximum distance of the sound
-	sx::gui::PTextEdit		m_tx_repeat;	//  repeat time for loop sound
-	sx::gui::PTextEdit		m_tx_chance;	//  chance to play sound
+	sx::gui::TextEdit*		m_tx_mindis;	//  minimum distance of the sound
+	sx::gui::TextEdit*		m_tx_maxdis;	//  maximum distance of the sound
+	sx::gui::TextEdit*		m_tx_repeat;	//  repeat time for loop sound
+	sx::gui::TextEdit*		m_tx_chance;	//  chance to play sound
 
-	sx::gui::PListBox		m_sndList;
+	sx::gui::ListBox*		m_sndList;
 	sx::gui::PButton		m_sndAdd;
 	sx::gui::PButton		m_sndRem;
 	sx::gui::PButton		m_moveUp;

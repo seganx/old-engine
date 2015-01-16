@@ -54,13 +54,13 @@ public:
 	static sx::gui::PTrackBar CreateTrackbar(sx::gui::PControl parent, const float width, const float fMin, const float fMax, const float angle = 0);
 
 	//! create new edit box
-	static sx::gui::PTextEdit CreateEditBox(sx::gui::PControl parent, const float left, const float width, const WCHAR* text = NULL);
+	static sx::gui::TextEdit* CreateEditBox(sx::gui::PControl parent, const float left, const float width, const WCHAR* text = NULL);
 
 	//! create a simple check box
 	static sx::gui::PCheckBox CreateCheckBox(sx::gui::PControl parent, const float left, const float width, const WCHAR* caption = NULL);
 
 	//! create labeled edit box. NOTE: label will bi the child of this objects
-	static sx::gui::PTextEdit CreateLabeldEditBox(sx::gui::PControl parent, float left, float textWidth, float labelWidth, const WCHAR* caption = NULL, const WCHAR* text = NULL);
+	static sx::gui::TextEdit* CreateLabeldEditBox(sx::gui::PControl parent, float left, float textWidth, float labelWidth, const WCHAR* caption = NULL, const WCHAR* text = NULL);
 };
 
 #endif	//	GUARD_EditorUI_HEADER_FILE

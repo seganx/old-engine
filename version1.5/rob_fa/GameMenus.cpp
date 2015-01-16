@@ -3239,7 +3239,9 @@ void MenuGameOver::Initialize( void )
 	m_back->GetElement(0)->SetTextureSrc( L"gui_gameoverBack.txr" );
 	m_back->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 
+	//	create disabled "NEXT" button
 	create_label( m_back, g_game->m_strings->Get(151), 250.0f, 50.0f, 15.0f, 35.0f, 0 )->GetElement(1)->Color() = 0xaaaaaaaa;
+
 	for ( int i=0; i<3; i++ )
 	{
 		sx::gui::Button* btn = sx_new( sx::gui::Button );
@@ -3250,9 +3252,11 @@ void MenuGameOver::Initialize( void )
 		btn->GetElement(1)->SetTextureSrc( L"gui_victory_button.txr" );
 		btn->GetElement(2)->SetTextureSrc( L"gui_victory_button.txr" );
 		btn->Position().Set( 5.0f + i * 20.0f, -20.0f - i * 60.0f, 0 );
-		create_label( btn, g_game->m_strings->Get(152 + i), 250.0f, 50.0f, 30.0f, -5.0f, 0 );
 		SEGAN_GUI_SET_ONCLICK( btn, MenuGameOver::OnClick );
 		SEGAN_GUI_SET_ONENTER( btn, Menu::OnEnter );
+
+		//	create label for each button
+		create_label( btn, g_game->m_strings->Get(152 + i), 250.0f, 50.0f, 30.0f, -5.0f, 0 );
 	}
 }
 
@@ -3372,31 +3376,16 @@ void MenuInfo::Initialize( void )
 	m_back->State_GetByIndex(1).Color.Set(0,0,0,0.8f);
 	SEGAN_GUI_SET_ONCLICK( m_back, MenuInfo::OnClick );
 
-	m_indicator = sx_new( sx::gui::Label );
-	m_indicator->SetParent( m_back );
+	m_indicator = create_label( m_back, g_game->m_strings->Get(465), 512.0f, 64.0f, 0.0f, 250.0f, 0.0f );
 	m_indicator->GetElement(0)->Color() = 0x00ff0000;
-	m_indicator->SetSize( float2( 512, 64 ) );
-	m_indicator->SetFont( FONT_INFO_INDICATOR );
-	m_indicator->SetAlign( GTA_CENTER );
-	m_indicator->Position().y = 250.0f;
 
-	m_title = sx_new( sx::gui::Label );
-	m_title->SetParent( m_back );
+	m_title = create_label( m_back, g_game->m_strings->Get(466), 1000.0f, 64.0f, 0.0f, 230.0f, 0.0f );
 	m_title->GetElement(0)->Color() = 0x0044ff44;
-	m_title->SetSize( float2( 1000, 64 ) );
-	m_title->SetFont( FONT_35_OUTLINE_SHADOWED );
-	m_title->SetAlign( GTA_CENTER );
-	m_title->Position().y = 230.0f;
-	create_label( m_title, FONT_45_OUTLINE_SHADOWED, GTA_CENTER, null, 1000, 380, 0, -200.0f, 0 );
 
-	m_desc = sx_new( sx::gui::Label );
-	m_desc->SetParent( m_back );
-	m_desc->GetElement(0)->Color() = 0x00aaaa00;
-	m_desc->SetSize( float2( 1000, 350 ) );
-	m_desc->SetFont( FONT_INFO_DESC );
-	m_desc->SetAlign( GTA_CENTER );
-	m_desc->Position().y = -120.0f;
-	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
+	//	inside contain some additional texts comes after \n in tutorial title
+	create_label( m_title, null, GTA_CENTER, L" ", 1000, 380, 0, -200.0f, 0 );
+
+	m_desc = create_label( m_back, null, GTA_CENTER, L" ", 1000.0f, 350.0f, 0.0f, -120.0f, 0.0f );
 
 	m_next = sx_new( sx::gui::Button );
 	m_next->SetParent( m_back );
@@ -3437,40 +3426,17 @@ void MenuInfo::Initialize( void )
 	m_helper.back->State_GetByIndex(1).Position.Set( 0.0f, -30.0f, 0.0f );
 	SEGAN_GUI_SET_ONCLICK( m_helper.back, MenuInfo::OnClick );
 
-
 	m_helper.image = sx_new( sx::gui::Panel );
 	m_helper.image->SetParent( m_helper.back );
 	m_helper.image->SetSize( float2( 64.0f, 64.0f ) );
 	m_helper.image->Position().Set( 120.0f, 2.5f, 0.0f );
 	m_helper.image->GetElement(0)->SetTextureSrc( L"gui_pnlGold_info.txr" );
 
-	m_helper.title = sx_new( sx::gui::Label );
-	m_helper.title->SetParent( m_helper.back );
-	m_helper.title->GetElement(0)->Color() = 0x00001000;
+	m_helper.title = create_label( m_helper.back, g_game->m_strings->Get(464), 250, 30, -15.0f, 0.0f, 0.0f );
 	m_helper.title->GetElement(1)->Color() = 0xffffff00;
-	m_helper.title->SetSize( float2( 250, 30 ) );
-	m_helper.title->SetFont( FONT_INFO_TITLE_HELPER );
-#if USE_RTL
-	m_helper.title->SetAlign( GTA_RIGHT );
-	m_helper.title->Position().Set( -15.0f, 5.0f, 0.0f );
-#else
-	m_helper.title->SetAlign( GTA_LEFT );
-	m_helper.title->Position().Set( -15.0f, 0.0f, 0.0f );
-#endif
 
-	m_helper.desc = sx_new( sx::gui::Label );
-	m_helper.desc->SetParent( m_helper.back );
+	m_helper.desc = create_label( m_helper.back, g_game->m_strings->Get(464), 250, 30, -15.0f, -10.0f, 0.0f );
 	m_helper.desc->GetElement(0)->Color() = 0x00001000;
-	m_helper.desc->SetSize( float2( 250, 25 ) );
-	m_helper.desc->SetFont( FONT_INFO_DESC_HELPER );
-#if USE_RTL
-	m_helper.title->SetAlign( GTA_RIGHT );
-#else
-	m_helper.title->SetAlign( GTA_LEFT );
-#endif
-	m_helper.desc->Position().Set( -15.0f, -10.0f, 0.0f );
-	m_helper.desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
-	m_helper.desc->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
 }
 
 void MenuInfo::Finalize( void )
@@ -3568,7 +3534,7 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 							continue;
 
 						int showNow = 0;
-						if ( !script.GetInteger( i, L"showNow", showNow	) )
+						if ( !script.GetInt( i, L"showNow", showNow	) )
 							continue;
 
 						if ( g_game->m_player->m_profile.level_played < g_game->m_game_currentLevel )

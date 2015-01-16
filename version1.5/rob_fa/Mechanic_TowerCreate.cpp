@@ -418,7 +418,7 @@ namespace GM
 									{
 										towerTypes[t]->m_maxLevel = NUM_LEVELS-1;
 										str.Format(L"tower%d_maxLevel", t+1);
-										script.GetInteger( i, str, towerTypes[t]->m_maxLevel );
+										script.GetInt( i, str, towerTypes[t]->m_maxLevel );
 									}
 								}
 							}

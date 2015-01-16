@@ -68,6 +68,7 @@ public:
 	sx::gui::PButton	m_btnRotate;		//  rotate button
 
 	sx::gui::PButton	m_btnView;			//  view button
+	sx::gui::PButton	m_viewList;			//  view list button
 
 	sx::gui::PButton	m_btnBack;			//  back to man scene
 

@@ -60,7 +60,7 @@ typedef struct TerrainLOD
 static Frustum					s_cameraFrsutum;			//  frustum of camera
 static float					s_cameraFOV;				//  cos( FOV ) of camera
 static float					s_LOD_Threshold = 6.0f;		//  threshold of changing LOD
-static TerrainMatList			s_Material;					//  material group
+static TerrainMatList			s_materials;					//  material group
 
 
 //  some static variables
@@ -465,9 +465,9 @@ void TerrainFinalizer()
 	s_terGeometry.Cleanup();
 
 	//  invalidate material textures
-	for (int i=0; i<s_Material.Count(); i++)
+	for (int i=0; i<s_materials.Count(); i++)
 	{
-		s_Material[i]->Invalidate();
+		s_materials[i]->Invalidate();
 	}
 }
 
@@ -549,9 +549,9 @@ namespace sx { namespace core {
 
 	void Terrain::Validate( int level )
 	{
-		for (int i=0; i<s_Material.Count(); i++)
+		for (int i=0; i<s_materials.Count(); i++)
 		{
-			s_Material[i]->Validate(0);
+			s_materials[i]->Validate(0);
 		}
 	}
 
@@ -881,10 +881,10 @@ namespace sx { namespace core {
 		s_patchVertexCount = 0;
 		s_patchFaceCount = 0;
 
-		if( s_Material.Count() < 1 )
+		if( s_materials.Count() < 1 )
 		{
 			//  create one default material group
-			s_Material.PushBack( sx_new( sx::core::MaterialMan ) );
+			s_materials.PushBack( sx_new( sx::core::MaterialMan ) );
 		}
 	}
 
@@ -940,21 +940,21 @@ namespace sx { namespace core {
 			//  draw base of terrain
 			{
 				d3d::Device3D::Matrix_World_Set( math::MTRX_IDENTICAL );
-				s_Material[0]->Get(0)->SetOption( SX_MATERIAL_CULLING | SX_MATERIAL_ZENABLE /*| SX_MATERIAL_OPTION_ZWRITING*/ );
-				s_Material[0]->Get(0)->SetToDevice(flag);
+				s_materials[0]->Get(0)->SetOption( SX_MATERIAL_CULLING | SX_MATERIAL_ZENABLE /*| SX_MATERIAL_OPTION_ZWRITING*/ );
+				s_materials[0]->Get(0)->SetToDevice(flag);
 				d3d::Device3D::DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, s_patchVertexCount, 0, s_patchFaceCount );
 			}			
 
 			//  draw other layer
-			if ( s_Material[0]->Count() > 1 )
+			if ( s_materials[0]->Count() > 1 )
 			{
 				Matrix matWorld = math::MTRX_IDENTICAL;		matWorld._42 = 0.01f;
 				d3d::Device3D::Matrix_World_Set( matWorld );
 
-				for (int i=1; i<s_Material[0]->Count(); i++)
+				for (int i=1; i<s_materials[0]->Count(); i++)
 				{
-					s_Material[0]->Get(i)->SetOption( SX_MATERIAL_CULLING | SX_MATERIAL_ZENABLE | SX_MATERIAL_ALPHABLEND );
-					s_Material[0]->Get(i)->SetToDevice(flag);
+					s_materials[0]->Get(i)->SetOption( SX_MATERIAL_CULLING | SX_MATERIAL_ZENABLE | SX_MATERIAL_ALPHABLEND );
+					s_materials[0]->Get(i)->SetToDevice(flag);
 					d3d::Device3D::DrawIndexedPrimitive( D3DPT_TRIANGLELIST, 0, 0, s_patchVertexCount, 0, s_patchFaceCount );
 				}
 			}
@@ -969,18 +969,18 @@ namespace sx { namespace core {
 
 	sx::core::PMaterialMan Terrain::Manager::GetMaterial( int index )
 	{
-		if ( index < 0 || index >= s_Material.Count() ) return NULL;
-		return s_Material[index];
+		if ( index < 0 || index >= s_materials.Count() ) return NULL;
+		return s_materials[index];
 	}
 
 	void Terrain::Manager::ClearrAll( void )
 	{
 		//  invalidate material textures
-		for (int i=0; i<s_Material.Count(); i++)
+		for (int i=0; i<s_materials.Count(); i++)
 		{
-			sx_delete_and_null( s_Material[i] );
+			sx_delete_and_null( s_materials[i] );
 		}
-		s_Material.Clear();
+		s_materials.Clear();
 	}
 
 	void Terrain::Manager::Save( Stream& strm )
@@ -992,11 +992,11 @@ namespace sx { namespace core {
 		SEGAN_STREAM_WRITE(strm, version);
 
 		//  save materials
-		int n = s_Material.Count();
+		int n = s_materials.Count();
 		SEGAN_STREAM_WRITE(strm, n);
 
 		for (int i=0; i<n; i++)
-			s_Material[i]->Save(strm);
+			s_materials[i]->Save(strm);
 
 		// save LOD threshold
 		SEGAN_STREAM_WRITE(strm, s_LOD_Threshold);
@@ -1031,7 +1031,7 @@ namespace sx { namespace core {
 			{
 				PMaterialMan mtrl = sx_new( sx::core::MaterialMan );
 				mtrl->Load(strm);
-				s_Material.PushBack( mtrl );
+				s_materials.PushBack( mtrl );
 			}
 		}
 

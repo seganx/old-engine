@@ -49,8 +49,8 @@ void ComponentManager::LoadTypes( void )
 			com_HealthModifier* hcom = sx_new( com_HealthModifier );
 			hcom->m_name = tmpStr.Text();
 			
-			script.GetInteger( i, L"value", hcom->m_value );
-			script.GetInteger( i, L"count", hcom->m_count );
+			script.GetInt( i, L"value", hcom->m_value );
+			script.GetInt( i, L"count", hcom->m_count );
 			script.GetFloat( i, L"coolTime", hcom->m_coolTime );
 			script.GetString( i, L"node", hcom->m_nodeName );		
 
@@ -65,12 +65,12 @@ void ComponentManager::LoadTypes( void )
 			script.GetFloat(	i, L"coolTime",			pcom->m_coolTime		);
 			script.GetFloat(	i, L"radius",			pcom->m_radius			);
 			script.GetFloat(	i, L"moveScale",		pcom->m_moveScale		);
-			script.GetInteger(	i, L"animIndex",		pcom->m_animIndex		);
+			script.GetInt(	i, L"animIndex",		pcom->m_animIndex		);
 			script.GetFloat(	i, L"modifyTime",		pcom->m_modifyTime		);
 			script.GetFloat(	i, L"speed",			pcom->m_speed			);
 			script.GetFloat(	i, L"physicalArmor",	pcom->m_physicalArmor	);
 			script.GetFloat(	i, L"electricalArmor",	pcom->m_electricalArmor	);
-			script.GetInteger(	i, L"health",			pcom->m_health			);
+			script.GetInt(	i, L"health",			pcom->m_health			);
 			script.GetFloat(	i, L"height",			pcom->m_offsetY			);
 
 			com = pcom;
@@ -83,7 +83,7 @@ void ComponentManager::LoadTypes( void )
 			script.GetString(	i, L"node",			pcom->m_nodeName	);
 			script.GetFloat(	i, L"speed",		pcom->m_speed		);
 			script.GetFloat(	i, L"speedTime",	pcom->m_speedTime	);
-			script.GetInteger(	i, L"turboCount",	pcom->m_turboCount	);
+			script.GetInt(	i, L"turboCount",	pcom->m_turboCount	);
 
 			com = pcom;
 		}

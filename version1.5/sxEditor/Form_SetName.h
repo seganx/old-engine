@@ -23,9 +23,6 @@ public:
 	//! set size of the form
 	void SetSize(float width, float height);
 
-	//! process input should be call before update
-	void ProcessInput(bool& inputHandled);
-
 	//! update the form
 	void Update(float elpsTime);
 
@@ -57,10 +54,10 @@ private:
 	sx::gui::PLabel				m_pTitle;			// Title of the form
 
 	sx::gui::PLabel				m_lb_memName;		// label of member name
-	sx::gui::PTextEdit			m_ed_memName;		// set member name edit box
+	sx::gui::TextEdit*			m_ed_memName;		// set member name edit box
 	sx::gui::PCheckBox			m_ch_newNode;		//  check box for create new node
 	sx::gui::PLabel				m_lb_nodName;		// label of name name
-	sx::gui::PTextEdit			m_ed_nodName;		// set node name edit box
+	sx::gui::TextEdit*			m_ed_nodName;		// set node name edit box
 	sx::gui::PButton			m_btn_Ok;			//  ok button
 
 public:

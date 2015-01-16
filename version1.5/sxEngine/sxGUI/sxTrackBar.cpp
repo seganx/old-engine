@@ -56,10 +56,10 @@ namespace sx { namespace gui {
 	{
 		Control::SetSize(S);
 		RectF rc = Control::GetRect();
-		m_Elements[0]->SetRect(rc);
+		m_elements[0]->SetRect(rc);
 
-		m_Elements[1]->SetRect( RectF(-rc.y1, rc.y1, -rc.y2, rc.y2) );
-		//m_Elements[1]->Matrix()._43 = SX_GUI_Z_BIAS;
+		m_elements[1]->SetRect( RectF(-rc.y1, rc.y1, -rc.y2, rc.y2) );
+		//m_elements[1]->Matrix()._43 = SX_GUI_Z_BIAS;
 
 		SetValue(m_Value);
 	}
@@ -105,13 +105,13 @@ namespace sx { namespace gui {
 			//	{
 			//		d3d::Device3D::Matrix_View_Get(matView);
 			//		d3d::Device3D::Matrix_Project_Get(matProjection);
-			//		m_Elements[0]->CheckCursor(absX, absY, matView, matProjection, uv);
+			//		m_elements[0]->CheckCursor(absX, absY, matView, matProjection, uv);
 			//	}
 			//	else
 			//	{
 			//		matView.LookAtLH(float3(0.0f, 0.0f, - Globals::Golden_FOV() * d3d::Device3D::Viewport()->Height), math::VEC3_ZERO, float3(0.0f, 1.0f, 0.0f));
 			//		matProjection.PerspectiveFovLH(	Globals::Golden_FOV(), (float)d3d::Device3D::Viewport()->Width / (float)d3d::Device3D::Viewport()->Height, 0.1f, 1000.0f);
-			//		m_Elements[0]->CheckCursor(absX, absY, matView, matProjection, uv);	
+			//		m_elements[0]->CheckCursor(absX, absY, matView, matProjection, uv);	
 			//	}
 
 			//	float mX = uv.x * m_Size.x;
@@ -157,7 +157,7 @@ namespace sx { namespace gui {
 				mV.Transform_Norm(mV, mat);
 
 				//  Change position of movable object ...
-				float mX = m_Elements[1]->Matrix()._41;
+				float mX = m_elements[1]->Matrix()._41;
 				mX += mV.x;
 
 				RectF rc = Control::GetRect();
@@ -293,7 +293,7 @@ namespace sx { namespace gui {
 		float W = m_Size.y / 2.0f;
 		float P = m_ValueScroll - m_Min;
 		float M = m_Max - m_Min; if (M<EPSILON) M=EPSILON;
-		m_Elements[1]->Matrix()._41 = GetRect().x1 + W + (P / M) * ( m_Size.x - W * 2.0f );
+		m_elements[1]->Matrix()._41 = GetRect().x1 + W + (P / M) * ( m_Size.x - W * 2.0f );
 	}
 
 	void TrackBar::Draw( DWORD option )

@@ -66,7 +66,7 @@ namespace sx { namespace core {
 		d3d::PMaterial operator[] (int index);
 
 	private:
-		Array<d3d::PMaterial>	m_Material;			//	array of materials
+		Array<d3d::PMaterial>	m_materials;			//	array of materials
 		int							m_ActiveMaterial;	//  index of rendering material
 
 		DWORD			reserved;		//  use to some internal options and operation

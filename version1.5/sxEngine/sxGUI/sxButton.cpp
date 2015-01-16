@@ -37,13 +37,13 @@ namespace sx { namespace gui {
 		Control::SetSize(S);
 		RectF rc = GetRect();
 
-		m_Elements[0]->SetRect(rc);
+		m_elements[0]->SetRect(rc);
 
-		m_Elements[1]->SetRect(rc);
-		//m_Elements[1]->Matrix()._43 = SX_GUI_Z_BIAS;
+		m_elements[1]->SetRect(rc);
+		//m_elements[1]->Matrix()._43 = SX_GUI_Z_BIAS;
 
-		m_Elements[2]->SetRect(rc);
-		//m_Elements[2]->Matrix()._43 = SX_GUI_Z_BIAS;
+		m_elements[2]->SetRect(rc);
+		//m_elements[2]->Matrix()._43 = SX_GUI_Z_BIAS;
 	}
 
 	int Button::MouseOver( float absX, float absY )
@@ -67,26 +67,26 @@ namespace sx { namespace gui {
 		if(	SEGAN_SET_HAS(m_Option, _SX_GUI_NOT_VISIBLE_) )
 			return;
 
-		float b0 = m_Elements[0]->Color().a;
-		float b1 = m_Elements[1]->Color().a;
-		float b2 = m_Elements[2]->Color().a;
+		float b0 = m_elements[0]->Color().a;
+		float b1 = m_elements[1]->Color().a;
+		float b2 = m_elements[2]->Color().a;
 
-		m_Elements[0]->Color().a = (1.0f - m_Alpha) * b0;
-		m_Elements[1]->Color().a = m_Alpha * b1;
-		m_Elements[2]->Color().a = 0.0f;
+		m_elements[0]->Color().a = (1.0f - m_Alpha) * b0;
+		m_elements[1]->Color().a = m_Alpha * b1;
+		m_elements[2]->Color().a = 0.0f;
 
 		if (m_SelectedElement==2) //  Clicked ....
 		{
-			m_Elements[0]->Color().a = 0.0f;
-			m_Elements[1]->Color().a = 0.0f;
-			m_Elements[2]->Color().a = b2;
+			m_elements[0]->Color().a = 0.0f;
+			m_elements[1]->Color().a = 0.0f;
+			m_elements[2]->Color().a = b2;
 		};
 
 		Control::Draw(option);
 
-		m_Elements[0]->Color().a = b0;
-		m_Elements[1]->Color().a = b1;
-		m_Elements[2]->Color().a = b2;
+		m_elements[0]->Color().a = b0;
+		m_elements[1]->Color().a = b1;
+		m_elements[2]->Color().a = b2;
 
 		Control::Draw_Childes(option);
 	}

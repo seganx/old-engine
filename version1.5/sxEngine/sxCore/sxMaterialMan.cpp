@@ -19,7 +19,7 @@ namespace sx { namespace core {
 
 	MaterialMan::MaterialMan():	m_ActiveMaterial(0), reserved(0)
 	{
-		m_Material.PushBack( sx_new( d3d::Material ) );
+		m_materials.PushBack( sx_new( d3d::Material ) );
 
 		VALIDATION_LEVEL = VALIDATION_NONE;
 		VALIDATION_COUNT = 0;
@@ -29,22 +29,22 @@ namespace sx { namespace core {
 	{
 		Invalidate();
 
-		for (int i=0; i<m_Material.Count(); i++)
+		for (int i=0; i<m_materials.Count(); i++)
 		{
-			sx_delete( m_Material[i] );
+			sx_delete( m_materials[i] );
 		}
-		m_Material.Clear();
+		m_materials.Clear();
 	}
 
 	void MaterialMan::Clear( void )
 	{
-		for (int i=0; i<m_Material.Count(); i++)
+		for (int i=0; i<m_materials.Count(); i++)
 		{
-			sx_delete( m_Material[i] );
+			sx_delete( m_materials[i] );
 		}
-		m_Material.Clear();
+		m_materials.Clear();
 
-		m_Material.PushBack( sx_new( d3d::Material ) );
+		m_materials.PushBack( sx_new( d3d::Material ) );
 	}
 
 	void MaterialMan::Validate( int level )
@@ -54,9 +54,9 @@ namespace sx { namespace core {
 			VALIDATION_LEVEL = level;
 			VALIDATION_COUNT += 1;
 
-			for (int i=0; i<m_Material.Count(); i++)
+			for (int i=0; i<m_materials.Count(); i++)
 			{
-				m_Material[i]->Validate(level);
+				m_materials[i]->Validate(level);
 			}
 		}
 	}
@@ -68,10 +68,10 @@ namespace sx { namespace core {
 			VALIDATION_LEVEL = VALIDATION_NONE;
 			while (VALIDATION_COUNT)
 			{
-				for (int i=0; i<m_Material.Count(); i++)
+				for (int i=0; i<m_materials.Count(); i++)
 				{
 					//sxLog::Log(L"start material [ %d ] invalidation", i);
-					m_Material[i]->Invalidate();
+					m_materials[i]->Invalidate();
 					//sxLog::Log(L"end material [ %d ] invalidation", i);
 				}
 
@@ -90,10 +90,10 @@ namespace sx { namespace core {
 		SEGAN_STREAM_WRITE(stream, version);
 
 		// write number of materials and their contents
-		int n = m_Material.Count();
+		int n = m_materials.Count();
 		SEGAN_STREAM_WRITE(stream, n);
-		for (int i=0; i<m_Material.Count(); i++)
-			m_Material[i]->Save(stream);
+		for (int i=0; i<m_materials.Count(); i++)
+			m_materials[i]->Save(stream);
 
 		//  finally write the active material index
 		SEGAN_STREAM_WRITE(stream, m_ActiveMaterial);
@@ -120,7 +120,7 @@ namespace sx { namespace core {
 			// read number of materials and their contents
 			int n = 0;
 			SEGAN_STREAM_READ(stream, n);
-			m_Material[0]->Load(stream);
+			m_materials[0]->Load(stream);
 			for (int i=1; i<n; i++)
 				Add()->Load(stream);
 			
@@ -132,7 +132,7 @@ namespace sx { namespace core {
 	d3d::PMaterial MaterialMan::Add( void )
 	{
 		d3d::PMaterial newMat = sx_new( d3d::Material );
-		m_Material.PushBack(newMat);
+		m_materials.PushBack(newMat);
 
 		if ( VALIDATION_LEVEL != VALIDATION_NONE )
 		{
@@ -147,34 +147,34 @@ namespace sx { namespace core {
 
 	void MaterialMan::Remove( int index )
 	{
-		if (index>0 || index<m_Material.Count()) 
+		if (index>0 || index<m_materials.Count()) 
 		{
 			for (int i=0; i<VALIDATION_COUNT; i++)
 			{
-				m_Material[index]->Invalidate();
+				m_materials[index]->Invalidate();
 			}
 
-			sx_delete_and_null( m_Material[index] );
-			m_Material.RemoveByIndex(index);
+			sx_delete_and_null( m_materials[index] );
+			m_materials.RemoveByIndex(index);
 		}
 	}
 
 	d3d::PMaterial MaterialMan::Get( int index )
 	{
-		if (index<0 || index>=m_Material.Count())
+		if (index<0 || index>=m_materials.Count())
 			return NULL;
 		else
-			return m_Material[index];
+			return m_materials[index];
 	}
 
 	FORCEINLINE int MaterialMan::Count( void )
 	{
-		return m_Material.Count();
+		return m_materials.Count();
 	}
 
 	FORCEINLINE void MaterialMan::SetActiveMaterial( int index )
 	{
-		if (index<0 || index>=m_Material.Count())
+		if (index<0 || index>=m_materials.Count())
 			m_ActiveMaterial = 0;
 		else
 			m_ActiveMaterial = index;
@@ -188,21 +188,21 @@ namespace sx { namespace core {
 	FORCEINLINE d3d::PMaterial MaterialMan::GetActiveMaterial( void )
 	{
 		if ( m_ActiveMaterial > -1 )
-			return m_Material[m_ActiveMaterial];
+			return m_materials[m_ActiveMaterial];
 		else return NULL;
 	}
 
 	FORCEINLINE void MaterialMan::SetToDevice( DWORD flag )
 	{
-		m_Material[m_ActiveMaterial]->SetToDevice(flag);
+		m_materials[m_ActiveMaterial]->SetToDevice(flag);
 	}
 
 	FORCEINLINE d3d::PMaterial MaterialMan::operator[]( int index )
 	{
-		if (index<0 || index>=m_Material.Count())
+		if (index<0 || index>=m_materials.Count())
 			return NULL;
 		else
-			return m_Material[index];
+			return m_materials[index];
 	}
 
 

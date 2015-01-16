@@ -52,8 +52,8 @@ namespace sx { namespace gui {
 		float	m_Max, m_Value, m_ValueScroll;
 
 		// we need additional vertex buffer to create circular progress
-		PDirect3DVertexBuffer		m_VB0;		//  hold the position vertex buffer
-		PDirect3DVertexBuffer		m_VB1;		//  hold the other vertex buffer information
+		PDirect3DVertexBuffer		m_vertexBuffer0;		//  hold the position vertex buffer
+		PDirect3DVertexBuffer		m_vertexBuffer1;		//  hold the other vertex buffer information
 	};
 	typedef ProgressBar *PProgressBar;
 

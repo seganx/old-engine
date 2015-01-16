@@ -36,7 +36,7 @@ private:
 
 	PD3DColor			m_pColor;			//! pointer to selected color
 	sx::gui::PTrackBar	m_tr_color[4];		//! four track bar as for color elements
-	sx::gui::PTextEdit	m_ed_color[4];		//! four edit text box as for color elements
+	sx::gui::TextEdit*	m_ed_color[4];		//! four edit text box as for color elements
 
 	//  additional parameters
 	float	m_fShowTime;

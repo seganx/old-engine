@@ -89,6 +89,7 @@ Form_Explorer::Form_Explorer( void ): BaseForm(), lastListIndex(-1), listScrolli
 	//  stop moving and resizing
 	SEGAN_SET_REM(m_Option, FORM_OPTION_MOVABLE);
 	SEGAN_SET_REM(m_Option, FORM_OPTION_RESIZABLE);
+	SEGAN_SET_ADD(m_Option, FORM_OPTION_ONTOP);
 
 	m_MinSize.x = 400.0f;	
 	m_MinSize.y = 200.0f;
@@ -511,7 +512,7 @@ void Form_Explorer::OnChangeItemIndex( sx::gui::PControl Sender )
 {
 	//  get and validate data
 	if (!Sender || !Sender->GetUserData()) return;
-	sx::gui::PListBox curList = (sx::gui::PListBox)Sender->GetUserData();
+	sx::gui::ListBox* curList = (sx::gui::ListBox*)Sender->GetUserData();
 	int itemIndex = curList->GetItemIndex();
 	
 	//  prepare necessary data

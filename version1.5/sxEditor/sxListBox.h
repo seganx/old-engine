@@ -32,6 +32,7 @@ namespace sx { namespace gui {
 			void SetTexture(const WCHAR* src);
 			const WCHAR* GetTexture(void);
 			bool operator==(Item& t);
+			bool IsSelected(void);
 
 			String			Text;
 			void*			UserData;

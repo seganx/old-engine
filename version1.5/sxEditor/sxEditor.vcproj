@@ -343,6 +343,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Form_NodeList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Form_NodeList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Form_SetName.cpp"
 				>
 			</File>

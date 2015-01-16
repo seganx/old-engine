@@ -57,7 +57,7 @@ private:
 	sx::gui::PCheckBox		m_ch_shReceive;		//	meshes can receive shadow
 	sx::gui::PCheckBox		m_ch_invisible;		//	invisible all meshes
 
-	sx::gui::PTextEdit		m_td_prefix;		//	prefix of resources
+	sx::gui::TextEdit*		m_td_prefix;		//	prefix of resources
 
 	sx::gui::PTrackBar		m_tr_lodFirst;		//  precision of first LOD
 	sx::gui::PTrackBar		m_tr_lodSecond;		//  precision of second LOD

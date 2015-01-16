@@ -60,9 +60,9 @@ private:
 
 	sx::gui::PLabel			m_pTitle;			//	title of the form
 
-	sx::gui::PTextEdit		m_animSpeed;
-	sx::gui::PTextEdit		m_blendTime;
-	sx::gui::PListBox		m_animlist;
+	sx::gui::TextEdit*		m_animSpeed;
+	sx::gui::TextEdit*		m_blendTime;
+	sx::gui::ListBox*		m_animlist;
 	sx::gui::PButton		m_addAnim;
 	sx::gui::PButton		m_remAnim;
 	sx::gui::PButton		m_clearList;
