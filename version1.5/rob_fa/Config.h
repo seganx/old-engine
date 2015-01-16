@@ -30,7 +30,7 @@
 #define USE_SITE_STATS		0
 #define SITE_STATS_TAG		0		//	0:Steam - 1:USA/UK - 2:Germany - 3:Poland - 4:Czech
 
-#define USE_UPDATE_1		1		//	switch to first update of the game
+#define USE_UPDATE_1		salam chetori		//	switch to first update of the game
 #define USE_ENCRPT_STR		0		//	force to use encrypted text
 
 
@@ -54,7 +54,6 @@
 
 
 #define FONT_STATUS							L"Font_17.fnt"
-#define FONT_MAP_DIFFICULTY					L"Font_20_l.fnt"
 #define FONT_PROFILE						L"Font_30_l.fnt"
 #define FONT_PROFILE_INFO					L"Font_20_l.fnt"
 #define FONT_ACHIEVEMENTS_NAMES				L"Font_25_l.fnt"

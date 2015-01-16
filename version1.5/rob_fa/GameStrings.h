@@ -26,20 +26,10 @@ public:
 	//! this will load an strings file.
 	void Load(const wchar* stringsFile);
 
-#if USE_UPDATE_1
 	GameString* Get( const int id );
-#else
-	//! return the strings by index
-	const wchar* Get( const int index );
-#endif
 
 private:
-#if USE_UPDATE_1
 	Map<uint, GameString*>	m_texts;
-#else
-	wchar				m_tmp[32];
-	sx::cmn::StringList m_list;
-#endif
 };
 
 #endif	//	GUARD_Scripter_HEADER_FILE

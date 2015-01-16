@@ -252,19 +252,11 @@ void MenuMain::Initialize( void )
 
 		switch ( i )
 		{
-#if USE_UPDATE_1
 			case 0:	create_label( m_btn[i], g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 1:	create_label( m_btn[i], g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 2:	create_label( m_btn[i], g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 3:	create_label( m_btn[i], g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 4:	create_label( m_btn[i], g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-#else
-			case 0:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 1:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 2:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 3:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 4:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-#endif
 		}
 	}
 #else
@@ -326,21 +318,12 @@ void MenuMain::Initialize( void )
 
 			switch ( i )
 			{
-#if USE_UPDATE_1
 			case 0:	create_label( m_btn[i], g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 1:	create_label( m_btn[i], g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 2:	create_label( m_btn[i], g_game->m_strings->Get(5), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 3:	create_label( m_btn[i], g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 4:	create_label( m_btn[i], g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			case 5:	create_label( m_btn[i], g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-#else
-			case 0:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 1:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 2:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(5), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 3:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 4:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 5:	create_label( m_btn[i], FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-#endif
 			}
 		}
 #endif
@@ -849,17 +832,8 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONCLICK( caption, MenuMap::OnClick );
 
 	//	create back button
-	m_goback = sx_new( sx::gui::Button );
+	m_goback = create_back_button( m_back, -274.0f, -11.0f );
 	m_goback->SetUserTag( 13 );
-	m_goback->SetParent( m_back );
-	m_goback->SetSize( float2( 128, 32 ) );
-	m_goback->Position().Set( -274.0f, -11.0f, 0.0f );
-	m_goback->GetElement(0)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(0)->Color().a = 0.01f;
-	m_goback->GetElement(1)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(1)->Color().a = 1.0f;
-	m_goback->GetElement(2)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(2)->Color().a = 0.5f;
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuMap::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
 	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
@@ -904,29 +878,6 @@ void MenuMap::Initialize( void )
 	panel->SetUserTag( 3 );
 	panel->Position().x = - m_diff_scroll->GetSize().x * 0.5f;
 	SEGAN_GUI_SET_ONCLICK( panel, MenuMap::OnScroll );
-
-	//	load some default value
-	String str = sx::sys::FileManager::Project_GetDir();
-	str << L"strings.txt";
-	Scripter script;
-	script.Load( str );
-	for (int i=0; i<script.GetObjectCount(); i++)
-	{
-		str512 tmpStr;
-		if ( script.GetString(i, L"Type", tmpStr) && tmpStr == L"Strings" )
-		{
-			if ( !script.GetString(i, L"Name", tmpStr) )
-				continue;
-
-			if ( tmpStr == L"DifficultyButton" )
-			{
-				script.GetString( i, L"norm",	m_diff_norm_text	);
-				script.GetString( i, L"hard",	m_diff_hard_text	);
-				script.GetString( i, L"insane", m_diff_insane_text	);
-				break;
-			}
-		}
-	}
 
 }
 
@@ -1302,7 +1253,7 @@ void MenuProfile::Initialize( void )
 	m_back->State_GetByIndex(1).Position.Set( 90.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(1).Blender.Set( 0.03f, 0.85f );
 
-	//	profile label
+	//	profile title of the page
 	create_label( m_back, g_game->m_strings->Get(22), 250.0f, 50.0f, -260.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
 
 	//	create text edit
@@ -1381,40 +1332,15 @@ void MenuProfile::Initialize( void )
 		SEGAN_GUI_SET_ONEXIT( lbl, MenuProfile::OnExit );
 
 		//	label to show total stars
-		lbl = sx_new( sx::gui::Label );
-		lbl->SetParent( m_profPanel[i] );
-		lbl->SetSize( float2( 50, 40) );
-		lbl->SetAlign( GTA_LEFT );
-		lbl->GetElement(0)->Color().a = 0.0f;
-		lbl->GetElement(1)->Color().a = 0.8f;
-		lbl->SetFont( FONT_PROFILE_INFO );
-		lbl->Position().Set( 120.0f, -18.0f, 0.0f );
+		create_label( m_profPanel[i], g_game->m_strings->Get(23), 100, 80, 120.0f, -18.0f, 0.0f )->GetElement(1)->Color().a = 0.8f;
 
 		//	label to show total people
-		lbl = sx_new( sx::gui::Label );
-		lbl->SetParent( m_profPanel[i] );
-		lbl->SetSize( float2( 100, 40) );
-		lbl->SetAlign( GTA_LEFT );
-		lbl->GetElement(0)->Color().a = 0.0f;
-		lbl->GetElement(1)->Color().a = 0.8f;
-		lbl->SetFont( FONT_PROFILE_INFO );
-		lbl->Position().Set( 230.0f, -18.0f, 0.0f );
+		create_label( m_profPanel[i], g_game->m_strings->Get(23), 100, 80, 230.0f, -18.0f, 0.0f )->GetElement(1)->Color().a = 0.8f;
 	}
 
 	//	create back button
-	m_goback = sx_new( sx::gui::Button );
-	m_goback->SetParent( m_back );
-	m_goback->SetSize( float2( 128, 32 ) );
-	m_goback->Position().Set( -188.0f, -92.0f, 0.0f );
-	m_goback->GetElement(0)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(0)->Color().a = 0.01f;
-	m_goback->GetElement(1)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(1)->Color().a = 1.0f;
-	m_goback->GetElement(2)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(2)->Color().a = 0.5f;
+	m_goback = create_back_button( m_back, -188.0f, -92.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuProfile::OnClick );
-	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-
 	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	//	prepare profile
@@ -1815,22 +1741,14 @@ void MenuAchievements::Initialize( void )
 	m_back->State_GetByIndex(0).Blender.Set( 0.2f, 0.3f );
 	m_back->State_GetByIndex(1).Position.Set( 90.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(1).Blender.Set( 0.03f, 0.85f );
-	create_label( m_back, FONT_45_OUTLINE_SHADOWED, GTA_LEFT, g_game->m_strings->Get(5), 300.0f, 50.0f, -180.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
+	
+	//	create title
+	create_label( m_back, g_game->m_strings->Get(377), 300.0f, 50.0f, -180.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
 
 	//	create back button
-	m_goback = sx_new( sx::gui::Button );
-	m_goback->SetParent( m_back );
-	m_goback->SetSize( float2( 128, 32 ) );
-	m_goback->Position().Set( -188.0f, -92.0f, 0.0f );
-	m_goback->GetElement(0)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(0)->Color().a = 0.01f;
-	m_goback->GetElement(1)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(1)->Color().a = 1.0f;
-	m_goback->GetElement(2)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(2)->Color().a = 0.5f;
+	m_goback = create_back_button( m_back, -188.0f, -92.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuAchievements::OnClick );
-	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
+	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0.0f );
 
 	//	create panel to show selected achievement
 	m_image = sx_new( sx::gui::Panel );
@@ -1840,33 +1758,11 @@ void MenuAchievements::Initialize( void )
 	m_image->Position().Set( -130.0f, -21.0f, 0.0f );
 
 	//	create label for the name
-	m_name = sx_new( sx::gui::Label );
-	m_name->SetParent( m_back );
-	m_name->GetElement(0)->Color() = 0x00010000;
-	m_name->GetElement(1)->Color() = 0xffffff00;
-	m_name->SetSize( float2( 270, 30 ) );
-#if USE_RTL
-	m_name->SetAlign( GTA_RIGHT );
-#else
-	m_name->SetAlign( GTA_LEFT );
-#endif
-	m_name->SetFont( FONT_ACHIEVEMENTS_NAMES );
-	m_name->Position().Set( 50.0f, -5.0f, 0.0f );
+	m_name = create_label( m_back, null, GTA_LEFT, L" ", 270.0f, 40.0f, 50.0f, -10.0f, 0.0f );
 
 	//	create label for the desc
-	m_desc = sx_new( sx::gui::Label );
-	m_desc->SetParent( m_back );
+	m_desc = create_label( m_back, null, GTA_LEFT, L" ", 300.0f, 50.0f, 65.0f, -40.0f, 0.0f );
 	m_desc->GetElement(0)->Color() = 0x00010000;
-	m_desc->SetSize( float2( 300, 50 ) );
-#if USE_RTL
-	m_desc->SetAlign( GTA_RIGHT );
-#else
-	m_desc->SetAlign( GTA_LEFT );
-#endif
-	m_desc->SetFont( FONT_ACHIEVEMENTS_DESC );
-	m_desc->Position().Set( 65.0f, -40.0f, 0.0f );
-	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
-	m_desc->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
 
 	//	create achievement icons
 	for ( int i=0; i<Achievement_Count; i++ )
@@ -1992,7 +1888,9 @@ void MenuSettings::Initialize( void )
 	m_back->State_GetByIndex(2).Position.Set( -250.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(2).Blender.Set( 0.03f, 0.85f );
 	m_back->State_GetByIndex(2).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
-	create_label( m_back, FONT_45_OUTLINE_SHADOWED, GTA_CENTER, g_game->m_strings->Get(7), 300.0f, 50.0f, -240.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
+
+	//	create title
+	create_label( m_back, g_game->m_strings->Get(118), 300.0f, 50.0f, -240.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
 
 	//	create full screen check box 
 	m_fullscreen = sx_new( sx::gui::CheckBox );
@@ -2002,7 +1900,7 @@ void MenuSettings::Initialize( void )
 	m_fullscreen->GetElement(0)->Color().a = 0.0f;
 	m_fullscreen->GetElement(1)->SetTextureSrc( L"gui_settings_check.txr" );
 	SEGAN_GUI_SET_ONCLICK( m_fullscreen, MenuSettings::OnClick );
-	create_label( m_fullscreen, FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(119), 200.0f, 40.0f, 120.0f, -5.0f, 0 );
+	create_label( m_fullscreen, g_game->m_strings->Get(119), 200.0f, 40.0f, 120.0f, -5.0f, 0 );
 
 
 	//	create scrolls
@@ -2015,7 +1913,7 @@ void MenuSettings::Initialize( void )
 		scroll->GetElement(1)->SetTextureSrc( L"gui_settings_trackbar.txr" );
 		SEGAN_GUI_SET_ONSCROLL( scroll, MenuSettings::OnScroll );
 
-		create_label( scroll, FONT_30_OUTLINE, GTA_LEFT, g_game->m_strings->Get(120 + i), 250.0f, 40.0f, 240.0f, 0, 0 )->GetElement(1)->Color().a = 0.8f;
+		create_label( scroll, g_game->m_strings->Get(120 + i), 250.0f, 40.0f, 240.0f, 0, 0 )->GetElement(1)->Color().a = 0.8f;
 
 		switch ( i )
 		{
@@ -2061,21 +1959,11 @@ void MenuSettings::Initialize( void )
 		}
 	}
 
-
 	//	create back button
-	m_goback = sx_new( sx::gui::Button );
-	m_goback->SetParent( m_back );
-	m_goback->SetSize( float2( 128, 32 ) );
-	m_goback->Position().Set( -166.0f, -113.0f, 0.0f );
-	m_goback->GetElement(0)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(0)->Color().a = 0.01f;
-	m_goback->GetElement(1)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(1)->Color().a = 1.0f;
-	m_goback->GetElement(2)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(2)->Color().a = 0.5f;
+	m_goback = create_back_button( m_back, -166.0f, -113.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuSettings::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
+	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 }
 
 void MenuSettings::ProcessInput( bool& inputHandled, float elpsTime )
@@ -2189,7 +2077,6 @@ void MenuSettings::OnScroll( sx::gui::PControl sender )
 		sx::io::Input::SendSignal( 0, IST_SET_SPEED, &v );
 	}
 
-
 	switch ( Config::GetData()->shadowLevel )
 	{
 	case 0:	case 1:	case 2:
@@ -2227,19 +2114,9 @@ void MenuCredits::Initialize( void )
 	m_back->State_GetByIndex(1).Blender.Set( 0.2f, 0.3f );
 
 	//	create back button
-	sx::gui::Button * m_goback = sx_new( sx::gui::Button );
-	m_goback->SetParent( m_back );
-	m_goback->SetSize( float2( 128, 32 ) );
-	m_goback->Position().Set( -360.0f, -255.0f, 0.0f );
-	m_goback->GetElement(0)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(0)->Color().a = 0.5f;
-	m_goback->GetElement(1)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(1)->Color().a = 1.0f;
-	m_goback->GetElement(2)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(2)->Color().a = 0.5f;
+	sx::gui::Button * m_goback = create_back_button( m_back, -360.0f, -255.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuCredits::OnClick );
-	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
+	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 }
 
 void MenuCredits::Finalize( void )
@@ -2292,7 +2169,7 @@ void MenuConfirmProfile::Initialize( void )
 	m_form->State_Add();
 	m_form->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
 	m_form->State_GetByIndex(1).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
-	create_label( m_form, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(525), 425.0f, 60.0f, 0, 10.0f, 0 );
+	create_label( m_form, g_game->m_strings->Get(525), 425.0f, 60.0f, 0, 10.0f, 0 );
 
 	//	create button yes
 	m_yes = sx_new( sx::gui::Button );
@@ -2304,7 +2181,7 @@ void MenuConfirmProfile::Initialize( void )
 	m_yes->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_yes, MenuConfirmProfile::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_yes, Menu::OnEnter );
-	create_label( m_yes, FONT_25_OUTLINE, GTA_RIGHT, g_game->m_strings->Get(526), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_yes, g_game->m_strings->Get(526), 120.0f, 30.0f, 0, -5.0f, 0 );
 
 	//	create button no
 	m_no = sx_new( sx::gui::Button );
@@ -2316,7 +2193,7 @@ void MenuConfirmProfile::Initialize( void )
 	m_no->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_no, MenuConfirmProfile::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_no, Menu::OnEnter );
-	create_label( m_no, FONT_25_OUTLINE, GTA_LEFT, g_game->m_strings->Get(527), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_no, g_game->m_strings->Get(527), 120.0f, 30.0f, 0, -5.0f, 0 );
 }
 
 void MenuConfirmProfile::Finalize( void )
@@ -2388,7 +2265,7 @@ void MenuConfirmMenu::Initialize( void )
 	m_form->State_Add();
 	m_form->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
 	m_form->State_GetByIndex(1).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
-	create_label( m_form, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(159), 425.0f, 60.0f, 0, 10.0f, 0 );
+	create_label( m_form, g_game->m_strings->Get(159), 425.0f, 60.0f, 0, 10.0f, 0 );
 
 	//	create button yes
 	m_yes = sx_new( sx::gui::Button );
@@ -2400,7 +2277,7 @@ void MenuConfirmMenu::Initialize( void )
 	m_yes->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_yes, MenuConfirmMenu::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_yes, Menu::OnEnter );
-	create_label( m_yes, FONT_25_OUTLINE, GTA_RIGHT, g_game->m_strings->Get(160), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_yes, g_game->m_strings->Get(160), 120.0f, 30.0f, 0, -5.0f, 0 );
 
 	//	create button no
 	m_no = sx_new( sx::gui::Button );
@@ -2412,7 +2289,7 @@ void MenuConfirmMenu::Initialize( void )
 	m_no->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_no, MenuConfirmMenu::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_no, Menu::OnEnter );
-	create_label( m_no, FONT_25_OUTLINE, GTA_LEFT, g_game->m_strings->Get(161), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_no, g_game->m_strings->Get(161), 120.0f, 30.0f, 0, -5.0f, 0 );
 }
 
 void MenuConfirmMenu::Finalize( void )
@@ -2482,7 +2359,7 @@ void MenuConfirmExit::Initialize( void )
 	m_form->State_Add();
 	m_form->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
 	m_form->State_GetByIndex(1).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
-	create_label( m_form, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(166), 425.0f, 60.0f, 0, 10.0f, 0 );
+	create_label( m_form, g_game->m_strings->Get(166), 425.0f, 60.0f, 0, 10.0f, 0 );
 
 	//	create button yes
 	m_yes = sx_new( sx::gui::Button );
@@ -2494,7 +2371,7 @@ void MenuConfirmExit::Initialize( void )
 	m_yes->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_yes, MenuConfirmExit::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_yes, Menu::OnEnter );
-	create_label( m_yes, FONT_25_OUTLINE, GTA_RIGHT, g_game->m_strings->Get(167), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_yes, g_game->m_strings->Get(167), 120.0f, 30.0f, 0, -5.0f, 0 );
 
 	//	create button no
 	m_no = sx_new( sx::gui::Button );
@@ -2506,7 +2383,7 @@ void MenuConfirmExit::Initialize( void )
 	m_no->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_no, MenuConfirmExit::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_no, Menu::OnEnter );
-	create_label( m_no, FONT_25_OUTLINE, GTA_LEFT, g_game->m_strings->Get(168), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_no, g_game->m_strings->Get(168), 120.0f, 30.0f, 0, -5.0f, 0 );
 }
 
 void MenuConfirmExit::Finalize( void )
@@ -2690,7 +2567,7 @@ void MenuPause::Initialize( void )
 		butn->GetElement(1)->SetTextureSrc( L"gui_pause_button.txr" );
 		butn->GetElement(2)->SetTextureSrc( L"gui_pause_button.txr" );
 		butn->Position().Set( 90.0f + i * 15.0f, 130.0f - i * 60.0f, 0 );
-		create_label( butn, FONT_45_OUTLINE_SHADOWED, GTA_RIGHT, g_game->m_strings->Get(131 + i), 300.0f, 50.0f, -20.0f, 0, 0 );
+		create_label( butn, g_game->m_strings->Get(131 + i), 300.0f, 50.0f, -20.0f, 0, 0 );
 	}
 
 	m_confirmMenu.Initialize();
@@ -2788,7 +2665,6 @@ void MenuPause::Show( void )
 
 	msg_SoundPlay msg( true, 0, 0, L"scrollMenu" );
 	m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
-
 }
 
 void MenuPause::Hide( void )
@@ -2912,23 +2788,12 @@ void MenuVictory::Initialize( void )
 	}
 
 	//	create label to show people
-	m_peopleLabel = sx_new( sx::gui::Label );
-	m_peopleLabel->SetParent( m_back );
-	m_peopleLabel->SetSize( float2(100, 50) );
-	m_peopleLabel->SetAlign( GTA_CENTER );
-	m_peopleLabel->Position().Set( -63.0f, 106.0f, 0.0f );
-	m_peopleLabel->GetElement(0)->Color().a = 0.0f;
+	m_peopleLabel = create_label( m_back, g_game->m_strings->Get(146), 100.0f, 50.0f, -63.0f, 106.0f, 0.0f );
 	m_peopleLabel->GetElement(1)->Color() = 0xffffffaa;
-	m_peopleLabel->SetFont( FONT_VICTORY_PEOPLE );
 
 	//	create label to show golds
-	m_goldLabel = (sx::gui::Label*)m_peopleLabel->Clone();
-	m_goldLabel->SetParent( m_back );
-#if USE_RTL
-	m_goldLabel->Position().Set( -148.0f, 117.0f, 0.0f );
-#else
-	m_goldLabel->Position().Set( -143.0f, 110.0f, 0.0f );
-#endif
+	m_goldLabel = create_label( m_back, g_game->m_strings->Get(146), 100.0f, 50.0f, -143.0f, 110.0f, 0.0f );
+	m_goldLabel->GetElement(1)->Color() = 0xffffffaa;
 
 	//	create buttons
 	for ( int i=0; i<5; i++ )
@@ -2941,16 +2806,17 @@ void MenuVictory::Initialize( void )
 		btn->GetElement(1)->SetTextureSrc( L"gui_victory_button.txr" );
 		btn->GetElement(2)->SetTextureSrc( L"gui_victory_button.txr" );
 		btn->Position().Set( -15.0f + i * 20.0f, 40.0f - i * 60.0f, 0 );
-		create_label( btn, FONT_45_OUTLINE_SHADOWED, GTA_LEFT, g_game->m_strings->Get(141 + i), 250.0f, 50.0f, 30.0f, -5.0f, 0 );
 		SEGAN_GUI_SET_ONCLICK( btn, MenuVictory::OnClick );
 		SEGAN_GUI_SET_ONENTER( btn, Menu::OnEnter );
+
+		create_label( btn, g_game->m_strings->Get(141 + i), 250.0f, 50.0f, 30.0f, -5.0f, 0 );
+
 		switch ( i )
 		{
 		case 0:	m_nextLevel = btn;	break;
 		case 2: m_upgrade = btn;	break;
 		}
 	}
-
 
 	m_guide = sx_new( GameGuide );
 }
@@ -3373,7 +3239,7 @@ void MenuGameOver::Initialize( void )
 	m_back->GetElement(0)->SetTextureSrc( L"gui_gameoverBack.txr" );
 	m_back->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 
-	create_label( m_back, FONT_45_OUTLINE_SHADOWED, GTA_LEFT, g_game->m_strings->Get(151), 250.0f, 50.0f, 15.0f, 35.0f, 0 )->GetElement(1)->Color() = 0xaaaaaaaa;
+	create_label( m_back, g_game->m_strings->Get(151), 250.0f, 50.0f, 15.0f, 35.0f, 0 )->GetElement(1)->Color() = 0xaaaaaaaa;
 	for ( int i=0; i<3; i++ )
 	{
 		sx::gui::Button* btn = sx_new( sx::gui::Button );
@@ -3384,7 +3250,7 @@ void MenuGameOver::Initialize( void )
 		btn->GetElement(1)->SetTextureSrc( L"gui_victory_button.txr" );
 		btn->GetElement(2)->SetTextureSrc( L"gui_victory_button.txr" );
 		btn->Position().Set( 5.0f + i * 20.0f, -20.0f - i * 60.0f, 0 );
-		create_label( btn, FONT_45_OUTLINE_SHADOWED, GTA_LEFT, g_game->m_strings->Get(152 + i), 250.0f, 50.0f, 30.0f, -5.0f, 0 );
+		create_label( btn, g_game->m_strings->Get(152 + i), 250.0f, 50.0f, 30.0f, -5.0f, 0 );
 		SEGAN_GUI_SET_ONCLICK( btn, MenuGameOver::OnClick );
 		SEGAN_GUI_SET_ONENTER( btn, Menu::OnEnter );
 	}
@@ -3407,8 +3273,6 @@ void MenuGameOver::Show( void )
 
 	msg_SoundPlay msg( true, 0, 0, L"gameOver" );
 	m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
-
-
 }
 
 void MenuGameOver::OnClick( sx::gui::PControl sender )
@@ -4112,18 +3976,8 @@ void MenuUpgrade::Initialize( void )
 	m_stars->GetElement(1)->Color() = 0xFFFFFF00;
 
 	//	create back button
-	m_goback = sx_new( sx::gui::Button );
-	m_goback->SetParent( m_back );
-	m_goback->SetSize( float2( 128, 32 ) );
-	m_goback->Position().Set( -358.0f, -256.0f, 0.0f );
-	m_goback->GetElement(0)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(0)->Color().a = 0.01f;
-	m_goback->GetElement(1)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(1)->Color().a = 1.0f;
-	m_goback->GetElement(2)->SetTextureSrc( L"gui_menu_back.txr" );
-	m_goback->GetElement(2)->Color().a = 0.5f;
+	m_goback = create_back_button( m_back, -358.0f, -256.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuUpgrade::OnClick );
-	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
 	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	m_desc = sx_new( sx::gui::Label );
