@@ -426,6 +426,7 @@ sx::gui::Label* create_label( sx::gui::Control* parent, const GameString* gameSt
 {
 	sx::gui::Label* res = create_label( parent, gameString->font, gameString->align, gameString->text, width, height, x, y, z );
 	res->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
+	return res;
 }
 
 sx::gui::Label* update_label( sx::gui::Label* label, const GameString* gameString )
@@ -434,6 +435,7 @@ sx::gui::Label* update_label( sx::gui::Label* label, const GameString* gameStrin
 	label->SetFont( gameString->font );
 	label->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
 	label->SetText( gameString->text );
+	return label;
 }
 sx::gui::Button* create_back_button( sx::gui::Control* parent, const float& x, const float& y )
 {
@@ -447,6 +449,5 @@ sx::gui::Button* create_back_button( sx::gui::Control* parent, const float& x, c
 	res->GetElement(1)->Color().a = 1.0f;
 	res->GetElement(2)->SetTextureSrc( L"gui_menu_back.txr" );
 	res->GetElement(2)->Color().a = 0.5f;
-	SEGAN_GUI_SET_ONENTER( res, Menu::OnEnter );
 	return res;
 }

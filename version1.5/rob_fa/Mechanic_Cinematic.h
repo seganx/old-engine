@@ -13,13 +13,13 @@
 #include "Mechanic.h"
 
 
-
+struct GameString;
 class FirstPresents
 {
 public:
 	FirstPresents( void );
 	~FirstPresents( void );
-	void AddPresents( const WCHAR* texture, const float size, const wchar* story, const float x, const float y  );
+	void AddPresents( const WCHAR* texture, const float size, const GameString* story, const float x, const float y  );
 	void Update( float elpstime );
 	void Draw( void );
 	bool Presenting( void );

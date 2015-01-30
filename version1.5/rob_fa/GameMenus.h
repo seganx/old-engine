@@ -377,16 +377,16 @@ public:
 	void Hide(void);
 	void OnClick(sx::gui::PControl sender);
 
-	void AddTutorial(const WCHAR* title, const WCHAR* desc, const WCHAR* image, int showNow = 0, bool settoCurrent = true);
+	void AddTutorial(const uint title, const uint desc, const WCHAR* image, int showNow = 0, bool settoCurrent = true);
 	void ClearTutorial(void);
 
 public:
 
 	struct Tutorial
 	{
-		String				title;
-		String				insides;
-		String				desc;
+		uint				title;
+		uint				insides;
+		uint				desc;
 		sx::gui::PPanel		image;
 	};
 	Array<Tutorial*>	m_tutorial;

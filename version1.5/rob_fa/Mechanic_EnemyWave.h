@@ -44,7 +44,7 @@ namespace GM
 
 			uint				infoTitle;
 			uint				infoDesc;
-			uint				infoImage;
+			WCHAR				infoImage[64];
 			int					infoShowNow;
 		};
 

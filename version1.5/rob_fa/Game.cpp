@@ -303,23 +303,24 @@ void Game::Initialize( sx::sys::Window* win )
 		Scripter script;
 		script.Load( str );
 
-		str512 tmp, name, desc, tips, image;
+		str512 tmp, image;
 		for (int i=0; i<script.GetObjectCount(); i++)
 		{
 			if ( script.GetString(i, L"Type", tmp) )
 			{
 				if ( tmp == L"Achievement" )
 				{
-					if ( !script.GetString( i, L"title", name ) )
+					uint name=0, desc=0, tips=0;
+					if ( !script.GetUint( i, L"title", name ) )
 						continue;
 
-					if ( !script.GetString( i, L"desc", desc ) )
+					if ( !script.GetUint( i, L"desc", desc ) )
 						continue;
 
 					if ( !script.GetString( i, L"image", image ) )
 						continue;
 
-					if ( !script.GetString( i, L"tips", tips ) )
+					if ( !script.GetUint( i, L"tips", tips ) )
 						continue;
 
 					int v = 0;
@@ -1691,7 +1692,7 @@ void Steam::OnUploadScore(LeaderboardScoreUploaded_t *pFindLeaderboardResult, bo
 
 #else
 
-void Achievement::Initialize( const WCHAR* cname, const WCHAR* cdesc, const WCHAR* ctips, const WCHAR* cicon, int irange )
+void Achievement::Initialize( const uint cname, const uint cdesc, const uint ctips, const WCHAR* cicon, int irange )
 {
 	if ( !cname || !cdesc || !cicon || !ctips )
 	{
@@ -1699,9 +1700,10 @@ void Achievement::Initialize( const WCHAR* cname, const WCHAR* cdesc, const WCHA
 		return;
 	}
 
-	textcopy( name, cname );
-	textcopy( desc, cdesc );
-	textcopy( tips, ctips );
+	name = cname;
+	desc = cdesc;
+	tips = ctips;
+
 	textcopy( icon, cicon );
 
 	range = irange;
@@ -1714,10 +1716,7 @@ void Achievement::AddValue( int val /*= 1 */ )
 	if ( value > range ) value = range;
 
 	if ( value != range ) return;
-	//str1024 str;
-	//str.Format( L" Achievement unlocked : \n %s ", name );
-	//g_game->m_gui->ShowTips( tips, 0xffffa352, icon );
-	g_game->m_gui->ShowTips( tips, 0xffff0319, icon );
+	g_game->m_gui->ShowTips( g_game->m_strings->Get(tips), icon );
 
 	msg_SoundPlay msg( true, 0, 0, L"achievement" );
 	g_game->m_gui->m_main->m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
@@ -1777,14 +1776,6 @@ void Upgrades::LoadDefaults( void )
 			{
 				tmpStr.Format( L"%d_value", j );
 				script.GetFloat(i, tmpStr, defaults[j] );
-
-				tmpStr.Format( L"%d_name", j );
-				if ( script.GetString(i, tmpStr, tmpStr ) )
-					String::Copy( name[j], 512, tmpStr );
-
-				tmpStr.Format( L"%d_desc", j );
-				if ( script.GetString(i, tmpStr, tmpStr ) )
-					String::Copy( desc[j], 512, tmpStr );
 
 				tmpStr.Format( L"%d_unlock", j );
 				script.GetInt(i, tmpStr, unlock[j] );

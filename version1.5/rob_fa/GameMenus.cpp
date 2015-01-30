@@ -457,10 +457,10 @@ void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
 						if ( max_level < tmpStr.ToInt() )
 							continue;
 
-						str512 title, desc, image;
-						if ( !script.GetString( i, L"title", title	) )
+						str512 image; uint title, desc;
+						if ( !script.GetUint( i, L"title", title	) )
 							continue;
-						if ( !script.GetString( i, L"desc", desc	) )
+						if ( !script.GetUint( i, L"desc", desc	) )
 							continue;
 						if ( !script.GetString( i, L"image", image	) )
 							continue;
@@ -1341,6 +1341,7 @@ void MenuProfile::Initialize( void )
 	//	create back button
 	m_goback = create_back_button( m_back, -188.0f, -92.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuProfile::OnClick );
+	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
 	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	//	prepare profile
@@ -1748,6 +1749,7 @@ void MenuAchievements::Initialize( void )
 	//	create back button
 	m_goback = create_back_button( m_back, -188.0f, -92.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuAchievements::OnClick );
+	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
 	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0.0f );
 
 	//	create panel to show selected achievement
@@ -1824,8 +1826,8 @@ void MenuAchievements::OnMouseEnter( sx::gui::Control* sender )
 	if ( !sender ) return;
 	int i = sender->GetUserTag();
 
-	m_name->SetText( g_game->m_achievements[i].name );
-	m_desc->SetText( g_game->m_achievements[i].desc );
+	update_label( m_name, g_game->m_strings->Get(g_game->m_achievements[i].name) );
+	update_label( m_name, g_game->m_strings->Get(g_game->m_achievements[i].desc) );
 	m_image->GetElement(0)->SetTexture( m_icon[i]->GetElement(0)->GetTexture() );
 	m_image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
 
@@ -2116,6 +2118,7 @@ void MenuCredits::Initialize( void )
 	//	create back button
 	sx::gui::Button * m_goback = create_back_button( m_back, -360.0f, -255.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuCredits::OnClick );
+	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
 	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 }
 
@@ -3525,10 +3528,10 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 						if ( !script.GetString(i, L"Name", tmpStr) )
 							continue;
 
-						str512 title, desc, image;
-						if ( !script.GetString( i, L"title", title	) )
+						str512 image; uint title, desc;
+						if ( !script.GetUint( i, L"title", title	) )
 							continue;
-						if ( !script.GetString( i, L"desc", desc	) )
+						if ( !script.GetUint( i, L"desc", desc	) )
 							continue;
 						if ( !script.GetString( i, L"image", image	) )
 							continue;
@@ -3667,9 +3670,9 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 
 		curr = m_tutorial[++m_Index];
 		curr->image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
-		m_title->SetText( curr->title );
-		sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
-		m_desc->SetText( curr->desc );
+		update_label( m_title, g_game->m_strings->Get(curr->title) );
+		//sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
+		update_label( m_desc, g_game->m_strings->Get(curr->desc) );
 
 		//	update label
 		{
@@ -3697,9 +3700,9 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 
 		curr = m_tutorial[--m_Index];
 		curr->image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
-		m_title->SetText( curr->title );
-		sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
-		m_desc->SetText( curr->desc );
+		update_label( m_title, g_game->m_strings->Get(curr->title) );
+//		sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
+		update_label( m_desc, g_game->m_strings->Get(curr->desc) );
 
 		//	update label
 		{
@@ -3717,10 +3720,10 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 }
 
 
-void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* image, int showNow /*= 0*/, bool settoCurrent /*= true*/ )
+void MenuInfo::AddTutorial( const uint title, const uint desc, const WCHAR* image, int showNow /*= 0*/, bool settoCurrent /*= true*/ )
 {
+	return;
 	if ( !title || !desc || !image ) return;
-	if ( !title[0] || !desc[0] || !image[0] ) return;
 
 	//	search for repetitious tutorial
 	for ( int i=0; i<m_tutorial.Count(); i++ )
@@ -3739,13 +3742,13 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 	tutor->title = title;
 	tutor->insides = title;
 	tutor->desc = desc;
-	tutor->desc.Replace( L"\\n", L"\n" );
 	tutor->image = sx_new( sx::gui::Panel );
 	tutor->image->SetParent( m_back );
 	tutor->image->SetSize( float2(1024, 1024) );
 	tutor->image->GetElement(0)->SetTextureSrc( image );
 	tutor->image->Position().y = 64.0f;
 
+#if	TODO
 	int returnpos = tutor->insides.Find(L"\n") + 1;
 	if ( returnpos > 0 )
 	{
@@ -3754,6 +3757,7 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 	}
 	else
 		tutor->insides.Clear();
+#endif
 
 	if ( tutor->image->GetElement(0)->GetTexture() )
 	{
@@ -3765,6 +3769,7 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 	//	push to list
 	m_tutorial.PushBack( tutor );
 
+#if TODO
 	//	set as next
 	if ( settoCurrent || m_tutorial.Count() == 1 )
 	{
@@ -3775,6 +3780,7 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 		sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
 		m_desc->SetText( curr->desc );
 	}
+#endif
 
 	//	update images
 	//	remove current tutorial
@@ -3812,10 +3818,10 @@ void MenuInfo::AddTutorial( const WCHAR* title, const WCHAR* desc, const WCHAR* 
 
 	if ( settoCurrent )
 	{
-		str512 helperdesc = tutor->desc;
+		str512 helperdesc = g_game->m_strings->Get(tutor->desc)->text;
 		helperdesc.Replace( L"\n", L"" );
 		helperdesc.Replace( L"   ", L"" );
-		m_helper.title->SetText( tutor->title );
+		m_helper.title->SetText( g_game->m_strings->Get(tutor->title)->text );
 		m_helper.desc->SetText( helperdesc );
 		m_helper.showTime = ( showNow != 2 ) ? 15000.0f : 0.0f;
 	}
@@ -3861,12 +3867,14 @@ void MenuUpgrade::Initialize( void )
 	m_border->Position().y = 150.0f;
 
 	for ( int i=0; i<5; ++i )
-		create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(192 + i * 2), 150, 25, -315 + i * 180.0f, 90, 0 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(187), 150, 25, -320, -180, 0 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(212), 150, 25, -125, -180, 0 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(206), 150, 25,   55, -180, 0 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(214), 150, 25,  240, -180, 0 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, FONT_UPGRADE_NAME, GTA_LEFT, g_game->m_strings->Get(208), 150, 25,  420, -180, 0 )->GetElement(1)->Color() = titleColor;
+	{
+		create_label( m_border, g_game->m_strings->Get(600 + i * 2), 150, 25, -315 + i * 180.0f, 90, 0 )->GetElement(1)->Color() = titleColor;
+	}
+	create_label( m_border, g_game->m_strings->Get(606), 150, 25, -320, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, g_game->m_strings->Get(607), 150, 25, -125, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, g_game->m_strings->Get(608), 150, 25,   55, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, g_game->m_strings->Get(609), 150, 25,  240, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, g_game->m_strings->Get(610), 150, 25,  420, -180, 0 )->GetElement(1)->Color() = titleColor;
 
 	for ( int i=0; i<44; i++ )
 	{
@@ -3881,16 +3889,8 @@ void MenuUpgrade::Initialize( void )
 		SEGAN_GUI_SET_ONEXIT( ch, MenuUpgrade::OnCheckExit );
 		m_checks[i] = ch;
 
-		sx::gui::Label* lb = sx_new( sx::gui::Label );
-		lb->SetUserTag( i );
-		lb->SetParent( ch );
-		lb->SetSize( float2( 160, 28 ) );
-		//lb->SetAlign( GTA_RIGHT );
-		lb->SetFont( FONT_UPGRADE_NAME );
-		lb->Position().Set( 40.0f, -2.0f, 0.0f );
-		lb->GetElement(0)->Color().a = 0.0f;
-		lb->GetElement(1)->Color().a = 1.0f;
-		m_labels[i] = lb;
+		m_labels[i] = create_label( ch, g_game->m_strings->Get(26 + i * 2), 160.0f, 28.0f, 40.0f, -2.0f, 0.0f );
+		m_labels[i]->SetUserTag( i );
 
 		switch ( i )
 		{
@@ -3927,39 +3927,20 @@ void MenuUpgrade::Initialize( void )
 	}
 
 	//	create a label to display number of starts
-	m_stars = sx_new( sx::gui::Label );
-	m_stars->SetParent( m_back );
-	m_stars->SetSize( float2(128, 40) );
-	m_stars->SetFont( FONT_UPGRADE_STARS );
-#if USE_RTL
-	m_stars->SetAlign( GTA_RIGHT );
-	m_stars->Position().Set( -130.0f, -250.0f, 0.0f );
-#else
-	m_stars->SetAlign( GTA_LEFT );
-	m_stars->Position().Set( -130.0f, -260.0f, 0.0f );
-#endif
+	m_stars = create_label( m_back, g_game->m_strings->Get(615), 128.0f, 40.0f, -130, -260.0f, 0.0f );
 	m_stars->GetElement(0)->Color() = 0x00010000;
 	m_stars->GetElement(1)->Color() = 0xFFFFFF00;
 
 	//	create back button
 	m_goback = create_back_button( m_back, -358.0f, -256.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuUpgrade::OnClick );
-	create_label( m_goback, FONT_25_OUTLINE, GTA_CENTER, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
+	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
+	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
-	m_desc = sx_new( sx::gui::Label );
-	m_desc->SetParent( m_back );
-	m_desc->SetSize( float2( 430, 100 ) );
-#if USE_RTL
-	m_desc->SetAlign( GTA_RIGHT );
-#else
-	m_desc->SetAlign( GTA_LEFT );
-#endif
-	m_desc->SetFont( FONT_UPGRADE_DESC );
-	m_desc->Position().Set( 220.0f, -250.0f, 0.0f );
+	//	create description label
+	m_desc = create_label( m_back, null, GTA_LEFT, L" ", 430.0f, 100.0f, 220.0f, -250.0f, 0.0f );
 	m_desc->GetElement(0)->Color() = 0x00000001;
 	m_desc->GetElement(1)->Color() = 0xffffffaa;
-	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
-	m_desc->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
 }
 
 void MenuUpgrade::Finalize( void )
@@ -3987,7 +3968,7 @@ void MenuUpgrade::MsgProc( UINT recieverID, UINT msg, void* data )
 	{
 	case GMT_LEVEL_LOADED:		/////////////////////////////////////////////////    LOAD LEVEL
 		{	
-			g_game->m_gui->m_upgradePanel->SetData( 
+			SetData( 
 				g_game->m_game_currentLevel + 1,
 				g_game->m_player->m_profile.GetNumStars(),
 				g_game->m_player->m_profile.upgrades
@@ -4085,7 +4066,7 @@ void MenuUpgrade::OnCheckEnter( sx::gui::PControl sender )
 
 	m_labels[index]->GetElement(1)->Color() = 0xffffffff;
 
-	m_desc->SetText( g_game->m_upgrades.desc[index] );
+	update_label( m_desc, g_game->m_strings->Get(27 + index * 2) );
 	m_desc->AddProperty( SX_GUI_PROPERTY_VISIBLE );
 
 	msg_SoundPlay msg( true, 0, 0, L"mouseHover" );
@@ -4108,14 +4089,8 @@ void MenuUpgrade::SetData( const int level, const int points, const int* upgrade
 {
 	m_points = points;
 
-// 	m_points = 0;
-// 	for ( int i=0; i<10; i++ )
-// 		m_points += g_game->m_player->m_profile.stars[i];
-
 	for ( int i=0; i<44; i++ )
 	{
-		m_labels[i]->SetText( g_game->m_upgrades.name[i] );
-
 		if ( upgrades[i] )
 		{
 			m_checks[i]->Checked() = true;

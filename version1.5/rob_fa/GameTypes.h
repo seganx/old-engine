@@ -418,15 +418,15 @@ private:
 
 struct Achievement
 {
-	WCHAR				name[32];
-	WCHAR				desc[128];
-	WCHAR				tips[128];
+	uint				name;
+	uint				desc;
+	uint				tips;
 	WCHAR				icon[32];
 	int					value;
 	int					range;
 
 	Achievement( void ){ ZeroMemory( this, sizeof(Achievement) ); }
-	void Initialize( const WCHAR* cname, const WCHAR* cdesc, const WCHAR* ctips, const WCHAR* cicon, int irange );
+	void Initialize( const uint cname, const uint cdesc, const uint ctips, const WCHAR* cicon, int irange );
 	void AddValue( int val = 1 );
 	bool IsUnlocked( void );
 	void Finalize( void );
@@ -489,10 +489,6 @@ struct Upgrades
 
 	float	defaults[44];
 	int		unlock[44];
-
-	typedef WCHAR upstr[512];
-	upstr	name[44];
-	upstr	desc[44];
 
 	Upgrades( void ){ ZeroMemory( this, sizeof(Upgrades) ); }
 	void LoadDefaults( void );

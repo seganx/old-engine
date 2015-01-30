@@ -26,8 +26,7 @@ public:
 	//! this will load an strings file.
 	void Load(const wchar* stringsFile);
 
-	GameString* Get( const int id );
-
+	GameString* Get( const uint id );
 private:
 	Map<uint, GameString*>	m_texts;
 };

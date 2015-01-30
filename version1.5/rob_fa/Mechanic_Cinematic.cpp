@@ -25,7 +25,7 @@ FirstPresents::~FirstPresents()
 	}
 }
 
-void FirstPresents::AddPresents( const WCHAR* texture, const float size, const wchar* story, const float x, const float y )
+void FirstPresents::AddPresents( const WCHAR* texture, const float size, const GameString* story, const float x, const float y )
 {
 	sx::gui::Panel* panel = (sx::gui::Panel*)sx::gui::Create( GUI_PANEL );
 	panel->SetSize( float2( size, size ) );
@@ -33,7 +33,7 @@ void FirstPresents::AddPresents( const WCHAR* texture, const float size, const w
 	panel->GetElement(0)->Color().a = 0.0f;
 
 	if ( story )
-		create_label( panel, FONT_25_OUTLINE, GTA_LEFT, story, size/3, size/3, x * size/2, y * size/2, 0 );
+		create_label( panel, story, size/3, size/3, x * size/2, y * size/2, 0 );
 
 	m_list.PushBack( panel );
 }

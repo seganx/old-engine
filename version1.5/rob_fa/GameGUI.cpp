@@ -383,7 +383,7 @@ public:
 		}
 	}
 
-	void Create(const WCHAR* tipText, DWORD tipColor, const WCHAR* tipIcon)
+	void Create(const GameString* tipText, const WCHAR* tipIcon)
 	{
 
 		float width		= (float)sx::d3d::Device3D::Viewport()->Width;
@@ -406,23 +406,8 @@ public:
 
 		if ( tipText )
 		{
-			String str = tipText;
-			str.Replace( L"\\n", L"\n" );
-
-			m_label = sx_new( sx::gui::Label );
-#if USE_RTL
-			m_label->SetAlign( GTA_RIGHT );
-#else
-			m_label->SetAlign( GTA_LEFT );
-#endif
-			m_label->SetFont( FONT_TIPS );
-			m_label->SetSize( float2(100.0f, GAMETIPS_ICON_SIZE_div2) );
+			m_label = create_label( null, tipText, 100.0f, GAMETIPS_ICON_SIZE_div2, 0, 0, 0 );
 			m_label->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
-			m_label->AddProperty( SX_GUI_PROPERTY_MULTILINE );
-			m_label->GetElement(0)->Color() = D3DColor(0,0,0,0);
-			m_label->GetElement(1)->Color() = tipColor;
-			
-			m_label->SetText( str );
 			m_label->Position().Set( left + m_label->GetSize().x * 0.5f, m_posY, 0 );
 
 			g_game->m_gui->Add_Back( m_label );
@@ -1027,12 +1012,12 @@ void GameGUI::MsgProc( UINT recieverID, UINT msg, void* data )
 	m_upgradePanel->MsgProc( recieverID, msg, data );
 }
 
-void GameGUI::ShowTips( const WCHAR* tipText, const DWORD tipColor /*= 0xffffffff*/, const WCHAR* tipIcon /*= NULL*/ )
+void GameGUI::ShowTips( const GameString* tipText, const WCHAR* tipIcon /*= NULL*/ )
 {
-	if ( !tipText || !tipText[0] ) return;
+	if ( !tipText ) return;
 
 	GameTips* newTips = sx_new( GameTips );
-	newTips->Create( tipText, tipColor, tipIcon );
+	newTips->Create( tipText, tipIcon );
 
 	for (int i=0; i<m_tips.Count(); i++)
 		m_tips[i]->m_posY += tipIcon ? GAMETIPS_ICON_SIZE : GAMETIPS_ICON_SIZE_div2;

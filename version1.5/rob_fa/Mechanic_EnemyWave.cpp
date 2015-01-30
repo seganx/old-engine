@@ -7,6 +7,7 @@
 #include "EntityManager.h"
 #include "GameConfig.h"
 #include "GameMenus.h"
+#include "GameStrings.h"
 
 #define		MAX_ENEMIES		32
 
@@ -248,8 +249,11 @@ namespace GM
 				pWave->nextWaveTime -= elpsTime*0.001f;
 
 				//  show tips of end wave
-				g_game->m_gui->ShowTips( pWave->tipsEnd, 0xffffa947, pWave->tipsEndIcon );
-				pWave->tipsEnd[0] = 0;
+				if (pWave->tipsEnd)
+				{
+					g_game->m_gui->ShowTips( g_game->m_strings->Get(pWave->tipsEnd), pWave->tipsEndIcon );
+					pWave->tipsEnd = 0;
+				}
 
 				m_startProgr->SetValue( pWave->nextWaveTime );
 				m_back->State_SetIndex(1);
@@ -277,7 +281,7 @@ namespace GM
 			if ( !pSubWave->count || m_waveTime < pSubWave->startTime ) continue;
 
 			//  its time to create an enemy ?
-			pSubWave->elapsTime += elpsTime*0.001f;
+			pSubWave->elapsTime += elpsTime * 0.001f;
 			if ( pSubWave->elapsTime < pSubWave->timeStep ) continue;
 			pSubWave->elapsTime = 0;
 			pSubWave->count--;
@@ -321,7 +325,7 @@ namespace GM
 
 			entity->m_curAttack = entity->m_curAttackLevel = entity->m_attackLevel[0];
 
-			//  test my new idea about addapting the enemy's health with player skill
+			//  test my new idea about adapting the enemy's health with player skill
 			{
 				//	perform difficulty value
 				float maxHelath = g_game->m_difficultyValue * (float)entity->m_health.icur;
@@ -397,7 +401,7 @@ namespace GM
 				g_game->m_gui->m_info->AddTutorial( pSubWave->infoTitle, pSubWave->infoDesc, pSubWave->infoImage, false );
 
 			//	ignore adding one tutorial twice
-			pSubWave->infoTitle[0] = 0;
+			pSubWave->infoTitle = 0;
 
 #if USE_STEAM_SDK
 			g_game->m_steam.CallStat( EST_Helper_Enemies, ESC_InPlay );
@@ -501,7 +505,7 @@ namespace GM
 			EnemyWave* pWave = m_wavesSrc[ m_waveIndex ];
 
 			//  show tips of start wave
-			g_game->m_gui->ShowTips( pWave->tipsStart, 0xffffbfa8, pWave->tipsStartIcon );
+			g_game->m_gui->ShowTips( g_game->m_strings->Get(pWave->tipsStart), pWave->tipsStartIcon );
 
 			//  play particle/sound of start wave
 			if ( pWave->tipsStartNode[0] )
@@ -645,11 +649,9 @@ namespace GM
 					ZeroMemory( ew, sizeof(EnemyWave) );
 					m_wavesSrc.PushBack(ew);
 
-					if ( script.GetInt( i, L"tipsStart", tmpStr ) )
-						CopyString( ew->tipsStart, 512, tmpStr );
-
-					if ( script.GetString( i, L"tipsEnd", tmpStr ) )
-						CopyString( ew->tipsEnd, 512, tmpStr );
+					script.GetUint( i, L"tipsStart", ew->tipsStart );
+					
+					script.GetUint( i, L"tipsEnd", ew->tipsEnd );
 
 					if ( script.GetString( i, L"tipsStartIcon", tmpStr ) )
 						CopyString( ew->tipsStartIcon, 64, tmpStr );
@@ -784,23 +786,20 @@ namespace GM
 
 						//	add info
 						{
-							str512 title, desc, image;
+							str512 image;
 
 							tmpStr.Format( L"%d_infoTitle", j );
-							script.GetString( i, tmpStr, title );
+							script.GetUint( i, tmpStr, ew->subWave[j].infoTitle );
 
 							tmpStr.Format( L"%d_infoDesc", j );
-							script.GetString( i, tmpStr, desc );
+							script.GetUint( i, tmpStr, ew->subWave[j].infoDesc );
 
 							tmpStr.Format( L"%d_infoImage", j );
 							script.GetString( i, tmpStr, image );
 
 							//g_game->m_gui->m_info->AddTutorial( title, desc, image );
-							if ( title.Text() && desc.Text() && image.Text() )
+							if ( image.Text() )
 							{
-
-								CopyString( ew->subWave[j].infoTitle, 128, title );
-								CopyString( ew->subWave[j].infoDesc,  512, desc  );
 								CopyString( ew->subWave[j].infoImage, 64,  image );
 
 								tmpStr.Format( L"%d_infoShowNow", j );
