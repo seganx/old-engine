@@ -6,6 +6,7 @@
 #include "Scripter.h"
 #include "EntityManager.h"
 #include "GameConfig.h"
+#include "GameStrings.h"
 
 
 static sx::core::PNode	towerNode = NULL;
@@ -88,29 +89,6 @@ namespace GM
 		g_game->m_gui->Add_Front( m_pnlCreate0 );
 
 		m_ShowRange.Initialize();
-
-
-		//	load some default value
-		String str = sx::sys::FileManager::Project_GetDir();
-		str << L"strings.txt";
-		Scripter script;
-		script.Load( str );
-		for (int i=0; i<script.GetObjectCount(); i++)
-		{
-			str512 tmpStr;
-			if ( script.GetString(i, L"Type", tmpStr) && tmpStr == L"Strings" )
-			{
-				if ( !script.GetString(i, L"Name", tmpStr) )
-					continue;
-
-				if ( tmpStr == L"GeneralTips" )
-				{
-					script.GetString( i, L"towerlocked",	m_tower_locked	);
-					m_tower_locked.Replace(L"\\n", L"\n");
-					break;
-				}
-			}
-		}
 	}
 
 	void Mechanic_TowerCreate::Finalize( void )
@@ -357,14 +335,18 @@ namespace GM
 					Entity* towerType = (Entity*)m_btnCreate[i]->GetUserData();
 					if ( towerType )
 					{
-						str1024 hint, tmp;
-						tmp.Format( L" %s \n %s ", towerType->m_displayName.Text(), towerType->m_typeDesc.Text() );
-						hint.Format( tmp, towerType->m_cost[0], g_game->m_player->m_gold );
-						m_btnCreate[i]->SetHint( hint );
+						GameString* hint = g_game->m_strings->Get(towerType->m_typeDesc);
+						if ( hint )
+						{
+							swprintf_s( hint->text, 512, hint->base, towerType->m_cost[0], g_game->m_player->m_gold );
+						}
+						str16 tmp; tmp.Format( L"%u\n%u", towerType->m_displayName, towerType->m_typeDesc );
+						m_btnCreate[i]->SetHint( tmp );
 					}
 					else
 					{
-						m_btnCreate[i]->SetHint( m_tower_locked );
+						//	tower is locked
+						m_btnCreate[i]->SetHint( L"182" );
 					}
 				}
 			}

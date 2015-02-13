@@ -252,11 +252,11 @@ void MenuMain::Initialize( void )
 
 		switch ( i )
 		{
-			case 0:	create_label( m_btn[i], g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 1:	create_label( m_btn[i], g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 2:	create_label( m_btn[i], g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 3:	create_label( m_btn[i], g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 4:	create_label( m_btn[i], g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 0:	create_label( m_btn[i], 3, 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 1:	create_label( m_btn[i], 4, 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 2:	create_label( m_btn[i], 6, 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 3:	create_label( m_btn[i], 7, 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 4:	create_label( m_btn[i], 8, 200, 30, -95.0f, 0.0f, 0.0f );	break;
 		}
 	}
 #else
@@ -318,12 +318,12 @@ void MenuMain::Initialize( void )
 
 			switch ( i )
 			{
-			case 0:	create_label( m_btn[i], g_game->m_strings->Get(3), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 1:	create_label( m_btn[i], g_game->m_strings->Get(4), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 2:	create_label( m_btn[i], g_game->m_strings->Get(5), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 3:	create_label( m_btn[i], g_game->m_strings->Get(6), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 4:	create_label( m_btn[i], g_game->m_strings->Get(7), 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 5:	create_label( m_btn[i], g_game->m_strings->Get(8), 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 0:	create_label( m_btn[i], 3, 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 1:	create_label( m_btn[i], 4, 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 2:	create_label( m_btn[i], 5, 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 3:	create_label( m_btn[i], 6, 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 4:	create_label( m_btn[i], 7, 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 5:	create_label( m_btn[i], 8, 200, 30, -95.0f, 0.0f, 0.0f );	break;
 			}
 		}
 #endif
@@ -643,7 +643,7 @@ void MenuMap::Initialize( void )
 	m_back->State_GetByIndex(1).Position.Set( 0.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(1).Blender.Set( 0.07f, 0.6f );
 
-	create_label( m_back, g_game->m_strings->Get(14), 300.0f, 30.0f, -350.0f, 290.0f, 0 );
+	create_label( m_back, 14, 300.0f, 30.0f, -350.0f, 290.0f, 0 );
 
 	//	create level chooser
 	m_chooser = sx_new( sx::gui::PanelEx );
@@ -782,7 +782,7 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_playGame, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_playGame, MenuMap::OnClick );
 
-	sx::gui::Label* caption = create_label( m_playGame, g_game->m_strings->Get(18), 150.0f, 40.0f, 60.0f, -5.0f, 0 );
+	sx::gui::Label* caption = create_label( m_playGame, 18, 150.0f, 40.0f, 60.0f, -5.0f, 0 );
 	caption->SetUserTag( 10 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
@@ -803,7 +803,7 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_miniGame, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_miniGame, MenuMap::OnClick );
 
-	caption = create_label( m_miniGame, g_game->m_strings->Get(19), 100.0f, 30.0f, 60.0f, -5.0f, 0 );
+	caption = create_label( m_miniGame, 19, 100.0f, 30.0f, 60.0f, -5.0f, 0 );
 	caption->SetUserTag( 11 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
@@ -824,7 +824,7 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_upgrade, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_upgrade, MenuMap::OnClick );
 
-	caption = create_label( m_upgrade, g_game->m_strings->Get(20), 100.0f, 30.0f, 50.0f, -5.0f, 0 );
+	caption = create_label( m_upgrade, 20, 100.0f, 30.0f, 50.0f, -5.0f, 0 );
 	caption->SetUserTag( 12 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
@@ -836,7 +836,7 @@ void MenuMap::Initialize( void )
 	m_goback->SetUserTag( 13 );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuMap::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
+	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	//	create difficulty
 	m_diff_scroll = sx_new( sx::gui::TrackBar );
@@ -856,7 +856,7 @@ void MenuMap::Initialize( void )
 	panel->GetElement(0)->SetTextureSrc( L"gui_menu_map_diff.txr" );
 
 	//	create label to show people
-	m_diff_label = create_label( panel, g_game->m_strings->Get(15), 80, 32, 0.0f, -5.0f, 0.0f );
+	m_diff_label = create_label( panel, 15, 80, 32, 0.0f, -5.0f, 0.0f );
 	
 	panel = sx_new( sx::gui::Panel );
 	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
@@ -1198,15 +1198,15 @@ void MenuMap::OnScroll( sx::gui::PControl sender )
 	switch ( g_game->m_player->m_profile.curDifficulty )
 	{
 	case 0:
-		update_label( m_diff_label, g_game->m_strings->Get(15) );
+		update_label( m_diff_label, 15 );
 		g_game->m_difficultyLevel = 0;
 		break;
 	case 1:
-		update_label( m_diff_label, g_game->m_strings->Get(16) );
+		update_label( m_diff_label, 16 );
 		g_game->m_difficultyLevel = 1;
 		break;
 	case 2:
-		update_label( m_diff_label, g_game->m_strings->Get(17) );
+		update_label( m_diff_label, 17 );
 		g_game->m_difficultyLevel = 2;
 		break;
 	}
@@ -1254,7 +1254,7 @@ void MenuProfile::Initialize( void )
 	m_back->State_GetByIndex(1).Blender.Set( 0.03f, 0.85f );
 
 	//	profile title of the page
-	create_label( m_back, g_game->m_strings->Get(22), 250.0f, 50.0f, -260.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
+	create_label( m_back, 22, 250.0f, 50.0f, -260.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
 
 	//	create text edit
 	m_profileName = sx_new( sx::gui::TextEdit );
@@ -1332,17 +1332,17 @@ void MenuProfile::Initialize( void )
 		SEGAN_GUI_SET_ONEXIT( lbl, MenuProfile::OnExit );
 
 		//	label to show total stars
-		create_label( m_profPanel[i], g_game->m_strings->Get(23), 100, 80, 120.0f, -18.0f, 0.0f )->GetElement(1)->Color().a = 0.8f;
+		create_label( m_profPanel[i], 23, 100, 80, 120.0f, -18.0f, 0.0f )->GetElement(1)->Color().a = 0.8f;
 
 		//	label to show total people
-		create_label( m_profPanel[i], g_game->m_strings->Get(23), 100, 80, 230.0f, -18.0f, 0.0f )->GetElement(1)->Color().a = 0.8f;
+		create_label( m_profPanel[i], 23, 100, 80, 230.0f, -18.0f, 0.0f )->GetElement(1)->Color().a = 0.8f;
 	}
 
 	//	create back button
 	m_goback = create_back_button( m_back, -188.0f, -92.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuProfile::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
+	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	//	prepare profile
 	String::Copy( m_profiles[0].name, 32, L"Player1" );
@@ -1744,13 +1744,13 @@ void MenuAchievements::Initialize( void )
 	m_back->State_GetByIndex(1).Blender.Set( 0.03f, 0.85f );
 	
 	//	create title
-	create_label( m_back, g_game->m_strings->Get(377), 300.0f, 50.0f, -180.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
+	create_label( m_back, 377, 300.0f, 50.0f, -180.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
 
 	//	create back button
 	m_goback = create_back_button( m_back, -188.0f, -92.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuAchievements::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0.0f );
+	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f, 0.0f );
 
 	//	create panel to show selected achievement
 	m_image = sx_new( sx::gui::Panel );
@@ -1826,8 +1826,8 @@ void MenuAchievements::OnMouseEnter( sx::gui::Control* sender )
 	if ( !sender ) return;
 	int i = sender->GetUserTag();
 
-	update_label( m_name, g_game->m_strings->Get(g_game->m_achievements[i].name) );
-	update_label( m_name, g_game->m_strings->Get(g_game->m_achievements[i].desc) );
+	update_label( m_name, g_game->m_achievements[i].name );
+	update_label( m_name, g_game->m_achievements[i].desc );
 	m_image->GetElement(0)->SetTexture( m_icon[i]->GetElement(0)->GetTexture() );
 	m_image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
 
@@ -1892,7 +1892,7 @@ void MenuSettings::Initialize( void )
 	m_back->State_GetByIndex(2).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
 
 	//	create title
-	create_label( m_back, g_game->m_strings->Get(118), 300.0f, 50.0f, -240.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
+	create_label( m_back, 118, 300.0f, 50.0f, -240.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
 
 	//	create full screen check box 
 	m_fullscreen = sx_new( sx::gui::CheckBox );
@@ -1902,7 +1902,7 @@ void MenuSettings::Initialize( void )
 	m_fullscreen->GetElement(0)->Color().a = 0.0f;
 	m_fullscreen->GetElement(1)->SetTextureSrc( L"gui_settings_check.txr" );
 	SEGAN_GUI_SET_ONCLICK( m_fullscreen, MenuSettings::OnClick );
-	create_label( m_fullscreen, g_game->m_strings->Get(119), 200.0f, 40.0f, 120.0f, -5.0f, 0 );
+	create_label( m_fullscreen, 119, 200.0f, 40.0f, 120.0f, -5.0f, 0 );
 
 
 	//	create scrolls
@@ -1915,7 +1915,7 @@ void MenuSettings::Initialize( void )
 		scroll->GetElement(1)->SetTextureSrc( L"gui_settings_trackbar.txr" );
 		SEGAN_GUI_SET_ONSCROLL( scroll, MenuSettings::OnScroll );
 
-		create_label( scroll, g_game->m_strings->Get(120 + i), 250.0f, 40.0f, 240.0f, 0, 0 )->GetElement(1)->Color().a = 0.8f;
+		create_label( scroll, 120 + i, 250.0f, 40.0f, 240.0f, 0, 0 )->GetElement(1)->Color().a = 0.8f;
 
 		switch ( i )
 		{
@@ -1965,7 +1965,7 @@ void MenuSettings::Initialize( void )
 	m_goback = create_back_button( m_back, -166.0f, -113.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuSettings::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
+	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 }
 
 void MenuSettings::ProcessInput( bool& inputHandled, float elpsTime )
@@ -2119,7 +2119,7 @@ void MenuCredits::Initialize( void )
 	sx::gui::Button * m_goback = create_back_button( m_back, -360.0f, -255.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuCredits::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
+	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 }
 
 void MenuCredits::Finalize( void )
@@ -2172,7 +2172,7 @@ void MenuConfirmProfile::Initialize( void )
 	m_form->State_Add();
 	m_form->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
 	m_form->State_GetByIndex(1).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
-	create_label( m_form, g_game->m_strings->Get(525), 425.0f, 60.0f, 0, 10.0f, 0 );
+	create_label( m_form, 525, 425.0f, 60.0f, 0, 10.0f, 0 );
 
 	//	create button yes
 	m_yes = sx_new( sx::gui::Button );
@@ -2184,7 +2184,7 @@ void MenuConfirmProfile::Initialize( void )
 	m_yes->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_yes, MenuConfirmProfile::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_yes, Menu::OnEnter );
-	create_label( m_yes, g_game->m_strings->Get(526), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_yes, 526, 120.0f, 30.0f, 0, -5.0f, 0 );
 
 	//	create button no
 	m_no = sx_new( sx::gui::Button );
@@ -2196,7 +2196,7 @@ void MenuConfirmProfile::Initialize( void )
 	m_no->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_no, MenuConfirmProfile::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_no, Menu::OnEnter );
-	create_label( m_no, g_game->m_strings->Get(527), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_no, 527, 120.0f, 30.0f, 0, -5.0f, 0 );
 }
 
 void MenuConfirmProfile::Finalize( void )
@@ -2268,7 +2268,7 @@ void MenuConfirmMenu::Initialize( void )
 	m_form->State_Add();
 	m_form->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
 	m_form->State_GetByIndex(1).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
-	create_label( m_form, g_game->m_strings->Get(159), 425.0f, 60.0f, 0, 10.0f, 0 );
+	create_label( m_form, 159, 425.0f, 60.0f, 0, 10.0f, 0 );
 
 	//	create button yes
 	m_yes = sx_new( sx::gui::Button );
@@ -2280,7 +2280,7 @@ void MenuConfirmMenu::Initialize( void )
 	m_yes->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_yes, MenuConfirmMenu::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_yes, Menu::OnEnter );
-	create_label( m_yes, g_game->m_strings->Get(160), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_yes, 160, 120.0f, 30.0f, 0, -5.0f, 0 );
 
 	//	create button no
 	m_no = sx_new( sx::gui::Button );
@@ -2292,7 +2292,7 @@ void MenuConfirmMenu::Initialize( void )
 	m_no->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_no, MenuConfirmMenu::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_no, Menu::OnEnter );
-	create_label( m_no, g_game->m_strings->Get(161), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_no, 161, 120.0f, 30.0f, 0, -5.0f, 0 );
 }
 
 void MenuConfirmMenu::Finalize( void )
@@ -2362,7 +2362,7 @@ void MenuConfirmExit::Initialize( void )
 	m_form->State_Add();
 	m_form->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
 	m_form->State_GetByIndex(1).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
-	create_label( m_form, g_game->m_strings->Get(166), 425.0f, 60.0f, 0, 10.0f, 0 );
+	create_label( m_form, 166, 425.0f, 60.0f, 0, 10.0f, 0 );
 
 	//	create button yes
 	m_yes = sx_new( sx::gui::Button );
@@ -2374,7 +2374,7 @@ void MenuConfirmExit::Initialize( void )
 	m_yes->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_yes, MenuConfirmExit::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_yes, Menu::OnEnter );
-	create_label( m_yes, g_game->m_strings->Get(167), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_yes, 167, 120.0f, 30.0f, 0, -5.0f, 0 );
 
 	//	create button no
 	m_no = sx_new( sx::gui::Button );
@@ -2386,7 +2386,7 @@ void MenuConfirmExit::Initialize( void )
 	m_no->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_no, MenuConfirmExit::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_no, Menu::OnEnter );
-	create_label( m_no, g_game->m_strings->Get(168), 120.0f, 30.0f, 0, -5.0f, 0 );
+	create_label( m_no, 168, 120.0f, 30.0f, 0, -5.0f, 0 );
 }
 
 void MenuConfirmExit::Finalize( void )
@@ -2570,7 +2570,7 @@ void MenuPause::Initialize( void )
 		butn->GetElement(1)->SetTextureSrc( L"gui_pause_button.txr" );
 		butn->GetElement(2)->SetTextureSrc( L"gui_pause_button.txr" );
 		butn->Position().Set( 90.0f + i * 15.0f, 130.0f - i * 60.0f, 0 );
-		create_label( butn, g_game->m_strings->Get(131 + i), 300.0f, 50.0f, -20.0f, 0, 0 );
+		create_label( butn, 131 + i, 300.0f, 50.0f, -20.0f, 0, 0 );
 	}
 
 	m_confirmMenu.Initialize();
@@ -2791,11 +2791,11 @@ void MenuVictory::Initialize( void )
 	}
 
 	//	create label to show people
-	m_peopleLabel = create_label( m_back, g_game->m_strings->Get(146), 100.0f, 50.0f, -63.0f, 106.0f, 0.0f );
+	m_peopleLabel = create_label( m_back, 146, 100.0f, 50.0f, -63.0f, 106.0f, 0.0f );
 	m_peopleLabel->GetElement(1)->Color() = 0xffffffaa;
 
 	//	create label to show golds
-	m_goldLabel = create_label( m_back, g_game->m_strings->Get(146), 100.0f, 50.0f, -143.0f, 110.0f, 0.0f );
+	m_goldLabel = create_label( m_back, 146, 100.0f, 50.0f, -143.0f, 110.0f, 0.0f );
 	m_goldLabel->GetElement(1)->Color() = 0xffffffaa;
 
 	//	create buttons
@@ -2812,7 +2812,7 @@ void MenuVictory::Initialize( void )
 		SEGAN_GUI_SET_ONCLICK( btn, MenuVictory::OnClick );
 		SEGAN_GUI_SET_ONENTER( btn, Menu::OnEnter );
 
-		create_label( btn, g_game->m_strings->Get(141 + i), 250.0f, 50.0f, 30.0f, -5.0f, 0 );
+		create_label( btn, 141 + i, 250.0f, 50.0f, 30.0f, -5.0f, 0 );
 
 		switch ( i )
 		{
@@ -3243,7 +3243,7 @@ void MenuGameOver::Initialize( void )
 	m_back->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 
 	//	create disabled "NEXT" button
-	create_label( m_back, g_game->m_strings->Get(151), 250.0f, 50.0f, 15.0f, 35.0f, 0 )->GetElement(1)->Color() = 0xaaaaaaaa;
+	create_label( m_back, 151, 250.0f, 50.0f, 15.0f, 35.0f, 0 )->GetElement(1)->Color() = 0xaaaaaaaa;
 
 	for ( int i=0; i<3; i++ )
 	{
@@ -3259,7 +3259,7 @@ void MenuGameOver::Initialize( void )
 		SEGAN_GUI_SET_ONENTER( btn, Menu::OnEnter );
 
 		//	create label for each button
-		create_label( btn, g_game->m_strings->Get(152 + i), 250.0f, 50.0f, 30.0f, -5.0f, 0 );
+		create_label( btn, 152 + i, 250.0f, 50.0f, 30.0f, -5.0f, 0 );
 	}
 }
 
@@ -3379,10 +3379,10 @@ void MenuInfo::Initialize( void )
 	m_back->State_GetByIndex(1).Color.Set(0,0,0,0.8f);
 	SEGAN_GUI_SET_ONCLICK( m_back, MenuInfo::OnClick );
 
-	m_indicator = create_label( m_back, g_game->m_strings->Get(465), 512.0f, 64.0f, 0.0f, 250.0f, 0.0f );
+	m_indicator = create_label( m_back, 465, 512.0f, 64.0f, 0.0f, 250.0f, 0.0f );
 	m_indicator->GetElement(0)->Color() = 0x00ff0000;
 
-	m_title = create_label( m_back, g_game->m_strings->Get(466), 1000.0f, 64.0f, 0.0f, 230.0f, 0.0f );
+	m_title = create_label( m_back, 466, 1000.0f, 64.0f, 0.0f, 230.0f, 0.0f );
 	m_title->GetElement(0)->Color() = 0x0044ff44;
 
 	//	inside contain some additional texts comes after \n in tutorial title
@@ -3435,10 +3435,10 @@ void MenuInfo::Initialize( void )
 	m_helper.image->Position().Set( 120.0f, 2.5f, 0.0f );
 	m_helper.image->GetElement(0)->SetTextureSrc( L"gui_pnlGold_info.txr" );
 
-	m_helper.title = create_label( m_helper.back, g_game->m_strings->Get(464), 250, 30, -15.0f, 0.0f, 0.0f );
+	m_helper.title = create_label( m_helper.back, 464, 250, 30, -15.0f, 0.0f, 0.0f );
 	m_helper.title->GetElement(1)->Color() = 0xffffff00;
 
-	m_helper.desc = create_label( m_helper.back, g_game->m_strings->Get(464), 250, 30, -15.0f, -10.0f, 0.0f );
+	m_helper.desc = create_label( m_helper.back, 464, 250, 30, -15.0f, -10.0f, 0.0f );
 	m_helper.desc->GetElement(0)->Color() = 0x00001000;
 }
 
@@ -3670,9 +3670,9 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 
 		curr = m_tutorial[++m_Index];
 		curr->image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
-		update_label( m_title, g_game->m_strings->Get(curr->title) );
+		update_label( m_title, curr->title );
 		//sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
-		update_label( m_desc, g_game->m_strings->Get(curr->desc) );
+		update_label( m_desc, curr->desc );
 
 		//	update label
 		{
@@ -3700,9 +3700,9 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 
 		curr = m_tutorial[--m_Index];
 		curr->image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
-		update_label( m_title, g_game->m_strings->Get(curr->title) );
+		update_label( m_title, curr->title );
 //		sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
-		update_label( m_desc, g_game->m_strings->Get(curr->desc) );
+		update_label( m_desc, curr->desc );
 
 		//	update label
 		{
@@ -3868,13 +3868,13 @@ void MenuUpgrade::Initialize( void )
 
 	for ( int i=0; i<5; ++i )
 	{
-		create_label( m_border, g_game->m_strings->Get(600 + i * 2), 150, 25, -315 + i * 180.0f, 90, 0 )->GetElement(1)->Color() = titleColor;
+		create_label( m_border, 600 + i * 2, 150, 25, -315 + i * 180.0f, 90, 0 )->GetElement(1)->Color() = titleColor;
 	}
-	create_label( m_border, g_game->m_strings->Get(606), 150, 25, -320, -180, 0 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, g_game->m_strings->Get(607), 150, 25, -125, -180, 0 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, g_game->m_strings->Get(608), 150, 25,   55, -180, 0 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, g_game->m_strings->Get(609), 150, 25,  240, -180, 0 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, g_game->m_strings->Get(610), 150, 25,  420, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, 606, 150, 25, -320, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, 607, 150, 25, -125, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, 608, 150, 25,   55, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, 609, 150, 25,  240, -180, 0 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, 610, 150, 25,  420, -180, 0 )->GetElement(1)->Color() = titleColor;
 
 	for ( int i=0; i<44; i++ )
 	{
@@ -3889,7 +3889,7 @@ void MenuUpgrade::Initialize( void )
 		SEGAN_GUI_SET_ONEXIT( ch, MenuUpgrade::OnCheckExit );
 		m_checks[i] = ch;
 
-		m_labels[i] = create_label( ch, g_game->m_strings->Get(26 + i * 2), 160.0f, 28.0f, 40.0f, -2.0f, 0.0f );
+		m_labels[i] = create_label( ch, 26 + i * 2, 160.0f, 28.0f, 40.0f, -2.0f, 0.0f );
 		m_labels[i]->SetUserTag( i );
 
 		switch ( i )
@@ -3927,7 +3927,7 @@ void MenuUpgrade::Initialize( void )
 	}
 
 	//	create a label to display number of starts
-	m_stars = create_label( m_back, g_game->m_strings->Get(615), 128.0f, 40.0f, -130, -260.0f, 0.0f );
+	m_stars = create_label( m_back, 615, 128.0f, 40.0f, -130, -260.0f, 0.0f );
 	m_stars->GetElement(0)->Color() = 0x00010000;
 	m_stars->GetElement(1)->Color() = 0xFFFFFF00;
 
@@ -3935,7 +3935,7 @@ void MenuUpgrade::Initialize( void )
 	m_goback = create_back_button( m_back, -358.0f, -256.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuUpgrade::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, g_game->m_strings->Get(21), 100.0f, 30.0f, 0.0f, -2.0f, 0 );
+	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f, 0 );
 
 	//	create description label
 	m_desc = create_label( m_back, null, GTA_LEFT, L" ", 430.0f, 100.0f, 220.0f, -250.0f, 0.0f );
@@ -4066,7 +4066,7 @@ void MenuUpgrade::OnCheckEnter( sx::gui::PControl sender )
 
 	m_labels[index]->GetElement(1)->Color() = 0xffffffff;
 
-	update_label( m_desc, g_game->m_strings->Get(27 + index * 2) );
+	update_label( m_desc, 27 + index * 2 );
 	m_desc->AddProperty( SX_GUI_PROPERTY_VISIBLE );
 
 	msg_SoundPlay msg( true, 0, 0, L"mouseHover" );

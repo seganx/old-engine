@@ -383,7 +383,7 @@ public:
 		}
 	}
 
-	void Create(const GameString* tipText, const WCHAR* tipIcon)
+	void Create(const uint tipText, const WCHAR* tipIcon)
 	{
 
 		float width		= (float)sx::d3d::Device3D::Viewport()->Width;
@@ -454,86 +454,74 @@ class GameHint
 {
 public:
 
-	GameHint(void): m_time(0), m_Current(0), m_panelEx(0), m_lblTitle(0), m_lblDesc(0)
+	GameHint(void): m_time(0), m_currCnrtl(0), m_back(0), m_title(0), m_desc(0)
 	{
-		m_panelEx = sx_new( sx::gui::PanelEx );
-		m_panelEx->AddProperty( SX_GUI_PROPERTY_BLENDCHILDS );
-		m_panelEx->State_Add();
-		m_panelEx->State_GetByIndex(0).Blender.Set(0.5f, 0.4f);
-		m_panelEx->State_GetByIndex(0).Scale.Set(0.7f, 0.7f, 1);
-		m_panelEx->State_GetByIndex(0).Color.Set(0, 0, 0, 0);
-		m_panelEx->State_GetByIndex(1).Blender.Set(0.5f, 0.4f);
-		m_panelEx->State_GetByIndex(1).Scale.Set(1, 1, 1);
-		m_panelEx->State_GetByIndex(1).Color.Set(0.0f, 0.0f, 0.0f, 0.6f);
+		m_back = sx_new( sx::gui::PanelEx );
+		m_back->AddProperty( SX_GUI_PROPERTY_BLENDCHILDS );
+		m_back->State_Add();
+		m_back->State_GetByIndex(0).Blender.Set(0.5f, 0.4f);
+		m_back->State_GetByIndex(0).Scale.Set(0.7f, 0.7f, 1);
+		m_back->State_GetByIndex(0).Color.Set(0, 0, 0, 0);
+		m_back->State_GetByIndex(1).Blender.Set(0.5f, 0.4f);
+		m_back->State_GetByIndex(1).Scale.Set(1, 1, 1);
+		m_back->State_GetByIndex(1).Color.Set(0.0f, 0.0f, 0.0f, 0.6f);
 		
+		m_title = sx_new( sx::gui::Label );
+		m_title->SetParent( m_back );
+		m_title->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
+		m_title->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
+		m_title->GetElement(0)->Color() = D3DColor(0,0,0,0);
+		m_title->GetElement(1)->Color() = D3DColor(1,1,0.2f,1);
 
-		m_lblTitle = sx_new( sx::gui::Label );
-		m_lblTitle->SetParent( m_panelEx );
-		m_lblTitle->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
-		m_lblTitle->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
-#if USE_RTL
-		m_lblTitle->SetAlign( GTA_RIGHT );
-#else
-		m_lblTitle->SetAlign( GTA_LEFT );
-#endif
-		m_lblTitle->SetFont( FONT_HINT_TITLE );
-		m_lblTitle->GetElement(0)->Color() = D3DColor(0,0,0,0);
-		m_lblTitle->GetElement(1)->Color() = D3DColor(1,1,0.2f,1);
-
-		m_lblDesc = sx_new( sx::gui::Label );
-		m_lblDesc->SetParent( m_panelEx );
-		m_lblDesc->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
-		m_lblDesc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
-		m_lblDesc->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
-#if USE_RTL
-		m_lblDesc->SetAlign( GTA_RIGHT );
-#else
-		m_lblDesc->SetAlign( GTA_LEFT );
-#endif
-		m_lblDesc->SetFont( FONT_HINT_DESC );
-		m_lblDesc->GetElement(0)->Color() = D3DColor(0,0,0,0);
-
+		m_desc = sx_new( sx::gui::Label );
+		m_desc->SetParent( m_back );
+		m_desc->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
+		m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
+		m_desc->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
+		m_desc->GetElement(0)->Color() = D3DColor(0,0,0,0);
 	}
 
 	~GameHint(void)
 	{
-		sx_delete_and_null( m_panelEx );
+		sx_delete_and_null( m_back );
 	}
 
-	void SetText(const WCHAR* hint)
+	void SetText(const wchar* hint)
 	{
-		m_hint = hint;
+		if ( m_currHint == hint ) return;
+
+		m_currHint = hint;
 		m_time = 0;
 
 		float2 panelSize, titleSize, descSize;
-		String strTitle = hint;
+		String tmp_title = hint;
 		int index = 0;
-		if ( ( index = strTitle.Find(L"\n") ) > -1 )
+		if ( ( index = tmp_title.Find(L"\n") ) > -1 )
 		{
-			String strDesc;
-			strTitle.CopyTo(strDesc, index+1, 99999);
-			strTitle.Delete(index, 99999);
+			String tmp_desc;
+			tmp_title.CopyTo( tmp_desc, index + 1, 99999 );
+			tmp_title.Delete( index, 99999 );
 
-			m_lblTitle->SetText( strTitle );
-			m_lblDesc->SetText( strDesc );
+			update_label( m_title, sx_str_to_uint( tmp_title ) );
+			update_label( m_desc, sx_str_to_uint( tmp_desc ) );
 
-			titleSize = m_lblTitle->GetSize();
-			descSize = m_lblDesc->GetSize();
+			titleSize = m_title->GetSize();
+			descSize = m_desc->GetSize();
 		}
 		else
 		{
-			m_lblTitle->SetText( strTitle );
-			m_lblDesc->SetText( NULL );
+			update_label( m_title, sx_str_to_uint( tmp_title ) );
+			m_desc->SetText( NULL );
 
-			titleSize = m_lblTitle->GetSize();
+			titleSize = m_title->GetSize();
 			descSize.Set(0,0);
 		}
 
 		panelSize.x = sx_max_f( titleSize.x, descSize.x ) + 32;
 		panelSize.y = titleSize.y + descSize.y + 32;
-		m_panelEx->SetSize( panelSize );
-		m_lblTitle->Position().Set( 0, (panelSize.y/2) - (titleSize.y/2) - 16, 0 );
-		m_lblDesc->Position().Set( 0, - (panelSize.y/2) + (descSize.y/2) + 16, 0 );
+		m_back->SetSize( panelSize );
+		m_title->Position().Set( 0, (panelSize.y/2) - (titleSize.y/2) - 16, 0 );
+		m_desc->Position().Set( 0, - (panelSize.y/2) + (descSize.y/2) + 16, 0 );
 
 	}
 
@@ -541,16 +529,15 @@ public:
 	{
 		if ( !pCurrent || !pCurrent->GetHint() || !pCurrent->HasProperty( SX_GUI_PROPERTY_ACTIVATE ) )
 		{
-			m_panelEx->State_SetIndex(0);
-			m_Current = pCurrent;
+			m_back->State_SetIndex(0);
+			m_currCnrtl = pCurrent;
 			return;
 		}
-		if ( m_hint == pCurrent->GetHint() && m_Current == pCurrent ) return;
+		if ( m_currHint == pCurrent->GetHint() && m_currCnrtl == pCurrent ) return;
 
-		m_Current = pCurrent;
-		SetText( m_Current->GetHint() );
-
-		m_panelEx->State_SetIndex(1);
+		m_currCnrtl = pCurrent;
+		SetText( m_currCnrtl->GetHint() );
+		m_back->State_SetIndex(1);
 	}
 
 	void Update(float elpsTime)
@@ -558,29 +545,29 @@ public:
 		m_time += elpsTime;
 		if ( m_time > 7000 )
 		{
-			m_panelEx->State_SetIndex(0);
+			m_back->State_SetIndex(0);
 		}
 
 		SetCurrentContorl( sx::gui::Control::GetCapturedControl() );
 
-		float2 siz = m_panelEx->GetSize();
+		float2 siz = m_back->GetSize();
 		float2 pos( SEGAN_MOUSE_ABSX(0) - SEGAN_VP_WIDTH/2, SEGAN_VP_HEIGHT/2 - SEGAN_MOUSE_ABSY(0) );
 		pos.x += (pos.x > 0) ? -siz.x/2 : siz.x/2;
 		pos.y += (pos.y > 0) ? -siz.y/2 : siz.y/2;
 
-		m_panelEx->State_GetCurrent().Position.Set( pos.x, pos.y, 0 );
+		m_back->State_GetCurrent().Position.Set( pos.x, pos.y, 0 );
 
-		m_panelEx->Update( elpsTime );
+		m_back->Update( elpsTime );
 	}
 
 
 public:
-	float					m_time;		//  time of display
-	String					m_hint;		//  description
-	sx::gui::PControl		m_Current;	//	current control
-	sx::gui::PPanelEx		m_panelEx;	//	use as background
-	sx::gui::PLabel			m_lblTitle;	//  title
-	sx::gui::PLabel			m_lblDesc;	//  description
+	float					m_time;			//  time of display
+	str64					m_currHint;		//  current hint numbers
+	sx::gui::PControl		m_currCnrtl;	//	current control
+	sx::gui::PPanelEx		m_back;			//	use as background
+	sx::gui::PLabel			m_title;		//  title
+	sx::gui::PLabel			m_desc;			//  description
 	
 };
 
@@ -916,7 +903,7 @@ void GameGUI::Draw( DWORD flag )
 
 	m_goldPeople->m_back->Draw( flag );
 	m_powerAttaks->Draw( flag );
-	m_hint->m_panelEx->Draw( flag );
+	m_hint->m_back->Draw( flag );
 	m_pause->Draw( flag );
 	m_gameOver->Draw( flag );
 	m_victory->Draw( flag );
@@ -1012,7 +999,7 @@ void GameGUI::MsgProc( UINT recieverID, UINT msg, void* data )
 	m_upgradePanel->MsgProc( recieverID, msg, data );
 }
 
-void GameGUI::ShowTips( const GameString* tipText, const WCHAR* tipIcon /*= NULL*/ )
+void GameGUI::ShowTips( const uint tipText, const WCHAR* tipIcon /*= NULL*/ )
 {
 	if ( !tipText ) return;
 

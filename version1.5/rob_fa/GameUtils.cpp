@@ -2,7 +2,7 @@
 #include "ImportEngine.h"
 #include "Entity.h"
 #include "Game.h"
-
+#include "GameStrings.h"
 
 #define CAMERA_FAR	6000.0f
 
@@ -422,19 +422,40 @@ sx::gui::Label* create_label( sx::gui::Control* parent, const wchar* font, const
 	return res;
 }
 
-sx::gui::Label* create_label( sx::gui::Control* parent, const GameString* gameString, const float& width, const float& height, const float& x, const float& y, const float& z )
+sx::gui::Label* create_label( sx::gui::Control* parent, const uint text, const float& width, const float& height, const float& x, const float& y, const float& z )
 {
-	sx::gui::Label* res = create_label( parent, gameString->font, gameString->align, gameString->text, width, height, x, y, z );
-	res->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
-	return res;
+	const GameString* gameString = g_game->m_strings->Get(text);
+	if (gameString)
+	{
+		sx::gui::Label* res = create_label( parent, gameString->font, gameString->align, gameString->text, width, height, x, y, z );
+		res->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
+		return res;
+	}
+	else
+	{
+		sx::gui::Label* res = create_label( parent, null, GTA_CENTER, null, width, height, x, y, z );
+		res->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
+		return res;
+	}
+	
 }
 
-sx::gui::Label* update_label( sx::gui::Label* label, const GameString* gameString )
+sx::gui::Label* update_label( sx::gui::Label* label, const uint text )
 {
-	label->SetAlign( gameString->align );
-	label->SetFont( gameString->font );
-	label->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
-	label->SetText( gameString->text );
+	const GameString* gameString = g_game->m_strings->Get(text);
+	if ( gameString )
+	{
+		label->SetAlign( gameString->align );
+		label->SetFont( gameString->font );
+		label->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
+		label->SetText( gameString->text );
+	}
+	else
+	{
+		sxLog::Log(L"ERROR : Can't find text id : %d", text);
+		str512 errmsg; errmsg.Format(L"%d missed", text);
+		label->SetText( errmsg );
+	}
 	return label;
 }
 sx::gui::Button* create_back_button( sx::gui::Control* parent, const float& x, const float& y )

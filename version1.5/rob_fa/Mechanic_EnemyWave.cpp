@@ -251,7 +251,7 @@ namespace GM
 				//  show tips of end wave
 				if (pWave->tipsEnd)
 				{
-					g_game->m_gui->ShowTips( g_game->m_strings->Get(pWave->tipsEnd), pWave->tipsEndIcon );
+					g_game->m_gui->ShowTips( pWave->tipsEnd, pWave->tipsEndIcon );
 					pWave->tipsEnd = 0;
 				}
 
@@ -505,7 +505,7 @@ namespace GM
 			EnemyWave* pWave = m_wavesSrc[ m_waveIndex ];
 
 			//  show tips of start wave
-			g_game->m_gui->ShowTips( g_game->m_strings->Get(pWave->tipsStart), pWave->tipsStartIcon );
+			g_game->m_gui->ShowTips( pWave->tipsStart, pWave->tipsStartIcon );
 
 			//  play particle/sound of start wave
 			if ( pWave->tipsStartNode[0] )

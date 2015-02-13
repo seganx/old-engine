@@ -86,7 +86,7 @@ public:
 
 	void Remove(sx::gui::PControl pGUI);
 
-	void ShowTips(const GameString* tipText, const WCHAR* tipIcon = NULL);
+	void ShowTips(const uint tipText, const WCHAR* tipIcon = NULL);
 
 	void ShowMenu( const WCHAR* name );
 

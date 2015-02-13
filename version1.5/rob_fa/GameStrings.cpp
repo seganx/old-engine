@@ -102,8 +102,17 @@ void GameStrings::Load( const wchar* stringsfile )
 				}
 			}// while ( true )
 
+			//  verify that text is filled
 			if ( gstr->text[0] == 0 )
-				sx_str_copy( gstr->text, 512, strList[++i]->Text() );
+			{
+				str512 tmp = strList[++i]->Text();
+				tmp.Replace( L"\\n", L"\n" );
+				sx_str_copy( gstr->text, 512, tmp.Text() );
+			}
+
+			//	copy to the base
+			sx_str_copy( gstr->base, 512, gstr->text );
+
 			if ( m_texts.Insert( gstr->id, gstr ) == false )
 			{
 				sxLog::Log( L" ERROR : Duplicated string id has been found in %s - id : %u ", stringsfile, gstr->id );

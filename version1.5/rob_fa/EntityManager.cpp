@@ -90,20 +90,8 @@ void EntityManager::LoadTypes( Callback_Draw_Loading drawLoading )
 			sxLog::Log(L"ERROR : Node not found for entity %s", tmpStr.Text());
 		}
 
-		if ( script.GetString(i, L"desc", tmpStr) )
-		{
-			pe->m_typeDesc = tmpStr;
-			pe->m_typeDesc.Replace(L"\\n", L"\n");
-		}
-
-		if ( script.GetString(i, L"displayName", tmpStr) )
-		{
-			pe->m_displayName = tmpStr;
-		}
-		else
-		{
-			pe->m_displayName = pe->m_typeName;
-		}
+		script.GetUint( i, L"desc", pe->m_typeDesc );
+		script.GetUint( i, L"displayName", pe->m_displayName );
 
 		if ( script.GetString(i, L"Type", tmpStr) )
 		{

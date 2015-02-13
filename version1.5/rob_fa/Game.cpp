@@ -1716,7 +1716,7 @@ void Achievement::AddValue( int val /*= 1 */ )
 	if ( value > range ) value = range;
 
 	if ( value != range ) return;
-	g_game->m_gui->ShowTips( g_game->m_strings->Get(tips), icon );
+	g_game->m_gui->ShowTips( tips, icon );
 
 	msg_SoundPlay msg( true, 0, 0, L"achievement" );
 	g_game->m_gui->m_main->m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );

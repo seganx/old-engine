@@ -122,7 +122,7 @@ void com_ShowRange::Update( float elpsTime )
 		bool showTitle = m_owner->m_partyCurrent == PARTY_TOWER && m_owner->m_initialized;
 		if ( showTitle )
 		{
-			s_entityName->SetText( m_owner->m_displayName.Text() );
+			update_label( s_entityName, m_owner->m_displayName );
 			s_entityName->Position() = m_owner->GetPosition();
 			s_entityName->Position().y = 7.0f - 10.0f / g_game->m_player->m_camera_RTS.m_Rad;
 			s_entityName->AddProperty( SX_GUI_PROPERTY_VISIBLE );

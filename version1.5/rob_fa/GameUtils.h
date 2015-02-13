@@ -124,8 +124,8 @@ public:
 
 
 sx::gui::Label* create_label( sx::gui::Control* parent, const wchar* font, const GUITextAlign align, const wchar* caption, const float& width, const float& height, const float& x, const float& y, const float& z );
-sx::gui::Label* create_label( sx::gui::Control* parent, const GameString* gameString, const float& width, const float& height, const float& x, const float& y, const float& z );
-sx::gui::Label* update_label( sx::gui::Label* label, const GameString* gameString );
+sx::gui::Label* create_label( sx::gui::Control* parent, const uint text, const float& width, const float& height, const float& x, const float& y, const float& z );
+sx::gui::Label* update_label( sx::gui::Label* label, const uint text );
 sx::gui::Button* create_back_button( sx::gui::Control* parent, const float& x, const float& y );
 
 

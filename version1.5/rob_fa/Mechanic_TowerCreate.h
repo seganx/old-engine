@@ -65,7 +65,6 @@ namespace GM
 		sx::gui::PPanelEx	m_pnlCreate1;		//  background panel of tower creator
 		sx::gui::PPanelEx	m_pnlArrow;			//	arrow to selected tower
 		sx::gui::PPanelEx	m_btnCreate[5];		//  buttons to create towers
-		str512				m_tower_locked;		//	the string to show that the tower is not unlocked
 		
 		float				m_tower_distance;	//	minimum distance of towers
 		int					m_towerIndex;		//  index of tower type
