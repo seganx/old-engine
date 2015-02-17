@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "Player.h"
 #include "Scripter.h"
+#include "GameStrings.h"
 
 #define GAMETIPS_MAXTIME		10
 #define GAMETIPS_ICON_SIZE		64
@@ -240,29 +241,25 @@ GameGuide::~GameGuide( void )
 	sx_delete_and_null( m_back );
 }
 
-void GameGuide::SetText( const wchar* str )
+void GameGuide::SetText( const uint title )
 {
-	m_hint = str;
+	const uint desc = title + 1;
+	m_currHint = title;
+	m_time = 0;
 
 	float2 panelSize, titleSize, descSize;
-	String strTitle = str;
-	strTitle.Replace(L"\\n", L"\n");
 	int index = 0;
-	if ( ( index = strTitle.Find(L"\n") ) > -1 )
+	if ( desc )
 	{
-		String strDesc;
-		strTitle.CopyTo(strDesc, index+1, 99999);
-		strTitle.Delete(index, 99999);
-
-		m_title->SetText( strTitle );
-		m_desc->SetText( strDesc );
+		update_label( m_title, title );
+		update_label( m_desc, desc );
 
 		titleSize = m_title->GetSize();
 		descSize = m_desc->GetSize();
 	}
 	else
 	{
-		m_title->SetText( strTitle );
+		update_label( m_title, title );
 		m_desc->SetText( NULL );
 
 		titleSize = m_title->GetSize();
@@ -281,7 +278,7 @@ void GameGuide::Show( const CORNER corner, const float x, const float y, const f
 {
 	m_time = lifetime;
 
-	if ( m_hint.Length() )
+	if ( m_currHint )
 	{
 		float2 pos( x, y );
 		float2 siz = m_back->GetSize();
@@ -488,8 +485,6 @@ public:
 
 	void SetText(const wchar* hint)
 	{
-		if ( m_currHint == hint ) return;
-
 		m_currHint = hint;
 		m_time = 0;
 
@@ -617,29 +612,6 @@ void GameGUI::Initialize( void )
 
 	//	add empty buttons to show the unlocked feature
 	{
-		//	load some default value
-		str512 power_locked;
-		String str = sx::sys::FileManager::Project_GetDir();
-		str << L"strings.txt";
-		Scripter script;
-		script.Load( str );
-		for (int i=0; i<script.GetObjectCount(); i++)
-		{
-			str512 tmpStr;
-			if ( script.GetString(i, L"Type", tmpStr) && tmpStr == L"Strings" )
-			{
-				if ( !script.GetString(i, L"Name", tmpStr) )
-					continue;
-
-				if ( tmpStr == L"GeneralTips" )
-				{
-					script.GetString( i, L"powerlocked", power_locked );
-					power_locked.Replace(L"\\n", L"\n");
-					break;
-				}
-			}
-		}
-
 		for ( uint i=0; i<5; ++i )
 		{
 			sx::gui::Panel* p = sx_new( sx::gui::Panel );
@@ -660,7 +632,7 @@ void GameGUI::Initialize( void )
 			}
 			p->Position().Set( left, top, 0.0f );
 
-			p->SetHint( power_locked );
+			p->SetHint( L"182\n184" );
 		}
 	}
 	

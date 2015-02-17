@@ -346,7 +346,7 @@ namespace GM
 					else
 					{
 						//	tower is locked
-						m_btnCreate[i]->SetHint( L"182" );
+						m_btnCreate[i]->SetHint( L"182\n183" );
 					}
 				}
 			}

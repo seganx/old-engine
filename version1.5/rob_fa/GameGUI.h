@@ -46,7 +46,7 @@ public:
 public:
 	GameGuide(void);
 	~GameGuide(void);
-	void SetText(const wchar* str);
+	void SetText(const uint title);
 	void Show(const CORNER corner, const float x, const float y, const float lifetime = 10);
 	void Hide( void );
 	void Update(const float elpsTime);
@@ -55,7 +55,7 @@ public:
 	//bool					m_used;		//	has been used before
 	float					m_time;		//  time of display
 	float2					m_pos;
-	String					m_hint;		//  description
+	uint					m_currHint;	//  description
 	sx::gui::PanelEx*		m_back;		//	background
 	sx::gui::Panel*			m_indic;	//	guid indicator
 	sx::gui::Label*			m_title;	//  title

@@ -112,14 +112,14 @@ class GuideText
 {
 public:
 	GuideText(void): m_fresh(true){}
-	const wchar* Use(void)
+	const uint Use(void)
 	{
 		m_fresh = false;
-		return m_text.Text();
+		return m_text;
 	}
 public:
 	bool	m_fresh;
-	String	m_text;
+	uint	m_text;
 };
 
 

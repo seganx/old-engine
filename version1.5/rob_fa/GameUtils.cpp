@@ -445,8 +445,8 @@ sx::gui::Label* update_label( sx::gui::Label* label, const uint text )
 	const GameString* gameString = g_game->m_strings->Get(text);
 	if ( gameString )
 	{
-		label->SetAlign( gameString->align );
 		label->SetFont( gameString->font );
+		label->SetAlign( gameString->align );
 		label->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
 		label->SetText( gameString->text );
 	}

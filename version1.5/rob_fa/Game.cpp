@@ -336,29 +336,11 @@ void Game::Initialize( sx::sys::Window* win )
 #endif
 
 	//	load guid strings
+	for ( int i = 0; i <= 7; ++i )
 	{
-		String str = sx::sys::FileManager::Project_GetDir();
-		str << L"Strings.txt";
-
-		Scripter script;
-		script.Load( str );
-
-		str512 tmp, tips;
-		for (int i=0; i<script.GetObjectCount(); i++)
-		{
-			if ( script.GetString(i, L"Type", tmp) )
-			{
-				if ( tmp == L"Guide" )
-				{
-					if ( !script.GetString( i, L"text", tips ) )
-						continue;
-
-					GuideText* guide = sx_new( GuideText );
-					guide->m_text.SetText( tips );
-					g_game->m_guides.PushBack( guide );
-				}
-			}
-		}
+		GuideText* guide = sx_new( GuideText );
+		guide->m_text = 630 + i * 2;
+		g_game->m_guides.PushBack( guide );
 	}
 
 	//	initialize upgrades
