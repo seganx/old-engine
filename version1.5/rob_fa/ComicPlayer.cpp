@@ -1,7 +1,7 @@
 #include "ComicPlayer.h"
 #include "Scripter.h"
 
-ComicPlayer::ComicPlayer( void ): m_time(0), m_maxTime(0), m_node(0) { }
+ComicPlayer::ComicPlayer( void ): m_time(0), m_maxTime(0), m_node(0), m_camera(0) { }
 
 ComicPlayer::~ComicPlayer( void )
 {
@@ -69,6 +69,9 @@ bool ComicPlayer::Load( const wchar* fileName )
 		m_maxTime = msg.animMaxTime * 1000.0f;
 	}
 
+	//	get the camera node
+	m_node->GetChildByName( L"camera", m_camera );
+	
 	return true;
 }
 
@@ -128,7 +131,9 @@ void ComicPlayer::Update( float elpstime )
 		SoundListener soundListener( float3(0, 0, -10), float3(0, 0, 1), float3(0, 1, 0) );
 		sx::snd::Device::SetListener( soundListener );
 
-		sx::d3d::Device3D::Camera_Pos( float3(5, 5, 5), float3(0, 0, 0) );
+		float3 camDir; camDir.Transform_Norm( float3(0, 0, 1), m_camera->GetMatrix_world() );
+		float3 camUp; camUp.Transform_Norm( float3(0, 1, 0), m_camera->GetMatrix_world() );
+		sx::d3d::Device3D::Camera_Pos( m_camera->GetPosition_world(), camDir, camUp );
 		sx::d3d::Device3D::Camera_Projection( sx::math::PIDIV2, SEGAN_VP_WIDTH / SEGAN_VP_HEIGHT, 0.3f, 100.0f );
 
 		//  update sun light
