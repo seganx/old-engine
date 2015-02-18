@@ -185,6 +185,14 @@
 			Name="Core"
 			>
 			<File
+				RelativePath=".\ComicPlayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ComicPlayer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Game.cpp"
 				>
 			</File>

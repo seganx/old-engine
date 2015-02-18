@@ -130,7 +130,7 @@ void MenuMain::Initialize( void )
 #elif USE_CZESH_LOGO
 	m_mainBack->GetElement(0)->SetTextureSrc( L"gui_root_czech.txr" );
 #else
-	m_mainBack->GetElement(0)->SetTextureSrc( L"gui_mainBack.txr" );
+	m_mainBack->GetElement(0)->SetTextureSrc( g_game->m_strings->Get(2002)->text );
 #endif
 	m_mainBack->State_Add();
 	m_mainBack->State_Add();

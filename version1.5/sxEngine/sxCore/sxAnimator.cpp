@@ -241,6 +241,7 @@ namespace sx { namespace core {
 				else
 					msgAnim->animSpeedScale = m_Controller.m_SpeedScale;
 
+				msgAnim->animMaxTime = m_Controller.GetCurrentMaxTime();
 			}
 			break;
 

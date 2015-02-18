@@ -217,9 +217,10 @@ struct msg_Animator
 	float			animSpeed;		//	set a new animation speed. pass -1 to leave default
 	float			animSpeedScale;	//	set a new animation speed scale. pass -1 to leave default
 	float			animTime;		//	time of animation. pass -1 to leave current
+	float			animMaxTime;	//	retrieve the max time of animation
 
 	msg_Animator(DWORD _addOption, DWORD _remOption=0, const WCHAR* _name=0, int _animIndex=-1, float _animSpeed=-1, float _animSpeedScale=-1, float _animTime = -1 )
-		: addOption(_addOption), remOption(_remOption), name(_name), animIndex(_animIndex), animSpeed(_animSpeed), animSpeedScale(_animSpeedScale), animTime(_animTime) {}
+		: addOption(_addOption), remOption(_remOption), name(_name), animIndex(_animIndex), animSpeed(_animSpeed), animSpeedScale(_animSpeedScale), animTime(_animTime), animMaxTime(0) {}
 };
 
 struct msg_Animator_Count
