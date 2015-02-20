@@ -3,9 +3,7 @@
 #include "GameTypes.h"
 #include "Game.h"
 #include "GameConfig.h"
-#include "Mechanic_Cinematic.h"
 #include "gameup_import.h"
-#include "ComicPlayer.h"
 #include "GameStrings.h"
 
 #if USE_HASH_LOCK
@@ -480,47 +478,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	}
 #else
 	Game::Initialize( &s_window );
-#endif
-
-	//	show presents
-#if 1
-	{
-		ComicPlayer comic;
-		comic.Load( g_game->m_strings->Get(2001)->text );
-
-		float initTime = sx::sys::GetSysTime();
-		float elpsTime = 0;
-		while ( comic.Playing() )
-		{
-			// calculate elapsed time
-			elpsTime = sx::sys::GetSysTime() - initTime;
-			initTime = sx::sys::GetSysTime();
-			comic.Update( elpsTime );
-			comic.Draw();
-		}
-	}
-	{
-		FirstPresents *presents = sx_new( FirstPresents );
-
-#if USE_ALAWAR_LOGO
-		presents->AddPresents( L"gui_alawar.txr", 512, null, 0, 0 );
-#endif
-
-		presents->AddPresents( L"gui_parseh.txr", 512, null, 0, 0 );
-		presents->AddPresents( L"gui_esra.txr", 1024, null, 0, 0 );
-
-		float initTime = sx::sys::GetSysTime();
-		float elpsTime = 0;
-		while ( presents->Presenting() )
-		{
-			// calculate elapsed time
-			elpsTime = sx::sys::GetSysTime() - initTime;
-			initTime = sx::sys::GetSysTime();
-			presents->Update( elpsTime );
-			presents->Draw();
-		}
-		sx_delete_and_null( presents );
-	}
 #endif
 
 	//  run the game

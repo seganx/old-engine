@@ -410,7 +410,7 @@ sx::gui::Label* create_label( sx::gui::Control* parent, const wchar* font, const
 	res->SetParent( parent );
 	res->SetSize( float2(width, height) );
 	res->SetAlign( align );
-	res->GetElement(0)->Color().a = 0.0f;
+	res->GetElement(0)->Color().a = 0.1f;
 	res->GetElement(1)->Color() = 0xffffffff;
 	res->SetFont( font );
 	res->AddProperty( SX_GUI_PROPERTY_MULTILINE );

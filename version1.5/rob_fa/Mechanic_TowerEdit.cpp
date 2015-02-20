@@ -6,18 +6,19 @@
 #include "Entity.h"
 #include "EntityManager.h"
 #include "Scripter.h"
+#include "GameStrings.h"
 
 
-static str512 s_te_upgrade;
-static str512 s_te_repair;
-static str512 s_te_sell;
-static str512 s_te_fulupgrade;
-static str512 s_te_xp;
-static str512 s_te_fast;
-static str512 s_te_medium;
-static str512 s_te_low;
-static str512 s_te_none;
 
+sx::gui::Panel* te_create_icon(sx::gui::Control* parent, float width, float height, float x, float y, const wchar* texture)
+{
+	sx::gui::Panel* res = sx_new( sx::gui::Panel );
+	res->SetParent( parent );
+	res->SetSize( float2(width, height) );
+	res->GetElement(0)->SetTextureSrc( texture );
+	res->Position().Set( x, y, 0.0f );
+	return res;
+}
 
 namespace GM
 {
@@ -159,94 +160,22 @@ namespace GM
 		m_pnlEditor1->SetParent( m_back );
 
 		//	create labels
-		m_lblHealth = sx_new( sx::gui::Label );
-		m_lblHealth->SetParent( m_back );
-		m_lblHealth->SetSize( float2(120, 50) );
-#if USE_RTL
-		m_lblHealth->Position().Set( -60.0f, -10.0f, 0.0f );
-#else
-		m_lblHealth->Position().Set( -60.0f, -20.0f, 0.0f );
-#endif
-		m_lblHealth->GetElement(0)->Color().a = 0.0f;
-		m_lblHealth->GetElement(1)->Color().a = 0.85f;
-		m_lblHealth->SetAlign( GTA_CENTER );
-		m_lblHealth->SetFont( FONT_TOWER_PANEL_HEALTH );
+		m_lblHealth = create_label( m_back, 187, 120, 50, -60, -22, 0 );
 
-		m_lblXP = sx_new( sx::gui::Label );
-		m_lblXP->SetParent( m_back );
-		m_lblXP->SetSize( float2(75, 40) );
-#if USE_RTL
-		m_lblXP->Position().Set( -265.0f, -40.0f, 0.0f );
-#else
-		m_lblXP->Position().Set( -265.0f, -50.0f, 0.0f );
-#endif
-		m_lblXP->GetElement(0)->Color().a = 0.0f;
+		m_lblXP = create_label( m_back, 189, 75, 40, -265, -48, 0 );
 		m_lblXP->GetElement(1)->Color().a = 0.85f;
-		m_lblXP->SetFont( FONT_TOWER_PANEL_INFO );
 
-		m_lblDamage = sx_new( sx::gui::Label );
-		m_lblDamage->SetParent( m_back );
-		m_lblDamage->SetSize( float2(70, 40) );
-#if USE_RTL
-		m_lblDamage->Position().Set( -153.0f, -40.0f, 0.0f );
-#else
-		m_lblDamage->Position().Set( -153.0f, -50.0f, 0.0f );
-#endif
-		m_lblDamage->GetElement(0)->Color().a = 0.0f;
+		m_lblDamage = create_label( m_back, 189, 70, 40, -153, -48, 0 );
 		m_lblDamage->GetElement(1)->Color().a = 0.85f;
-		m_lblDamage->SetFont( FONT_TOWER_PANEL_INFO );
 
-		m_lblFireRate = sx_new( sx::gui::Label );
-		m_lblFireRate->SetParent( m_back );
-		m_lblFireRate->SetSize( float2(70, 40) );
-#if USE_RTL
-		m_lblFireRate->Position().Set( -52.0f, -40.0f, 0.0f );
-#else
-		m_lblFireRate->Position().Set( -52.0f, -50.0f, 0.0f );
-#endif
-		m_lblFireRate->GetElement(0)->Color().a = 0.0f;
+		m_lblFireRate = create_label( m_back, 189, 70, 40, -52, -48, 0 );
 		m_lblFireRate->GetElement(1)->Color().a = 0.85f;
-		m_lblFireRate->SetFont( FONT_TOWER_PANEL_INFO );
-
 
 		//	create images for labels
-		sx::gui::Panel* pnl = sx_new( sx::gui::Panel );
-		pnl->SetParent( m_lblHealth );
-		pnl->SetSize( float2(32, 32) );
-		pnl->GetElement(0)->SetTextureSrc( L"gui_iconHeart.txr" );
-#if USE_RTL
-		pnl->Position().Set( -60.0f, 2.0f, 0.0f );
-#else
-		pnl->Position().Set( -60.0f, 12.0f, 0.0f );
-#endif
-
-		pnl = sx_new( sx::gui::Panel );
-		pnl->SetParent( m_lblXP );
-		pnl->SetSize( float2(32, 32) );
-		pnl->GetElement(0)->SetTextureSrc( L"gui_iconXP.txr" );
-#if USE_RTL
-		pnl->Position().Set( -50.0f, 2.0f, 0.0f );
-#else
-		pnl->Position().Set( -50.0f, 12.0f, 0.0f );
-#endif
-		pnl = sx_new( sx::gui::Panel );
-		pnl->SetParent( m_lblDamage );
-		pnl->SetSize( float2(32, 32) );
-		pnl->GetElement(0)->SetTextureSrc( L"gui_iconDamage.txr" );
-#if USE_RTL
-		pnl->Position().Set( -50.0f, 2.0f, 0.0f );
-#else
-		pnl->Position().Set( -50.0f, 12.0f, 0.0f );
-#endif
-		pnl = sx_new( sx::gui::Panel );
-		pnl->SetParent( m_lblFireRate );
-		pnl->SetSize( float2(32, 32) );
-		pnl->GetElement(0)->SetTextureSrc( L"gui_iconFireRate.txr" );
-#if USE_RTL
-		pnl->Position().Set( -50.0f, 2.0f, 0.0f );
-#else
-		pnl->Position().Set( -50.0f, 12.0f, 0.0f );
-#endif
+		te_create_icon( m_back, 32, 32, -124, -10, L"gui_iconHeart.txr" );
+		te_create_icon( m_back, 32, 32, -315, -35, L"gui_iconXP.txr" );
+		te_create_icon( m_back, 32, 32, -200, -35, L"gui_iconDamage.txr" );
+		te_create_icon( m_back, 32, 32, -100, -35, L"gui_iconFireRate.txr" );
 
 		m_guide = sx_new( GameGuide );
 		m_guide->m_back->SetParent( m_pnlUpdate[0] );
@@ -399,10 +328,14 @@ namespace GM
 					m_pnlButton[0]->RemProperty( SX_GUI_PROPERTY_VISIBLE );
 
 					//  update hint of buttons
-					str1024 strHint;
-					int d = selectedEntity->m_health.imax - selectedEntity->m_health.icur;		
-					strHint.Format( s_te_repair, d, g_game->m_player->m_gold);
-					m_pnlButton[1]->SetHint( strHint );
+					GameString* desc = g_game->m_strings->Get( 173 );
+					if ( desc )
+					{
+						int d = selectedEntity->m_health.imax - selectedEntity->m_health.icur;	
+						swprintf_s( desc->text, 512, desc->base, d, g_game->m_player->m_gold );
+
+						m_pnlButton[1]->SetHint( L"172\n173" );
+					}					
 				}
 				else
 				{
@@ -412,47 +345,53 @@ namespace GM
 					//  update hint of buttons
 					if ( curLevel < maxLevel  )
 					{
-						str1024 strHint;
-						strHint.Format( s_te_upgrade, g_game->m_player->m_gold, selectedEntity->m_cost[curLevel+1], int(selectedEntity->m_experience), selectedEntity->m_costXP[curLevel+1] );
-						m_pnlButton[0]->SetHint( strHint );
+						GameString* desc = g_game->m_strings->Get( 171 );
+						if ( desc )
+						{
+							swprintf_s( desc->text, 512, desc->base, g_game->m_player->m_gold, selectedEntity->m_cost[curLevel+1], int(selectedEntity->m_experience), selectedEntity->m_costXP[curLevel+1] );
+							m_pnlButton[0]->SetHint( L"170\n171" );
+						}	
 					}
-					else m_pnlButton[0]->SetHint( s_te_fulupgrade );
+					else m_pnlButton[0]->SetHint( L"170\n176" );
 				}
 
 				//  update hint of buttons
-				int cost = 0;
-				for (int i=0; i<=curLevel; i++)
-					cost += selectedEntity->m_cost[ i ];
+				GameString* desc = g_game->m_strings->Get( 175 );
+				if ( desc )
+				{
+					int cost = 0;
+					for (int i=0; i<=curLevel; i++)
+						cost += selectedEntity->m_cost[ i ];
 
-				float sellPercent = 0.7f + g_game->m_upgrades.general_sell_income;
-				cost = int( sx::cmn::Round( cost * sellPercent ) );
+					float sellPercent = 0.7f + g_game->m_upgrades.general_sell_income;
+					cost = int( sx::cmn::Round( cost * sellPercent ) );
 
-				str1024 strHint;
-				strHint.Format( s_te_sell, cost );
-				m_pnlButton[2]->SetHint( strHint );
-
+					swprintf_s( desc->text, 512, desc->base, cost );
+					m_pnlButton[2]->SetHint( L"174\n175" );
+				}	
 
 				//	update info
+				str64 strHint;
 				strHint.Format( L"%d/%d", selectedEntity->m_health.icur, selectedEntity->m_health.imax );
 				m_lblHealth->SetText( strHint );
 
 				if ( curLevel < maxLevel )
+				{
 					strHint.Format( L"%d/%d", int(selectedEntity->m_experience), selectedEntity->m_costXP[curLevel+1] );
-				else
-					strHint = s_te_xp;
-				m_lblXP->SetText( strHint );
+					m_lblXP->SetText( strHint );
+				}
+				else m_lblXP->SetText( g_game->m_strings->Get(177)->text );
 
 				int av = int( pAttack->physicalDamage + pAttack->electricalDamage );
-				strHint.Format( L"%d-%d", av-1, av+1 );
+				strHint.Format( L"%d-%d", av - 1, av + 1 );
 				m_lblDamage->SetText( strHint );
 
 				if ( pAttack->rate >= 3 )
-					m_lblFireRate->SetText( s_te_fast );
+					update_label( m_lblFireRate, 178 );
 				else if ( pAttack->rate > 1 )
-					m_lblFireRate->SetText( s_te_medium );
+					update_label( m_lblFireRate, 179 );
 				else
-					m_lblFireRate->SetText(s_te_low );
-
+					update_label( m_lblFireRate, 180 );
 			}
 			else
 			{
@@ -476,22 +415,21 @@ namespace GM
 				int av = int( pAttack->physicalDamage + pAttack->electricalDamage );
 				if ( av )
 				{
-					str.Format( L"%d-%d", av-1, av+1 );
+					str.Format( L"%d-%d", av - 1, av + 1 );
 					m_lblDamage->SetText( str );
 
 					if ( pAttack->rate > 4 )
-						m_lblFireRate->SetText( s_te_fast );
+						update_label( m_lblFireRate, 178 );
 					else if ( pAttack->rate > 1 )
-						m_lblFireRate->SetText( s_te_medium );
+						update_label( m_lblFireRate, 179 );
 					else
-						m_lblFireRate->SetText( s_te_low );
+						update_label( m_lblFireRate, 180 );
 				}
 				else
 				{
-					m_lblDamage->SetText( s_te_none );
-					m_lblFireRate->SetText( s_te_none );
+					update_label( m_lblDamage, 181 );
+					update_label( m_lblFireRate, 181 );
 				}
-
 			}
 		}
 		else
@@ -621,41 +559,6 @@ namespace GM
 
 		case GMT_GAME_RESET:
 		case GMT_LEVEL_LOAD:
-			{
-				str1024 str = sx::sys::FileManager::Project_GetDir();
-				str << L"strings.txt";
-
-				Scripter script;
-				script.Load( str );
-
-				for (int i=0; i<script.GetObjectCount(); i++)
-				{
-					str512 tmpStr;
-					if ( script.GetString(i, L"Type", tmpStr) )
-					{
-						if ( tmpStr == L"Strings" )
-						{
-							if ( !script.GetString(i, L"Name", tmpStr) )
-								continue;
-
-							if ( tmpStr == L"TowerEdit" )
-							{
-								script.GetString( i, L"upgrade", s_te_upgrade );			s_te_upgrade.Replace( L"\\n", L"\n" );
-								script.GetString( i, L"repair", s_te_repair );				s_te_repair.Replace( L"\\n", L"\n" );
-								script.GetString( i, L"sell", s_te_sell );					s_te_sell.Replace( L"\\n", L"\n" );
-								script.GetString( i, L"fulupgrade", s_te_fulupgrade );		s_te_fulupgrade.Replace( L"\\n", L"\n" );
-								script.GetString( i, L"xp", s_te_xp );						s_te_xp.Replace( L"\\n", L"\n" );
-								script.GetString( i, L"fast", s_te_fast );					s_te_fast.Replace( L"\\n", L"\n" );
-								script.GetString( i, L"medium", s_te_medium );				s_te_medium.Replace( L"\\n", L"\n" );
-								script.GetString( i, L"low", s_te_low );					s_te_low.Replace( L"\\n", L"\n" );
-								script.GetString( i, L"none", s_te_none );					s_te_none.Replace( L"\\n", L"\n" );
-
-								break;
-							}
-						}
-					}
-				}
-			}
 			break;
 		}
 	}

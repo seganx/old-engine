@@ -235,6 +235,7 @@ namespace sx { namespace gui {
 		if ( inSpace3D )
 		{
 			d3d::Device3D::RS_ZEnabled(true);
+			d3d::Device3D::RS_ZWritable(false);
 			m_elements[0]->Draw(option);
 			DrawText(option);
 		}

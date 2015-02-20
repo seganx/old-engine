@@ -6,7 +6,7 @@
 #include "GameGUI.h"
 #include "EntityManager.h"
 #include "GameStrings.h"
-
+#include "ComicPlayer.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -196,6 +196,38 @@ namespace GM
 	{
 		switch (msg)
 		{
+		case GMT_PLAY_COMIC:
+			{
+				//	show presents
+#if 0
+				{
+					FirstPresents *presents = sx_new( FirstPresents );
+
+#if USE_ALAWAR_LOGO
+					presents->AddPresents( L"gui_alawar.txr", 512, null, 0, 0 );
+#endif
+
+					presents->AddPresents( L"gui_parseh.txr", 512, null, 0, 0 );
+					presents->AddPresents( L"gui_esra.txr", 1024, null, 0, 0 );
+
+					float initTime = sx::sys::GetSysTime();
+					float elpsTime = 0;
+					while ( presents->Presenting() )
+					{
+						// calculate elapsed time
+						elpsTime = sx::sys::GetSysTime() - initTime;
+						initTime = sx::sys::GetSysTime();
+						presents->Update( elpsTime );
+						presents->Draw();
+					}
+					sx_delete_and_null( presents );
+				}
+#else
+				if ( g_game->m_game_currentLevel == 0 )
+					play_comic(2002, data);
+#endif
+			}
+			break;
 		case GMT_LEVEL_LOADED:		/////////////////////////////////////////////////    LOAD LEVEL
 			{						//////////////////////////////////////////////////////////////////////////
 

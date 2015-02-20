@@ -5,6 +5,7 @@
 #include "Entity.h"
 #include "GameGUI.h"
 #include "EntityManager.h"
+#include "GameStrings.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -18,8 +19,8 @@ namespace GM
 
 	Mechanic_PA_Repair::Mechanic_PA_Repair( void ) 
 		: Mechanic()
-		, m_Cost(100)
-		, m_Time(0)
+		, m_cost(100)
+		, m_time(0)
 		, m_coolTime(10)
 		, m_index( powerAttack_count++ )
 	{
@@ -73,7 +74,7 @@ namespace GM
 
 		sx_callstack();
 
-		if ( m_Time < m_coolTime )
+		if ( m_time < m_coolTime )
 		{
 			m_panelEx->State_SetIndex(1);
 			m_progBar->AddProperty( SX_GUI_PROPERTY_VISIBLE );
@@ -101,21 +102,29 @@ namespace GM
 		
 		sx_callstack();
 
-		if ( m_Time < m_coolTime )
+		if ( m_time < m_coolTime )
 		{
-			m_Time += elpsTime * 0.001f;
-			m_progBar->SetValue( m_Time/m_coolTime );
+			m_time += elpsTime * 0.001f;
+			m_progBar->SetValue( m_time/m_coolTime );
 		}
 		else m_progBar->SetValue( 1 );
 
 		//  update hint of buttons
-		str1024 strHint;		
-		if ( m_Hint.Text() )
-			strHint.Format(m_Hint.Text(), (m_index+1), m_Cost, g_game->m_player->m_gold);
-		m_panelEx->SetHint( strHint );
-		m_progBar->SetHint( strHint );
+		{
+			//	title
+			GameString* title = g_game->m_strings->Get( 575 );
+			GameString* desc = g_game->m_strings->Get( 576 );
+			if ( title && desc )
+			{
+				swprintf_s( title->text, 512, title->base, (m_index + 1) );
+				swprintf_s( desc->text, 512, desc->base, m_cost, g_game->m_player->m_gold );
 
-		if ( g_game->m_player->m_gold >= m_Cost )
+				m_panelEx->SetHint( L"575\n576" );
+				m_progBar->SetHint( L"575\n576" );
+			}
+		}
+
+		if ( g_game->m_player->m_gold >= m_cost )
 		{
 			m_panelEx->State_GetCurrent().Color.y = 1.0f;
 			m_panelEx->State_GetCurrent().Color.z = 1.0f;
@@ -161,15 +170,9 @@ namespace GM
 
 							if ( tmpStr == L"Repair" )
 							{
-								script.GetInt(i, L"cost", m_Cost);
+								script.GetInt(i, L"cost", m_cost);
 								script.GetFloat(i, L"coolTime", m_coolTime);
-								m_Time = m_coolTime;
-
-								if ( script.GetString(i, L"hint", tmpStr) )
-									m_Hint = tmpStr.Text();
-								else
-									m_Hint.Clear();
-								m_Hint.Replace(L"\\n", L"\n");
+								m_time = m_coolTime;
 							}
 						}
 					}
@@ -185,7 +188,7 @@ namespace GM
 
 		case GMT_GAME_START:		/////////////////////////////////////////////////    START GAME
 			{						//////////////////////////////////////////////////////////////////////////
-				m_Time = m_coolTime;
+				m_time = m_coolTime;
 
 				float left, top = -11.0f;
 				switch ( m_index )
@@ -212,7 +215,7 @@ namespace GM
 
 		case GMT_GAME_RESET:		/////////////////////////////////////////////////    RESET GAME
 			{						//////////////////////////////////////////////////////////////////////////
-				m_Time = 0;
+				m_time = 0;
 				MsgProc(0, GMT_LEVEL_LOAD, 0);
 			}
 			break;	//	GMT_GAME_RESET
@@ -228,10 +231,10 @@ namespace GM
 
 		sx_callstack();
 
-		if ( m_Time >= m_coolTime && g_game->m_player->m_gold >= m_Cost )
+		if ( m_time >= m_coolTime && g_game->m_player->m_gold >= m_cost )
 		{
-			m_Time = 0;
-			g_game->m_player->m_gold -= m_Cost;
+			m_time = 0;
+			g_game->m_player->m_gold -= m_cost;
 
 			int n = EntityManager::GetEntityCount();
 			for (int i=0; i<n; i++)

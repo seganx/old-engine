@@ -47,16 +47,13 @@ namespace GM
 
 	public:
 
-		int			m_Cost;
-		float		m_Time;
+		int			m_cost;
+		float		m_time;
 		float		m_coolTime;
 		float		m_stunTime;
 		float		m_stunValue;
 
 		int			m_index;		//  index of power attack used in gui alignment
-
-		str512		m_Hint;			//  hint of power attack contain name and description
-
 	public:
 
 		sx::gui::PPanelEx		m_panelEx;

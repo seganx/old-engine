@@ -1,4 +1,6 @@
 #include "ComicPlayer.h"
+#include "Game.h"
+#include "GameStrings.h"
 #include "Scripter.h"
 #include "GameUtils.h"
 
@@ -15,8 +17,13 @@ ComicPlayer::~ComicPlayer( void )
 	sx_delete_and_null(m_node);
 }
 
-bool ComicPlayer::Load( const wchar* fileName )
+bool ComicPlayer::Load( const wchar* fileName, void* loadingCallback )
 {
+	Callback_Draw_Loading drawLoading = loadingCallback ? (Callback_Draw_Loading)loadingCallback : null;
+
+	if ( drawLoading )
+		drawLoading(0, 0, L"loading comic", fileName);
+
 	Scripter script;
 	script.Load( fileName );
 
@@ -37,6 +44,31 @@ bool ComicPlayer::Load( const wchar* fileName )
 					{
 						m_node->Load(*pfile);
 						sx::sys::FileManager::File_Close(pfile);
+#if 0
+						for ( Map<UINT, sx::d3d::PGeometry>::Iterator& it = sx::d3d::Geometry::Manager::GetFirst(); !it.IsLast(); it++)
+						{
+							sx::d3d::Geometry* gm = (*it);
+							if ( !gm->Validate(0) )
+							{
+								if ( drawLoading )
+									drawLoading( 0, 0, L"loading geometry", gm->GetSource() );
+								gm->Activate(0);
+							}
+						}
+
+						for ( Map<UINT, sx::d3d::PTexture>::Iterator& it = sx::d3d::Texture::Manager::GetFirst(); !it.IsLast(); it++)
+						{
+							sx::d3d::Texture* tx = (*it);
+							if ( !tx->Activated() )
+							{
+								if ( drawLoading )
+									drawLoading( 0, 0, L"loading texture", tx->GetSource() );
+								tx->Activate(0);
+							}
+						}
+#endif
+						if ( drawLoading )
+							drawLoading( 0, 0, L"activating node", m_node->GetName() );
 
 						//	activate node
 						float f = 0;
@@ -131,10 +163,12 @@ void ComicPlayer::Update( float elpstime )
 		SoundListener soundListener( float3(0, 0, -10), float3(0, 0, 1), float3(0, 1, 0) );
 		sx::snd::Device::SetListener( soundListener );
 
+		float3 camPos = m_camera->GetPosition_world();
 		float3 camDir; camDir.Transform_Norm( float3(0, 0, 1), m_camera->GetMatrix_world() );
+		float3 camAt = camPos + camDir;
 		float3 camUp; camUp.Transform_Norm( float3(0, 1, 0), m_camera->GetMatrix_world() );
-		sx::d3d::Device3D::Camera_Pos( m_camera->GetPosition_world(), camDir, camUp );
-		sx::d3d::Device3D::Camera_Projection( sx::math::PIDIV2, SEGAN_VP_WIDTH / SEGAN_VP_HEIGHT, 0.3f, 100.0f );
+		sx::d3d::Device3D::Camera_Pos( m_camera->GetPosition_world(), camAt, camUp );
+		sx::d3d::Device3D::Camera_Projection( PI * 0.25f, SEGAN_VP_WIDTH / SEGAN_VP_HEIGHT, 0.1f, 400.0f );
 
 		//  update sun light
 		sx::d3d::ShaderPool::SetLight( sx::core::Renderer::GetSunLight() );
@@ -210,3 +244,20 @@ bool ComicPlayer::Playing( void )
 
 
 
+
+void play_comic( const uint id, void* loadingCallback )
+{
+	ComicPlayer comic;
+	comic.Load( g_game->m_strings->Get(id)->text, loadingCallback );
+
+	float initTime = sx::sys::GetSysTime();
+	float elpsTime = 0;
+	while ( comic.Playing() )
+	{
+		// calculate elapsed time
+		elpsTime = sx::sys::GetSysTime() - initTime;
+		initTime = sx::sys::GetSysTime();
+		comic.Update( elpsTime );
+		comic.Draw();
+	}
+}

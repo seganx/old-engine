@@ -51,12 +51,12 @@ namespace GM
 
 	public:
 
-		int			m_Cost;
-		float		m_Time;
+		int			m_cost;
+		float		m_time;
 		float		m_coolTime;
 		int			m_index;		//  index of power attack used in gui alignment
-		str512		m_Hint;			//  hint of power attack contain name and description
-		prpAttack	m_Attack;		//  attack value 
+
+		prpAttack	m_attack;		//  attack value 
 		
 		sx::core::PNode	m_hotNode;			//  node to show hot zone
 

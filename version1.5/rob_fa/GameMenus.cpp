@@ -6,6 +6,7 @@
 #include "GameConfig.h"
 #include "Scripter.h"
 #include "GameStrings.h"
+#include "ComicPlayer.h"
 
 //////////////////////////////////////////////////////////////////////////
 //	menu 
@@ -130,7 +131,7 @@ void MenuMain::Initialize( void )
 #elif USE_CZESH_LOGO
 	m_mainBack->GetElement(0)->SetTextureSrc( L"gui_root_czech.txr" );
 #else
-	m_mainBack->GetElement(0)->SetTextureSrc( g_game->m_strings->Get(2002)->text );
+	m_mainBack->GetElement(0)->SetTextureSrc( g_game->m_strings->Get(2101)->text );
 #endif
 	m_mainBack->State_Add();
 	m_mainBack->State_Add();
@@ -579,6 +580,13 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 	case 5: // credits
 #endif
 		{
+			msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
+			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
+
+			play_comic(2001, null);
+			
+			break;
+
 			m_slantBack->State_SetIndex(0);
 			for ( int i=0; i<MAIN_MENU_COUNT; i++ )
 			{
@@ -643,7 +651,7 @@ void MenuMap::Initialize( void )
 	m_back->State_GetByIndex(1).Position.Set( 0.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(1).Blender.Set( 0.07f, 0.6f );
 
-	create_label( m_back, 14, 300.0f, 30.0f, -350.0f, 290.0f, 0 );
+	create_label( m_back, 14, 300.0f, 30.0f, -260.0f, 290.0f, 0 );
 
 	//	create level chooser
 	m_chooser = sx_new( sx::gui::PanelEx );
@@ -1254,7 +1262,7 @@ void MenuProfile::Initialize( void )
 	m_back->State_GetByIndex(1).Blender.Set( 0.03f, 0.85f );
 
 	//	profile title of the page
-	create_label( m_back, 22, 250.0f, 50.0f, -260.0f, 315.0f, 0 )->GetElement(1)->Color().a = 0.8f;
+	create_label( m_back, 22, 250.0f, 50.0f, -230.0f, 300.0f, 0 )->GetElement(1)->Color().a = 0.8f;
 
 	//	create text edit
 	m_profileName = sx_new( sx::gui::TextEdit );
@@ -1332,10 +1340,10 @@ void MenuProfile::Initialize( void )
 		SEGAN_GUI_SET_ONEXIT( lbl, MenuProfile::OnExit );
 
 		//	label to show total stars
-		create_label( m_profPanel[i], 23, 100, 80, 120.0f, -18.0f, 0.0f )->GetElement(1)->Color().a = 0.8f;
+		create_label( m_profPanel[i], 23, 40, 30, 120.0f, -22.0f, 0.0f )->GetElement(1)->Color().a = 0.8f;
 
 		//	label to show total people
-		create_label( m_profPanel[i], 23, 100, 80, 230.0f, -18.0f, 0.0f )->GetElement(1)->Color().a = 0.8f;
+		create_label( m_profPanel[i], 23, 100, 30, 230.0f, -18.0f, 0.0f )->GetElement(1)->Color().a = 0.8f;
 	}
 
 	//	create back button
@@ -3866,9 +3874,10 @@ void MenuUpgrade::Initialize( void )
 	m_border->GetElement(0)->SetTextureSrc( L"gui_menu_upgrade.txr" );
 	m_border->Position().y = 150.0f;
 
+	//	create titles
 	for ( int i=0; i<5; ++i )
 	{
-		create_label( m_border, 600 + i * 2, 150, 25, -315 + i * 180.0f, 90, 0 )->GetElement(1)->Color() = titleColor;
+		create_label( m_border, 601 + i, 150, 25, -315 + i * 180.0f, 90, 0 )->GetElement(1)->Color() = titleColor;
 	}
 	create_label( m_border, 606, 150, 25, -320, -180, 0 )->GetElement(1)->Color() = titleColor;
 	create_label( m_border, 607, 150, 25, -125, -180, 0 )->GetElement(1)->Color() = titleColor;

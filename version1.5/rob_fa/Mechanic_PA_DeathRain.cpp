@@ -7,6 +7,7 @@
 #include "Projectile.h"
 #include "GameGUI.h"
 #include "ProjectileManager.h"
+#include "GameStrings.h"
 
 //////////////////////////////////////////////////////////////////////////
 //  external variables
@@ -37,8 +38,8 @@ namespace GM
 
 	Mechanic_PA_DeathRain::Mechanic_PA_DeathRain( void ) 
 		: Mechanic()
-		, m_Cost(100)
-		, m_Time(0)
+		, m_cost(100)
+		, m_time(0)
 		, m_coolTime(10)
 		, m_index( powerAttack_count++ )
 		, m_hotNode(0)
@@ -100,7 +101,7 @@ namespace GM
 			return;
 		sx_callstack();
 
-		if ( m_Time < m_coolTime )
+		if ( m_time < m_coolTime )
 		{
 			m_panelEx->State_SetIndex(1);
 			m_progBar->AddProperty( SX_GUI_PROPERTY_VISIBLE );
@@ -133,7 +134,7 @@ namespace GM
 			
 			sx::core::PMesh mesh = (sx::core::PMesh)m_hotNode->GetMemberByIndex(0);
 			if ( mesh )
-				mesh->GetActiveMaterial()->SetFloat( 0 , m_Attack.maxRange );
+				mesh->GetActiveMaterial()->SetFloat( 0 , m_attack.maxRange );
 
 			m_hotNode->SetPosition(hotPos);
 			sx::core::Scene::AddNode( m_hotNode );
@@ -160,21 +161,29 @@ namespace GM
 
 		sx_callstack();
 
-		if ( m_Time < m_coolTime )
+		if ( m_time < m_coolTime )
 		{
-			m_Time += elpsTime * 0.001f;
-			m_progBar->SetValue( m_Time/m_coolTime );
+			m_time += elpsTime * 0.001f;
+			m_progBar->SetValue( m_time/m_coolTime );
 		}
 		else m_progBar->SetValue( 1 );
 
 		//  update hint of buttons
-		str1024 strHint;
-		if ( m_Hint.Text() )
-			strHint.Format(m_Hint.Text(), (m_index+1), m_Cost, g_game->m_player->m_gold);
-		m_panelEx->SetHint( strHint );
-		m_progBar->SetHint( strHint );
+		{
+			//	title
+			GameString* title = g_game->m_strings->Get( 577 );
+			GameString* desc = g_game->m_strings->Get( 578 );
+			if ( title && desc )
+			{
+				swprintf_s( title->text, 512, title->base, (m_index + 1) );
+				swprintf_s( desc->text, 512, desc->base, m_cost, g_game->m_player->m_gold );
 
-		if ( g_game->m_player->m_gold >= m_Cost )
+				m_panelEx->SetHint( L"577\n578" );
+				m_progBar->SetHint( L"577\n578" );
+			}
+		}
+
+		if ( g_game->m_player->m_gold >= m_cost )
 		{
 			m_panelEx->State_GetCurrent().Color.y = 1.0f;
 			m_panelEx->State_GetCurrent().Color.z = 1.0f;
@@ -199,16 +208,16 @@ namespace GM
 			rateTime -= elpsTime;
 			if ( rateTime < 0 )
 			{
-				hotzone->ratetime = 1000.0f / m_Attack.rate;
+				hotzone->ratetime = 1000.0f / m_attack.rate;
 				
 				//  spill bomb
- 				Projectile* proj = ProjectileManager::CreateProjectileByTypeName( m_Attack.bullet );
+ 				Projectile* proj = ProjectileManager::CreateProjectileByTypeName( m_attack.bullet );
  				if ( proj )
   				{
 					proj->m_targetPos = hotzone->node->GetPosition_world();
 
 					static sx::core::ArrayPNode_inline nodes(512); nodes.Clear();
-					sx::core::Scene::GetNodesByArea( proj->m_targetPos, m_Attack.maxRange + 5.0f, nodes, NMT_PATHNODE );
+					sx::core::Scene::GetNodesByArea( proj->m_targetPos, m_attack.maxRange + 5.0f, nodes, NMT_PATHNODE );
 					if ( nodes.Count() )
 						proj->m_targetPos = nodes[ sx::cmn::Random( nodes.Count()-1 ) ]->GetPosition_world();
 
@@ -231,7 +240,7 @@ namespace GM
 					proj->m_speed		= 0.5f;
 					proj->m_tag			= EAT_Apocalypto;
 
-					proj->m_attack		= m_Attack;
+					proj->m_attack		= m_attack;
 					proj->m_attack.targetType = GMT_BOTH;
 
 					proj->m_pos		= proj->m_targetPos;
@@ -288,30 +297,24 @@ namespace GM
 
 						if ( tmpStr == L"DeathRain" )
 						{
-							script.GetInt(i, L"cost", m_Cost);
+							script.GetInt(i, L"cost", m_cost);
 							script.GetFloat(i, L"coolTime", m_coolTime);
-							m_Time = m_coolTime;
+							m_time = m_coolTime;
 
-							if ( script.GetString(i, L"hint", tmpStr) )
-								m_Hint = tmpStr.Text();
-							else
-								m_Hint.Clear();
-							m_Hint.Replace(L"\\n", L"\n");
-
-							m_Attack.targetType = GMT_BOTH;
-							script.GetFloat(i, L"physicalDamage",		m_Attack.physicalDamage);
-							script.GetFloat(i, L"physicalArmor",		m_Attack.physicalArmor);
-							script.GetFloat(i, L"electricalDamage",		m_Attack.electricalDamage);
-							script.GetFloat(i, L"electricalArmor",		m_Attack.electricalArmor);
-							script.GetFloat(i, L"splashRadius",			m_Attack.splashRadius);
-							script.GetFloat(i, L"stunValue",			m_Attack.stunValue);
-							script.GetFloat(i, L"stunTime",				m_Attack.stunTime);
-							script.GetFloat(i, L"fireRate",				m_Attack.rate);
-							script.GetFloat(i, L"bombRadius",			m_Attack.maxRange);
-							script.GetFloat(i, L"bombCount",			m_Attack.minRange);
+							m_attack.targetType = GMT_BOTH;
+							script.GetFloat(i, L"physicalDamage",		m_attack.physicalDamage);
+							script.GetFloat(i, L"physicalArmor",		m_attack.physicalArmor);
+							script.GetFloat(i, L"electricalDamage",		m_attack.electricalDamage);
+							script.GetFloat(i, L"electricalArmor",		m_attack.electricalArmor);
+							script.GetFloat(i, L"splashRadius",			m_attack.splashRadius);
+							script.GetFloat(i, L"stunValue",			m_attack.stunValue);
+							script.GetFloat(i, L"stunTime",				m_attack.stunTime);
+							script.GetFloat(i, L"fireRate",				m_attack.rate);
+							script.GetFloat(i, L"bombRadius",			m_attack.maxRange);
+							script.GetFloat(i, L"bombCount",			m_attack.minRange);
 
 							if ( script.GetString(i, L"bullet", tmpStr) )
-								String::Copy( m_Attack.bullet, 64, tmpStr );
+								String::Copy( m_attack.bullet, 64, tmpStr );
 
  							if ( script.GetString(i, L"node", tmpStr) )
  							{
@@ -328,14 +331,14 @@ namespace GM
  
  									sx::core::PMesh mesh = (sx::core::PMesh)m_hotNode->GetMemberByIndex(0);
  									mesh->SetActiveMaterial(1);
- 									mesh->GetActiveMaterial()->SetFloat(0, m_Attack.maxRange/*m_Attack.splashRaduis*/);
+ 									mesh->GetActiveMaterial()->SetFloat(0, m_attack.maxRange/*m_attack.splashRaduis*/);
  								}
  							}
 
 							m_coolTime				-= g_game->m_upgrades.deathrain_cooltime;
-							m_Attack.minRange		+= g_game->m_upgrades.deathrain_count;
-							m_Attack.maxRange		+= g_game->m_upgrades.deathrain_range;
-							m_Attack.splashRadius	+= g_game->m_upgrades.deathrain_splash;
+							m_attack.minRange		+= g_game->m_upgrades.deathrain_count;
+							m_attack.maxRange		+= g_game->m_upgrades.deathrain_range;
+							m_attack.splashRadius	+= g_game->m_upgrades.deathrain_splash;
 
 
 						}	//if ( tmpStr == L"DeathRain" )
@@ -354,7 +357,7 @@ namespace GM
 
 		case GMT_GAME_START:		/////////////////////////////////////////////////    START GAME
 			{						//////////////////////////////////////////////////////////////////////////
-				m_Time = m_coolTime;
+				m_time = m_coolTime;
 
 				float left, top = -11.0f;
 				switch ( m_index )
@@ -371,8 +374,8 @@ namespace GM
 				m_panelEx->State_GetBlended().Position.Set( left, top, 0.0f );
 				m_panelEx->State_SetIndex( 0 );
 
-				if ( m_Attack.rate < 0.001f )
-					m_Attack.rate = 1;
+				if ( m_attack.rate < 0.001f )
+					m_attack.rate = 1;
 
 #if USE_STEAM_SDK
 				g_game->m_steam.CallAchievement( EAT_Wrath_Of_Battle, ESC_OnStart );
@@ -393,7 +396,7 @@ namespace GM
 
 		case GMT_GAME_RESET:		/////////////////////////////////////////////////    RESET GAME
 			{						//////////////////////////////////////////////////////////////////////////
-				m_Time = 0;
+				m_time = 0;
 				sx_delete_and_null( m_hotNode );
 				MsgProc(0, GMT_LEVEL_LOAD, 0);
 			}
@@ -403,7 +406,7 @@ namespace GM
 
 	void Mechanic_PA_DeathRain::OnGUIClick( sx::gui::PControl Sender )
 	{
-		if ( !m_hotNode || !m_Attack.bullet[0] || !m_Attack.minRange ) return;
+		if ( !m_hotNode || !m_attack.bullet[0] || !m_attack.minRange ) return;
 
 		static float lasttime = 0;
 		const float  newtime = sx::sys::GetSysTime();
@@ -412,7 +415,7 @@ namespace GM
 
 		sx_callstack();
 
-		if ( m_Time >= m_coolTime && g_game->m_player->m_gold >= m_Cost )
+		if ( m_time >= m_coolTime && g_game->m_player->m_gold >= m_cost )
 		{
 			g_game->m_mouseMode = MS_CreateHotzone;
 
@@ -435,7 +438,7 @@ namespace GM
 		if ( SEGAN_KEYDOWN(0, SX_INPUT_KEY_MOUSE_LEFT) )
 		{
 			static sx::core::ArrayPNode_inline nodes(512); nodes.Clear();
-			sx::core::Scene::GetNodesByArea( pos, m_Attack.maxRange, nodes, NMT_PATHNODE );
+			sx::core::Scene::GetNodesByArea( pos, m_attack.maxRange, nodes, NMT_PATHNODE );
 			if ( !nodes.Count() )
 			{
 				//	say to player by a sound
@@ -446,14 +449,14 @@ namespace GM
 
 			sx::core::Scene::RemoveNode( m_hotNode );
 
-			m_Time = 0;
-			g_game->m_player->m_gold -= m_Cost;
+			m_time = 0;
+			g_game->m_player->m_gold -= m_cost;
 
 			HotZone* hotzone = sx_new( HotZone );
 			hotzone->node = m_hotNode->Clone();
   			hotzone->node->SetPosition( pos );
 			hotzone->ratetime = 0;
-			hotzone->bombs = int( m_Attack.minRange );
+			hotzone->bombs = int( m_attack.minRange );
  			arrayBombRain.PushBack( hotzone );
 			sx::core::Scene::AddNode( hotzone->node );
 

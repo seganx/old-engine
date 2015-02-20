@@ -11,7 +11,6 @@
 
 #include "ImportEngine.h"
 
-
 struct ComicText
 {
 	sx::core::Node* node;	//	transformation of the text
@@ -37,7 +36,7 @@ public:
 	ComicPlayer( void );
 	~ComicPlayer( void );
 
-	bool Load( const wchar* fileName );
+	bool Load( const wchar* fileName, void* loadingCallback );
 	void Update( float elpstime );
 	void Draw( void );
 	bool Playing( void );
@@ -51,5 +50,9 @@ public:
 	Array<ComicSound> m_sounds;
 	Array<ComicParticle> m_particles;
 };
+
+
+//	load and play a comic
+void play_comic(const uint id, void* loadingCallback);
 
 #endif // GUARD_ComicPlayer_HEADER_FILE

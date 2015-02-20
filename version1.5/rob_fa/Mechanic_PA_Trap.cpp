@@ -5,7 +5,7 @@
 #include "Entity.h"
 #include "GameGUI.h"
 #include "EntityManager.h"
-
+#include "GameStrings.h"
 
 //////////////////////////////////////////////////////////////////////////
 //  external variables
@@ -35,8 +35,8 @@ namespace GM
 
 	Mechanic_PA_Trap::Mechanic_PA_Trap( void ) 
 		: Mechanic()
-		, m_Cost(100)
-		, m_Time(0)
+		, m_cost(100)
+		, m_time(0)
 		, m_coolTime(10)
 		, m_index( powerAttack_count++ )
 		, m_node(0)
@@ -98,7 +98,7 @@ namespace GM
 
 		sx_callstack();
 
-		if ( m_Time < m_coolTime )
+		if ( m_time < m_coolTime )
 		{
 			m_panelEx->State_SetIndex(1);
 			m_progBar->AddProperty( SX_GUI_PROPERTY_VISIBLE );
@@ -153,21 +153,28 @@ namespace GM
 
 		sx_callstack();
 
-		if ( m_Time < m_coolTime )
+		if ( m_time < m_coolTime )
 		{
-			m_Time += elpsTime * 0.001f;
-			m_progBar->SetValue( m_Time/m_coolTime );
+			m_time += elpsTime * 0.001f;
+			m_progBar->SetValue( m_time/m_coolTime );
 		}
 		else m_progBar->SetValue( 1 );
 
 		//  update hint of buttons
-		str1024 strHint;
-		if ( m_Hint.Text() )
-			strHint.Format( m_Hint.Text(), (m_index+1), m_Cost, g_game->m_player->m_gold );
-		m_panelEx->SetHint( strHint );
-		m_progBar->SetHint( strHint );
+		{
+			GameString* title = g_game->m_strings->Get( 571 );
+			GameString* desc = g_game->m_strings->Get( 572 );
+			if ( title && desc )
+			{
+				swprintf_s( title->text, 512, title->base, (m_index + 1) );
+				swprintf_s( desc->text, 512, desc->base, m_cost, g_game->m_player->m_gold );
 
-		if ( g_game->m_player->m_gold >= m_Cost )
+				m_panelEx->SetHint( L"571\n572" );
+				m_progBar->SetHint( L"571\n572" );
+			}
+		}
+
+		if ( g_game->m_player->m_gold >= m_cost )
 		{
 			m_panelEx->State_GetCurrent().Color.y = 1.0f;
 			m_panelEx->State_GetCurrent().Color.z = 1.0f;
@@ -293,15 +300,9 @@ namespace GM
 
 						if ( tmpStr == L"Trap" )
 						{
-							script.GetInt(i, L"cost", m_Cost);
+							script.GetInt(i, L"cost", m_cost);
 							script.GetFloat(i, L"coolTime", m_coolTime);
-							m_Time = m_coolTime;
-
-							if ( script.GetString(i, L"hint", tmpStr) )
-								m_Hint = tmpStr.Text();
-							else
-								m_Hint.Clear();
-							m_Hint.Replace(L"\\n", L"\n");
+							m_time = m_coolTime;
 
 							if ( script.GetString(i, L"node", tmpStr) )
 							{
@@ -345,7 +346,7 @@ namespace GM
 
 		case GMT_GAME_START:		/////////////////////////////////////////////////    START GAME
 			{						//////////////////////////////////////////////////////////////////////////
-				m_Time = m_coolTime;
+				m_time = m_coolTime;
 
 				float left, top = -11.0f;
 				switch ( m_index )
@@ -378,7 +379,7 @@ namespace GM
 
 		case GMT_GAME_RESET:		/////////////////////////////////////////////////    RESET GAME
 			{						//////////////////////////////////////////////////////////////////////////
-				m_Time = 0;
+				m_time = 0;
 				sx::core::Scene::DeleteNode( m_node );
 				MsgProc(0, GMT_LEVEL_LOAD, 0);
 			}
@@ -397,7 +398,7 @@ namespace GM
 
 		sx_callstack();
 
-		if ( m_Time >= m_coolTime && g_game->m_player->m_gold >= m_Cost )
+		if ( m_time >= m_coolTime && g_game->m_player->m_gold >= m_cost )
 		{
 			g_game->m_mouseMode = MS_CreateTrap;
 			m_node->SetRotation( 0, sx::cmn::Random(6.12f), 0 );
@@ -497,8 +498,8 @@ namespace GM
 			if ( cancelCreation ) return;
 
 			sx::core::Scene::RemoveNode( m_node );
-			m_Time = 0;
-			g_game->m_player->m_gold -= m_Cost;
+			m_time = 0;
+			g_game->m_player->m_gold -= m_cost;
 
 			Trap* trap = sx_new( Trap );
 			trap->coolTime	= m_attack.actionTime;

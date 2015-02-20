@@ -124,7 +124,7 @@ void Draw_Loading( int count, int index, const WCHAR* state, const WCHAR* name )
 
 	game->Render( 1 );
 
-	Sleep(5);
+	Sleep(1);
 }
 
 Game::Game( void )
@@ -400,9 +400,12 @@ void Game::LoadLevel( void )
 	str1024 str = L"gui_loading_level_";
 	str << m_game_currentLevel << L".txr";
 	m_panel_Loading->GetElement(0)->SetTextureSrc( str );
+	Draw_Loading( 0, 0, L"prepare contents", NULL );
+
+	//	play comic if exist
+	PostMessage( 0, GMT_PLAY_COMIC, &Draw_Loading );
 
 	//  load the scene
-	Sleep(5);
 	str = GetLevelPath();
 	str << L"scene.scene";
 	sx::sys::FileStream file;
@@ -435,6 +438,7 @@ void Game::LoadLevel( void )
 	//  additional part
 	if ( true )
 	{
+#if 0
 		for ( Map<UINT, sx::d3d::PGeometry>::Iterator& it = sx::d3d::Geometry::Manager::GetFirst(); !it.IsLast(); it++)
 		{
 			sx::d3d::Geometry* gm = (*it);
@@ -454,6 +458,12 @@ void Game::LoadLevel( void )
 				tx->Activate(0);
 			}
 		}
+#else
+		for (int i=0; i<50; ++i)
+		{
+			Draw_Loading( 0, 0, L"Preparing ", L"gui" );
+		}
+#endif
 
 		sx::core::ArrayPNode nodes;
 		sx::core::Scene::GetAllNodes( nodes );

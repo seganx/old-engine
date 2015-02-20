@@ -97,6 +97,7 @@ enum WeaponType
 enum GameMessageType
 {
 	GMT_BLANK = 0,			//  no message
+	GMT_PLAY_COMIC,			//	say to cinematic player to play a comic
 	GMT_LEVEL_LOAD,			//	say to all objects that level is loading
 	GMT_LEVEL_LOADED,		//	say to all objects that level has been loaded
 	GMT_LEVEL_CLEAR,		//	say to all objects that level is clearing
