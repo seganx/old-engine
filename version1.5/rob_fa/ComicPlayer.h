@@ -11,6 +11,13 @@
 
 #include "ImportEngine.h"
 
+
+struct ComicText
+{
+	sx::core::Node* node;	//	transformation of the text
+	sx::gui::Label* label;	//	label to show the text
+};
+
 struct ComicSound
 {
 	float	time;		//	time of playing sound
@@ -40,6 +47,7 @@ public:
 	float m_maxTime;
 	sx::core::Node* m_node;
 	sx::core::Node* m_camera;
+	Array<ComicText> m_labels;
 	Array<ComicSound> m_sounds;
 	Array<ComicParticle> m_particles;
 };

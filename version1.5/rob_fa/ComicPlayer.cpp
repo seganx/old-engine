@@ -1,10 +1,17 @@
 #include "ComicPlayer.h"
 #include "Scripter.h"
+#include "GameUtils.h"
 
 ComicPlayer::ComicPlayer( void ): m_time(0), m_maxTime(0), m_node(0), m_camera(0) { }
 
 ComicPlayer::~ComicPlayer( void )
 {
+	for ( int i=0; i<m_labels.Count(); ++i )
+	{
+		sx::gui::Label* label = m_labels[i].label;
+		sx_delete(label);
+	}
+
 	sx_delete_and_null(m_node);
 }
 
@@ -59,12 +66,33 @@ bool ComicPlayer::Load( const wchar* fileName )
 					sx_str_copy( comicParticle.name, 32, tmp );
 				m_particles.PushBack( comicParticle );
 			}
+			else if ( tmp == L"Text")
+			{
+				if ( script.GetString( i, L"node", tmp ) )
+				{
+					ComicText comicText;
+					if ( m_node->GetChildByName( tmp, comicText.node ) )
+					{
+						uint txtId = 0;
+						float width = 0, height = 0;
+						script.GetUint( i, L"text", txtId );
+						script.GetFloat( i, L"width", width );
+						script.GetFloat( i, L"height", height );
+
+						comicText.label = create_label( null, txtId, width, height, 0, 0, 0 );
+						comicText.label->AddProperty( SX_GUI_PROPERTY_3DSPACE );
+						
+						m_labels.PushBack( comicText );
+					}
+					else sxLog::Log(L"ERROR : ComicPlayer couldn't find node %s in %s", tmp.Text(), fileName);
+				}
+			}
 		}
 	}
 
 	//	retrieve total animation time
 	{
-		msg_Animator msg(SX_ANIMATOR_PLAY, SX_ANIMATOR_LOOP);
+		msg_Animator msg( SX_ANIMATOR_PLAY, SX_ANIMATOR_LOOP, 0, -1, -1, -1, 0.0f );
 		m_node->MsgProc( MT_ANIMATOR, &msg );
 		m_maxTime = msg.animMaxTime * 1000.0f;
 	}
@@ -98,7 +126,31 @@ void ComicPlayer::Update( float elpstime )
 		return;
 	}
 
-	m_time += elpstime;
+	//	update rendering device
+	{
+		SoundListener soundListener( float3(0, 0, -10), float3(0, 0, 1), float3(0, 1, 0) );
+		sx::snd::Device::SetListener( soundListener );
+
+		float3 camDir; camDir.Transform_Norm( float3(0, 0, 1), m_camera->GetMatrix_world() );
+		float3 camUp; camUp.Transform_Norm( float3(0, 1, 0), m_camera->GetMatrix_world() );
+		sx::d3d::Device3D::Camera_Pos( m_camera->GetPosition_world(), camDir, camUp );
+		sx::d3d::Device3D::Camera_Projection( sx::math::PIDIV2, SEGAN_VP_WIDTH / SEGAN_VP_HEIGHT, 0.3f, 100.0f );
+
+		//  update sun light
+		sx::d3d::ShaderPool::SetLight( sx::core::Renderer::GetSunLight() );
+		sx::d3d::ShaderPool::Update( elpstime );
+	}
+
+	//	update node
+	m_node->Update( elpstime );
+
+	//	update texts
+	for ( int i=0; i<m_labels.Count(); ++i )
+	{
+		ComicText& ct = m_labels[i];
+		ct.label->Position() = ct.node->GetPosition_world();
+		ct.label->Update( elpstime );
+	}
 
 	//	play sounds
 	for ( int i=0; i<m_sounds.Count(); ++i )
@@ -126,23 +178,7 @@ void ComicPlayer::Update( float elpstime )
 		}
 	}
 
-	//	update rendering device
-	{
-		SoundListener soundListener( float3(0, 0, -10), float3(0, 0, 1), float3(0, 1, 0) );
-		sx::snd::Device::SetListener( soundListener );
-
-		float3 camDir; camDir.Transform_Norm( float3(0, 0, 1), m_camera->GetMatrix_world() );
-		float3 camUp; camUp.Transform_Norm( float3(0, 1, 0), m_camera->GetMatrix_world() );
-		sx::d3d::Device3D::Camera_Pos( m_camera->GetPosition_world(), camDir, camUp );
-		sx::d3d::Device3D::Camera_Projection( sx::math::PIDIV2, SEGAN_VP_WIDTH / SEGAN_VP_HEIGHT, 0.3f, 100.0f );
-
-		//  update sun light
-		sx::d3d::ShaderPool::SetLight( sx::core::Renderer::GetSunLight() );
-		sx::d3d::ShaderPool::Update( elpstime );
-	}
-
-	//	update node
-	m_node->Update( elpstime );
+	m_time += elpstime;
 }
 
 void ComicPlayer::Draw( void )
@@ -153,8 +189,16 @@ void ComicPlayer::Draw( void )
 	sx::d3d::UI3D::ReadyToDebug( D3DColor(0,0,0,0) );
 	sx::d3d::Device3D::Clear_Screen(0);
 
+	//	draw base node
 	m_node->Draw(SX_DRAW_PARTICLE | SX_DRAW_MESH);
 	m_node->Draw(SX_DRAW_ALPHA | SX_DRAW_PARTICLE | SX_DRAW_MESH);
+
+	//	draw labels
+	sx::d3d::UI3D::ReadyToDebug( D3DColor(0,0,0,0) );
+	for ( int i=0; i<m_labels.Count(); ++i )
+	{
+		m_labels[i].label->Draw(0);
+	}
 
 	sx::core::Renderer::End();
 }
