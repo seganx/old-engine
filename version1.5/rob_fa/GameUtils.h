@@ -122,10 +122,9 @@ public:
 	uint	m_text;
 };
 
-
-sx::gui::Label* create_label( sx::gui::Control* parent, const wchar* font, const GUITextAlign align, const wchar* caption, const float& width, const float& height, const float& x, const float& y, const float& z );
-sx::gui::Label* create_label( sx::gui::Control* parent, const uint text, const float& width, const float& height, const float& x, const float& y, const float& z );
+sx::gui::Label* create_label( sx::gui::Control* parent, const uint text, const float& width, const float& height, const float& x, const float& y );
 sx::gui::Label* update_label( sx::gui::Label* label, const uint text );
+void update_all_labels( void );
 sx::gui::Button* create_back_button( sx::gui::Control* parent, const float& x, const float& y );
 
 

@@ -52,7 +52,6 @@ public:
 	void Update(const float elpsTime);
 	bool IsVisible(void);
 public:
-	//bool					m_used;		//	has been used before
 	float					m_time;		//  time of display
 	float2					m_pos;
 	uint					m_currHint;	//  description

@@ -89,16 +89,7 @@ namespace GM
 		m_guide = sx_new( GameGuide );
 		m_guide->m_back->SetParent( m_startProgr );
 
-		m_label = sx_new( sx::gui::Label );
-		m_label->SetParent( m_back );
-		m_label->SetFont( FONT_TOWER_PANEL_INFO );
-		m_label->SetSize( float2( 100.0f, 40.0f ) );
-#if USE_RTL
-		m_label->Position().Set( -45.0f, -107.0f, 0.0f );
-#else
-		m_label->Position().Set( -45.0f, -113.0f, 0.0f );
-#endif
-		m_label->GetElement(0)->Color() = D3DColor( 0, 0, 0, 0 );
+		m_label = create_label( m_back, 190, 100.0f, 40.0f, -45, -113 );
 		m_label->GetElement(1)->Color() = 0xcccccccc;
 
 		// add panel to the game
@@ -111,16 +102,7 @@ namespace GM
 			i--;
 		}
 
-		m_labelGold = sx_new( sx::gui::Label );
-		m_labelGold->SetFont( FONT_WAVE_CALL_GOLD );
-		m_labelGold->SetAlign( GTA_CENTER );
-		m_labelGold->SetParent( g_game->m_gui->m_goldPeople->m_back );
-		m_labelGold->SetSize( float2( 100.0f, 75.0f ) );
-		m_labelGold->Position().Set( -60.0f, -100.0f, 0.0f );
-		m_labelGold->GetElement(0)->Color() = D3DColor( 0, 0, 0, 0 );
-		m_labelGold->GetElement(1)->Color() = 0xffffff00;
-		m_labelGold->SetText( L"+17" );
-
+		m_labelGold = create_label( g_game->m_gui->m_goldPeople->m_back, 191, 100, 75, -60, -100 );
 
 		//////////////////////////////////////////////////////////////////////////
 		//	create a panel for mini map

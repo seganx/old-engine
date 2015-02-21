@@ -49,16 +49,10 @@ void com_ShowRange::Initialize( void )
 		}
 
 #if 1
-		s_entityName = sx_new( sx::gui::Label );
-		s_entityName->SetSize( float2(256, 64) );
+		s_entityName = create_label( null, 192, 256, 64, 0, 0 );
 		s_entityName->AddProperty( SX_GUI_PROPERTY_BILLBOARD );
 		s_entityName->RemProperty( SX_GUI_PROPERTY_VISIBLE );
-		s_entityName->SetFont( FONT_HUD_TITLE );
-		s_entityName->SetAlign( GTA_CENTER );
-		//s_entityName->AddProperty( SX_GUI_PROPERTY_3DSPACE );
-		s_entityName->GetElement(0)->Color().a = 0;
 		s_entityName->GetElement(1)->Color() = D3DColor(1.0f, 0.3f, 0.3f, 1.0f);
-
 		g_game->m_gui->Add_Back( s_entityName );
 #endif
 	}

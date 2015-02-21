@@ -111,7 +111,7 @@ bool ComicPlayer::Load( const wchar* fileName, void* loadingCallback )
 						script.GetFloat( i, L"width", width );
 						script.GetFloat( i, L"height", height );
 
-						comicText.label = create_label( null, txtId, width, height, 0, 0, 0 );
+						comicText.label = create_label( null, txtId, width, height, 0, 0 );
 						comicText.label->AddProperty( SX_GUI_PROPERTY_3DSPACE );
 						
 						m_labels.PushBack( comicText );

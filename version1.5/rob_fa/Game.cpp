@@ -239,9 +239,7 @@ Game::Game( void )
 	}
 #else
 	{
-		str1024 path = sx::sys::FileManager::Project_GetDir();
-		path << "localization/strings.txt";
-		m_strings->Load( path );
+		m_strings->Load( Config::GetData()->language );
 	}
 #endif
 

@@ -207,31 +207,17 @@ GameGuide::GameGuide( void ): m_time(0), m_pos(0,0)//, m_used(false)
 	m_indic->GetElement(0)->Color() = D3DColor(0.0f, 0.0f, 0.0f, 1.0f );
 	m_indic->SetSize( float2(32.0f, 32.0f) );
 
-	m_title = sx_new( sx::gui::Label );
-	m_title->SetParent( m_back );
+	m_title = create_label( m_back, 644, 0, 0, 0, 0 );
+	m_title->RemProperty( SX_GUI_PROPERTY_WORDWRAP );
 	m_title->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 	m_title->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
-#if USE_RTL
-	m_title->SetAlign( GTA_RIGHT );
-#else
-	m_title->SetAlign( GTA_LEFT );
-#endif
-	m_title->SetFont( FONT_HINT_TITLE );
-	m_title->GetElement(0)->Color() = D3DColor(0,0,0,0);
 	m_title->GetElement(1)->Color() = D3DColor(1,1,0.2f,1);
 
-	m_desc = sx_new( sx::gui::Label );
-	m_desc->SetParent( m_back );
+	m_desc = create_label( m_back, 645, 0, 0, 0, 0 );
+	m_desc->RemProperty( SX_GUI_PROPERTY_WORDWRAP );
 	m_desc->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 	m_desc->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
-#if USE_RTL
-	m_desc->SetAlign( GTA_RIGHT );
-#else
-	m_desc->SetAlign( GTA_LEFT );
-#endif
-	m_desc->SetFont( FONT_HINT_DESC );
-	m_desc->GetElement(0)->Color() = D3DColor(0,0,0,0);
 }
 
 GameGuide::~GameGuide( void )
@@ -403,7 +389,7 @@ public:
 
 		if ( tipText )
 		{
-			m_label = create_label( null, tipText, 100.0f, GAMETIPS_ICON_SIZE_div2, 0, 0, 0 );
+			m_label = create_label( null, tipText, 100.0f, GAMETIPS_ICON_SIZE_div2, 0, 0 );
 			m_label->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 			m_label->Position().Set( left + m_label->GetSize().x * 0.5f, m_posY, 0 );
 
@@ -463,19 +449,17 @@ public:
 		m_back->State_GetByIndex(1).Scale.Set(1, 1, 1);
 		m_back->State_GetByIndex(1).Color.Set(0.0f, 0.0f, 0.0f, 0.6f);
 		
-		m_title = sx_new( sx::gui::Label );
-		m_title->SetParent( m_back );
+		m_title = create_label( m_back, 644, 0, 0, 0, 0 );
+		m_title->RemProperty( SX_GUI_PROPERTY_WORDWRAP );
 		m_title->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 		m_title->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
-		m_title->GetElement(0)->Color() = D3DColor(0,0,0,0);
 		m_title->GetElement(1)->Color() = D3DColor(1,1,0.2f,1);
 
-		m_desc = sx_new( sx::gui::Label );
-		m_desc->SetParent( m_back );
+		m_desc = create_label( m_back, 645, 0, 0, 0, 0 );
+		m_desc->RemProperty( SX_GUI_PROPERTY_WORDWRAP );
 		m_desc->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 		m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 		m_desc->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
-		m_desc->GetElement(0)->Color() = D3DColor(0,0,0,0);
 	}
 
 	~GameHint(void)

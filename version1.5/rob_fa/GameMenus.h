@@ -258,9 +258,19 @@ public:
 	sx::gui::TrackBar*	m_music;
 	sx::gui::TrackBar*	m_sound;
 	sx::gui::TrackBar*	m_mouse;
+	sx::gui::TrackBar*	m_language;
 
 	sx::gui::Button*	m_goback;
 	bool				m_applyChange;
+
+	struct Languages
+	{
+		wchar	file[64];
+		wchar	font[128];
+		wchar	name[64];
+		float	x, y;
+	};
+	Array<Languages>	m_langs;	//	list of available languages
 };
 
 class MenuCredits: public Menu

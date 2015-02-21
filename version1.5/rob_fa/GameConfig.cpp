@@ -37,7 +37,7 @@ Config::GameConfig::GameConfig( void )
 , soundVolume( 1 )
 , mouseSpeed( 1 )
 {
-	//language[0]=0;
+	sx_str_copy( language, 64, L"english.txt" );
 }
 
 void Config::LoadConfig( void )
@@ -128,6 +128,10 @@ void Config::LoadConfig( void )
 			{
 				s_configData.mouseSpeed = value.StrToInt(value) * 0.01f;
 				sx::io::Input::SendSignal( 0, IST_SET_SPEED, &s_configData.mouseSpeed );
+			}
+			else if ( name == L"language_file" )
+			{
+				sx_str_copy( s_configData.language, 64, value );
 			}
 			else if ( name == L"texture_level" )
 			{
@@ -257,6 +261,13 @@ void Config::SaveConfig( void )
 
 	tmpstr.Format( L"mouse_speed=%d" , int(s_configData.mouseSpeed * 100 + 0.5f) );
 	i = ConfigSearch( configList, L"mouse_speed" );
+	if ( i >= 0 )
+		configList.At(i)->SetText( tmpstr );
+	else
+		configList.PushBack( tmpstr );
+
+	tmpstr.Format( L"language_file=%s" , s_configData.language );
+	i = ConfigSearch( configList, L"language_file" );
 	if ( i >= 0 )
 		configList.At(i)->SetText( tmpstr );
 	else

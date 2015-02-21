@@ -32,7 +32,7 @@ void FirstPresents::AddPresents( const WCHAR* texture, const float size, const u
 	panel->GetElement(0)->SetTextureSrc( texture );
 	panel->GetElement(0)->Color().a = 0.0f;
 
-	create_label( panel, story, size/3, size/3, x * size/2, y * size/2, 0 );
+	create_label( panel, story, size/3, size/3, x * size/2, y * size/2 );
 
 	m_list.PushBack( panel );
 }

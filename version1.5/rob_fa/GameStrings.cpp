@@ -23,11 +23,16 @@ void GameStrings::Clear( void )
 
 void GameStrings::Load( const wchar* stringsfile )
 {
-	if ( !stringsfile || !sx::sys::FileExist(stringsfile) )
+	if ( !stringsfile ) return;
+	
+	str1024 path = sx::sys::FileManager::Project_GetDir();
+	path << L"localization/" << stringsfile;
+
+	if ( !sx::sys::FileExist(path) )
 		return;
 
 	sx::sys::FileStream myFile;
-	if ( !myFile.Open( stringsfile, FM_OPEN_READ | FM_SHARE_READ) ) return;
+	if ( !myFile.Open( path, FM_OPEN_READ | FM_SHARE_READ) ) return;
 	int fsize = myFile.Size();
 
 	//	check for encryption

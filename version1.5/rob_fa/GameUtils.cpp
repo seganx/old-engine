@@ -404,51 +404,70 @@ namespace GU
 	}
 } // namespace GU
 
-sx::gui::Label* create_label( sx::gui::Control* parent, const wchar* font, const GUITextAlign align, const wchar* caption, const float& width, const float& height, const float& x, const float& y, const float& z )
+
+struct GameLabelString
 {
-	sx::gui::Label* res =  sx_new( sx::gui::Label );
-	res->SetParent( parent );
-	res->SetSize( float2(width, height) );
-	res->SetAlign( align );
-	res->GetElement(0)->Color().a = 0.1f;
-	res->GetElement(1)->Color() = 0xffffffff;
-	res->SetFont( font );
-	res->AddProperty( SX_GUI_PROPERTY_MULTILINE );
-	res->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
-	res->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
-	res->RemProperty( SX_GUI_PROPERTY_PIXELALIGN );
-	res->Position().Set(x, y, z);
-	res->SetText( caption );
-	return res;
+	uint text;
+	sx::gui::Label* label;
+};
+static Array<GameLabelString> s_game_labels;
+
+void set_label_caption( sx::gui::Label* label, const wchar* caption )
+{
+	if ( wcsstr( caption, L"//" ) ) return;
+	label->SetText( caption );
 }
 
-sx::gui::Label* create_label( sx::gui::Control* parent, const uint text, const float& width, const float& height, const float& x, const float& y, const float& z )
+sx::gui::Label* create_label( sx::gui::Control* parent, const uint text, const float& width, const float& height, const float& x, const float& y )
 {
 	const GameString* gameString = g_game->m_strings->Get(text);
 	if (gameString)
 	{
-		sx::gui::Label* res = create_label( parent, gameString->font, gameString->align, gameString->text, width, height, x, y, z );
+		sx::gui::Label* res =  sx_new( sx::gui::Label );
+		res->SetParent( parent );
+		res->SetSize( float2(width, height) );
+		res->SetAlign( gameString->align );
+		res->GetElement(0)->Color().a = 0.1f;
+		res->GetElement(1)->Color() = 0xffffffff;
+		res->SetFont( gameString->font );
+		res->AddProperty( SX_GUI_PROPERTY_MULTILINE );
+		res->AddProperty( SX_GUI_PROPERTY_WORDWRAP );
+		res->RemProperty( SX_GUI_PROPERTY_ACTIVATE );
+		res->RemProperty( SX_GUI_PROPERTY_PIXELALIGN );
+		res->Position().Set(x, y, 0.0f);
 		res->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
+
+		set_label_caption( res, gameString->text );
+
+		if ( parent )
+		{
+			GameLabelString gpair;
+			gpair.text = text;
+			gpair.label = res;
+			s_game_labels.PushBack(gpair);
+		}
+
 		return res;
 	}
 	else
 	{
-		sx::gui::Label* res = create_label( parent, null, GTA_CENTER, null, width, height, x, y, z );
-		res->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
-		return res;
+		sxLog::Log( L"ERROR : Can't find text id %u in localization file", text );
+		return null;
 	}
-	
 }
 
 sx::gui::Label* update_label( sx::gui::Label* label, const uint text )
 {
+	sx_callstack_param(update_label(label=%p, text=%u), label, text);
+
 	const GameString* gameString = g_game->m_strings->Get(text);
 	if ( gameString )
 	{
 		label->SetFont( gameString->font );
 		label->SetAlign( gameString->align );
 		label->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
-		label->SetText( gameString->text );
+		
+		set_label_caption( label, gameString->text );
 	}
 	else
 	{
@@ -458,6 +477,17 @@ sx::gui::Label* update_label( sx::gui::Label* label, const uint text )
 	}
 	return label;
 }
+
+void update_all_labels( void )
+{
+	sx_callstack();
+
+	for ( int i = 0; i < s_game_labels.Count(); ++i )
+	{
+		update_label( s_game_labels[i].label, s_game_labels[i].text );
+	}
+}
+
 sx::gui::Button* create_back_button( sx::gui::Control* parent, const float& x, const float& y )
 {
 	sx::gui::Button* res = sx_new( sx::gui::Button );

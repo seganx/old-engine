@@ -160,15 +160,15 @@ namespace GM
 		m_pnlEditor1->SetParent( m_back );
 
 		//	create labels
-		m_lblHealth = create_label( m_back, 187, 120, 50, -60, -22, 0 );
+		m_lblHealth = create_label( m_back, 187, 120, 50, -60, -22 );
 
-		m_lblXP = create_label( m_back, 189, 75, 40, -265, -48, 0 );
+		m_lblXP = create_label( m_back, 189, 75, 40, -265, -48 );
 		m_lblXP->GetElement(1)->Color().a = 0.85f;
 
-		m_lblDamage = create_label( m_back, 189, 70, 40, -153, -48, 0 );
+		m_lblDamage = create_label( m_back, 189, 70, 40, -153, -48 );
 		m_lblDamage->GetElement(1)->Color().a = 0.85f;
 
-		m_lblFireRate = create_label( m_back, 189, 70, 40, -52, -48, 0 );
+		m_lblFireRate = create_label( m_back, 189, 70, 40, -52, -48 );
 		m_lblFireRate->GetElement(1)->Color().a = 0.85f;
 
 		//	create images for labels
