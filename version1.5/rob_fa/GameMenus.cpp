@@ -253,11 +253,11 @@ void MenuMain::Initialize( void )
 
 		switch ( i )
 		{
-			case 0:	create_label( m_btn[i], 3, 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 1:	create_label( m_btn[i], 4, 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 2:	create_label( m_btn[i], 6, 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 3:	create_label( m_btn[i], 7, 200, 30, -95.0f, 0.0f, 0.0f );	break;
-			case 4:	create_label( m_btn[i], 8, 200, 30, -95.0f, 0.0f, 0.0f );	break;
+			case 0:	create_label( m_btn[i], 3, 200, 30, -95.0f, 0.0f, true );	break;
+			case 1:	create_label( m_btn[i], 4, 200, 30, -95.0f, 0.0f, true );	break;
+			case 2:	create_label( m_btn[i], 6, 200, 30, -95.0f, 0.0f, true );	break;
+			case 3:	create_label( m_btn[i], 7, 200, 30, -95.0f, 0.0f, true );	break;
+			case 4:	create_label( m_btn[i], 8, 200, 30, -95.0f, 0.0f, true );	break;
 		}
 	}
 #else
@@ -319,12 +319,12 @@ void MenuMain::Initialize( void )
 
 			switch ( i )
 			{
-			case 0:	create_label( m_btn[i], 3, 200, 30, -95.0f, 0.0f );	break;
-			case 1:	create_label( m_btn[i], 4, 200, 30, -95.0f, 0.0f );	break;
-			case 2:	create_label( m_btn[i], 5, 200, 30, -95.0f, 0.0f );	break;
-			case 3:	create_label( m_btn[i], 6, 200, 30, -95.0f, 0.0f );	break;
-			case 4:	create_label( m_btn[i], 7, 200, 30, -95.0f, 0.0f );	break;
-			case 5:	create_label( m_btn[i], 8, 200, 30, -95.0f, 0.0f );	break;
+			case 0:	create_label( m_btn[i], 3, 200, 30, -95.0f, 0.0f, true );	break;
+			case 1:	create_label( m_btn[i], 4, 200, 30, -95.0f, 0.0f, true );	break;
+			case 2:	create_label( m_btn[i], 5, 200, 30, -95.0f, 0.0f, true );	break;
+			case 3:	create_label( m_btn[i], 6, 200, 30, -95.0f, 0.0f, true );	break;
+			case 4:	create_label( m_btn[i], 7, 200, 30, -95.0f, 0.0f, true );	break;
+			case 5:	create_label( m_btn[i], 8, 200, 30, -95.0f, 0.0f, true );	break;
 			}
 		}
 #endif
@@ -651,7 +651,7 @@ void MenuMap::Initialize( void )
 	m_back->State_GetByIndex(1).Position.Set( 0.0f, -76.0f, 0.0f );
 	m_back->State_GetByIndex(1).Blender.Set( 0.07f, 0.6f );
 
-	create_label( m_back, 14, 300.0f, 30.0f, -260.0f, 290.0f );
+	create_label( m_back, 14, 300.0f, 30.0f, -260.0f, 290.0f, true );
 
 	//	create level chooser
 	m_chooser = sx_new( sx::gui::PanelEx );
@@ -790,7 +790,7 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_playGame, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_playGame, MenuMap::OnClick );
 
-	sx::gui::Label* caption = create_label( m_playGame, 18, 150.0f, 40.0f, 60.0f, -5.0f );
+	sx::gui::Label* caption = create_label( m_playGame, 18, 150.0f, 40.0f, 60.0f, -5.0f, true );
 	caption->SetUserTag( 10 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
@@ -811,7 +811,7 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_miniGame, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_miniGame, MenuMap::OnClick );
 
-	caption = create_label( m_miniGame, 19, 100.0f, 30.0f, 60.0f, -5.0f );
+	caption = create_label( m_miniGame, 19, 100.0f, 30.0f, 60.0f, -5.0f, true );
 	caption->SetUserTag( 11 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
@@ -832,7 +832,7 @@ void MenuMap::Initialize( void )
 	SEGAN_GUI_SET_ONEXIT( m_upgrade, Menu::OnExit );
 	SEGAN_GUI_SET_ONCLICK( m_upgrade, MenuMap::OnClick );
 
-	caption = create_label( m_upgrade, 20, 100.0f, 30.0f, 50.0f, -5.0f );
+	caption = create_label( m_upgrade, 20, 100.0f, 30.0f, 50.0f, -5.0f, true );
 	caption->SetUserTag( 12 );
 	caption->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 	SEGAN_GUI_SET_ONENTER( caption, MenuMap::OnEnter_ );
@@ -844,7 +844,7 @@ void MenuMap::Initialize( void )
 	m_goback->SetUserTag( 13 );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuMap::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f );
+	create_label( m_goback, 21, 150.0f, 30.0f, 0.0f, -2.0f, true );
 
 	//	create difficulty
 	m_diff_scroll = sx_new( sx::gui::TrackBar );
@@ -864,7 +864,7 @@ void MenuMap::Initialize( void )
 	panel->GetElement(0)->SetTextureSrc( L"gui_menu_map_diff.txr" );
 
 	//	create label to show people
-	m_diff_label = create_label( panel, 15, 80, 32, 0.0f, -5.0f );
+	m_diff_label = create_label( panel, 15, 80, 32, 0.0f, -5.0f, true );
 	
 	panel = sx_new( sx::gui::Panel );
 	panel->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
@@ -1262,7 +1262,7 @@ void MenuProfile::Initialize( void )
 	m_back->State_GetByIndex(1).Blender.Set( 0.03f, 0.85f );
 
 	//	profile title of the page
-	create_label( m_back, 22, 250.0f, 50.0f, -230.0f, 300.0f )->GetElement(1)->Color().a = 0.8f;
+	create_label( m_back, 22, 250.0f, 50.0f, -230.0f, 300.0f, true )->GetElement(1)->Color().a = 0.8f;
 
 	//	create text edit
 	m_profileName = sx_new( sx::gui::TextEdit );
@@ -1326,7 +1326,7 @@ void MenuProfile::Initialize( void )
 		m_profPanel[i]->State_GetByIndex(2).Color.w = 1.0f;
 
 		//	label to show profile name
-		sx::gui::Label* lbl = create_label( m_profPanel[i], 23, 450, 40, 0, -5 );
+		sx::gui::Label* lbl = create_label( m_profPanel[i], 23, 450, 40, 0, -5, true );
 		lbl->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 		lbl->GetElement(1)->Color().a = 0.8f;
 		SEGAN_GUI_SET_ONCLICK( lbl, MenuProfile::OnClick );
@@ -1334,17 +1334,17 @@ void MenuProfile::Initialize( void )
 		SEGAN_GUI_SET_ONEXIT( lbl, MenuProfile::OnExit );
 
 		//	label to show total stars
-		create_label( m_profPanel[i], 24, 40, 30, 120.0f, -22.0f )->GetElement(1)->Color().a = 0.8f;
+		create_label( m_profPanel[i], 24, 40, 30, 120.0f, -22.0f, true )->GetElement(1)->Color().a = 0.8f;
 
 		//	label to show total people
-		create_label( m_profPanel[i], 24, 100, 30, 230.0f, -18.0f )->GetElement(1)->Color().a = 0.8f;
+		create_label( m_profPanel[i], 24, 100, 30, 230.0f, -18.0f, true )->GetElement(1)->Color().a = 0.8f;
 	}
 
 	//	create back button
 	m_goback = create_back_button( m_back, -188.0f, -92.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuProfile::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f );
+	create_label( m_goback, 21, 150.0f, 30.0f, 0.0f, -2.0f, true );
 
 	//	prepare profile
 	String::Copy( m_profiles[0].name, 32, L"Player1" );
@@ -1746,13 +1746,13 @@ void MenuAchievements::Initialize( void )
 	m_back->State_GetByIndex(1).Blender.Set( 0.03f, 0.85f );
 	
 	//	create title
-	create_label( m_back, 377, 300.0f, 50.0f, -180.0f, 315.0f )->GetElement(1)->Color().a = 0.8f;
+	create_label( m_back, 377, 400.0f, 50.0f, -130.0f, 315.0f, true )->GetElement(1)->Color().a = 0.8f;
 
 	//	create back button
 	m_goback = create_back_button( m_back, -188.0f, -92.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuAchievements::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f );
+	create_label( m_goback, 21, 150.0f, 30.0f, 0.0f, -2.0f, true );
 
 	//	create panel to show selected achievement
 	m_image = sx_new( sx::gui::Panel );
@@ -1762,11 +1762,11 @@ void MenuAchievements::Initialize( void )
 	m_image->Position().Set( -130.0f, -21.0f, 0.0f );
 
 	//	create label for the name
-	m_name = create_label( m_back, 378, 270.0f, 40.0f, 50.0f, -10.0f );
+	m_name = create_label( m_back, 378, 270.0f, 40.0f, 40.0f, -6.0f, true );
 
 	//	create label for the desc
-	m_desc = create_label( m_back, 379, 300.0f, 50.0f, 65.0f, -40.0f );
-	m_desc->GetElement(0)->Color() = 0x00010000;
+	m_desc = create_label( m_back, 379, 300.0f, 50.0f, 55.0f, -34.0f, true );
+	//m_desc->GetElement(0)->Color() = 0x00010000;
 
 	//	create achievement icons
 	for ( int i=0; i<Achievement_Count; i++ )
@@ -1829,7 +1829,7 @@ void MenuAchievements::OnMouseEnter( sx::gui::Control* sender )
 	int i = sender->GetUserTag();
 
 	update_label( m_name, g_game->m_achievements[i].name );
-	update_label( m_name, g_game->m_achievements[i].desc );
+	update_label( m_desc, g_game->m_achievements[i].desc );
 	m_image->GetElement(0)->SetTexture( m_icon[i]->GetElement(0)->GetTexture() );
 	m_image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
 
@@ -1929,7 +1929,7 @@ void MenuSettings::Initialize( void )
 	m_back->State_GetByIndex(2).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
 
 	//	create title
-	create_label( m_back, 118, 300.0f, 50.0f, -240.0f, 315.0f )->GetElement(1)->Color().a = 0.8f;
+	create_label( m_back, 118, 300.0f, 50.0f, -200.0f, 315.0f, true )->GetElement(1)->Color().a = 0.8f;
 
 	//	create full screen check box 
 	m_fullscreen = sx_new( sx::gui::CheckBox );
@@ -1939,8 +1939,7 @@ void MenuSettings::Initialize( void )
 	m_fullscreen->GetElement(0)->Color().a = 0.0f;
 	m_fullscreen->GetElement(1)->SetTextureSrc( L"gui_settings_check.txr" );
 	SEGAN_GUI_SET_ONCLICK( m_fullscreen, MenuSettings::OnClick );
-	create_label( m_fullscreen, 119, 200.0f, 40.0f, 120.0f, -5.0f );
-
+	create_label( m_fullscreen, 119, 200.0f, 40.0f, 120.0f, -5.0f, true );
 
 	//	create scrolls
 	for ( int i=0; i<7; i++ )
@@ -1952,7 +1951,7 @@ void MenuSettings::Initialize( void )
 		scroll->GetElement(1)->SetTextureSrc( L"gui_settings_trackbar.txr" );
 		SEGAN_GUI_SET_ONSCROLL( scroll, MenuSettings::OnScroll );
 
-		create_label( scroll, 120 + i, 250.0f, 40.0f, 240.0f, 0 )->GetElement(1)->Color().a = 0.8f;
+		create_label( scroll, 120 + i, 250.0f, 40.0f, 240.0f, 0, true )->GetElement(1)->Color().a = 0.8f;
 
 		switch ( i )
 		{
@@ -2010,7 +2009,7 @@ void MenuSettings::Initialize( void )
 	m_goback = create_back_button( m_back, -166.0f, -113.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuSettings::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f );
+	create_label( m_goback, 21, 150.0f, 30.0f, 0.0f, -2.0f, true );
 }
 
 void MenuSettings::ProcessInput( bool& inputHandled, float elpsTime )
@@ -2180,7 +2179,7 @@ void MenuCredits::Initialize( void )
 	sx::gui::Button * m_goback = create_back_button( m_back, -360.0f, -255.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuCredits::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f );
+	create_label( m_goback, 21, 150.0f, 30.0f, 0.0f, -2.0f, true );
 }
 
 void MenuCredits::Finalize( void )
@@ -2233,7 +2232,7 @@ void MenuConfirmProfile::Initialize( void )
 	m_form->State_Add();
 	m_form->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
 	m_form->State_GetByIndex(1).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
-	create_label( m_form, 525, 425.0f, 60.0f, 0, 10.0f );
+	create_label( m_form, 525, 425.0f, 60.0f, 0, 10.0f, true );
 
 	//	create button yes
 	m_yes = sx_new( sx::gui::Button );
@@ -2245,7 +2244,7 @@ void MenuConfirmProfile::Initialize( void )
 	m_yes->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_yes, MenuConfirmProfile::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_yes, Menu::OnEnter );
-	create_label( m_yes, 526, 120.0f, 30.0f, 0, -5.0f );
+	create_label( m_yes, 526, 120.0f, 30.0f, 0, -5.0f, true );
 
 	//	create button no
 	m_no = sx_new( sx::gui::Button );
@@ -2257,7 +2256,7 @@ void MenuConfirmProfile::Initialize( void )
 	m_no->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_no, MenuConfirmProfile::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_no, Menu::OnEnter );
-	create_label( m_no, 527, 120.0f, 30.0f, 0, -5.0f );
+	create_label( m_no, 527, 120.0f, 30.0f, 0, -5.0f, true );
 }
 
 void MenuConfirmProfile::Finalize( void )
@@ -2329,7 +2328,7 @@ void MenuConfirmMenu::Initialize( void )
 	m_form->State_Add();
 	m_form->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
 	m_form->State_GetByIndex(1).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
-	create_label( m_form, 159, 425.0f, 60.0f, 0, 10.0f );
+	create_label( m_form, 159, 425.0f, 60.0f, 0, 10.0f, true );
 
 	//	create button yes
 	m_yes = sx_new( sx::gui::Button );
@@ -2341,7 +2340,7 @@ void MenuConfirmMenu::Initialize( void )
 	m_yes->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_yes, MenuConfirmMenu::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_yes, Menu::OnEnter );
-	create_label( m_yes, 160, 120.0f, 30.0f, 0, -5.0f );
+	create_label( m_yes, 160, 120.0f, 30.0f, 0, -5.0f, true );
 
 	//	create button no
 	m_no = sx_new( sx::gui::Button );
@@ -2353,7 +2352,7 @@ void MenuConfirmMenu::Initialize( void )
 	m_no->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_no, MenuConfirmMenu::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_no, Menu::OnEnter );
-	create_label( m_no, 161, 120.0f, 30.0f, 0, -5.0f );
+	create_label( m_no, 161, 120.0f, 30.0f, 0, -5.0f, true );
 }
 
 void MenuConfirmMenu::Finalize( void )
@@ -2423,7 +2422,7 @@ void MenuConfirmExit::Initialize( void )
 	m_form->State_Add();
 	m_form->State_GetByIndex(0).Color.Set( 0, 0, 0, 0 );
 	m_form->State_GetByIndex(1).Color.Set( 1.0f, 1.0f, 1.0f, 1.0f );
-	create_label( m_form, 166, 425.0f, 60.0f, 0, 10.0f );
+	create_label( m_form, 166, 425.0f, 60.0f, 0, 10.0f, true );
 
 	//	create button yes
 	m_yes = sx_new( sx::gui::Button );
@@ -2435,7 +2434,7 @@ void MenuConfirmExit::Initialize( void )
 	m_yes->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_yes, MenuConfirmExit::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_yes, Menu::OnEnter );
-	create_label( m_yes, 167, 120.0f, 30.0f, 0, -5.0f );
+	create_label( m_yes, 167, 120.0f, 30.0f, 0, -5.0f, true );
 
 	//	create button no
 	m_no = sx_new( sx::gui::Button );
@@ -2447,7 +2446,7 @@ void MenuConfirmExit::Initialize( void )
 	m_no->GetElement(2)->Color().a = 0;
 	SEGAN_GUI_SET_ONCLICK( m_no, MenuConfirmExit::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_no, Menu::OnEnter );
-	create_label( m_no, 168, 120.0f, 30.0f, 0, -5.0f );
+	create_label( m_no, 168, 120.0f, 30.0f, 0, -5.0f, true );
 }
 
 void MenuConfirmExit::Finalize( void )
@@ -2543,7 +2542,7 @@ void MenuStatus::Initialize( void )
 		m_back->GetElement(0)->SetTextureSrc( L"gui_statusBack2.txr" );
 
 	//	create player name on status
-	m_playerName = create_label( m_back, 10, 140, 20, -35, 12 );
+	m_playerName = create_label( m_back, 10, 140, 20, -35, 12, true );
 	m_playerName->GetElement(1)->Color().a = 0.6f;
 
 	//	create battery status
@@ -2625,7 +2624,7 @@ void MenuPause::Initialize( void )
 		butn->GetElement(1)->SetTextureSrc( L"gui_pause_button.txr" );
 		butn->GetElement(2)->SetTextureSrc( L"gui_pause_button.txr" );
 		butn->Position().Set( 90.0f + i * 15.0f, 130.0f - i * 60.0f, 0 );
-		create_label( butn, 131 + i, 300.0f, 50.0f, -20.0f, 0 );
+		create_label( butn, 131 + i, 300.0f, 50.0f, -20.0f, 0, true );
 	}
 
 	m_confirmMenu.Initialize();
@@ -2846,11 +2845,11 @@ void MenuVictory::Initialize( void )
 	}
 
 	//	create label to show people
-	m_peopleLabel = create_label( m_back, 146, 100.0f, 50.0f, -63.0f, 106.0f );
+	m_peopleLabel = create_label( m_back, 146, 100.0f, 50.0f, -63.0f, 106.0f, true );
 	m_peopleLabel->GetElement(1)->Color() = 0xffffffaa;
 
 	//	create label to show golds
-	m_goldLabel = create_label( m_back, 146, 100.0f, 50.0f, -143.0f, 110.0f );
+	m_goldLabel = create_label( m_back, 146, 100.0f, 50.0f, -143.0f, 110.0f, true );
 	m_goldLabel->GetElement(1)->Color() = 0xffffffaa;
 
 	//	create buttons
@@ -2867,7 +2866,7 @@ void MenuVictory::Initialize( void )
 		SEGAN_GUI_SET_ONCLICK( btn, MenuVictory::OnClick );
 		SEGAN_GUI_SET_ONENTER( btn, Menu::OnEnter );
 
-		create_label( btn, 141 + i, 250.0f, 50.0f, 30.0f, -5.0f );
+		create_label( btn, 141 + i, 250.0f, 50.0f, 30.0f, -5.0f, true );
 
 		switch ( i )
 		{
@@ -3298,7 +3297,7 @@ void MenuGameOver::Initialize( void )
 	m_back->AddProperty( SX_GUI_PROPERTY_ACTIVATE );
 
 	//	create disabled "NEXT" button
-	create_label( m_back, 151, 250.0f, 50.0f, 15.0f, 35.0f )->GetElement(1)->Color() = 0xaaaaaaaa;
+	create_label( m_back, 151, 250.0f, 50.0f, 15.0f, 35.0f, true )->GetElement(1)->Color() = 0xaaaaaaaa;
 
 	for ( int i=0; i<3; i++ )
 	{
@@ -3314,7 +3313,7 @@ void MenuGameOver::Initialize( void )
 		SEGAN_GUI_SET_ONENTER( btn, Menu::OnEnter );
 
 		//	create label for each button
-		create_label( btn, 152 + i, 250.0f, 50.0f, 30.0f, -5.0f );
+		create_label( btn, 152 + i, 250.0f, 50.0f, 30.0f, -5.0f, true );
 	}
 }
 
@@ -3924,13 +3923,13 @@ void MenuUpgrade::Initialize( void )
 	//	create titles
 	for ( int i=0; i<5; ++i )
 	{
-		create_label( m_border, 601 + i, 150, 25, -315 + i * 180.0f, 90 )->GetElement(1)->Color() = titleColor;
+		create_label( m_border, 601 + i, 150, 25, -315 + i * 180.0f, 90, true )->GetElement(1)->Color() = titleColor;
 	}
-	create_label( m_border, 606, 150, 25, -320, -180 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, 607, 150, 25, -125, -180 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, 608, 150, 25,   55, -180 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, 609, 150, 25,  240, -180 )->GetElement(1)->Color() = titleColor;
-	create_label( m_border, 610, 150, 25,  420, -180 )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, 606, 150, 25, -320, -180, true )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, 607, 150, 25, -125, -180, true )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, 608, 150, 25,   55, -180, true )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, 609, 150, 25,  240, -180, true )->GetElement(1)->Color() = titleColor;
+	create_label( m_border, 610, 150, 25,  420, -180, true )->GetElement(1)->Color() = titleColor;
 
 	for ( int i=0; i<44; i++ )
 	{
@@ -3945,7 +3944,7 @@ void MenuUpgrade::Initialize( void )
 		SEGAN_GUI_SET_ONEXIT( ch, MenuUpgrade::OnCheckExit );
 		m_checks[i] = ch;
 
-		m_labels[i] = create_label( ch, 26 + i * 2, 160.0f, 28.0f, 40.0f, -2.0f );
+		m_labels[i] = create_label( ch, 26 + i * 2, 160.0f, 28.0f, 40.0f, -2.0f, true );
 		m_labels[i]->SetUserTag( i );
 
 		switch ( i )
@@ -3983,7 +3982,7 @@ void MenuUpgrade::Initialize( void )
 	}
 
 	//	create a label to display number of starts
-	m_stars = create_label( m_back, 615, 128.0f, 40.0f, -130, -260.0f );
+	m_stars = create_label( m_back, 615, 128.0f, 40.0f, -130, -260.0f, true );
 	m_stars->GetElement(0)->Color() = 0x00010000;
 	m_stars->GetElement(1)->Color() = 0xFFFFFF00;
 
@@ -3991,10 +3990,10 @@ void MenuUpgrade::Initialize( void )
 	m_goback = create_back_button( m_back, -358.0f, -256.0f );
 	SEGAN_GUI_SET_ONCLICK( m_goback, MenuUpgrade::OnClick );
 	SEGAN_GUI_SET_ONENTER( m_goback, Menu::OnEnter );
-	create_label( m_goback, 21, 100.0f, 30.0f, 0.0f, -2.0f );
+	create_label( m_goback, 21, 150.0f, 30.0f, 0.0f, -2.0f, true );
 
 	//	create description label
-	m_desc = create_label( m_back, 27, 430.0f, 100.0f, 220.0f, -250.0f );
+	m_desc = create_label( m_back, 27, 430.0f, 100.0f, 220.0f, -250.0f, true );
 	m_desc->GetElement(0)->Color() = 0x00000001;
 	m_desc->GetElement(1)->Color() = 0xffffffaa;
 }

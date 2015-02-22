@@ -207,13 +207,13 @@ GameGuide::GameGuide( void ): m_time(0), m_pos(0,0)//, m_used(false)
 	m_indic->GetElement(0)->Color() = D3DColor(0.0f, 0.0f, 0.0f, 1.0f );
 	m_indic->SetSize( float2(32.0f, 32.0f) );
 
-	m_title = create_label( m_back, 644, 0, 0, 0, 0 );
+	m_title = create_label( m_back, 644, 100, 100, 0, 0 );
 	m_title->RemProperty( SX_GUI_PROPERTY_WORDWRAP );
 	m_title->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 	m_title->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
 	m_title->GetElement(1)->Color() = D3DColor(1,1,0.2f,1);
 
-	m_desc = create_label( m_back, 645, 0, 0, 0, 0 );
+	m_desc = create_label( m_back, 645, 100, 100, 0, 0 );
 	m_desc->RemProperty( SX_GUI_PROPERTY_WORDWRAP );
 	m_desc->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 	m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );
@@ -390,6 +390,7 @@ public:
 		if ( tipText )
 		{
 			m_label = create_label( null, tipText, 100.0f, GAMETIPS_ICON_SIZE_div2, 0, 0 );
+			m_label->RemProperty( SX_GUI_PROPERTY_WORDWRAP );
 			m_label->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 			m_label->Position().Set( left + m_label->GetSize().x * 0.5f, m_posY, 0 );
 
@@ -449,13 +450,13 @@ public:
 		m_back->State_GetByIndex(1).Scale.Set(1, 1, 1);
 		m_back->State_GetByIndex(1).Color.Set(0.0f, 0.0f, 0.0f, 0.6f);
 		
-		m_title = create_label( m_back, 644, 0, 0, 0, 0 );
+		m_title = create_label( m_back, 644, 100, 100, 0, 0 );
 		m_title->RemProperty( SX_GUI_PROPERTY_WORDWRAP );
 		m_title->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 		m_title->AddProperty( SX_GUI_PROPERTY_IGNOREBLEND );
 		m_title->GetElement(1)->Color() = D3DColor(1,1,0.2f,1);
 
-		m_desc = create_label( m_back, 645, 0, 0, 0, 0 );
+		m_desc = create_label( m_back, 645, 100, 100, 0, 0 );
 		m_desc->RemProperty( SX_GUI_PROPERTY_WORDWRAP );
 		m_desc->AddProperty( SX_GUI_PROPERTY_AUTOSIZE );
 		m_desc->AddProperty( SX_GUI_PROPERTY_MULTILINE );

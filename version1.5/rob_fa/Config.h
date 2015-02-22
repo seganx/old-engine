@@ -52,9 +52,9 @@
 #endif
 
 
-
+#define FONT_PROFILE						L"font_Profile.fnt"
+#if 0
 #define FONT_STATUS							L"Font_17.fnt"
-#define FONT_PROFILE						L"Font_30_l.fnt"
 #define FONT_PROFILE_INFO					L"Font_20_l.fnt"
 #define FONT_ACHIEVEMENTS_NAMES				L"Font_25_l.fnt"
 #define FONT_ACHIEVEMENTS_DESC				L"Font_20_l.fnt"
@@ -80,7 +80,7 @@
 #define FONT_30_OUTLINE						L"Font_30_l.fnt"
 #define FONT_25_OUTLINE						L"Font_25_l.fnt"
 #define FONT_20_OUTLINE						L"Font_20_l.fnt"
-
+#endif
 
 #define GUIDE_CALLWAVE						0
 #define GUIDE_UPGRADE						1

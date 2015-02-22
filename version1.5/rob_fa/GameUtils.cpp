@@ -412,13 +412,7 @@ struct GameLabelString
 };
 static Array<GameLabelString> s_game_labels;
 
-void set_label_caption( sx::gui::Label* label, const wchar* caption )
-{
-	if ( wcsstr( caption, L"//" ) ) return;
-	label->SetText( caption );
-}
-
-sx::gui::Label* create_label( sx::gui::Control* parent, const uint text, const float& width, const float& height, const float& x, const float& y )
+sx::gui::Label* create_label( sx::gui::Control* parent, const uint text, const float& width, const float& height, const float& x, const float& y, bool addToPool )
 {
 	const GameString* gameString = g_game->m_strings->Get(text);
 	if (gameString)
@@ -437,9 +431,10 @@ sx::gui::Label* create_label( sx::gui::Control* parent, const uint text, const f
 		res->Position().Set(x, y, 0.0f);
 		res->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
 
-		set_label_caption( res, gameString->text );
+		if ( wcsstr( gameString->text, L"//" ) == null )
+			res->SetText( gameString->text );
 
-		if ( parent )
+		if ( addToPool )
 		{
 			GameLabelString gpair;
 			gpair.text = text;
@@ -465,9 +460,11 @@ sx::gui::Label* update_label( sx::gui::Label* label, const uint text )
 	{
 		label->SetFont( gameString->font );
 		label->SetAlign( gameString->align );
-		label->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
 		
-		set_label_caption( label, gameString->text );
+		if ( wcsstr( gameString->text, L"//" ) == null )
+			label->SetText( gameString->text );
+
+		label->PositionOffset().Set( gameString->x, gameString->y, 0.0f );
 	}
 	else
 	{

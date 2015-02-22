@@ -123,7 +123,7 @@ namespace GM
 		sx::gui::PPanelEx		m_nextWave;			//	gui to show next wave info
 		sx::gui::PProgressBar	m_startProgr;		//	progress bar to show the time
 
-		GameGuide*				m_guide;				//	use guid to show in game tutorial 
+		GameGuide*				m_guide;			//	use guid to show in game tutorial 
 	
 		sx::gui::PPanelEx		m_mapBack;			//	background for mini map
 

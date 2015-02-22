@@ -89,7 +89,7 @@ namespace GM
 		m_guide = sx_new( GameGuide );
 		m_guide->m_back->SetParent( m_startProgr );
 
-		m_label = create_label( m_back, 190, 100.0f, 40.0f, -45, -113 );
+		m_label = create_label( m_back, 190, 100.0f, 40.0f, -45, -113, true );
 		m_label->GetElement(1)->Color() = 0xcccccccc;
 
 		// add panel to the game
@@ -102,7 +102,8 @@ namespace GM
 			i--;
 		}
 
-		m_labelGold = create_label( g_game->m_gui->m_goldPeople->m_back, 191, 100, 75, -60, -100 );
+		m_labelGold = create_label( g_game->m_gui->m_goldPeople->m_back, 191, 100, 75, -60, -100, true );
+		m_labelGold->GetElement(1)->Color() = 0xffffff33;
 
 		//////////////////////////////////////////////////////////////////////////
 		//	create a panel for mini map

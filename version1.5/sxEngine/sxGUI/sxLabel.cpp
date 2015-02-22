@@ -155,7 +155,7 @@ namespace sx { namespace gui {
 		if (!SEGAN_SET_HAS(m_Option, SX_GUI_PROPERTY_MULTILINE))
 			SEGAN_SET_REM(m_Option, SX_GUI_PROPERTY_WORDWRAP);
 
-		if (prop & SX_GUI_PROPERTY_PIXELALIGN || prop & SX_GUI_PROPERTY_MULTILINE || prop & SX_GUI_PROPERTY_WORDWRAP)
+		if ( prop & SX_GUI_PROPERTY_PIXELALIGN || prop & SX_GUI_PROPERTY_MULTILINE || prop & SX_GUI_PROPERTY_WORDWRAP || prop & SX_GUI_PROPERTY_AUTOSIZE )
 		{
 			CreateLines();
 			BurnBuffer();
@@ -170,7 +170,7 @@ namespace sx { namespace gui {
 		if (!SEGAN_SET_HAS(m_Option, SX_GUI_PROPERTY_MULTILINE))
 			SEGAN_SET_REM(m_Option, SX_GUI_PROPERTY_WORDWRAP);
 
-		if (prop & SX_GUI_PROPERTY_PIXELALIGN || prop & SX_GUI_PROPERTY_MULTILINE || prop & SX_GUI_PROPERTY_WORDWRAP)
+		if ( prop & SX_GUI_PROPERTY_PIXELALIGN || prop & SX_GUI_PROPERTY_MULTILINE || prop & SX_GUI_PROPERTY_WORDWRAP )
 		{
 			CreateLines();
 			BurnBuffer();
@@ -539,7 +539,7 @@ namespace sx { namespace gui {
 			{
 				GUITextLine* curline = m_lines[i];
 
-				if ( curline->width > m_Size.x )
+				if ( m_Size.x > 0.1f && curline->width > m_Size.x )
 				{
 					int cur_j = 0, last_j = 0;
 					for ( int j=0; j<=curline->text.Length(); j++ )
@@ -553,7 +553,7 @@ namespace sx { namespace gui {
 
 							testline.text = s_tmp;
 							testline.UpdateWidth( m_font, false );
-							if ( testline.width > m_Size.x && testline.width < curline->width )
+							if ( last_j && testline.width > m_Size.x && testline.width < curline->width )
 							{
 								//	insert new line after this line
 								GUITextLine* newline = sx_new( GUITextLine );
