@@ -455,6 +455,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Mechanic_MT_Machinegun.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Mechanic_MT_Machinegun.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Mechanic_MT_Sniper.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Mechanic_MT_Sniper.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Mechanic_PA_BomberMan.cpp"
 				>
 			</File>

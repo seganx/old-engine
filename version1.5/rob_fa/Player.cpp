@@ -20,6 +20,8 @@
 #include "Mechanic_PA_Trap.h"
 #include "Mechanic_PA_DeathRain.h"
 #include "Mechanic_PA_GoldenTowers.h"
+#include "Mechanic_MT_Machinegun.h"
+#include "Mechanic_MT_Sniper.h"
 
 
 Player::Player( void ):	m_gold(500), m_people(100)
@@ -178,11 +180,14 @@ void Player::Update( float elpsTime )
 
 		return;
 	}
-	
-	m_camera_MBL.Attach( Entity::GetSelected() );
-	m_camera_MBL.Update(elpsTime);
-	m_camera_RTS.Update(elpsTime);
-	m_camera_Pause = g_game->m_player->m_camera_RTS;
+
+	if (g_game->m_mouseMode != MS_ManualTower)
+	{
+		m_camera_MBL.Attach( Entity::GetSelected() );
+		m_camera_MBL.Update(elpsTime);
+		m_camera_RTS.Update(elpsTime);
+		m_camera_Pause = m_camera_RTS;
+	}
 
 	for (int i=0; i<m_Mechanics.Count(); i++)
 	{
@@ -343,6 +348,16 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 							m_Mechanics.PushBack( sx_new( GM::Mechanic_PA_Trap ) );
 						else if ( tmpStr == L"Predator" )
 							m_Mechanics.PushBack( sx_new( GM::Mechanic_PA_Predator ) );
+					}
+					else if ( tmpStr == L"ManualTower" )
+					{
+						if ( !script.GetString(i, L"Name", tmpStr) )
+							continue;
+
+						if ( tmpStr == L"Machinegun" )
+							m_Mechanics.Insert( 0, sx_new( GM::Mechanic_MT_Machinegun ) );
+						else if ( tmpStr == L"Sniper" )
+							m_Mechanics.Insert( 0, sx_new( GM::Mechanic_MT_Sniper ) );
 					}
 				}
 			}

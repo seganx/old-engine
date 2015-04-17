@@ -67,7 +67,7 @@ void GM::Mechanic::MsgProc( UINT recieverID, UINT msg, void* data )
 	}
 }
 
-FORCEINLINE bool GM::Mechanic::IsFocused( void )
+bool GM::Mechanic::IsFocused( void )
 {
 	return s_Focused == this;
 }

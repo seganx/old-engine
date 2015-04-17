@@ -18,8 +18,8 @@
 #define USE_8_LEVELS		0
 #define USE_HASH_LOCK		0
 #define USE_STEAM_LINK		0
-#define USE_DEV_CHEAT		0		//	development cheats
-#define USE_CHEAT_CODE		0		//	player cheats
+#define USE_DEV_CHEAT		1		//	development cheats
+#define USE_CHEAT_CODE		1		//	player cheats
 
 #define USE_STEAM_SDK		0
 
