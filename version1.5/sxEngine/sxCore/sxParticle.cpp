@@ -20,7 +20,7 @@ NOTE:	in this class I use a member named 'reserved' to do some operation.
 static const UINT particleFileID = MAKEFOURCC('P', 'R', 'T', 'L');
 
 //  some static variables
-static float				s_minimumVolume = 0.1f;			//  minimum volumes to display particles
+static float				s_minimumVolume = 0.075f;			//  minimum volumes to display particles
 static float3				s_camDir(0,0,0);				//  use to sort particles
 static sx::d3d::Geometry3D	s_geometry;						//  use geometry to display particle quads
 static AABox				s_particleBox( float3(-0.05f, -0.05f, -0.05f), float3(0.05f, 0.05f, 0.05f) );

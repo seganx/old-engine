@@ -96,7 +96,7 @@ typedef byte				*pbyte;
 
 #define SEGAN_CALLSTACK			1		// enable call stack system to log stack of function
 
-#define SEGAN_LIB_ASSERT		0		// check and log some special events on containers
+#define SEGAN_LIB_ASSERT		1		// check and log some special events on containers
 
 
 //////////////////////////////////////////////////////////////////////////

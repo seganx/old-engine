@@ -38,7 +38,7 @@ static bool						s_patchUsed					= false;	//	verify to use patch system
 
 //  some management variables
 static int						s_meshCount = 0;
-static float					s_minimumVolume = 0.15f;
+static float					s_minimumVolume = 0.075f;
 static float					s_lodRange = 4.5;
 
 

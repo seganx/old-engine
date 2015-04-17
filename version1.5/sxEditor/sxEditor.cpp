@@ -264,8 +264,8 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 			Sleep(10);
 		}
 	}
-	sxLog::SetCallback( loggerCallback );
 #endif
+	sxLog::SetCallback( loggerCallback );
 
 	sx::d3d::Texture::Manager::LoadInThread() = true;
 	sx::d3d::Geometry::Manager::LoadInThread() = true;
