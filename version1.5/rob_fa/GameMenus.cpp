@@ -3424,8 +3424,8 @@ void MenuInfo::Initialize( void )
 	Menu::Initialize();
 
 	m_index = -1;
-	m_time = 0;
-	m_delayTime = 0;
+	m_infoButtonTime = 0;
+	m_tutorialDelayTime = 0;
 	m_go_to_menu = false;
 
 	m_back->SetSize( float2( 20000, 2000 ) );
@@ -3548,14 +3548,14 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 	case GMT_LEVEL_CLEAR:
 		ClearTutorial();
 		m_helper.showTime = 0;
-		m_time = 0;
-		m_delayTime = 0;
+		m_infoButtonTime = 0;
+		m_tutorialDelayTime = 0;
 		break;
 
 	case GMT_GAME_RESET:
 	case GMT_GAME_START:
 		{
-			m_delayTime = 0;
+			m_tutorialDelayTime = 0;
 			m_helper.showTime = 0;
 
 			//	reset button of information
@@ -3581,7 +3581,7 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 			}
 			
 			//	show tutorial if there is new one
-			ShowTutorial(showNow);
+			ShowTutorial(showNow, 1000);
 		}
 		break;
 	}
@@ -3596,23 +3596,23 @@ void MenuInfo::Update( float elpsTime )
 		m_helper.back->State_SetIndex( 0 );
 	}
 
-	if ( m_delayTime > 0 && g_game->m_mouseMode == MS_Null && !g_game->m_game_paused )
+	if ( m_tutorialDelayTime > 0 && g_game->m_mouseMode == MS_Null && !g_game->m_game_paused )
 	{
-		m_delayTime -= elpsTime;
-		if ( m_delayTime <= 0 )
+		m_tutorialDelayTime -= elpsTime;
+		if ( m_tutorialDelayTime <= 0 )
 		{
 			Show();
 
 			msg_SoundPlay msg( true, 0, 0, L"info" );
 			m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
 		}
-		m_time = 0;
+		m_infoButtonTime = 0.001f;
 	}
 
-	if ( m_time > 0 )
+	if ( m_infoButtonTime > 0 )
 	{
-		m_time -= elpsTime;
-		if ( m_time < 0 )
+		m_infoButtonTime -= elpsTime;
+		if ( m_infoButtonTime < 0 )
 			g_game->m_gui->m_goldPeople->m_info->State_SetIndex(0);
 		else
 			g_game->m_gui->m_goldPeople->m_info->State_SetIndex(1);
@@ -3646,7 +3646,7 @@ void MenuInfo::Show( bool gamepaused )
 {
 	Menu::Show();
 	g_game->m_game_paused = gamepaused;
-	m_time = 0;
+	m_infoButtonTime = 0;
 	m_helper.showTime = 0;
 }
 
@@ -3695,7 +3695,7 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 			return;
 		}
 
-		ShowTutorial(++m_index);
+		ShowTutorial(++m_index, 0);
 
 		msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 		m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
@@ -3711,7 +3711,7 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 			return;
 		}
 
-		ShowTutorial(--m_index);
+		ShowTutorial(--m_index, 0);
 
 		msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 		m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
@@ -3765,8 +3765,8 @@ void MenuInfo::ClearTutorial( void )
 	PrepareTutorial(null);
 	m_tutorial.Clear();
 	m_index = -1;
-	m_delayTime = 0;
-	m_time = 0;
+	m_tutorialDelayTime = 0;
+	m_infoButtonTime = 0;
 }
 
 void MenuInfo::PrepareTutorial( const GameTutorial* tutor )
@@ -3795,7 +3795,7 @@ void MenuInfo::PrepareTutorial( const GameTutorial* tutor )
 	}
 }
 
-void MenuInfo::ShowTutorial( int index )
+void MenuInfo::ShowTutorial( int index, float displayDelayTime )
 {
 	if ( index < 0 || index >= m_tutorial.Count() ) return;
 
@@ -3810,8 +3810,8 @@ void MenuInfo::ShowTutorial( int index )
 		m_indicator->SetText( tmp );
 	}
 
-	m_delayTime = 1000;
-	m_time = 0;
+	m_tutorialDelayTime = displayDelayTime;
+	m_infoButtonTime = 0;
 }
 
 void MenuInfo::ShowInfo( int index )
@@ -3825,6 +3825,7 @@ void MenuInfo::ShowInfo( int index )
 	m_helper.title->SetText( g_game->m_strings->Get(tutor->texts[1])->text );
 	m_helper.desc->SetText( helperdesc );
 	m_helper.showTime = 15000.0f;
+	m_infoButtonTime = 5000.0f;
 }
 
 

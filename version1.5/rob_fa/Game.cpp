@@ -267,6 +267,7 @@ Game::~Game( void )
 		m_achievements[i].Finalize();
 #endif
 
+	sx_delete_and_null(m_tutorials);
 	sx_delete_and_null(m_strings);
 
 	sx::d3d::Texture::Manager::Release(texture_post);

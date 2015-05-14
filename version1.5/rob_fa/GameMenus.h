@@ -392,7 +392,7 @@ public:
 	int AddTutorial(GameTutorial* tutor);
 	void ClearTutorial(void);
 	void PrepareTutorial(const GameTutorial* tutor);
-	void ShowTutorial(int index);
+	void ShowTutorial(int index, float displayDelayTime);
 	void ShowInfo(int index);
 
 public:
@@ -404,8 +404,8 @@ public:
 	sx::gui::Label*			m_indicator;
 	sx::gui::Button*		m_next;
 	sx::gui::Button*		m_prev;
-	float					m_time;
-	float					m_delayTime;
+	float					m_infoButtonTime;
+	float					m_tutorialDelayTime;
 	bool					m_go_to_menu;
 
 
