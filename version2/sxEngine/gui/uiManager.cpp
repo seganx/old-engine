@@ -47,7 +47,7 @@ void uiManager::update( float elpsTime, const float vpwidth, const float vpheigh
 
 	for ( sint i=0; i<m_controls.m_count; ++i )
 	{
-		m_controls.m_item[i]->update( elpsTime, vpwidth, vpheight );
+		m_controls.m_item[i]->update(elpsTime, (uint)vpwidth, (uint)vpheight);
 	}
 }
 

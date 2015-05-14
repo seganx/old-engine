@@ -63,7 +63,7 @@ inline    void		operator delete( void *p ){ mem_free_dbg(p); }
 #define sx_mem_realloc( p, newsizeinbyte )		mem_realloc_dbg( (void*&)p, newsizeinbyte, _CRT_WIDE(__FILE__), __LINE__ )
 #define sx_mem_size( p )						mem_size( p )
 #define sx_mem_free( p )						mem_free_dbg( p )
-#define sx_mem_free_and_null( p )				mem_free_dbg( p ); p = null
+#define sx_mem_free_and_null( p )				{ mem_free_dbg( p ); p = null; }
 
 #define sx_new( obj )							( new( _CRT_WIDE(__FILE__), __LINE__ ) obj )
 #define sx_delete( obj )						{ if (obj) { delete(obj) ; } }				
@@ -83,7 +83,7 @@ inline	  void		operator delete ( void *p ){ mem_free(p); }
 #define sx_mem_realloc( p, newsizeinbyte )		mem_realloc( (void*&)p, newsizeinbyte )
 #define sx_mem_size( p )						mem_size( p )
 #define sx_mem_free( p )						mem_free( (void*&)p )
-#define sx_mem_free_and_null( p )				mem_free( p ); p = null
+#define sx_mem_free_and_null( p )				{ mem_free( p ); p = null }
 
 #define sx_new( obj )							( new obj )
 #define sx_delete( obj )						{ if (obj) { delete(obj) ; } }				

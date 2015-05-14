@@ -21,9 +21,9 @@ namespace GM
 		, m_nodeWeapon(null)
 		, m_pipeIndex(0)
 		, m_shootTime(0)
-		, m_Rot(0,0,0)
-		, m_RotOffset(0,0,0)
-		, m_RotMax(0.5f, 1.0f, 0)
+		, m_rot(0,0,0)
+		, m_rotOffset(0,0,0)
+		, m_rotMax(0.5f, 1.0f, 0)
 		, m_shakeMagnitude(1.0f)
 		, m_forceFeedback(0.01f)
 		, m_fire(0)
@@ -149,12 +149,12 @@ namespace GM
 				}
 			}
 
-			m_RotOffset.x += SEGAN_MOUSE_RLY(0) * 0.002f;
-			m_RotOffset.y += SEGAN_MOUSE_RLX(0) * 0.002f;
-			if ( m_RotOffset.x > m_RotMax.x ) m_RotOffset.x = m_RotMax.x;
-			if ( m_RotOffset.y > m_RotMax.y ) m_RotOffset.y = m_RotMax.y;
-			if ( m_RotOffset.x < -m_RotMax.x ) m_RotOffset.x = -m_RotMax.x;
-			if ( m_RotOffset.y < -m_RotMax.y ) m_RotOffset.y = -m_RotMax.y;
+			m_rotOffset.x += SEGAN_MOUSE_RLY(0) * 0.002f;
+			m_rotOffset.y += SEGAN_MOUSE_RLX(0) * 0.002f;
+			if ( m_rotOffset.x > m_rotMax.x ) m_rotOffset.x = m_rotMax.x;
+			if ( m_rotOffset.y > m_rotMax.y ) m_rotOffset.y = m_rotMax.y;
+			if ( m_rotOffset.x < -m_rotMax.x ) m_rotOffset.x = -m_rotMax.x;
+			if ( m_rotOffset.y < -m_rotMax.y ) m_rotOffset.y = -m_rotMax.y;
 			SEGAN_MOUSE_ABSX(0) = SEGAN_VP_WIDTH/2;
 			SEGAN_MOUSE_ABSY(0) = SEGAN_VP_HEIGHT/2;
 			inputHandled = true;
@@ -235,15 +235,15 @@ namespace GM
 
 		//	Blend Direction
 		{
-			const float dx = m_RotOffset.x - m_Rot.x;
-			const float dy = m_RotOffset.y - m_Rot.y;
-			const float dz = m_RotOffset.z - m_Rot.z;
+			const float dx = m_rotOffset.x - m_rot.x;
+			const float dy = m_rotOffset.y - m_rot.y;
+			const float dz = m_rotOffset.z - m_rot.z;
 
 			const float blendTime = elpsTime * 0.005f;
-			m_Rot.y += dy * blendTime;
-			m_Rot.x += dx * blendTime;
-			m_Rot.z += dz * blendTime;
-			m_nodeWeapon->SetRotation( m_Rot.x, m_Rot.y, m_Rot.z );
+			m_rot.y += dy * blendTime;
+			m_rot.x += dx * blendTime;
+			m_rot.z += dz * blendTime;
+			m_nodeWeapon->SetRotation( m_rot.x, m_rot.y, m_rot.z );
 		}
 
 		//  compute max shoot time depend on fire rate
@@ -319,8 +319,8 @@ namespace GM
 							script.GetFloat(i, L"physicalDamage", m_attack.physicalDamage);
 							script.GetFloat(i, L"electricalDamage", m_attack.electricalDamage);
 							script.GetFloat(i, L"fireRate", m_attack.rate);
-							script.GetFloat(i, L"maxPhi", m_RotMax.y);
-							script.GetFloat(i, L"maxTheta", m_RotMax.x);
+							script.GetFloat(i, L"maxPhi", m_rotMax.y);
+							script.GetFloat(i, L"maxTheta", m_rotMax.x);
 							script.GetFloat(i, L"shakeMagnitude", m_shakeMagnitude);
 							script.GetFloat(i, L"forceFeedback", m_forceFeedback);
 							script.GetInteger(i, L"energyPerBullet", m_energyPerBullet);
@@ -599,7 +599,7 @@ namespace GM
 		}
 
 		--m_fire;
-		m_RotOffset.x -= m_forceFeedback;
+		m_rotOffset.x -= m_forceFeedback;
 
 		g_game->m_player->m_energy -= m_energyPerBullet;
 		const int availableBullets = g_game->m_player->m_energy / m_energyPerBullet;

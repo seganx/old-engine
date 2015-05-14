@@ -57,12 +57,20 @@ void Renderer::set_scene( const d3dScene* scene )
 
 void Renderer::update( float elpstime )
 {
-	static float timer = 0;
+	static float timer = 20000;
 	timer += elpstime;
 	float aspect = (float)m_device->m_viewport.height / (float)m_device->m_viewport.width;
 
 	matrix proj = sx_perspective_fov( PI/3.0f, aspect, 0.5f, 1000.0f );
-	matrix view = sx_lookat( float3( sx_sin( timer * 0.001f ) * 5.0f, 5.0f, -5.0f ), float3(0,0,0), float3(0,1.0f,0) );
+	matrix view = sx_lookat(
+		float3(
+		3 + sx_sin(timer * 0.0001f) * 8.0f, 
+		8.0f,
+		3 + sx_cos(timer * 0.0001f) * 8.0f
+		),
+		float3(3, 3, 3), 
+		float3(0, 1.0f, 0)
+		);
 
 	m_device->set_matrix( MM_VIEW, view );
 	m_device->set_matrix( MM_PROJECTION, proj );
@@ -72,6 +80,10 @@ void Renderer::begin_draw( const Color& bgcolor )
 {
 	m_device->begin_scene();
 	m_device->clear_screen( bgcolor );
+
+	matrix mat;
+	mat.identity();
+	m_device->set_matrix(MM_WORLD, mat);
 }
 
 void Renderer::end_draw( void )
@@ -82,12 +94,12 @@ void Renderer::end_draw( void )
 
 void Renderer::render( float elpstime, uint flag )
 {
-#if 1
+#if 0
 	float vert[9] = { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f };
 	m_device->draw_debug( PT_LINE_STRIP, 3, vert, Color(0.0f, 0.0f, 1.0f, 1.0f) );
 #endif
 
-#if 1
+#if 0
 	for ( sint i=0; i<m_elements.m_count; ++i )
 	{
 		d3dContext* elmnt = m_elements[i];

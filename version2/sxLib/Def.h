@@ -118,6 +118,9 @@ typedef byte				*pbyte;
 #define sx_3th_byte_of(var)					( ( (byte*)(&var) )[2] )
 #define sx_4th_byte_of(var)					( ( (byte*)(&var) )[3] )
 
+#define sx_1th_word_of(var)					( ( (word*)(&var) )[0] )
+#define sx_2th_word_of(var)					( ( (word*)(&var) )[1] )
+
 #define sx_fourcc(ch0, ch1, ch2, ch3)		( (dword)(byte)(ch0) | ((dword)(byte)(ch1) << 8) | ((dword)(byte)(ch2) << 16) | ((dword)(byte)(ch3) << 24 ) )
 
 

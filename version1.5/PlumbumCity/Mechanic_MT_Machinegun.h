@@ -62,9 +62,9 @@ namespace GM
 		sx::core::PNode		m_nodePipe[4];		//  pipes of weapon to shoot
 		int					m_pipeIndex;		//  index of weapon pipeline
 		float				m_shootTime;		//  time of shooting
-		float3				m_Rot;				//  direction of weapon
-		float3				m_RotOffset;		//  offset of direction
-		float3				m_RotMax;			//	maximum rotation value
+		float3				m_rot;				//  direction of weapon
+		float3				m_rotOffset;		//  offset of direction
+		float3				m_rotMax;			//	maximum rotation value
 		float				m_shakeMagnitude;
 		float				m_forceFeedback;
 		int					m_fire;				//  fire order for weapon
