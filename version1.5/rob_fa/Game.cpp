@@ -10,6 +10,7 @@
 #include "Scripter.h"
 #include "Entity.h"
 #include "GameStrings.h"
+#include "GameTutorials.h"
 
 //  singleton pointer
 extern Game*			g_game = NULL;
@@ -243,6 +244,8 @@ Game::Game( void )
 	}
 #endif
 
+	m_tutorials = sx_new( GameTutorials );
+	m_tutorials->Load( L"tutorials.txt" );
 }
 
 Game::~Game( void )

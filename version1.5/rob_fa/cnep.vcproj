@@ -249,6 +249,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GameTutorials.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GameTutorials.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GameTypes.h"
 				>
 			</File>

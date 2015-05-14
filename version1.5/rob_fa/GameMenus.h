@@ -374,6 +374,7 @@ public:
 	void Update(float elpsTime);
 };
 
+struct GameTutorial;
 class MenuInfo: public Menu
 {
 public:
@@ -387,29 +388,25 @@ public:
 	void Hide(void);
 	void OnClick(sx::gui::PControl sender);
 
-	void AddTutorial(const uint title, const uint desc, const WCHAR* image, int showNow = 0, bool settoCurrent = true);
+	//	add a tutorial to display list and return the index of that
+	int AddTutorial(GameTutorial* tutor);
 	void ClearTutorial(void);
+	void PrepareTutorial(const GameTutorial* tutor);
+	void ShowTutorial(int index);
+	void ShowInfo(int index);
 
 public:
 
-	struct Tutorial
-	{
-		uint				title;
-		uint				insides;
-		uint				desc;
-		sx::gui::PPanel		image;
-	};
-	Array<Tutorial*>	m_tutorial;
-	int					m_Index;
+	Array<GameTutorial*>	m_tutorial;
+	int						m_index;
 	
-	sx::gui::PLabel		m_indicator;
-	sx::gui::PLabel		m_title;
-	sx::gui::PLabel		m_desc;
-	sx::gui::PButton	m_next;
-	sx::gui::PButton	m_prev;
-	float				m_time;
-	float				m_delayTime;
-	bool				m_go_to_menu;
+	sx::gui::Panel*			m_holder;		//	place holder for tutorial objects
+	sx::gui::Label*			m_indicator;
+	sx::gui::Button*		m_next;
+	sx::gui::Button*		m_prev;
+	float					m_time;
+	float					m_delayTime;
+	bool					m_go_to_menu;
 
 
 	struct Helper

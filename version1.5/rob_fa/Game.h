@@ -19,6 +19,7 @@ class GamePlay;
 class GameGUI;
 class GuideText;
 class GameStrings;
+class GameTutorials;
 
 //////////////////////////////////////////////////////////////////////////
 //  main class of the game
@@ -91,6 +92,7 @@ public:
 	sx::sys::Window*		m_window;					//	rendering context
 	Array<GuideText*>		m_guides;					//	array of strings for the guide panels
 	GameStrings*			m_strings;					//	strings used in game
+	GameTutorials*			m_tutorials;				//	tutorial of the game
 };
 
 //	global game pointer

@@ -98,6 +98,14 @@ void GameStrings::Load( const wchar* stringsfile )
 				{
 					gstr->y = toker.Next().ToFloat();
 				}
+				else if ( field == L"w" )
+				{
+					gstr->w = toker.Next().ToFloat();
+				}
+				else if ( field == L"h" )
+				{
+					gstr->h = toker.Next().ToFloat();
+				}
 				else if ( field == L"text" )
 				{
 					str512 tmp = toker.GetCurChar();

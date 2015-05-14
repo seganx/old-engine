@@ -126,6 +126,8 @@ struct GameString
 	uint			id;			//	id of the text
 	wchar			font[48];	//	font name of the string
 	GUITextAlign	align;		//	alignment of the text
+	float			w;			//	x offset
+	float			h;			//	y offset
 	float			x;			//	x offset
 	float			y;			//	y offset
 	wchar			base[512];	//	unformatted text of the string

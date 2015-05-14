@@ -1,18 +1,13 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxEditor", "sxEditor.vcproj", "{22ADBFEB-ED2D-401F-8A2E-EA7F11A9352F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{7520084F-C31A-4C0C-ACE7-9BE930EDC600} = {7520084F-C31A-4C0C-ACE7-9BE930EDC600}
-		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF} = {E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxEditor", "sxEditor.vcxproj", "{22ADBFEB-ED2D-401F-8A2E-EA7F11A9352F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxEngine", "..\sxEngine\win32dll\sxEngine.vcproj", "{7520084F-C31A-4C0C-ACE7-9BE930EDC600}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF} = {E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxEngine", "..\sxEngine\win32dll\sxEngine.vcxproj", "{7520084F-C31A-4C0C-ACE7-9BE930EDC600}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxlib", "..\sxLib\win32dll\sxlib.vcproj", "{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxlib", "..\sxLib\win32dll\sxlib.vcxproj", "{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -7,6 +7,7 @@
 #include "Scripter.h"
 #include "GameStrings.h"
 #include "ComicPlayer.h"
+#include "GameTutorials.h"
 
 //////////////////////////////////////////////////////////////////////////
 //	menu 
@@ -435,7 +436,7 @@ void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
 			}
 			++max_level;
 #if USE_DEV_CHEAT
-			int info_index = m_info->m_Index + 1;
+			int info_index = m_info->m_index + 1;
 			int info_counter = 0;
 #endif
 			m_info->ClearTutorial();
@@ -469,11 +470,11 @@ void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
 						if (data)
 						{
 							++info_counter;
-							m_info->AddTutorial( title, desc, image, false, info_index == info_counter );
+//							m_info->AddTutorial( title, desc, image, false, info_index == info_counter );
 						}
 						else
 						{
-							m_info->AddTutorial( title, desc, image, false, false );
+//							m_info->AddTutorial( title, desc, image, false, false );
 						}
 #else
 						m_info->AddTutorial( title, desc, image, false, false );
@@ -3422,7 +3423,7 @@ void MenuInfo::Initialize( void )
 {
 	Menu::Initialize();
 
-	m_Index = -1;
+	m_index = -1;
 	m_time = 0;
 	m_delayTime = 0;
 	m_go_to_menu = false;
@@ -3433,16 +3434,14 @@ void MenuInfo::Initialize( void )
 	m_back->State_GetByIndex(1).Color.Set(0,0,0,0.8f);
 	SEGAN_GUI_SET_ONCLICK( m_back, MenuInfo::OnClick );
 
-	m_indicator = create_label( m_back, 465, 512.0f, 64.0f, 0.0f, 250.0f );
+	//	create place holder for tutorial objects
+	m_holder = sx_new( sx::gui::Panel );
+	m_holder->SetParent(m_back);
+	m_holder->SetSize(float2(1, 1));
+	m_holder->GetElement(0)->Color() = D3DColor(0, 0, 0, 0.1f);
+
+	m_indicator = create_label( m_back, 2991, 512.0f, 64.0f, 0.0f, 250.0f );
 	m_indicator->GetElement(0)->Color() = 0x00ff0000;
-
-	m_title = create_label( m_back, 466, 1000.0f, 64.0f, 0.0f, 230.0f );
-	m_title->GetElement(0)->Color() = 0x0044ff44;
-
-	//	inside contain some additional texts comes after \n in tutorial title
-	create_label( m_title, 465, 1000, 380, 0, -200.0f );
-
-	m_desc = create_label( m_back, 466, 1000.0f, 350.0f, 0.0f, -120.0f );
 
 	m_next = sx_new( sx::gui::Button );
 	m_next->SetParent( m_back );
@@ -3489,10 +3488,10 @@ void MenuInfo::Initialize( void )
 	m_helper.image->Position().Set( 120.0f, 2.5f, 0.0f );
 	m_helper.image->GetElement(0)->SetTextureSrc( L"gui_pnlGold_info.txr" );
 
-	m_helper.title = create_label( m_helper.back, 464, 250, 30, -15.0f, 0.0f );
+	m_helper.title = create_label( m_helper.back, 2990, 250, 30, -15.0f, 0.0f );
 	m_helper.title->GetElement(1)->Color() = 0xffffff00;
 
-	m_helper.desc = create_label( m_helper.back, 464, 250, 30, -15.0f, -10.0f );
+	m_helper.desc = create_label( m_helper.back, 2990, 250, 30, -15.0f, -10.0f );
 	m_helper.desc->GetElement(0)->Color() = 0x00001000;
 }
 
@@ -3562,50 +3561,27 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 			//	reset button of information
 			g_game->m_gui->m_goldPeople->m_info->State_SetIndex(0);
 
-			//  load some level configuration
-			String str = Game::GetLevelPath();
-			if ( g_game->m_miniGame )
-				str << L"config_mini.txt";
-			else
-				str << L"config.txt";
+			//	clear all tutorials references
+			ClearTutorial();
 
-			Scripter script;
-			script.Load( str );
-
-			for (int i=0; i<script.GetObjectCount(); i++)
+			//	search through tutorials to find them for this level
+			int showNow = 0;
+			for (int i=0; i<g_game->m_tutorials->m_tutor.Count(); ++i)
 			{
-				str512 tmpStr;
-				if ( script.GetString(i, L"Type", tmpStr) )
+				GameTutorial* tr = &g_game->m_tutorials->m_tutor[i];
+				if ( tr->level && tr->level <= g_game->m_player->m_profile.level_played )
 				{
-					if ( tmpStr == L"Tutorial" )
+					int indexAdded = AddTutorial(tr);
+
+					if (!showNow && g_game->m_player->m_profile.level_played <= g_game->m_game_currentLevel )
 					{
-						if ( !script.GetString(i, L"Name", tmpStr) )
-							continue;
-
-						str512 image; uint title, desc;
-						if ( !script.GetUint( i, L"title", title	) )
-							continue;
-						if ( !script.GetUint( i, L"desc", desc	) )
-							continue;
-						if ( !script.GetString( i, L"image", image	) )
-							continue;
-
-						int showNow = 0;
-						if ( !script.GetInt( i, L"showNow", showNow	) )
-							continue;
-
-						if ( g_game->m_player->m_profile.level_played < g_game->m_game_currentLevel )
-						{
-							AddTutorial( title, desc, image, showNow , ( showNow > 0 ) );
-						}
-						else
-						{
-							AddTutorial( title, desc, image, g_game->m_miniGame, ( showNow > 0 ) );
-						}
+						showNow = indexAdded;
 					}
 				}
 			}
-
+			
+			//	show tutorial if there is new one
+			ShowTutorial(showNow);
 		}
 		break;
 	}
@@ -3713,27 +3689,13 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 
 	if ( sender == m_next )
 	{
-		if ( m_Index < 0 || m_Index >= m_tutorial.Count() - 1 )
+		if ( m_index < 0 || m_index >= m_tutorial.Count() - 1 )
 		{
 			Hide();
 			return;
 		}
 
-		Tutorial* curr = m_tutorial[m_Index];
-		curr->image->RemProperty( SX_GUI_PROPERTY_VISIBLE );
-
-		curr = m_tutorial[++m_Index];
-		curr->image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
-		update_label( m_title, curr->title );
-		//sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
-		update_label( m_desc, curr->desc );
-
-		//	update label
-		{
-			str512 tmp;
-			tmp.Format( L"%d/%d", (m_Index+1), m_tutorial.Count() );
-			m_indicator->SetText( tmp );
-		}
+		ShowTutorial(++m_index);
 
 		msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 		m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
@@ -3743,27 +3705,13 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 
 	if ( sender == m_prev )
 	{
-		if ( m_Index <= 0 )
+		if ( m_index <= 0 )
 		{
 			Hide();
 			return;
 		}
 
-		Tutorial* curr = m_tutorial[m_Index];
-		curr->image->RemProperty( SX_GUI_PROPERTY_VISIBLE );
-
-		curr = m_tutorial[--m_Index];
-		curr->image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
-		update_label( m_title, curr->title );
-//		sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
-		update_label( m_desc, curr->desc );
-
-		//	update label
-		{
-			str512 tmp;
-			tmp.Format( L"%d/%d", (m_Index+1), m_tutorial.Count() );
-			m_indicator->SetText( tmp );
-		}
+		ShowTutorial(--m_index);
 
 		msg_SoundPlay msg( true, 0, 0, L"mouseClick" );
 		m_soundNode->MsgProc( MT_SOUND_PLAY, &msg );
@@ -3774,88 +3722,17 @@ void MenuInfo::OnClick( sx::gui::PControl sender )
 }
 
 
-void MenuInfo::AddTutorial( const uint title, const uint desc, const WCHAR* image, int showNow /*= 0*/, bool settoCurrent /*= true*/ )
+int MenuInfo::AddTutorial( GameTutorial* tutor)
 {
-	return;
-	if ( !title || !desc || !image ) return;
-
-	//	search for repetitious tutorial
-	for ( int i=0; i<m_tutorial.Count(); i++ )
-	{
-		Tutorial* t = m_tutorial[i];
-		if ( t->title == title && t->desc == desc )
-		{
-			str512 img = t->image->GetElement(0)->GetTextureSrc();
-			if ( img == image )
-				return;
-		}
-	}
-
-	//	create tutorial
-	Tutorial* tutor = sx_new( Tutorial );
-	tutor->title = title;
-	tutor->insides = title;
-	tutor->desc = desc;
-	tutor->image = sx_new( sx::gui::Panel );
-	tutor->image->SetParent( m_back );
-	tutor->image->SetSize( float2(1024, 1024) );
-	tutor->image->GetElement(0)->SetTextureSrc( image );
-	tutor->image->Position().y = 64.0f;
-
-#if	TODO
-	int returnpos = tutor->insides.Find(L"\n") + 1;
-	if ( returnpos > 0 )
-	{
-		tutor->title.Delete( returnpos, 999 );
-		tutor->insides.Delete( 0, returnpos);
-	}
-	else
-		tutor->insides.Clear();
-#endif
-
-	if ( tutor->image->GetElement(0)->GetTexture() )
-	{
-		//sx::d3d::Texture::Manager::LoadInThread() = true;
-		tutor->image->GetElement(0)->GetTexture()->Activate();
-		//sx::d3d::Texture::Manager::LoadInThread() = false;
-	}
-
 	//	push to list
 	m_tutorial.PushBack( tutor );
 
-#if TODO
-	//	set as next
-	if ( settoCurrent || m_tutorial.Count() == 1 )
-	{
-		m_Index = m_tutorial.Count() - 1;
-
-		Tutorial* curr = m_tutorial[m_Index];
-		m_title->SetText( curr->title );
-		sx::gui::PLabel(m_title->GetChild(0))->SetText( curr->insides.Text() );
-		m_desc->SetText( curr->desc );
-	}
-#endif
-
-	//	update images
-	//	remove current tutorial
-	for ( int i=0; i<m_tutorial.Count(); i++ )
-		m_tutorial[i]->image->RemProperty( SX_GUI_PROPERTY_VISIBLE );
-	m_tutorial[m_Index]->image->AddProperty( SX_GUI_PROPERTY_VISIBLE );
-	m_next->SetParent( NULL );
-	m_next->SetParent( m_back );
-	m_prev->SetParent( NULL );
-	m_prev->SetParent( m_back );
-	m_title->SetParent( NULL );
-	m_title->SetParent( m_back );
-	m_desc->SetParent( NULL );
-	m_desc->SetParent( m_back );
-	m_indicator->SetParent( NULL );
-	m_indicator->SetParent( m_back );
-
+	return (m_tutorial.Count() - 1);
+#if 0
 	//	update label
 	{
 		str512 tmp;
-		tmp.Format( L"%d/%d", (m_Index+1), m_tutorial.Count() );
+		tmp.Format( L"%d/%d", (m_index+1), m_tutorial.Count() );
 		m_indicator->SetText( tmp );
 	}
 
@@ -3872,30 +3749,85 @@ void MenuInfo::AddTutorial( const uint title, const uint desc, const WCHAR* imag
 
 	if ( settoCurrent )
 	{
-		str512 helperdesc = g_game->m_strings->Get(tutor->desc)->text;
+		str512 helperdesc = g_game->m_strings->Get(tutor->)->text;
 		helperdesc.Replace( L"\n", L"" );
 		helperdesc.Replace( L"   ", L"" );
 		m_helper.title->SetText( g_game->m_strings->Get(tutor->title)->text );
 		m_helper.desc->SetText( helperdesc );
 		m_helper.showTime = ( showNow != 2 ) ? 15000.0f : 0.0f;
 	}
+#endif
 }
 
 void MenuInfo::ClearTutorial( void )
 {
 	sx_callstack();
-
-	for ( int i=0; i<m_tutorial.Count(); i++ )
-	{
-		Tutorial* t = m_tutorial[i];
-		t->image->SetParent( NULL );
-		sx_delete_and_null(t->image);
-		sx_delete_and_null(t);
-	}
+	PrepareTutorial(null);
 	m_tutorial.Clear();
-	m_Index = -1;
+	m_index = -1;
 	m_delayTime = 0;
+	m_time = 0;
 }
+
+void MenuInfo::PrepareTutorial( const GameTutorial* tutor )
+{
+	//	clear current tutorial
+	while(m_holder->GetChildCount())
+	{
+		sx::gui::Control* obj = m_holder->GetChild(0);
+		obj->SetParent(null);
+		if (obj->GetType() != GUI_PANEL)
+			sx::gui::Destroy(obj);
+	}
+	if ( tutor == null ) return;
+
+	tutor->image->SetParent(m_holder);
+	for (int i=0; i<16; ++i)
+	{
+		if (tutor->texts[i])
+		{
+			GameString* gstr = g_game->m_strings->Get(tutor->texts[i]);
+			if (gstr)
+			{
+				create_label(m_holder, gstr->id, gstr->w, gstr->h, 0, 0);
+			}
+		}
+	}
+}
+
+void MenuInfo::ShowTutorial( int index )
+{
+	if ( index < 0 || index >= m_tutorial.Count() ) return;
+
+	PrepareTutorial( m_tutorial[index] );
+	
+	m_index = index;
+	
+	//	update label
+	{
+		str512 tmp;
+		tmp.Format( L"%d/%d", (m_index+1), m_tutorial.Count() );
+		m_indicator->SetText( tmp );
+	}
+
+	m_delayTime = 1000;
+	m_time = 0;
+}
+
+void MenuInfo::ShowInfo( int index )
+{
+	if ( index < 0 || index >= m_tutorial.Count() ) return;
+	GameTutorial* tutor = m_tutorial[index];
+
+	str512 helperdesc = g_game->m_strings->Get(tutor->texts[0])->text;
+	helperdesc.Replace( L"\n", L"" );
+	helperdesc.Replace( L"   ", L"" );
+	m_helper.title->SetText( g_game->m_strings->Get(tutor->texts[1])->text );
+	m_helper.desc->SetText( helperdesc );
+	m_helper.showTime = 15000.0f;
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////
 //	upgrade menu 
