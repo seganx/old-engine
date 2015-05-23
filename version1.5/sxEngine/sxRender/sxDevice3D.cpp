@@ -411,7 +411,7 @@ namespace sx { namespace d3d
 		D3DPresentParameters PresentParam;
 		ZeroMemory(&PresentParam, sizeof(PresentParam));
 
-		PresentParam.BackBufferFormat		= D3DFMT_A8R8G8B8;
+		PresentParam.BackBufferFormat		= D3DFMT_X8R8G8B8;
 		PresentParam.BackBufferCount		= 0;
 		PresentParam.Flags					= 0;
 		PresentParam.MultiSampleQuality		= 0;
@@ -451,6 +451,51 @@ namespace sx { namespace d3d
 			return false;
 		}
 
+#if 1
+		if (false)
+		{
+			HDC hdc = GetDC(Display);
+			if ( hdc )
+			{
+				WORD GammaArray[3][256];
+				WORD wBrightness = 128;
+
+				if ( GetDeviceGammaRamp(hdc, GammaArray) == TRUE )
+				{
+					for (int iIndex = 0; iIndex < 256; iIndex++)
+					{
+						int iArrayValue = iIndex * (wBrightness + 128);
+
+						if (iArrayValue > 65535)
+							iArrayValue = 65535;
+
+						GammaArray[0][iIndex] = 
+							GammaArray[1][iIndex] = 
+							GammaArray[2][iIndex] = (WORD)iArrayValue;
+
+					}
+
+					SetDeviceGammaRamp(hdc, GammaArray);
+				}
+
+				ReleaseDC(Display, hdc);
+			}
+		}
+#else
+		{
+			// retrieve current gamma
+			D3DGAMMARAMP gr;
+			Direct3D_internal::m_pDevice->GetGammaRamp(0, &gr);
+			for (int i=0; i<256; ++i)
+			{
+				gr.blue[i] = sx_clamp_i(gr.blue[i] * 2, 0, 255);
+				gr.green[i] = 2;
+				gr.red[i] = 2;
+			}
+			Direct3D_internal::m_pDevice->SetGammaRamp(0, D3DSGR_NO_CALIBRATION, &gr);
+		}
+#endif
+
 		// Create Vertex declaration 
 		Direct3D_internal::m_pDevice->CreateVertexDeclaration(SeganVrtxDecl, &Direct3D_internal::m_pVrtxDecl);
 
@@ -476,7 +521,7 @@ namespace sx { namespace d3d
 
 		String slog = L"Rendering device created successfully :\r\n";
 		slog << L"	API		: DirectX 9\r\n";
-		slog << L"	BackBuffer	: A8R8G8B8\r\n";
+		slog << L"	BackBuffer	: X8R8G8B8\r\n";
 		slog << L"	Depth		: ";
 		switch (Direct3D_internal::m_PrsntParam.AutoDepthStencilFormat)
 		{
@@ -682,7 +727,7 @@ namespace sx { namespace d3d
 		// Set up the structure used to reset the D3DDevice...
 		D3DPresentParameters PresentParam	= Direct3D_internal::m_PrsntParam;
 
-		PresentParam.BackBufferFormat		= D3DFMT_A8R8G8B8;
+		PresentParam.BackBufferFormat		= D3DFMT_X8R8G8B8;
 		PresentParam.BackBufferCount		= 0;
 		PresentParam.Flags					= 0;
 		PresentParam.MultiSampleQuality		= 0;
@@ -843,7 +888,14 @@ e_reset:
 			Direct3D_internal::m_pDevice->Present(NULL, NULL, NULL, NULL);
 		else
 #endif
+#if 0
 			Direct3D_internal::m_pDevice->Present(&Direct3D_internal::m_rc, pDestRect, Direct3D_internal::m_hDisplay, NULL);
+#else
+			IDirect3DSwapChain9 *swapchain = NULL;
+			Direct3D_internal::m_pDevice->GetSwapChain(0, &swapchain);
+			swapchain->Present(&Direct3D_internal::m_rc, pDestRect, Direct3D_internal::m_hDisplay, NULL, 0);//D3DPRESENT_LINEAR_CONTENT);
+			SEGAN_RELEASE(swapchain);
+#endif
 	}
 
 	FORCEINLINE void Device3D::SetClipPlane( DWORD Index, const float* pPlane )

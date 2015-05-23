@@ -330,22 +330,27 @@ void MenuMain::Initialize( void )
 		}
 #endif
 
+#if 0
 	m_info = sx_new( MenuInfo );
 	m_info->Initialize();
-
+#endif
 }
 
 void MenuMain::Finalize( void )
 {
+#if 0
 	m_info->Finalize();
 	sx_delete_and_null( m_info );
+#endif
 
 	Menu::Finalize();
 }
 
 void MenuMain::ProcessInput( bool& inputHandled, float elpsTime )
 {
+#if 0
 	m_info->ProcessInput( inputHandled, elpsTime );
+#endif
 
 	if ( inputHandled ) return;
 	sx_callstack();
@@ -409,8 +414,9 @@ void MenuMain::Update( float elpsTime )
 
 		m_mainSparks->State_SetIndex(0);
 	}
-
+#if 0
 	m_info->Update( elpsTime );
+#endif
 
 	Menu::Update( elpsTime );
 }
@@ -418,7 +424,9 @@ void MenuMain::Update( float elpsTime )
 void MenuMain::Draw( DWORD flag )
 {
 	Menu::Draw( flag );
+#if 0
 	m_info->Draw( flag );
+#endif
 }
 
 void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
@@ -427,61 +435,6 @@ void MenuMain::MsgProc( UINT recieverID, UINT msg, void* data )
 	{
 	case GMT_LEVEL_LOADED:		/////////////////////////////////////////////////    LOAD LEVEL
 		{
-			//	find maximum level played in profiles
-			sint max_level = 0;
-			for ( sint i=0; i<4; ++i )
-			{
-				if ( max_level < g_game->m_gui->m_profile->m_profiles[i].level_played )
-					max_level = g_game->m_gui->m_profile->m_profiles[i].level_played;
-			}
-			++max_level;
-#if USE_DEV_CHEAT
-			int info_index = m_info->m_index + 1;
-			int info_counter = 0;
-#endif
-			m_info->ClearTutorial();
-
-			String str = sx::sys::FileManager::Project_GetDir();
-			str << L"level0/Encyclopedia.txt";
-			Scripter script;
-			script.Load( str );
-
-			for (int i=0; i<script.GetObjectCount(); i++)
-			{
-				str512 tmpStr;
-				if ( script.GetString(i, L"Type", tmpStr) )
-				{
-					if ( tmpStr == L"Encyclopedia" )
-					{
-						if ( !script.GetString(i, L"Name", tmpStr) )
-							continue;
-
-						if ( max_level < tmpStr.ToInt() )
-							continue;
-
-						str512 image; uint title, desc;
-						if ( !script.GetUint( i, L"title", title	) )
-							continue;
-						if ( !script.GetUint( i, L"desc", desc	) )
-							continue;
-						if ( !script.GetString( i, L"image", image	) )
-							continue;
-#if USE_DEV_CHEAT
-						if (data)
-						{
-							++info_counter;
-//							m_info->AddTutorial( title, desc, image, false, info_index == info_counter );
-						}
-						else
-						{
-//							m_info->AddTutorial( title, desc, image, false, false );
-						}
-#else
-						m_info->AddTutorial( title, desc, image, false, false );
-#endif
-					}
-				}
-			}
 		}
 	}
 }
@@ -552,8 +505,8 @@ void MenuMain::OnClick( sx::gui::PControl sender )
 			}
 			m_mainBack->State_SetIndex(3);
 
-			m_info->m_go_to_menu = true;
-			m_info->Show( false );
+			g_game->m_gui->m_info->m_go_to_menu = true;
+			g_game->m_gui->m_info->Show( false );
 		}
 		break;
 
@@ -3423,7 +3376,7 @@ void MenuInfo::Initialize( void )
 {
 	Menu::Initialize();
 
-	m_index = -1;
+	m_index = m_indexToShow = -1;
 	m_infoButtonTime = 0;
 	m_tutorialDelayTime = 0;
 	m_go_to_menu = false;
@@ -3546,42 +3499,61 @@ void MenuInfo::MsgProc( UINT recieverID, UINT msg, void* data )
 
 	case GMT_GAME_RESETING:
 	case GMT_LEVEL_CLEAR:
-		ClearTutorial();
+		//ClearTutorial();
 		m_helper.showTime = 0;
 		m_infoButtonTime = 0;
 		m_tutorialDelayTime = 0;
 		break;
 
+	case GMT_LEVEL_LOADED:
 	case GMT_GAME_RESET:
-	case GMT_GAME_START:
 		{
 			m_tutorialDelayTime = 0;
 			m_helper.showTime = 0;
+
+			//	find maximum level played in profiles
+			sint max_level = 0;
+			for ( sint i=0; i<4; ++i )
+			{
+				if ( max_level < g_game->m_gui->m_profile->m_profiles[i].level_played )
+					max_level = g_game->m_gui->m_profile->m_profiles[i].level_played;
+			}
+			++max_level;
 
 			//	reset button of information
 			g_game->m_gui->m_goldPeople->m_info->State_SetIndex(0);
 
 			//	clear all tutorials references
+#if USE_DEV_CHEAT
+			int current_index = m_index;
+#endif
 			ClearTutorial();
 
 			//	search through tutorials to find them for this level
-			int showNow = 0;
+			m_indexToShow = 0;
 			for (int i=0; i<g_game->m_tutorials->m_tutor.Count(); ++i)
 			{
 				GameTutorial* tr = &g_game->m_tutorials->m_tutor[i];
-				if ( tr->level && tr->level <= g_game->m_player->m_profile.level_played )
+				if ( tr->level && tr->level <= max_level )
 				{
 					int indexAdded = AddTutorial(tr);
 
-					if (!showNow && g_game->m_player->m_profile.level_played <= g_game->m_game_currentLevel )
+					if (!m_indexToShow && max_level <= g_game->m_game_currentLevel )
 					{
-						showNow = indexAdded;
+						m_indexToShow = indexAdded;
 					}
 				}
 			}
-			
+
 			//	show tutorial if there is new one
-			ShowTutorial(showNow, 1000);
+			if ( g_game->m_game_currentLevel > 0 )
+				ShowTutorial(m_indexToShow, 1000);
+#if USE_DEV_CHEAT
+			else if ( IsVisible() )
+			{
+				ShowTutorial(current_index, 0);
+			}
+#endif
 		}
 		break;
 	}
@@ -3648,6 +3620,7 @@ void MenuInfo::Show( bool gamepaused )
 	g_game->m_game_paused = gamepaused;
 	m_infoButtonTime = 0;
 	m_helper.showTime = 0;
+	ShowTutorial(m_index >= 0 ? m_index : 0, 0);
 }
 
 void MenuInfo::Hide( void )

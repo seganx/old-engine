@@ -703,6 +703,34 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="GDF"
+			>
+			<File
+				RelativePath=".\GDF\Rush for Glory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GDF\Rush for Glory.rc"
+				>
+			</File>
+			<Filter
+				Name="NEU"
+				>
+				<File
+					RelativePath=".\GDF\NEU\boxart_NEU.png"
+					>
+				</File>
+				<File
+					RelativePath=".\GDF\NEU\gameicon_NEU.ico"
+					>
+				</File>
+				<File
+					RelativePath=".\GDF\NEU\Rush for Glory.gdf.xml"
+					>
+				</File>
+			</Filter>
+		</Filter>
 		<File
 			RelativePath=".\cnep.cpp"
 			>

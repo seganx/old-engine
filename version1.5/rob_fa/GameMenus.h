@@ -399,6 +399,7 @@ public:
 
 	Array<GameTutorial*>	m_tutorial;
 	int						m_index;
+	int						m_indexToShow;
 	
 	sx::gui::Panel*			m_holder;		//	place holder for tutorial objects
 	sx::gui::Label*			m_indicator;
