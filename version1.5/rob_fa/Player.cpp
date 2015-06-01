@@ -124,16 +124,8 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 #if USE_DEV_CHEAT
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYUP( 0, SX_INPUT_KEY_M ) )
 	{		
-		str1024 path = sx::sys::FileManager::Project_GetDir();
-		path << "localization/";
-#if USE_STEAM_SDK
-		const char* language = SteamApps()->GetCurrentGameLanguage();
-#else 
-		const char* language = "strings";
-#endif
-		path << language << L".txt";
-		g_game->m_strings->Load( path );
-		g_game->m_gui->m_main->MsgProc(0, GMT_LEVEL_LOADED, g_game);
+		g_game->m_strings->Load( Config::GetData()->language );
+		g_game->m_gui->m_info->MsgProc(0, GMT_LEVEL_LOADED, g_game);
 	}
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_R) )
 	{
@@ -372,6 +364,10 @@ void Player::MsgProc( UINT recieverID, UINT msg, void* data )
 
 	case GMT_LEVEL_CLEAR:		/////////////////////////////////////////////////    CLEAR LEVEL
 		{						//////////////////////////////////////////////////////////////////////////
+			//  send message to mechanics
+			for (int i=0; i<m_Mechanics.Count(); i++)
+				m_Mechanics[i]->MsgProc( recieverID, msg, data );
+			
 			//  clear mechanics
 			ClearMechanincs();
 		}

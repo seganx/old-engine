@@ -354,7 +354,7 @@ namespace GM
 		case GMT_GAME_RESET:
 			MsgProc( 0, GMT_LEVEL_LOAD, 0 );
 		case GMT_GAME_START:
-		case GMT_GAME_END:
+		//case GMT_GAME_END:
 			{
 				if ( m_node )
 				{
@@ -385,10 +385,13 @@ namespace GM
 
 				m_curTemperature = 0.0f;
 
-				const float3 addPos( 0, m_node->GetBox_local().Max.y + 0.5f, 0 );
-				m_temperatureBar->SetMax( m_maxTemperature );
-				m_temperatureBar->SetValue( m_curTemperature );
-				m_temperatureBar->Position() = m_node->GetPosition_world() + addPos;
+				if (m_node && m_temperatureBar)
+				{
+					const float3 addPos( 0, m_node->GetBox_local().Max.y + 0.5f, 0 );
+					m_temperatureBar->SetMax( m_maxTemperature );
+					m_temperatureBar->SetValue( m_curTemperature );
+					m_temperatureBar->Position() = m_node->GetPosition_world() + addPos;
+				}
 
 				const int availableBullets = /*g_game->m_player->m_energy*/1000 / m_energyPerBullet;
 				str128 str;

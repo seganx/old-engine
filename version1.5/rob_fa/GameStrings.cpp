@@ -30,6 +30,9 @@ void GameStrings::Load( const wchar* stringsfile )
 
 	if ( !sx::sys::FileExist(path) )
 		return;
+	else
+		Clear();
+
 
 	sx::sys::FileStream myFile;
 	if ( !myFile.Open( path, FM_OPEN_READ | FM_SHARE_READ) ) return;
