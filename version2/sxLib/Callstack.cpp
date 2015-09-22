@@ -151,6 +151,8 @@ void detect_crash( void )
 
 void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ )
 {
+	if ( callstack_pool[0].line < 1 || callstack_pool[0].file == null ) return;
+
 	sx_enter_cs();
 
 	wchar strName[128];

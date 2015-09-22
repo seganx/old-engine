@@ -270,13 +270,13 @@ SEGAN_LIB_INLINE float sx_clamp_f( const float value, const float fmin, const fl
 }
 
 //! return true if value is in range
-SEGAN_LIB_INLINE float sx_between_i( const sint value, const sint imin, const sint imax )
+SEGAN_LIB_INLINE bool sx_between_i( const sint value, const sint imin, const sint imax )
 {
 	return ( imin <= value && value <= imax );
 }
 
 //! return true if value is in range
-SEGAN_LIB_INLINE float sx_between_f( const float value, const float fmin, const float fmax )
+SEGAN_LIB_INLINE bool sx_between_f( const float value, const float fmin, const float fmax )
 {
 	return ( fmin <= value && value <= fmax );
 }

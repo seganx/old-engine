@@ -413,6 +413,50 @@ SEGAN_INLINE void mem_free_dbg( const void* p )
 	sx_leave_cs();
 }
 
+uint mem_report_compute_num( const uint tag )
+{
+	if ( !s_mem_root ) return 0;
+
+	uint result = 0;
+	MemBlock* leaf = s_mem_root;
+	if (tag)
+	{
+		if (tag == -1)
+		{
+			while (leaf)
+			{
+				mem_check_protection(leaf);
+				if (leaf->corrupted)
+					result++;
+				leaf = leaf->next;
+			}
+		}
+		else
+		{
+			while (leaf)
+			{
+				if (leaf->tag == tag)
+				{
+					mem_check_protection(leaf);
+					result++;
+				}
+				leaf = leaf->next;
+			}
+		}
+	}
+	else
+	{
+		while (leaf)
+		{
+			mem_check_protection(leaf);
+			result++;
+			leaf = leaf->next;
+		}
+	}
+
+	return result;
+}
+
 SEGAN_INLINE void mem_report_debug( CB_Memory callback, const uint tag /*= 0 */ )
 {
 	if ( !s_mem_root || !callback ) return;
@@ -495,6 +539,8 @@ SEGAN_INLINE void mem_report_debug_to_file( const wchar* fileName, const uint ta
 #if defined(DEBUG_OUTPUT_WINDOW)
 	mem_report_debug_to_window( 0 );
 #endif
+
+	if ( mem_report_compute_num(tag) < 1 ) return;
 
 	//	report called functions in the file
 	FILE* f = null;

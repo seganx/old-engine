@@ -58,16 +58,6 @@ typedef byte				*pbyte;
 #endif
 #define null	0
 
-#if	defined(true)
-	#undef true
-#endif
-#define true	1
-
-#if defined(false)
-	#undef false
-#endif
-#define false	0
-
 //////////////////////////////////////////////////////////////////////////
 //!!!    CHANGE THESE PREPROCESSORS TO CHANGE COMPILER BEHAVIOR      !!!//
 //////////////////////////////////////////////////////////////////////////
@@ -156,6 +146,8 @@ typedef byte				*pbyte;
 //////////////////////////////////////////////////////////////////////////
 //	basic functions
 //////////////////////////////////////////////////////////////////////////
+#define sx_print(fmt, ...)	wprintf(fmt, __VA_ARGS__)
+
 
 #if ( SEGAN_CRITICAL_SECTION == 1 )
 SEGAN_LIB_API void lib_enter_cs( void );

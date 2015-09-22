@@ -26,6 +26,8 @@ SEGAN_LIB_API bool sx_load_string_list( Array<String*>& dest, const wchar* filen
 //! clear all allocated strings
 SEGAN_LIB_API void sx_clear_string_list( Array<String*>& list );
 
+//! write time stamp to the buffer with specified format and return the length of string
+SEGAN_LIB_API uint sx_time_to_str( wchar* dest, const uint destSize, const wchar* timeFormat );
 
 //! protocol class used to transferring data 
 class SEGAN_LIB_API Protocol

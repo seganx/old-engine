@@ -1,8 +1,9 @@
-#include <memory>
 #include "Memory.h"
 #include "Math.h"
 #include "Utils.h"
 
+#include <memory>
+#include <time.h>
 
 
 SEGAN_LIB_API bool sx_load_string( String& dest, const wchar* filename )
@@ -66,6 +67,15 @@ SEGAN_LIB_API void sx_clear_string_list( Array<String*>& list )
 		sx_delete( list.m_item[i] );
 	}
 	list.clear();
+}
+
+SEGAN_LIB_API uint sx_time_to_str( wchar* dest, const uint destSize, const wchar* timeFormat )
+{
+	time_t rawTime;
+	time( &rawTime );
+	struct tm timeInfo;
+	localtime_s( &timeInfo, &rawTime );
+	return (uint)wcsftime( dest, destSize, timeFormat, &timeInfo );
 }
 
 
