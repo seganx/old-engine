@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="render">
+      <UniqueIdentifier>{b3883a02-432a-4500-8230-1cdbde5868e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="render\opengl">
+      <UniqueIdentifier>{3c2a6ad1-a82e-4781-809b-a78d9e745916}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{8c710342-ecdc-4562-848d-4631dce9a4f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{a429b29a-3aa0-4e3f-9437-455d7d3bfcde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="system">
+      <UniqueIdentifier>{e95b6ee4-8651-4371-979c-6f3a94542739}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="system\win32">
+      <UniqueIdentifier>{031fe06e-560f-4de9-a99b-34acab9d67d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gui">
+      <UniqueIdentifier>{a97bfcfc-4c8f-4c53-a808-737deafe98d9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\render\Render.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\opengl\Device.h">
+      <Filter>render\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\opengl\Mesh.h">
+      <Filter>render\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\opengl\OpenGLExtensions.h">
+      <Filter>render\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\render\opengl\Renderer.h">
+      <Filter>render\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\Math.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\Math_generic.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\Math_sse.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\math\Math_tools.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\system\OS.h">
+      <Filter>system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\system\System.h">
+      <Filter>system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\system\Window.h">
+      <Filter>system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\system\win32\Win6.h">
+      <Filter>system\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gui\uiDevice.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gui\uiManager.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine_def.h" />
+    <ClInclude Include="..\sxEngine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\render\opengl\Device.cpp">
+      <Filter>render\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\opengl\IndexBuffer.cpp">
+      <Filter>render\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\opengl\Mesh.cpp">
+      <Filter>render\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\opengl\MeshMan.cpp">
+      <Filter>render\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\opengl\OpenGLExtensions.cpp">
+      <Filter>render\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\opengl\Renderer.cpp">
+      <Filter>render\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\opengl\Texture.cpp">
+      <Filter>render\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\render\opengl\VertexBuffer.cpp">
+      <Filter>render\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\math\Math.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\system\win32\OS.cpp">
+      <Filter>system\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\system\win32\Window.cpp">
+      <Filter>system\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gui\uiControl.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gui\uiDevice.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gui\uiManager.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gui\uiPanel.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="sxEngine.cpp" />
+  </ItemGroup>
+</Project>
