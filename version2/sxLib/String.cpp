@@ -159,53 +159,53 @@ SEGAN_INLINE char sx_str_lower( char c )
 	return c;
 }
 
-SEGAN_INLINE sint sx_str_to_int( const wchar* str )
+SEGAN_INLINE sint sx_str_to_int( const wchar* str, const sint defaul_val /*= 0 */ )
 {
-	if ( !str ) return 0;
+	if ( !str ) return defaul_val;
 	return _wtoi( str );
 }
 
-SEGAN_INLINE sint sx_str_to_int( const char* str )
+SEGAN_INLINE sint sx_str_to_int( const char* str, const sint defaul_val /*= 0 */ )
 {
-	if ( !str ) return 0;
+	if ( !str ) return defaul_val;
 	return atoi( str );
 }
 
-SEGAN_INLINE uint sx_str_to_uint( const wchar* str )
+SEGAN_INLINE uint sx_str_to_uint( const wchar* str, const uint defaul_val /*= 0 */ )
 {
-	if ( !str ) return 0;
-	uint res = 0;
+	if ( !str ) return defaul_val;
+	uint res = defaul_val;
 	swscanf_s( str, L"%u", &res, sizeof(res) );
 	return res;
 }
 
-SEGAN_INLINE uint64 sx_str_to_uint64( const wchar* str )
+SEGAN_INLINE uint64 sx_str_to_uint64( const wchar* str, const uint64 defaul_val /*= 0 */ )
 {
-	if ( !str ) return 0;
-	uint64 res = 0;
+	if ( !str ) return defaul_val;
+	uint64 res = defaul_val;
 	swscanf_s( str, L"%llu", &res, sizeof(res) );
 	return res;
 }
 
-SEGAN_INLINE uint sx_str_to_uint( const char* str )
+SEGAN_INLINE uint sx_str_to_uint( const char* str, const uint defaul_val /*= 0 */ )
 {
-	if ( !str ) return 0;
-	uint res = 0;
+	if ( !str ) return defaul_val;
+	uint res = defaul_val;
 	sscanf_s( str, "%u", &res, sizeof(res) );
 	return res;
 }
 
-SEGAN_INLINE uint64 sx_str_to_uint64( const char* str )
+SEGAN_INLINE uint64 sx_str_to_uint64( const char* str, const uint64 defaul_val /*= 0 */ )
 {
-	if ( !str ) return 0;
-	uint64 res = 0;
+	if ( !str ) return defaul_val;
+	uint64 res = defaul_val;
 	sscanf_s( str, "%llu", &res, sizeof(res) );
 	return res;
 }
 
-SEGAN_INLINE float sx_str_to_float( const wchar* str )
+SEGAN_INLINE float sx_str_to_float( const wchar* str, const float defaul_val /*= 0 */ )
 {
-	if ( !str ) return 0.0f;
+	if ( !str ) return defaul_val;
 	return (float)_wtof( str );
 }
 

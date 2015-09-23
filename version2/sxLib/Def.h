@@ -75,11 +75,11 @@ typedef byte				*pbyte;
 
 #define SEGAN_MEMLEAK						1		//	use first version of memory leak detector
 
-#define SEGAN_CALLSTACK						1		//	enable call stack system to log stack of function
+#define SEGAN_CALLSTACK						0		//	enable call stack system to log stack of function
 
 #define SEGAN_ASSERT						1		//	check and log some special events on containers
 
-#define SEGAN_CRITICAL_SECTION				1		//	use critical section for multi threaded safety
+#define SEGAN_CRITICAL_SECTION				0		//	use critical section for multi threaded safety
 
 
 

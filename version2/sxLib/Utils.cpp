@@ -64,7 +64,7 @@ SEGAN_LIB_API void sx_clear_string_list( Array<String*>& list )
 {
 	for ( sint i=0; i < list.m_count; ++i )
 	{
-		sx_delete( list.m_item[i] );
+		sx_safe_delete( list.m_item[i] );
 	}
 	list.clear();
 }

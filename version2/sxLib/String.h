@@ -44,13 +44,13 @@ SEGAN_LIB_API wchar sx_str_upper( wchar c );
 SEGAN_LIB_API wchar sx_str_lower( wchar c );
 SEGAN_LIB_API char sx_str_upper( char c );
 SEGAN_LIB_API char sx_str_lower( char c );
-SEGAN_LIB_API sint sx_str_to_int( const wchar* str );
-SEGAN_LIB_API sint sx_str_to_int( const char* str );
-SEGAN_LIB_API uint sx_str_to_uint( const wchar* str );
-SEGAN_LIB_API uint64 sx_str_to_uint64( const wchar* str );
-SEGAN_LIB_API uint sx_str_to_uint( const char* str );
-SEGAN_LIB_API uint64 sx_str_to_uint64( const char* str );
-SEGAN_LIB_API float sx_str_to_float( const wchar* str );
+SEGAN_LIB_API sint sx_str_to_int( const wchar* str, const sint defaul_val = 0 );
+SEGAN_LIB_API sint sx_str_to_int( const char* str, const sint defaul_val = 0 );
+SEGAN_LIB_API uint sx_str_to_uint( const wchar* str, const uint defaul_val = 0 );
+SEGAN_LIB_API uint64 sx_str_to_uint64( const wchar* str, const uint64 defaul_val = 0 );
+SEGAN_LIB_API uint sx_str_to_uint( const char* str, const uint defaul_val = 0 );
+SEGAN_LIB_API uint64 sx_str_to_uint64( const char* str, const uint64 defaul_val = 0 );
+SEGAN_LIB_API float sx_str_to_float( const wchar* str, const float defaul_val = 0 );
 
 /*! return true if entry string is type of file path and end with '/' or '\'*/
 SEGAN_LIB_API const bool sx_str_is_pathstyle( const wchar* filepath );

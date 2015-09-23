@@ -66,8 +66,9 @@ inline    void		operator delete( void *p ){ mem_free_dbg(p); }
 #define sx_mem_free_and_null( p )				{ mem_free_dbg( p ); p = null; }
 
 #define sx_new									new( _CRT_WIDE(__FILE__), __LINE__ )
-#define sx_delete( obj )						{ if (obj) { delete(obj) ; } }				
-#define sx_delete_and_null( obj )				{ if (obj) { delete(obj) ; obj = null; } }
+#define sx_delete								delete
+#define sx_safe_delete( obj )					{ if (obj) { delete(obj) ; } }				
+#define sx_safe_delete_and_null( obj )			{ if (obj) { delete(obj) ; obj = null; } }
 
 #else
 
@@ -86,8 +87,9 @@ inline	  void		operator delete ( void *p ){ mem_free(p); }
 #define sx_mem_free_and_null( p )				{ mem_free( p ); p = null }
 
 #define sx_new									new
-#define sx_delete( obj )						{ if (obj) { delete(obj) ; } }				
-#define sx_delete_and_null( obj )				{ if (obj) { delete(obj) ; obj = null; } }
+#define sx_delete								delete
+#define sx_safe_delete( obj )					{ if (obj) { delete(obj) ; } }				
+#define sx_safe_delete_and_null( obj )			{ if (obj) { delete(obj) ; obj = null; } }
 
 #endif
 
