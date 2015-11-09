@@ -185,7 +185,7 @@ Window* sx_create_window( const wchar* name, const CB_Window callback, const boo
 	sx_callstack_param(sx_create_window(name=%s), name);
 
 	if ( s_windows == null )
-		s_windows = sx_new( (Map<uint64, class Window_win32*>) );
+		s_windows = sx_new Map<uint64, class Window_win32*>;
 
 	Window_win32* win = sx_new( Window_win32 );
 
@@ -241,10 +241,10 @@ void sx_destroy_window( Window*& pwindow )
 		s_windows->remove( reinterpret_cast<uint64>(win->m_handle) );
 
 		if ( s_windows->m_count < 1 )
-			sx_delete_and_null( s_windows );
+			sx_safe_delete_and_null( s_windows );
 	}
 
-	sx_delete_and_null( pwindow );
+	sx_safe_delete_and_null( pwindow );
 }
 
 #if 0

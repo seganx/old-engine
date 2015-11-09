@@ -320,8 +320,10 @@ SEGAN_INLINE void mem_realloc_dbg( void*& p, const uint newsizeinbyte, const wch
 			swprintf_s( tmp, 64, L"sx_mem_report_%d.txt", s_mem_corruptions );
 			mem_report_debug_to_file( tmp, -1 );
 
+#if ( defined(_DEBUG) || SEGAN_ASSERT )
 			//	report call stack
 			lib_assert( L"memory block has been corrupted !", memreport.mb->file, memreport.mb->line );
+#endif
 		}
 		else
 		{
@@ -398,8 +400,10 @@ SEGAN_INLINE void mem_free_dbg( const void* p )
 			swprintf_s( tmp, 64, L"sx_mem_report_%d.txt", s_mem_corruptions );
 			mem_report_debug_to_file( tmp, -1 );
 
+#if ( defined(_DEBUG) || SEGAN_ASSERT )
 			//	report call stack
 			lib_assert( L"memory block has been corrupted !", memreport.mb->file, memreport.mb->line );
+#endif
 		}
 		else
 		{

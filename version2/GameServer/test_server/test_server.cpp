@@ -16,13 +16,12 @@ int wmain(int argc, wchar* argv[])
 	sx_net_initialize();
 
 
-	word currPort = 32000;
-
-	if (argc > 1)
-		currPort = sx_str_to_uint(argv[1], currPort);
+	NetConfig config;
+	config.recv_port = 31100;
+	config.send_port = 32100;
 
 	Server* server = sx_new Server;
-	server->Initialize(currPort);
+	server->Initialize( /*&config*/ );
 
 	char buffer[BUF_SZ] = {0};
 	double lastTime = sx_net_get_timer();
@@ -31,6 +30,7 @@ int wmain(int argc, wchar* argv[])
 		double tickCount = sx_net_get_timer();
 		double elpsTime = (tickCount - lastTime);
 		lastTime = tickCount;
+		if ( elpsTime < 0 ) continue;
 
 		server->Update(elpsTime);
 

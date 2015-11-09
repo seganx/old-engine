@@ -295,7 +295,7 @@ void d3dDevice::destroy_vertex_buffer( VertexBuffer*& IN_OUT vertexBuffer )
 {
 	if ( !vertexBuffer ) return;
 	m_vertexBufferArray.remove( vertexBuffer );
-	sx_delete_and_null( vertexBuffer );
+	sx_safe_delete_and_null( vertexBuffer );
 }
 
 void d3dDevice::set_vertex_buffer( const VertexBuffer* vertexBuffer, uint streamIndex )
@@ -321,7 +321,7 @@ void d3dDevice::destroy_index_buffer( IndexBuffer*& IN_OUT indexBuffer )
 {
 	if ( !indexBuffer ) return;
 	m_indexBufferArray.remove( indexBuffer );
-	sx_delete_and_null( indexBuffer );
+	sx_safe_delete_and_null( indexBuffer );
 }
 
 void d3dDevice::set_index_buffer( const IndexBuffer* indexBuffer )
@@ -347,7 +347,7 @@ void d3dDevice::destroy_texture( d3dTexture_gl*& IN_OUT texture )
 {
 	if ( !texture ) return;
 	m_textureArray.remove( texture );
-	sx_delete_and_null( texture );
+	sx_safe_delete_and_null( texture );
 }
 
 void d3dDevice::set_texture( const d3dTexture_gl* texture, uint stage /*= 0 */ )

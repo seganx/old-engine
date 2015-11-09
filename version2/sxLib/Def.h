@@ -75,7 +75,7 @@ typedef byte				*pbyte;
 
 #define SEGAN_MEMLEAK						1		//	use first version of memory leak detector
 
-#define SEGAN_CALLSTACK						0		//	enable call stack system to log stack of function
+#define SEGAN_CALLSTACK						1		//	enable call stack system to log stack of function
 
 #define SEGAN_ASSERT						1		//	check and log some special events on containers
 
@@ -146,7 +146,8 @@ typedef byte				*pbyte;
 //////////////////////////////////////////////////////////////////////////
 //	basic functions
 //////////////////////////////////////////////////////////////////////////
-#define sx_print(fmt, ...)	wprintf(fmt, __VA_ARGS__)
+#define sx_print(fmt, ...)		wprintf(fmt, __VA_ARGS__)
+#define sx_print_a(fmt, ...)	printf(fmt, __VA_ARGS__)
 
 
 #if ( SEGAN_CRITICAL_SECTION == 1 )

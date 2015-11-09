@@ -18,6 +18,10 @@
 class Socket;
 class Connection;
 
+//! general callback function for connections. return true to notify the action performed
+typedef bool (*CBServer) (Connection* connection);
+
+
 //! basic UPD server class
 class Server
 {
@@ -27,7 +31,7 @@ public:
 	~Server(void);
 
 	//! initialize the server on the specified port
-	void Initialize( const word port );
+	void Initialize( const NetConfig* config = null, CBServer add = null, CBServer remove = null );
 
 	//! finalize the server and clear all allocated memory
 	void Finalize( void );
@@ -46,10 +50,19 @@ private:
 	//! read data from port and put them on connections
 	void PeekReceivedMessages( void );
 
+	//! update statistics
+	void UpdateStatistics( void );
+
 public:
-	Socket*					m_socket;			//! main UDP socket
+	NetConfig				m_config;			//! hold server configuration
+	NetStats				m_stats;			//!	hold server statistics data
+	Socket*					m_sendSocket;		//! UDP socket for send packets
+	Socket*					m_recvSocket;		//! UDP socket to receive packets
 	Array<Connection*>		m_connections;		//! list of connections used for iteration
 	Map<uint, Connection*>	m_connectionMap;	//! map of connections to find a connection so fast
+
+	CBServer				m_connectionAdd;	//! called when a new connection added to server.
+	CBServer				m_connectionRem;	//! called when a connection is going to be deleted. if callback function returned false, server will not remove that
 };
 
 #endif	//	GUARD_Server_HEADER_FILE

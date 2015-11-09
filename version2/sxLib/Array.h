@@ -93,11 +93,15 @@ public:
 		return true;
 	}
 
-	SEGAN_LIB_INLINE void remove_index( const sint index )
+	SEGAN_LIB_INLINE void remove_index( const sint index, const bool keep_order = true )
 	{
 		sx_assert(index>=0 && index<m_count);
-		for ( sint i=index; i<m_count-1; i++ )
-			m_item[i] = m_item[i+1];
+		if (keep_order)
+		{
+			for (sint i = index; i < m_count - 1; ++i)
+				m_item[i] = m_item[i + 1];
+		}
+		else m_item[index] = m_item[m_count - 1];
 		_realloc( --m_count );
 	}
 
@@ -279,12 +283,16 @@ public:
 		return true;
 	}
 
-	SEGAN_LIB_INLINE void remove_index( const sint index )
+	SEGAN_LIB_INLINE void remove_index( const sint index, const bool keep_order = true )
 	{
 		sx_assert(index>=0 && index<m_count);
 		m_count--;
-		for ( sint i=index; i<m_count; i++ )
-			m_item[i] = m_item[i+1];
+		if (keep_order)
+		{
+			for (sint i = index; i < m_count - 1; ++i)
+				m_item[i] = m_item[i + 1];
+		}
+		else m_item[index] = m_item[m_count - 1];
 	}
 
 	SEGAN_LIB_INLINE void swap( const sint index1, const sint index2 )

@@ -7,9 +7,9 @@
 //////////////////////////////////////////////////////////////////////////
 //	HELPER FUNCTION
 //////////////////////////////////////////////////////////////////////////
-bool connection_socket_send(Socket* socket, const NetPackage* np, const NetAddress& address)
+bool connection_socket_send(Socket* socket, const NetPacket* np, const NetAddress& address)
 {
-	//sx_print(L"Sent [NO: %d, OP: %d] %s\n", np->header->number, np->header->option, np->data + sizeof(NetHeader) );
+	sx_print(L"Sent [NO: %d, OP: %d] %s\n", np->header->number, np->header->option, np->data + sizeof(NetHeader) );
 	return socket->Send( address, np->data, np->size );
 }
 
@@ -78,9 +78,14 @@ void Connection::SetSpeed( const int packPerSecond )
 		m_delayTimeMax = -1;
 }
 
-void Connection::SetTimeOut(const double timeOut)
+void Connection::SetTimeOut( const double timeOut )
 {
 	m_outTimeMax = timeOut;
+}
+
+void Connection::SetRetryTime( const double retryTime )
+{
+	m_retryTimeMax = retryTime;
 }
 
 bool Connection::Send( const void* buffer, const int size, const word option )
@@ -93,9 +98,9 @@ bool Connection::Send( const void* buffer, const int size, const word option )
 		return false;
 	}
 
-	NetPackage* cp = (NetPackage*)sx_mem_alloc( sizeof(NetPackage) );
+	NetPacket* cp = (NetPacket*)sx_mem_alloc( sizeof(NetPacket) );
 #if _DEBUG
-	sx_mem_set( cp, 0, sizeof(NetPackage) );
+	sx_mem_set( cp, 0, sizeof(NetPacket) );
 #endif
 	cp->size = size + sizeof(NetHeader);
 	cp->header = (NetHeader*)cp->data;
@@ -117,16 +122,16 @@ uint Connection::Received( void* destBuffer, const int destSize )
 
 	if ( m_receivedPacks.m_count )
 	{
-		NetPackage* np = m_receivedPacks[0];
+		NetPacket* np = m_receivedPacks[0];
 
-		//	copy package data to the destination buffer
+		//	copy packet data to the destination buffer
 		int size = sx_min_i( np->size - sizeof(NetHeader), destSize );
 		sx_mem_copy( destBuffer, np->data + sizeof(NetHeader), size );
 
 		//	remove from the list
 		m_receivedPacks.remove_index(0);
 
-		// delete package
+		// delete packet
 		sx_mem_free(np);
 
 		return size;
@@ -145,8 +150,9 @@ void Connection::Update( class Socket* socket, const double elpsTime )
 		// the connection is dropped
 		m_outTime = 0;
 		m_connected = false;
-		sx_print(L"Warning: Connection time out !\n");
+		sx_print(L"Connection time out !\n");
 	}
+
 
 	if ( m_confirmNumber )	//	we are waiting for received confirmation from the other side
 	{
@@ -155,7 +161,6 @@ void Connection::Update( class Socket* socket, const double elpsTime )
 		if (m_retryTime > m_retryTimeMax)
 		{
 			m_retryTime = 0;
-
 			if ( m_sendingPacks.m_count )
 			{
 				connection_socket_send(socket, m_sendingPacks[0], m_destination);
@@ -165,7 +170,7 @@ void Connection::Update( class Socket* socket, const double elpsTime )
 				m_confirmNumber = 0;  // confirmed
 				m_retryTime = 0;
 				m_outTime = 0;
-			}					
+			}
 		}
 	}
 	else // just continue sending data
@@ -176,10 +181,9 @@ void Connection::Update( class Socket* socket, const double elpsTime )
 			if (m_delayTime < m_delayTimeMax) return;
 			m_delayTime = 0;
 		}
-
 		while ( m_sendingPacks.m_count && !m_confirmNumber )	// is there any message to send ?
 		{
-			NetPackage* np = m_sendingPacks[0];
+			NetPacket* np = m_sendingPacks[0];
 			connection_socket_send( socket, np, m_destination );
 
 			//	verify id the message has safe send option
@@ -240,7 +244,7 @@ void Connection::AppendReceivedMessage( class Socket* socket, const void* buffer
 		{
 			m_RecvNumber = ch->number;
 
-			NetPackage* np = (NetPackage*)sx_mem_alloc(sizeof(NetPackage));
+			NetPacket* np = (NetPacket*)sx_mem_alloc(sizeof(NetPacket));
 			np->size = size;
 			np->header = (NetHeader*)np->data;
 			sx_mem_copy(np->data, buffer, size);

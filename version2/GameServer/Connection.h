@@ -37,6 +37,9 @@ public:
 	//! set connection time out
 	void SetTimeOut( const double timeOut );
 
+	//! set connection retry time
+	void SetRetryTime( const double retryTime );
+
 	//! send data to the destination address
 	bool Send( const void* buffer, const int size, const word option );
 
@@ -53,8 +56,8 @@ public:
 	bool				m_connected;		//! specified that the connection is established
 
 	NetAddress			m_destination;		//! connection address
-	Array<NetPackage*>	m_sendingPacks;		//!	list of packages for send
-	Array<NetPackage*>	m_receivedPacks;	//!	list of received packages
+	Array<NetPacket*>	m_sendingPacks;		//!	list of packets for send
+	Array<NetPacket*>	m_receivedPacks;	//!	list of received packets
 
 	word				m_sentNumber;		//! used in reliability system. hold the number of message sent
 	word				m_RecvNumber;		//! used in reliability system. hold the number of latest message has been received
@@ -70,6 +73,7 @@ public:
 
 	double				m_outTime;			//!	time out counter
 	double				m_outTimeMax;		//! maximum time out
+
 };
 
 #endif	//	GUARD_Connection_HEADER_FILE

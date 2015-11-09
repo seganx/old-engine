@@ -106,6 +106,8 @@ private:
 
 	Iterator*	m_back;
 	Iterator*	m_front;
+
+public:
 	sint		m_count;
 
 };

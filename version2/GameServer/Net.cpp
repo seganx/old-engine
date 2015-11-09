@@ -165,14 +165,18 @@ wchar* sx_net_error_string( const sint code )
 
 SEGAN_LIB_INLINE word sx_net_compute_checksum(const void* buffer, const uint size)
 {
-	word res = SX_NET_ID;
 	const byte* buf = (const byte*)buffer;
-	for ( uint i = 0; i < size; ++i )
-		res += ( res + buf[i] ) * SX_NET_ID;
-	return res;
+	word sum1 = 0;
+	word sum2 = 0;
+	for ( uint index = 0; index < size; ++index )
+	{
+	   sum1 = (sum1 + buf[index]) % 255;
+	   sum2 = (sum2 + sum1) % 255;
+	}
+	return (sum2 << 8) | sum1;
 }
 
-bool sx_net_verify_package(const void* buffer, const uint size, const word lastNumber)
+bool sx_net_verify_packet(const void* buffer, const uint size, const word lastNumber)
 {
 	//	validate message size
 	if ( sx_between_i( size, sizeof(NetHeader), SX_NET_BUFF_SIZE ) == false )
@@ -185,7 +189,7 @@ bool sx_net_verify_package(const void* buffer, const uint size, const word lastN
 		return false;
 
 	//	validate if message is duplicated
-	if ( ch->number == lastNumber && sx_set_hasnt( ch->option, SX_NET_OPTN_SAFESEND ) )
+	if ( ch->number == lastNumber && sx_set_hasnt( ch->option, SX_NET_OPTN_CONFIRMED ) )
 		return false;
 
 	//	validate data checksum
@@ -214,6 +218,11 @@ double sx_net_get_timer(void)
 	{
 		return 0;
 	}
+}
+
+dword sx_net_get_time(void)
+{
+	return GetTickCount();
 }
 
 

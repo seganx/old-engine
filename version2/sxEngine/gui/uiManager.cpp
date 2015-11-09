@@ -12,7 +12,7 @@ uiManager::uiManager( void )
 uiManager::~uiManager( void )
 {
 	//	destroy drawable element
-	sx_delete_and_null( m_drawable );
+	sx_safe_delete_and_null( m_drawable );
 }
 
 void uiManager::add( const uiControl* control )

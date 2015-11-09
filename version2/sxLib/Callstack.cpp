@@ -7,7 +7,7 @@
 
 
 
-#if ( defined(_DEBUG) || SEGAN_CALLSTACK )
+#if ( defined(_DEBUG) || SEGAN_CALLSTACK || SEGAN_ASSERT )
 
 
 SEGAN_INLINE sint lib_assert( const wchar* expression, const wchar* file, const sint line )
@@ -19,7 +19,7 @@ SEGAN_INLINE sint lib_assert( const wchar* expression, const wchar* file, const 
 
 #if defined(_DEBUG)
 	__debugbreak();	//	just move your eyes down and look at the call stack list in IDE to find out what happened !
-#else
+#elif ( SEGAN_CALLSTACK == 1 )
 	callstack_report_to_file( L"sx_assertion", L"assertion failed !" );
 #endif
 
