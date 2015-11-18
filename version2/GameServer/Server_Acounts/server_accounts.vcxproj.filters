@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="server_accounts.cpp" />
+    <ClCompile Include="..\Connection.cpp">
+      <Filter>sxNet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Net.cpp">
+      <Filter>sxNet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Server.cpp">
+      <Filter>sxNet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Socket.cpp">
+      <Filter>sxNet</Filter>
+    </ClCompile>
+    <ClCompile Include="Database.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Database_Result.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Database_Task.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Database_Thread.cpp">
+      <Filter>Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread_Manager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Connection.h">
+      <Filter>sxNet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Net.h">
+      <Filter>sxNet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Server.h">
+      <Filter>sxNet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Socket.h">
+      <Filter>sxNet</Filter>
+    </ClInclude>
+    <ClInclude Include="Database.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database_Result.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database_Task.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database_Thread.h">
+      <Filter>Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread_Manager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="sxNet">
+      <UniqueIdentifier>{e070e3a2-2864-49b2-9aa4-e7bc36db1057}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Database">
+      <UniqueIdentifier>{96397d22-c697-41ad-a9bd-1e9248325387}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
