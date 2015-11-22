@@ -28,7 +28,7 @@ bool Socket::Open( const word port )
 
 	if ( m_socket == INVALID_SOCKET )
 	{
-		sx_print( L"Error: Can't initialize socket. error code : %s !\n" , sx_net_error_string( WSAGetLastError() ) );
+		sx_print( L"Error: Can't initialize socket. error code : %s !" , sx_net_error_string( WSAGetLastError() ) );
 		return false;
 	}
 
@@ -37,7 +37,7 @@ bool Socket::Open( const word port )
 	int i = 1;
 	if( setsockopt( m_socket, SOL_SOCKET, SO_BROADCAST, (char *)&i, sizeof(i) ) == SOCKET_ERROR )
 	{
-		sx_print(L"Error: Unable to make socket broadcast! error code : %s !\n", sx_net_error_string(WSAGetLastError()));
+		sx_print(L"Error: Unable to make socket broadcast! error code : %s !", sx_net_error_string(WSAGetLastError()));
 		Close();
 		return false;
 	}
@@ -50,7 +50,7 @@ bool Socket::Open( const word port )
 	address.sin_port = htons( port );
 	if ( bind( m_socket, (const sockaddr*) &address, sizeof(sockaddr_in) ) == SOCKET_ERROR )
 	{
-		sx_print(L"Error: Unable to bind socket! error code : %s !\n", sx_net_error_string(WSAGetLastError()));
+		sx_print(L"Error: Unable to bind socket! error code : %s !", sx_net_error_string(WSAGetLastError()));
 		Close();
 		return false;
 	}
@@ -59,12 +59,12 @@ bool Socket::Open( const word port )
 	DWORD nonBlocking = 1;
 	if ( ioctlsocket( m_socket, FIONBIO, &nonBlocking ) == SOCKET_ERROR )
 	{
-		sx_print(L"Error: Unable to make non-blocking socket! error code : %s !\n", sx_net_error_string(WSAGetLastError()));
+		sx_print(L"Error: Unable to make non-blocking socket! error code : %s !", sx_net_error_string(WSAGetLastError()));
 		Close();
 		return false;
 	}
 
-	sx_print(L"Info: Socket has been opened on port : %d\n", port);
+	sx_print(L"Info: Socket has been opened on port : %d", port);
 	return true;
 }
 

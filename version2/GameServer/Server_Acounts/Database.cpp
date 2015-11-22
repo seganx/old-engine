@@ -28,8 +28,9 @@ bool Database::initalize( const DatabaseConfig* config )
 
 	if ( mysql_real_connect( m_mysql, config->host, config->user, config->pass,	config->name, config->port, NULL, 0 ) == null )
 	{
-		sx_print( L"%s\n", mysql_error( m_mysql ) );
+		sx_print_a( "%s\n", mysql_error( m_mysql ) );
 		mysql_close( m_mysql );
+		m_mysql = null;
 		return false;
 	}
 	return true;
@@ -38,6 +39,7 @@ bool Database::initalize( const DatabaseConfig* config )
 uint Database::Command( DatabaseResult& dest, const char* command, ... )
 {
 	sx_callstack();
+	if (m_mysql == null) return 0;
 
 	// send query to SQL
 	{
@@ -53,7 +55,7 @@ uint Database::Command( DatabaseResult& dest, const char* command, ... )
 		
 		if ( mysql_query( m_mysql, sqlcommand ) )
 		{
-			sx_print( L"%s\n", sx_utf8_to_str( mysql_error( m_mysql ) ) );
+			sx_print_a( "%s\n", mysql_error( m_mysql ) );
 			return false;
 		}
 	}

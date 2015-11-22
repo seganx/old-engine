@@ -23,6 +23,7 @@
 #include "Logger.h"
 #include "Table.h"
 #include "Partition.h"
+#include "Timer.h"
 #include "Utils.h"
 
 

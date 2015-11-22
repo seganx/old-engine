@@ -146,8 +146,10 @@ typedef byte				*pbyte;
 //////////////////////////////////////////////////////////////////////////
 //	basic functions
 //////////////////////////////////////////////////////////////////////////
-#define sx_print(fmt, ...)		wprintf(fmt, __VA_ARGS__)
-#define sx_print_a(fmt, ...)	printf(fmt, __VA_ARGS__)
+#define _FILE_ sx_str_get_filename(__FILE__)
+
+#define sx_print(fmt, ...)		{ wprintf(fmt, __VA_ARGS__); printf(" - %s(%d)\n", _FILE_, __LINE__); }
+#define sx_print_a(fmt, ...)	{ printf(fmt, __VA_ARGS__);  printf(" - %s(%d)\n", _FILE_, __LINE__); }
 
 
 #if ( SEGAN_CRITICAL_SECTION == 1 )

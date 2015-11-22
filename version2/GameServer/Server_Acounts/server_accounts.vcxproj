@@ -56,6 +56,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -71,6 +72,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -85,6 +87,7 @@
     <ClCompile Include="..\Server.cpp" />
     <ClCompile Include="..\Socket.cpp" />
     <ClCompile Include="Database.cpp" />
+    <ClCompile Include="DatabaseServer.cpp" />
     <ClCompile Include="Database_Result.cpp" />
     <ClCompile Include="Database_Task.cpp" />
     <ClCompile Include="Database_Thread.cpp" />
@@ -97,6 +100,7 @@
     <ClInclude Include="..\Server.h" />
     <ClInclude Include="..\Socket.h" />
     <ClInclude Include="Database.h" />
+    <ClInclude Include="DatabaseServer.h" />
     <ClInclude Include="Database_Result.h" />
     <ClInclude Include="Database_Task.h" />
     <ClInclude Include="Database_Thread.h" />

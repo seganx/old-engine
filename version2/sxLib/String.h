@@ -30,26 +30,24 @@ SEGAN_LIB_API sint sx_str_cmp( const wchar* str1, const char* str2 );
 
 //! copy the src string to the destination string and return number of characters which have copied contain null character
 SEGAN_LIB_API sint sx_str_copy( wchar* dest, const sint dest_size_in_word, const wchar* src );
-
-//! copy the src string to the destination string and return number of characters which have copied contain null character
 SEGAN_LIB_API sint sx_str_copy( wchar* dest, const sint dest_size_in_word, const char* src );
-
-//! copy the src string to the destination string and return number of characters which have copied contain null character
-SEGAN_LIB_API sint sx_str_copy( char* dest, const sint dest_size_in_word, const wchar* src );
-
-//! copy the src string to the destination string and return number of characters which have copied contain null character
+SEGAN_LIB_API sint sx_str_copy( char* dest, const sint dest_size_in_byte, const wchar* src );
 SEGAN_LIB_API sint sx_str_copy( char* dest, const sint dest_size_in_byte, const char* src );
 
 SEGAN_LIB_API wchar sx_str_upper( wchar c );
 SEGAN_LIB_API wchar sx_str_lower( wchar c );
 SEGAN_LIB_API char sx_str_upper( char c );
 SEGAN_LIB_API char sx_str_lower( char c );
+
 SEGAN_LIB_API sint sx_str_to_int( const wchar* str, const sint defaul_val = 0 );
 SEGAN_LIB_API sint sx_str_to_int( const char* str, const sint defaul_val = 0 );
+
 SEGAN_LIB_API uint sx_str_to_uint( const wchar* str, const uint defaul_val = 0 );
+SEGAN_LIB_API uint sx_str_to_uint(const char* str, const uint defaul_val = 0);
+
 SEGAN_LIB_API uint64 sx_str_to_uint64( const wchar* str, const uint64 defaul_val = 0 );
-SEGAN_LIB_API uint sx_str_to_uint( const char* str, const uint defaul_val = 0 );
 SEGAN_LIB_API uint64 sx_str_to_uint64( const char* str, const uint64 defaul_val = 0 );
+
 SEGAN_LIB_API float sx_str_to_float( const wchar* str, const float defaul_val = 0 );
 
 /*! return true if entry string is type of file path and end with '/' or '\'*/
@@ -115,6 +113,26 @@ SEGAN_LIB_API const wchar* sx_str_exclude_extension( const wchar* filename );
 /*! return path file as string and guarantee the file path end with '/' or '\'
 NOTE: this function uses string memory pool and the returned string will be deleted in the next call*/
 SEGAN_LIB_API const wchar* sx_str_make_pathstyle( const wchar* filepath );
+
+//! point to the file name ( may contain file extension ) from full filename.
+SEGAN_LIB_API const wchar* sx_str_get_filename( const wchar* filename );
+SEGAN_LIB_API const char* sx_str_get_filename( const char* filename );
+
+//! find key in string and return the pointer of starting value
+SEGAN_LIB_API const wchar* sx_str_get_value( const wchar* str, const wchar* key );
+SEGAN_LIB_API const char* sx_str_get_value(const char* str, const char* key);
+
+//! return true if key found in string and fill out the destination with value
+SEGAN_LIB_API bool sx_str_get_value( wchar* dest, const uint dest_size_in_word, const wchar* str, const wchar* key );
+
+/*! return true if key found in string and fill out the destination with value
+NOTE: this function does not convert UNICODE characters to UTF-8 characters. Don't use to read UNICODE strings*/
+SEGAN_LIB_API bool sx_str_get_value(char* dest, const uint dest_size_in_byte, const wchar* str, const wchar* key);
+
+//! find key in string and return the value
+SEGAN_LIB_API sint sx_str_get_value_int( const wchar* str, const wchar* key, const sint default_val );
+SEGAN_LIB_API uint sx_str_get_value_uint(const wchar* str, const wchar* key, const uint default_val );
+
 
 /*! 
 string class stores strings of wide characters

@@ -1,6 +1,7 @@
 #include "String.h"
 #include "Assert.h"
 
+#include <string>
 
 SEGAN_INLINE uint sx_str_len( const wchar* str )
 {
@@ -607,6 +608,118 @@ SEGAN_INLINE const wchar* sx_str_make_pathstyle( const wchar* filepath )
 		}
 	}
 	return filepath;
+}
+
+SEGAN_LIB_API const wchar* sx_str_get_filename(const wchar* filename)
+{
+	const wchar* res = filename;
+	for (const wchar* c = filename; *c != 0; ++c)
+		if (*c == '/' || *c == '\\')
+			res = c + 1;
+	return res;
+}
+
+SEGAN_LIB_API const char* sx_str_get_filename(const char* filename)
+{
+	const char* res = filename;
+	for (const char* c = filename; *c != 0; ++c)
+		if (*c == '/' || *c == '\\')
+			res = c + 1;
+	return res;
+}
+
+SEGAN_LIB_API const wchar* sx_str_get_value(const wchar* str, const wchar* key)
+{
+	if ( str != null )
+	{
+		const wchar* c = wcsstr(str, key);
+		if ( c != null )
+		{
+			while ( *c != '\n' && *c != 0 )
+			{
+				c++;
+				if ( *c == ':' )
+				{
+					while ( *c != '\n' && *c != 0 && (*c == ':' || *c == ' ' || *c == '	') )
+						c++;
+					if ( *c != '\n' && *c != 0 )
+						return c;
+				}
+			}
+		}		
+	}	
+	return null;
+}
+
+SEGAN_LIB_API const char* sx_str_get_value(const char* str, const char* key)
+{
+	if ( str != null )
+	{
+		const char* c = strstr( str, key );
+		if (c != null)
+		{
+			while (*c != '\n' && *c != 0)
+			{
+				c++;
+				if (*c == ':')
+				{
+					while (*c != '\n' && *c != 0 && (*c == ':' || *c == ' ' || *c == '	'))
+						c++;
+					if (*c != '\n' && *c != 0)
+						return c;
+				}
+			}
+		}
+	}
+	return null;
+}
+
+SEGAN_LIB_API bool sx_str_get_value(wchar* dest, const uint dest_size_in_word, const wchar* str, const wchar* key)
+{
+	const wchar* c = sx_str_get_value( str, key );
+	if ( c )
+	{
+		uint i = 0;
+		for ( ; i < dest_size_in_word - 1; ++i )
+		{
+			if ( *c != '\n' && *c != '"' )
+				dest[i] = *c++;
+			else break;
+		}
+		dest[i] = 0;
+		return true;
+	}
+	return false;
+}
+
+SEGAN_LIB_API bool sx_str_get_value(char* dest, const uint dest_size_in_byte, const wchar* str, const wchar* key)
+{
+	const wchar* c = sx_str_get_value(str, key);
+	if (c)
+	{
+		uint i = 0;
+		for (; i < dest_size_in_byte - 1; ++i)
+		{
+			if (*c != '\n' && *c != '"')
+				dest[i] = (char)*c++;
+			else break;
+		}
+		dest[i] = 0;
+		return true;
+	}
+	return false;
+}
+
+SEGAN_LIB_API sint sx_str_get_value_int( const wchar* str, const wchar* key, const sint default_val )
+{
+	const wchar* c = sx_str_get_value( str, key );
+	return sx_str_to_int( c, default_val );
+}
+
+SEGAN_LIB_API uint sx_str_get_value_uint(const wchar* str, const wchar* key, const uint default_val)
+{
+	const wchar* c = sx_str_get_value(str, key);
+	return sx_str_to_uint(c, default_val);
 }
 
 

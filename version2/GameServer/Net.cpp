@@ -28,7 +28,7 @@ bool sx_net_initialize( void )
 
 	if ( s_netInternal  )
 	{
-		sx_print(L"Warning: calling sx_net_initialize() failed due to network system was initialized!\n");
+		sx_print(L"Warning: calling sx_net_initialize() failed due to network system was initialized!");
 		return 0;
 	}
 	bool netInitialized = true;
@@ -37,7 +37,7 @@ bool sx_net_initialize( void )
 	WSADATA wsaData;
 	if( ::WSAStartup( MAKEWORD( 2, 2 ), &wsaData ) )
 	{
-		sx_print(L"Error: Network initialization on Windows failed! error code : %s !\n", sx_net_error_string(WSAGetLastError()));
+		sx_print(L"Error: Network initialization on Windows failed! error code : %s !", sx_net_error_string(WSAGetLastError()));
 		netInitialized = false;
 	}
 
@@ -45,7 +45,7 @@ bool sx_net_initialize( void )
 	bool incorrectVersion = LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2;
 	if ( netInitialized && incorrectVersion )
 	{
-		sx_print(L"Error: Network initialization on Windows failed! Invalid version detected!\n");
+		sx_print(L"Error: Network initialization on Windows failed! Invalid version detected!");
 		netInitialized = false;
 	}
 
@@ -53,7 +53,7 @@ bool sx_net_initialize( void )
 	char hostName[128] = {0};
 	if( netInitialized && ::gethostname( hostName, sizeof(hostName) ) )
 	{
-		sx_print(L"Error: function ::gethostname() failed with error code : %s !\n", sx_net_error_string(WSAGetLastError()));
+		sx_print(L"Error: function ::gethostname() failed with error code : %s !", sx_net_error_string(WSAGetLastError()));
 		netInitialized = false;
 	}
 
@@ -61,7 +61,7 @@ bool sx_net_initialize( void )
 	hostent* pHost = ::gethostbyname( hostName );
 	if( netInitialized && !pHost )
 	{
-		sx_print(L"Error: function ::gethostbyname() failed with error code : %s !\n", sx_net_error_string(WSAGetLastError()));
+		sx_print(L"Error: function ::gethostbyname() failed with error code : %s !", sx_net_error_string(WSAGetLastError()));
 		netInitialized = false;
 	}
 	
@@ -77,9 +77,9 @@ bool sx_net_initialize( void )
 		s_netInternal->address.ip_bytes[3] = pbyte(pHost->h_addr_list[0])[3];
 		s_netInternal->address.port  = 0;
 
-		sx_print(L"Network system initialized successfully on Windows.\n");
-		sx_print(L"    Name:		%s\n", s_netInternal->name);
-		sx_print(L"    IP:			%d.%d.%d.%d \r\n\r\n",
+		sx_print(L"Network system initialized successfully on Windows.");
+		sx_print(L"	Name: %s", s_netInternal->name);
+		sx_print(L"	IP: %d.%d.%d.%d",
 			s_netInternal->address.ip_bytes[0], s_netInternal->address.ip_bytes[1], s_netInternal->address.ip_bytes[2], s_netInternal->address.ip_bytes[3] );
 	}
 	else
@@ -100,11 +100,11 @@ void sx_net_finalize( void )
 		sx_safe_delete_and_null( s_netInternal );
 
 		WSACleanup();
-		sx_print(L"Network system Finalized.  \r\n");
+		sx_print(L"Network system Finalized.");
 	}
 	else
 	{
-		sx_print(L"Warning: calling sx_net_finalize() failed due to network system was finalized or was not initialized!\n");
+		sx_print(L"Warning: calling sx_net_finalize() failed due to network system was finalized or was not initialized!");
 	}
 }
 
@@ -176,7 +176,7 @@ SEGAN_LIB_INLINE word sx_net_compute_checksum(const void* buffer, const uint siz
 	return (sum2 << 8) | sum1;
 }
 
-bool sx_net_verify_packet(const void* buffer, const uint size, const word lastNumber)
+bool sx_net_verify_packet(const void* buffer, const uint size)
 {
 	//	validate message size
 	if ( sx_between_i( size, sizeof(NetHeader), SX_NET_BUFF_SIZE ) == false )
@@ -186,10 +186,6 @@ bool sx_net_verify_packet(const void* buffer, const uint size, const word lastNu
 
 	//	validate net id
 	if ( ch->netId != SX_NET_ID )
-		return false;
-
-	//	validate if message is duplicated
-	if ( ch->number == lastNumber && sx_set_hasnt( ch->option, SX_NET_OPTN_CONFIRMED ) )
 		return false;
 
 	//	validate data checksum

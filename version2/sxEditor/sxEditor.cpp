@@ -9,6 +9,7 @@ Window*				window = null;
 d3dRenderer*		render = null;
 uiManager*			gui = null;
 Partition<uint>*	scene = null;
+Timer*				timer = null;
 
 void*				node[CNODES] = { 0 };
 
@@ -59,15 +60,15 @@ void mainloop(float elpstime)
 	//render->draw_sphere( Sphere( -3, 1, 2, 1 ), SX_D3D_WIREFRAME, 0xff6688aa );
 	//render->draw_circle( float3( 1,1,1 ), 1, SX_D3D_BILLBOARD, 0xff33cc33 );
 
-	static float timer = 1234567;
-	timer += elpstime;
+	static float s_time = 1234567;
+	s_time += elpstime;
 	for (int i = 0; i < CNODES; i++)
 	{
 		float delta = 1 + i * 0.01f;
 		scene->update_node(node[i],
-			sx_sin(timer * 0.0001f * delta + i) * SSIZE + SSIZE,
-			sx_sin(timer * 0.0002f * delta + i) * 3 + 3,
-			sx_sin(timer * 0.0003f * delta + i) * SSIZE + SSIZE);
+			sx_sin(s_time * 0.0001f * delta + i) * SSIZE + SSIZE,
+			sx_sin(s_time * 0.0002f * delta + i) * 3 + 3,
+			sx_sin(s_time * 0.0003f * delta + i) * SSIZE + SSIZE);
 
 	}
 
@@ -98,7 +99,17 @@ void mainloop(float elpstime)
 		);
 	render->draw_box(aabox, 0xffffff00);
 	uint objCount = scene->get_count_in_aabox(aabox.x1, aabox.y1, aabox.z1, aabox.x2, aabox.y2, aabox.z2);
-	window->set_title(sx_uint_to_str(objCount));
+	
+	if (0)
+	{
+		wchar tmp[64] = {0};
+		uint64 t = timer->GetCurrTime();
+		_ui64tow_s( t, tmp, 64, 10 );
+		window->set_title(tmp);
+	}
+	else window->set_title(sx_uint_to_str(objCount));
+
+
 
 	render->render(elpstime, 0);
 
@@ -141,9 +152,8 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	//////////////////////////////////////////////////////////////////////////
 	//	going to main loop in window
-	static float blendedElapesTime = 0;
-	float initTime = (float)sx_os_get_timer();
-	float elpsTime = 0;
+
+	timer = sx_new Timer;
 
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
@@ -160,18 +170,9 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			msg.message = 0;
 		}
 
-		// calculate elapsed time
-		float curTime = (float)sx_os_get_timer();
-		elpsTime = curTime - initTime;
-		initTime = curTime;
+		timer->Update();
+		mainloop(timer->m_elpsTime_smoothed);
 
-		//  avoid update when system timer has been reseted after about 47 days
-		if (0.0f < elpsTime && elpsTime < 2000.0f)
-		{
-			// call the main loop function
-			blendedElapesTime += (elpsTime - blendedElapesTime) * 0.1f;
-			mainloop(blendedElapesTime);
-		}
 	}
 
 	sx_delete_and_null(scene);

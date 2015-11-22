@@ -25,13 +25,13 @@
 struct NetConfig
 {
 	word		id;						//!	net id helps to avoid servers conflicts
-	word		recv_port;				//! server port for receiving packets
-	word		send_port;				//! server port for sending packets
-	word		packs_per_sec;			//!	number of sent packets per second. 0 means unlimited packets sent
-	word		retry_time;				//! resend time for critical packets that should be confirmed by client
-	word		retry_timeout;			//! time out for stop resending packets and close the connection
+	uint		recv_port;				//! server port for receiving packets
+	uint		send_port;				//! server port for sending packets
+	uint		packs_per_sec;			//!	number of sent packets per second. 0 means unlimited packets sent
+	uint		retry_time;				//! resend time in milliseconds for critical packets that should be confirmed by client
+	uint		retry_timeout;			//! time out in milliseconds for stop resending packets and close the connection
 
-	NetConfig( void ): id(31), recv_port(31000), send_port(32000), packs_per_sec(10), retry_time(1), retry_timeout(10) {}
+	NetConfig( void ): id(31), recv_port(31000), send_port(32000), packs_per_sec(10), retry_time(100), retry_timeout(10000) {}
 };
 
 //! report network statistics
@@ -117,7 +117,7 @@ wchar* sx_net_error_string( const sint code );
 word sx_net_compute_checksum( const void* buffer, const uint size );
 
 //! return true if the packet is a valid message
-bool sx_net_verify_packet( const void* buffer, const uint size, const word lastNumber );
+bool sx_net_verify_packet( const void* buffer, const uint size );
 
 //! return system timer with high frequency
 double sx_net_get_timer( void );

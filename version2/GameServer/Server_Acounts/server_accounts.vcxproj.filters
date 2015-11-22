@@ -27,6 +27,7 @@
       <Filter>Database</Filter>
     </ClCompile>
     <ClCompile Include="Thread_Manager.cpp" />
+    <ClCompile Include="DatabaseServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Connection.h">
@@ -54,6 +55,7 @@
       <Filter>Database</Filter>
     </ClInclude>
     <ClInclude Include="Thread_Manager.h" />
+    <ClInclude Include="DatabaseServer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="sxNet">

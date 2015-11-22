@@ -16,7 +16,7 @@ class DatabaseThread;
 class ThreadManager
 {
 public:
-	ThreadManager( const uint timeout );
+	ThreadManager( void );
 
 	//! add a new thread with specific id
 	DatabaseThread* Add( const uint id, const struct DatabaseConfig* databaseConfig );
@@ -34,7 +34,7 @@ public:
 	void CheckThreadsTime( const double elpsTime );
 
 public:
-	uint						m_timeout;		//! time out for idle thread to be destroyed
+	double						m_timeout;		//! time out for idle thread to be destroyed
 	Array<DatabaseThread*>		m_threads;		//! list of threads used for iteration
 	Map<uint, DatabaseThread*>	m_threadsMap;	//! map of threads to find a connection so fast
 };

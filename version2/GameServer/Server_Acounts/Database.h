@@ -18,10 +18,10 @@
 struct DatabaseConfig
 {
 	uint		port;
-	char*		host;				//	host of SQL server
-	char*		name;				//	name of database
-	char*		user;				//	user name of database
-	char*		pass;				//	user pass of database
+	char		host[128];				//	host of SQL server
+	char		name[128];				//	name of database
+	char		user[128];				//	user name of database
+	char		pass[128];				//	user pass of database
 };
 
 //////////////////////////////////////////////////////////////////////////

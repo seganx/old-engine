@@ -9,13 +9,13 @@
 //////////////////////////////////////////////////////////////////////////
 bool connection_socket_send(Socket* socket, const NetPacket* np, const NetAddress& address)
 {
-	sx_print(L"Sent [NO: %d, OP: %d] %s\n", np->header->number, np->header->option, np->data + sizeof(NetHeader) );
+	sx_print(L"Sent [NO: %d, OP: %d] %s", np->header->number, np->header->option, np->data + sizeof(NetHeader) );
 	return socket->Send( address, np->data, np->size );
 }
 
 bool connection_socket_send(Socket* socket, const NetHeader* nh, const NetAddress& address)
 {
-	sx_print( L"Sent header [NO: %d OP: %d CH: %d]\n", nh->number, nh->option, nh->checksum );
+	sx_print( L"Sent header [NO: %d OP: %d CH: %d]", nh->number, nh->option, nh->checksum );
 	return socket->Send( address, nh, sizeof(NetHeader) );
 }
 
@@ -94,7 +94,7 @@ bool Connection::Send( const void* buffer, const int size, const word option )
 
 	if ( (size + sizeof(NetHeader)) > SX_NET_BUFF_SIZE )
 	{
-		sx_print( L"Error: Buffer size for sending with connection is out of range!\n" );
+		sx_print( L"Error: Buffer size for sending with connection is out of range!" );
 		return false;
 	}
 
@@ -150,7 +150,7 @@ void Connection::Update( class Socket* socket, const double elpsTime )
 		// the connection is dropped
 		m_outTime = 0;
 		m_connected = false;
-		sx_print(L"Connection time out !\n");
+		sx_print(L"Connection time out !");
 	}
 
 
@@ -172,32 +172,37 @@ void Connection::Update( class Socket* socket, const double elpsTime )
 				m_outTime = 0;
 			}
 		}
+		return;
 	}
-	else // just continue sending data
-	{
-		if (m_delayTimeMax > 0)
-		{
-			m_delayTime += elpsTime;
-			if (m_delayTime < m_delayTimeMax) return;
-			m_delayTime = 0;
-		}
-		while ( m_sendingPacks.m_count && !m_confirmNumber )	// is there any message to send ?
-		{
-			NetPacket* np = m_sendingPacks[0];
-			connection_socket_send( socket, np, m_destination );
 
-			//	verify id the message has safe send option
-			if (np->header->option & SX_NET_OPTN_SAFESEND)
-			{
-				m_confirmNumber = np->header->number;
-				m_confirmChecksum = np->header->checksum;
-			}
-			else
-			{
-				m_sendingPacks.remove_index(0);
-				sx_mem_free( np );
-			}
+
+	//	handle delay time
+	if (m_delayTimeMax > 0 && m_delayTime > 0)
+	{
+		m_delayTime -= elpsTime;
+		if (m_delayTime > 0) return;
+	}
+
+
+	// is there any message to send ?
+	if ( m_sendingPacks.m_count && !m_confirmNumber )
+	{
+		NetPacket* np = m_sendingPacks[0];
+		connection_socket_send( socket, np, m_destination );
+
+		//	verify id the message has safe send option
+		if (np->header->option & SX_NET_OPTN_SAFESEND)
+		{
+			m_confirmNumber = np->header->number;
+			m_confirmChecksum = np->header->checksum;
 		}
+		else
+		{
+			m_sendingPacks.remove_index(0);
+			sx_mem_free( np );
+		}
+
+		m_delayTime = m_delayTimeMax;
 	}
 }
 
@@ -215,7 +220,7 @@ void Connection::AppendReceivedMessage( class Socket* socket, const void* buffer
 	{
 		if ( ch->number == m_confirmNumber && ch->checksum == m_confirmChecksum )
 		{
-			sx_print(L"Info: Message number %d has been confirmed from other side!\n", m_confirmNumber);
+			sx_print(L"Info: Message number %d has been confirmed from other side!", m_confirmNumber);
 
 			m_confirmNumber = 0;  // confirmed
 			m_retryTime = 0;
@@ -226,35 +231,34 @@ void Connection::AppendReceivedMessage( class Socket* socket, const void* buffer
 		}
 		else
 		{
-			// do nothing !!
+			// we should handle this situation.
 		}
+		return;
 	}
-	else
+	
+
+	//	replay to sender that safe message has been received
+	if (ch->option & SX_NET_OPTN_SAFESEND)
 	{
-		//	replay to sender that safe message has been received
-		if (ch->option & SX_NET_OPTN_SAFESEND)
-		{
-			NetHeader tmp = *ch;
-			tmp.option = SX_NET_OPTN_CONFIRMED;
-			connection_socket_send(socket, &tmp, m_destination);
-		}
-
-		//	create message container and append it to the list
-		if (ch->number != m_RecvNumber)
-		{
-			m_RecvNumber = ch->number;
-
-			NetPacket* np = (NetPacket*)sx_mem_alloc(sizeof(NetPacket));
-			np->size = size;
-			np->header = (NetHeader*)np->data;
-			sx_mem_copy(np->data, buffer, size);
-
-			//	add it to the received list
-			m_receivedPacks.push_back(np);
-
-			sx_print( L"message received header [NO: %d OP: %d CH: %d]\n", np->header->number, np->header->option, np->header->checksum );
-		}
+		NetHeader tmp = *ch;
+		tmp.option = SX_NET_OPTN_CONFIRMED;
+		connection_socket_send(socket, &tmp, m_destination);
 	}
 
+	//	create message container and append it to the list
+	if (ch->number != m_RecvNumber)
+	{
+		m_RecvNumber = ch->number;
+
+		NetPacket* np = (NetPacket*)sx_mem_alloc(sizeof(NetPacket));
+		np->size = size;
+		np->header = (NetHeader*)np->data;
+		sx_mem_copy(np->data, buffer, size);
+
+		//	add it to the received list
+		m_receivedPacks.push_back(np);
+
+		sx_print( L"message received header [NO: %d OP: %d CH: %d]", np->header->number, np->header->option, np->header->checksum );
+	}
 }
 

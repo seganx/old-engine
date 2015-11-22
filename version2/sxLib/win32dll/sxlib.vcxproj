@@ -60,11 +60,13 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -98,6 +100,7 @@
     <ClInclude Include="..\Stream.h" />
     <ClInclude Include="..\String.h" />
     <ClInclude Include="..\Table.h" />
+    <ClInclude Include="..\Timer.h" />
     <ClInclude Include="..\Utils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +110,7 @@
     <ClCompile Include="..\Math.cpp" />
     <ClCompile Include="..\Memory.cpp" />
     <ClCompile Include="..\String.cpp" />
+    <ClCompile Include="..\Timer.cpp" />
     <ClCompile Include="..\Utils.cpp" />
     <ClCompile Include="sxlib.cpp" />
   </ItemGroup>

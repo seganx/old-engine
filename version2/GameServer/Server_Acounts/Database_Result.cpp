@@ -67,6 +67,6 @@ void DatabaseResult::Print()
 {
 	for (uint i = 0; i < m_count; ++i )
 	{
-		sx_print( L"[%d] %s\n", i, m_data[i] );
+		sx_print( L"[%d] %s", i, m_data[i] );
 	}
 }

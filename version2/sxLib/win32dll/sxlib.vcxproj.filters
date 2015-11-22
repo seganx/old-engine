@@ -54,6 +54,9 @@
     <ClInclude Include="..\Partition.h">
       <Filter>lib</Filter>
     </ClInclude>
+    <ClInclude Include="..\Timer.h">
+      <Filter>lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Callstack.cpp">
@@ -78,5 +81,8 @@
       <Filter>utils</Filter>
     </ClCompile>
     <ClCompile Include="sxlib.cpp" />
+    <ClCompile Include="..\Timer.cpp">
+      <Filter>lib</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

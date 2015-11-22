@@ -9,7 +9,7 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 	DatabaseThread* dt = (DatabaseThread*)lpParameter;
 
 	Database db;
-	db.initalize( dt->m_config );
+	if ( db.initalize( dt->m_config ) == false ) return 0;
 
 	while ( dt->m_status != DBTS_JOBSDONE )
 	{
