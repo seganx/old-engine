@@ -8,7 +8,7 @@ Timer::Timer(void): m_time(0), m_elpsTime(0), m_elpsTime_smoothed(0), m_speed(1)
 
 void Timer::Update(void)
 {
-	double tickCount = GetCurrTime() * 0.001;
+	double tickCount = GetCurrTime() * 0.000001;
 	double elpsTime = (tickCount - m_lastTime) * m_speed * m_speedFactor;
 	m_lastTime = tickCount;
 	if (elpsTime > 0)

@@ -54,7 +54,7 @@ private:
 	void UpdateStatistics( void );
 
 public:
-	NetConfig				m_config;			//! hold server configuration
+	NetConfig*				m_config;			//! hold server configuration
 	NetStats				m_stats;			//!	hold server statistics data
 	Socket*					m_sendSocket;		//! UDP socket for send packets
 	Socket*					m_recvSocket;		//! UDP socket to receive packets

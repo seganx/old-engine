@@ -103,22 +103,60 @@ bool Socket::Send( const NetAddress& destination, const void* buffer, const int 
 	return sentBytes == size;
 }
 
-sint Socket::Receive( const void* buffer, const int size, NetAddress* OUT sender )
+sint Socket::Receive( void* buffer, const int size, NetAddress* OUT sender )
 {
 	sx_assert( m_socket || buffer || size>0 );
 	sx_callstack();
 
-	int receivedBytes = 0;
+	DWORD receivedBytes = 0;
 	if ( sender )
 	{
-		SOCKADDR_IN from;
-		int fromLength = sizeof( from );
-		receivedBytes = recvfrom( m_socket, (char*)buffer, size, 0, (sockaddr*)&from, &fromLength );
-		if ( receivedBytes > 0 )
+#if 0
+		struct sockaddr_storage from;
+		int fromLength = sizeof( sockaddr_storage );
+		//receivedBytes = recvfrom( m_socket, (char*)buffer, size, 0, (sockaddr*)&from, &fromLength );
+
+		DWORD flag = 0;
+		WSABUF winBuf;
+		winBuf.len = size;
+		winBuf.buf = (char*)buffer;
+		int res = ::WSARecvFrom( m_socket, &winBuf, 1, &receivedBytes, &flag, (sockaddr*)&from, &fromLength, null, null );
+		if ( res == 0 && receivedBytes > 0 )
 		{
-			sender->ip	 = from.sin_addr.S_un.S_addr;
-			sender->port = ntohs( from.sin_port );
+			switch ( from.ss_family )
+			{
+				case AF_INET:
+				{
+					sockaddr_in* sa = (sockaddr_in*)&from;
+					sender->ip = sa->sin_addr.S_un.S_addr;
+					sender->port = ntohs(sa->sin_port);
+
+
+					sx_print_a("\ngetting host name: ...");
+					struct hostent* h = gethostbyaddr((const char*)&sender->ip, 4, AF_INET);
+					sx_print_a("\ndone: ");
+					//byte* hp = (byte*)h->h_addr_list[0];
+					sx_print_a("\n\nName: %s", h->h_name);
+					//sx_print_a("\n\nName: %s, adrs: %u.%u.%u.%u", h->h_name, hp[0], hp[1], hp[2], hp[3]);
+					Sleep(10000);
+				}
+					break;
+				case AF_INET6:
+					break;
+			}
 		}
+#else
+		struct sockaddr_in from;
+		int fromlen = sizeof(from);
+		sx_mem_set(&from, 0, sizeof(from));
+		receivedBytes = recvfrom(m_socket, (char*)buffer, size, 0, (sockaddr*)&from, &fromlen);
+		if ( receivedBytes > 0)
+		{
+			sender->ip = from.sin_addr.S_un.S_addr;
+			sender->port = ntohs(from.sin_port);
+		}
+#endif
+
 	}
 	else
 	{

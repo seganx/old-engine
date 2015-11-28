@@ -92,6 +92,7 @@
     <ClCompile Include="Database_Task.cpp" />
     <ClCompile Include="Database_Thread.cpp" />
     <ClCompile Include="server_accounts.cpp" />
+    <ClCompile Include="sxConsole.cpp" />
     <ClCompile Include="Thread_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +105,7 @@
     <ClInclude Include="Database_Result.h" />
     <ClInclude Include="Database_Task.h" />
     <ClInclude Include="Database_Thread.h" />
+    <ClInclude Include="sxConsole.h" />
     <ClInclude Include="Thread_Manager.h" />
   </ItemGroup>
   <ItemGroup>

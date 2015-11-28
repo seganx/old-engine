@@ -28,7 +28,7 @@ bool Database::initalize( const DatabaseConfig* config )
 
 	if ( mysql_real_connect( m_mysql, config->host, config->user, config->pass,	config->name, config->port, NULL, 0 ) == null )
 	{
-		sx_print_a( "%s\n", mysql_error( m_mysql ) );
+		sx_print_a( "Error: %s", mysql_error( m_mysql ) );
 		mysql_close( m_mysql );
 		m_mysql = null;
 		return false;
@@ -55,7 +55,7 @@ uint Database::Command( DatabaseResult& dest, const char* command, ... )
 		
 		if ( mysql_query( m_mysql, sqlcommand ) )
 		{
-			sx_print_a( "%s\n", mysql_error( m_mysql ) );
+			sx_print_a( "Error: %s", mysql_error( m_mysql ) );
 			return false;
 		}
 	}

@@ -38,15 +38,19 @@ DatabaseServer::DatabaseServer(void)
 	, m_netConfig(0)
 	, m_dbConfig(0)
 {
+	// create configuration file
+	m_netConfig = sx_new NetConfig;
+	m_dbConfig = sx_new DatabaseConfig;
+}
 
+DatabaseServer::~DatabaseServer(void)
+{
+	sx_safe_delete_and_null(m_dbConfig);
+	sx_safe_delete_and_null(m_netConfig);
 }
 
 void DatabaseServer::Initialize(void)
 {
-	// create configuration file
-	m_netConfig = sx_new NetConfig;
-	m_dbConfig = sx_new DatabaseConfig;
-
 	//	create objects
 	m_timer = sx_new Timer;
 	m_server = sx_new Server;
@@ -54,30 +58,26 @@ void DatabaseServer::Initialize(void)
 
 	//	initialize objects
 	m_server->Initialize(m_netConfig);
+	m_threadMan->m_timeout = m_netConfig->retry_timeout * 0.0005;
 }
 
 void DatabaseServer::Finalize(void)
 {
+	m_server->Finalize();
+
 	sx_safe_delete_and_null(m_threadMan);
 	sx_safe_delete_and_null(m_server);
-	sx_safe_delete_and_null(m_timer);
-	sx_safe_delete_and_null(m_dbConfig);
-	sx_safe_delete_and_null(m_netConfig);
-}
+	sx_safe_delete_and_null(m_timer);}
 
 bool DatabaseServer::LoadConfig(const wchar* configFile)
 {
 	//	try to load configuration file
-	if (LoadConfigs(m_netConfig, m_dbConfig, configFile))
-	{
-		m_threadMan->m_timeout = m_netConfig->retry_timeout * 0.0005;
-		return true;
-	}
-	else
+	if (LoadConfigs(m_netConfig, m_dbConfig, configFile) == false)
 	{
 		sx_print(L"ERROR: Can't read the configuration file %s", configFile);
 		return false;
 	}
+	else return true;
 }
 
 void DatabaseServer::Update()

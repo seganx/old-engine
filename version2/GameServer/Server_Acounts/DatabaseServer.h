@@ -15,6 +15,7 @@ class DatabaseServer
 {
 public:
 	DatabaseServer( void );
+	~DatabaseServer( void );
 
 	//! initialize the server
 	void Initialize( void );

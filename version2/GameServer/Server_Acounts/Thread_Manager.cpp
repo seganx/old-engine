@@ -19,13 +19,15 @@ DatabaseThread* ThreadManager::Add(const uint id, const struct DatabaseConfig* d
 	m_threads.push_back(dbThread);
 	m_threadsMap.insert(id, dbThread);
 
-	sx_print_a("Thread [%u] has been created!\n", dbThread->m_id);
+	sx_print_a("Info: Thread [%u] has been created!", dbThread->m_id);
 
 	return dbThread;
 }
 
 void ThreadManager::Remove(DatabaseThread* dt)
 {
+	sx_print_a("Info: Thread [%u] has been removed!", dt->m_id);
+
 	m_threads.remove(dt);
 	m_threadsMap.remove(dt->m_id);
 
@@ -99,20 +101,12 @@ void ThreadManager::CheckThreadsTime(const double elpsTime)
 				{
 					dbThread->m_time -= elpsTime;
 					if (dbThread->m_time < 0)
-					{
-						dbThread->m_time = m_timeout;
 						dbThread->m_status = DBTS_JOBSDONE;
-					}
 				}
 				break;
 
 			case DBTS_JOBSDONE:	//	remove the database thread
-				dbThread->m_time -= elpsTime;
-				if (dbThread->m_time < 0)
-				{
-					sx_print_a("Thread [%u] has been removed!\n", dbThread->m_id);
 					Remove(dbThread);
-				}
 				break;
 		}
 	}

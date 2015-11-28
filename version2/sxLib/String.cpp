@@ -30,7 +30,7 @@ SEGAN_INLINE sint sx_str_cmp( const wchar* str1, const wchar* str2 )
 	{
 		res = (sint)(*str1 - *str2);
 		while( !res && *str1 && *str2 )
-			++str1, ++str2;
+			++str1, ++str2, res = (sint)(*str1 - *str2);
 	}
 	else if ( str1 )	res = 1;
 	else if ( str2 )	res = -1;
@@ -45,7 +45,7 @@ SEGAN_INLINE sint sx_str_cmp( const char* str1, const char* str2 )
 	{
 		res = (sint)(*str1 - *str2);
 		while( !res && *str1 && *str2 )
-			++str1, ++str2;
+			++str1, ++str2, res = (sint)(*str1 - *str2);
 	}
 	else if ( str1 )	res = 1;
 	else if ( str2 )	res = -1;
@@ -60,7 +60,7 @@ SEGAN_INLINE sint sx_str_cmp( const wchar* str1, const char* str2 )
 	{
 		res = (sint)(*str1 - *str2);
 		while( !res && *str1 && *str2 )
-			++str1, ++str2;
+			++str1, ++str2, res = (sint)(*str1 - *str2);
 	}
 	else if ( str1 )	res = 1;
 	else if ( str2 )	res = -1;	

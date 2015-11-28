@@ -9,7 +9,8 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 	DatabaseThread* dt = (DatabaseThread*)lpParameter;
 
 	Database db;
-	if ( db.initalize( dt->m_config ) == false ) return 0;
+	if ( db.initalize( dt->m_config ) == false )
+		goto _exit;
 
 	while ( dt->m_status != DBTS_JOBSDONE )
 	{
@@ -42,6 +43,8 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 		}
 	}
 
+	_exit:
+	dt->m_status = DBTS_JOBSDONE;
 	return 0;
 }
 
@@ -73,7 +76,7 @@ void DatabaseThread::Init( const uint connectionId, const double timeout, const 
 
 	m_thread = CreateThread(0, 0, &ThreadProc, this, 0, 0);
 	if ( m_thread == null )
-		sx_print(L"ERROR: Creating thread failed! OS Error: %u", GetLastError());
+		sx_print(L"Error: Creating thread failed! OS Error: %u", GetLastError());
 }
 
 void DatabaseThread::Finit(void)

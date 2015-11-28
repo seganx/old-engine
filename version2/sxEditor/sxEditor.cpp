@@ -172,7 +172,6 @@ sint APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 		timer->Update();
 		mainloop(timer->m_elpsTime_smoothed);
-
 	}
 
 	sx_delete_and_null(scene);

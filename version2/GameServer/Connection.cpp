@@ -9,17 +9,15 @@
 //////////////////////////////////////////////////////////////////////////
 bool connection_socket_send(Socket* socket, const NetPacket* np, const NetAddress& address)
 {
-	sx_print(L"Sent [NO: %d, OP: %d] %s", np->header->number, np->header->option, np->data + sizeof(NetHeader) );
+	sx_print(L"Info: Send [NO: %d, OP: %d, IP:%d.%d.%d.%d:%d]", np->header->number, np->header->option, address.ip_bytes[0], address.ip_bytes[1], address.ip_bytes[2], address.ip_bytes[3], address.port );
 	return socket->Send( address, np->data, np->size );
 }
 
 bool connection_socket_send(Socket* socket, const NetHeader* nh, const NetAddress& address)
 {
-	sx_print( L"Sent header [NO: %d OP: %d CH: %d]", nh->number, nh->option, nh->checksum );
+	sx_print( L"Info: Send header [NO: %d OP: %d CH: %d, IP:%d.%d.%d.%d:%d]", nh->number, nh->option, nh->checksum, address.ip_bytes[0], address.ip_bytes[1], address.ip_bytes[2], address.ip_bytes[3], address.port );
 	return socket->Send( address, nh, sizeof(NetHeader) );
 }
-
-
 
 Connection::Connection( void )
 	: m_connected(true)
@@ -150,7 +148,7 @@ void Connection::Update( class Socket* socket, const double elpsTime )
 		// the connection is dropped
 		m_outTime = 0;
 		m_connected = false;
-		sx_print(L"Connection time out !");
+		sx_print(L"Warning: Connection time out !");
 	}
 
 
@@ -257,8 +255,13 @@ void Connection::AppendReceivedMessage( class Socket* socket, const void* buffer
 
 		//	add it to the received list
 		m_receivedPacks.push_back(np);
+	} 
 
-		sx_print( L"message received header [NO: %d OP: %d CH: %d]", np->header->number, np->header->option, np->header->checksum );
+	{
+		char tmp[SX_NET_BUFF_SIZE] = {0};
+		int copysize = sx_min_i(size, SX_NET_BUFF_SIZE-1);
+		sx_mem_copy(tmp, (byte*)buffer + sizeof(NetHeader), copysize);
+		sx_print_a("Info: Received [NO: %d OP: %d CH: %d, IP:%d.%d.%d.%d:%d]: %s", ch->number, ch->option, ch->checksum, m_destination.ip_bytes[0], m_destination.ip_bytes[1], m_destination.ip_bytes[2], m_destination.ip_bytes[3], m_destination.port, tmp);
 	}
 }
 

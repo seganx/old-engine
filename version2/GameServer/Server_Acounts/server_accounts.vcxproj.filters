@@ -28,6 +28,9 @@
     </ClCompile>
     <ClCompile Include="Thread_Manager.cpp" />
     <ClCompile Include="DatabaseServer.cpp" />
+    <ClCompile Include="sxConsole.cpp">
+      <Filter>sxConsole</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Connection.h">
@@ -56,6 +59,9 @@
     </ClInclude>
     <ClInclude Include="Thread_Manager.h" />
     <ClInclude Include="DatabaseServer.h" />
+    <ClInclude Include="sxConsole.h">
+      <Filter>sxConsole</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="sxNet">
@@ -63,6 +69,9 @@
     </Filter>
     <Filter Include="Database">
       <UniqueIdentifier>{96397d22-c697-41ad-a9bd-1e9248325387}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sxConsole">
+      <UniqueIdentifier>{552217ba-23bc-4d15-a0c3-a6d3fa139d90}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

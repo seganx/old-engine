@@ -34,7 +34,7 @@ public:
 	bool Send( const NetAddress& destination, const void* buffer, const int size );
 
 	//! pick up data on the port and fill out address of sender
-	sint Receive( const void* buffer, const int size, NetAddress* OUT sender );
+	sint Receive( void* buffer, const int size, NetAddress* OUT sender );
 
 public:
 	uint	m_socket;

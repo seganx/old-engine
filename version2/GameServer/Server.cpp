@@ -5,6 +5,7 @@
 
 
 Server::Server(void) 
+	: m_config(0)
 {
 	sx_mem_set( &m_stats, 0, sizeof(m_stats) );
 	m_stats.min_cycle_per_sec = 9999999;
@@ -17,16 +18,19 @@ void Server::Initialize( const NetConfig* config /*= null*/, CBServer add /*= nu
 	sx_callstack();
 	sx_print( L"\nInfo: Initializing server:");
 
-	if ( config )
-		m_config = *config;
+	m_config = (NetConfig*)config;
 
 	sx_print( L"Info: Opening receiver port:" );
 	m_recvSocket = sx_new Socket;
-	m_recvSocket->Open( m_config.recv_port );
+	m_recvSocket->Open( m_config->recv_port );
 
-	sx_print( L"Info: Opening sender port:" );
-	m_sendSocket = sx_new Socket;
-	m_sendSocket->Open( m_config.send_port );
+	if (m_config->send_port != m_config->recv_port)
+	{
+		sx_print(L"Info: Opening sender port:");
+		m_sendSocket = sx_new Socket;
+		m_sendSocket->Open(m_config->send_port);
+	}
+	else m_sendSocket = m_recvSocket;
 
 	m_stats.start_time = sx_net_get_time();
 
@@ -72,7 +76,7 @@ void Server::Update( const double elpsTime )
 				if (m_connectionRem(con) == false)
 					continue;
 
-			sx_print( L"Info: Connection closed from %d.%d.%d.%d:%d", con->m_destination.ip_bytes[0], con->m_destination.ip_bytes[1], con->m_destination.ip_bytes[2], con->m_destination.ip_bytes[3], con->m_destination.port );
+			sx_print( L"Info: Connection closed [%d.%d.%d.%d:%d]", con->m_destination.ip_bytes[0], con->m_destination.ip_bytes[1], con->m_destination.ip_bytes[2], con->m_destination.ip_bytes[3], con->m_destination.port );
 			RemoveConnection( i-- );
 			sx_print( L"Info: Total connections: %d", m_connections.m_count );
 		}
@@ -87,9 +91,9 @@ Connection* Server::AddConnection( const NetAddress& address )
 	Connection* res = sx_new Connection;
 
 	//	set properties
-	res->SetSpeed( m_config.packs_per_sec );
-	res->SetRetryTime( m_config.retry_time / 1000.0 );
-	res->SetTimeOut( m_config.retry_timeout / 1000.0 );
+	res->SetSpeed( m_config->packs_per_sec );
+	res->SetRetryTime( m_config->retry_time / 1000.0 );
+	res->SetTimeOut( m_config->retry_timeout / 1000.0 );
 	res->Open( address );
 
 	//	add connection to the connection list
