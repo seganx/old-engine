@@ -88,7 +88,6 @@
     <ClCompile Include="..\Socket.cpp" />
     <ClCompile Include="Database.cpp" />
     <ClCompile Include="DatabaseServer.cpp" />
-    <ClCompile Include="Database_Result.cpp" />
     <ClCompile Include="Database_Task.cpp" />
     <ClCompile Include="Database_Thread.cpp" />
     <ClCompile Include="server_accounts.cpp" />
@@ -102,7 +101,6 @@
     <ClInclude Include="..\Socket.h" />
     <ClInclude Include="Database.h" />
     <ClInclude Include="DatabaseServer.h" />
-    <ClInclude Include="Database_Result.h" />
     <ClInclude Include="Database_Task.h" />
     <ClInclude Include="Database_Thread.h" />
     <ClInclude Include="sxConsole.h" />

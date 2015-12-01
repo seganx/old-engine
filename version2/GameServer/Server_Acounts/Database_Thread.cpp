@@ -36,7 +36,8 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 					for (int i = 0; i < 64 && *s != 0; ++i)
 						nickName[i] = *s++;
 
-					db.Command( dt->m_current->m_result, "INSERT INTO players(deviceId, nickname) VALUES('%s', '%s')", deviceID, nickName );
+					dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "INSERT INTO players(deviceId, nickname) VALUES('%s', '%s')", deviceID, nickName);
+					//dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "SELECT COUNT(*) FROM players;");
 					
 					dt->m_status = DBTS_RECEIVED;
 				}
@@ -58,7 +59,8 @@ DatabaseThread::DatabaseThread(void)
 	, m_id(0)
 	, m_thread(null)
 	, m_config(null)
-	, m_time(0)
+	, m_deadtime(0)
+	, m_maxdeadtime(5)
 {
 }
 
@@ -71,7 +73,7 @@ DatabaseThread::~DatabaseThread(void)
 void DatabaseThread::Init( const uint connectionId, const double timeout, const struct DatabaseConfig* databaseConfig )
 {
 	m_id = connectionId;
-	m_time = timeout;
+	m_deadtime = m_maxdeadtime = timeout;
 	m_config = databaseConfig;
 
 	m_thread = CreateThread(0, 0, &ThreadProc, this, 0, 0);
@@ -85,11 +87,61 @@ void DatabaseThread::Finit(void)
 	{
 		CloseHandle(m_thread);
 		m_thread = null;
-	}	
+	}
+
+	sx_safe_delete_and_null(m_current);
+
+	DatabaseTask* task = null;
+	while (m_queue.pop(task))
+		sx_safe_delete_and_null(task);
 }
 
 void DatabaseThread::Add( DatabaseTask* task )
 {
 	m_queue.push(task);
+}
+
+uint DatabaseThread::PeekResult(char* dest, const uint destsize)
+{
+	uint res = 0;
+	switch (m_status)
+	{
+		case DBTS_RECEIVED:
+			if (m_current)
+			{
+				if ( m_current->m_ressize > 0 && m_current->m_ressize <= destsize )
+				{
+					sx_mem_copy( dest, m_current->m_res, m_current->m_ressize );
+					res = m_current->m_ressize;
+				}
+				sx_delete_and_null( m_current );
+			}
+			m_status = DBTS_NONE;
+			break;
+	}
+	return res;
+}
+
+void DatabaseThread::Update(void)
+{
+	switch (m_status)
+	{
+		case DBTS_NONE:
+			if (m_current == null)
+			{
+				if (m_queue.pop(m_current))
+				{
+					m_deadtime = m_maxdeadtime;
+					m_status = DBTS_READY;
+				}
+				else
+				{
+					m_deadtime -= g_timer->m_elpsTime;
+					if (m_deadtime < 0)
+						m_status = DBTS_JOBSDONE;
+				}
+			}
+			break;
+	}
 }
 

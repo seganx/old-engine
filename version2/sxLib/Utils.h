@@ -14,8 +14,31 @@
 #include "String.h"
 
 
+#define  SX_RAW_SIZE_TYPE		word
 #define  SX_PROTOCOL_COMPRESS	0x01000000		//	data compressed
 #define  SX_PROTOCOL_ENCRYPT	0x02000000		//	data encrypted
+
+
+//! copy data to destination buffer from the source buffer and return pointer to the beginning of next data. return null if no more data available 
+SEGAN_LIB_API const char* sx_raw_read( char* dest, const SX_RAW_SIZE_TYPE destsize, const char* src );
+
+//! copy data which is specified by index to destination buffer from the source buffer and return false if no data available
+SEGAN_LIB_API bool sx_raw_read( char* dest, const SX_RAW_SIZE_TYPE destsize, const char* src, const uint dataindex );
+
+/*! 
+append data to the destination buffer and return new size of raw data on successful. return 0 on fail
+NOTE: destination buffer should be 0 filled
+*/
+SEGAN_LIB_API uint sx_raw_write( char* dest, const uint destsize, const char* data, const SX_RAW_SIZE_TYPE size );
+
+/*!
+append text to the destination buffer and return new size of raw data on successful. return 0 on fail
+NOTE: destination buffer should be 0 filled
+*/
+SEGAN_LIB_API uint sx_raw_write_text(char* dest, const uint destsize, const char* data);
+
+//! print raw data on console
+SEGAN_LIB_API void sx_raw_print( const char* src );
 
 //!	load a text file and append that to the string
 SEGAN_LIB_API bool sx_load_string( String& dest, const wchar* filename );
@@ -47,7 +70,7 @@ public:
 	{
 		char	type[8];	//! type of data
 		uint	size;		//! size of data
-		char*	data;		//! pointer to the main data. DO NOT changing that
+		char*	data;		//! pointer to the main data. DO NOT change that
 	};
 
 public:

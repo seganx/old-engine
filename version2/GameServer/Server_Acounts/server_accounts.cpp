@@ -7,6 +7,8 @@
 #define NET_ID 32
 #define BUF_SZ 1024	
 
+extern Timer* g_timer = null;
+
 int wmain(int argc, wchar* argv[])
 {
 	sx_callstack();
@@ -33,6 +35,7 @@ int wmain(int argc, wchar* argv[])
 			msg.message = 0;
 		}
 
+		g_timer->Update();
 		dbServer.Update();
 
 		{
@@ -67,7 +70,6 @@ int wmain(int argc, wchar* argv[])
 
 	sx_net_finalize();
 
-	getchar();
 	sx_detect_crash();
 	return 0;
 }

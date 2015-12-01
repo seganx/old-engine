@@ -9,7 +9,9 @@
 #ifndef DATABASE_TASK_DEFINED
 #define DATABASE_TASK_DEFINED
 
-#include "Database_Result.h"
+#include "../Net.h"
+
+#define  SX_DB_RESULT_SIZE  2048
 
 class DatabaseTask
 {
@@ -17,8 +19,9 @@ public:
 	DatabaseTask( const char* receivedMsg, const uint msgSize );
 
 public:
-	char			m_msg[SX_NET_BUFF_SIZE];	//! received message from connection
-	DatabaseResult	m_result;					//! result of database
+	char	m_msg[SX_NET_BUFF_SIZE];	//! received message from connection
+	char	m_res[SX_DB_RESULT_SIZE];	//! result of database
+	word	m_ressize;					//! result size in byte
 };
 
 

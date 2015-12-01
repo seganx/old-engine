@@ -55,16 +55,27 @@ void Server::Finalize(void)
 
 	m_recvSocket->Close();
 	m_sendSocket->Close();
+
+	if (m_sendSocket == m_recvSocket)
+	{
+		sx_delete_and_null( m_sendSocket );
+		m_recvSocket = null;
+	}
+	else 
+	{
+		sx_delete_and_null(m_sendSocket);
+		sx_delete_and_null(m_recvSocket);
+	}
 }
 
-void Server::Update( const double elpsTime )
+void Server::Update( void )
 {
 	// peek packets on the port
 	PeekReceivedMessages();
 
 	// update connections
 	for ( int i = 0; i < m_connections.m_count; ++i )
-		m_connections[i]->Update( m_sendSocket, elpsTime );
+		m_connections[i]->Update( m_sendSocket, g_timer->m_elpsTime );
 
 	// remove lost connections from the list
 	for (int i = 0; i < m_connections.m_count; ++i)

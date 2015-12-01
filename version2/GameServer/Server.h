@@ -37,7 +37,7 @@ public:
 	void Finalize( void );
 
 	//! peek data from port and manage connections
-	void Update( const double elpsTime );
+	void Update( void );
 
 private:
 

@@ -85,11 +85,11 @@ public:
 		m_item[index] = newItem;
 	}
 
-	SEGAN_LIB_INLINE bool remove( const T& item )
+	SEGAN_LIB_INLINE bool remove( const T& item, const bool keep_order = true )
 	{
 		sint i = index_of( item );
 		if ( i < 0 ) return false;
-		remove_index( i );
+		remove_index( i, keep_order );
 		return true;
 	}
 

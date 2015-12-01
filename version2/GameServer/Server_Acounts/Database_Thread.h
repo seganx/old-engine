@@ -36,14 +36,21 @@ public:
 	//! add a new task to thread
 	void Add( class DatabaseTask* task );
 
+	//! peek received results and return the result length in byte. return 0 if no result exist
+	uint PeekResult( char* dest, const uint destsize );
+
+	//! update thread
+	void Update( void );
+
 public:
-	uint							m_id;			//! id of the thread
-	double							m_time;			//! time of the last received message
-	void*							m_thread;		//! handle of the thread
-	const struct DatabaseConfig*	m_config;		//! configuration of SQL database 
-	DataBaseThreadStatus			m_status;		//! status of the thread
-	class DatabaseTask*				m_current;		//! current task is processing
-	Queue<class DatabaseTask*>		m_queue;		//! queue of database query
+	uint							m_id;				//! id of the thread
+	double							m_deadtime;			//! time of the last received message
+	double							m_maxdeadtime;		//! thread will be destroyed after this delay time when task queue became empty
+	void*							m_thread;			//! handle of the thread
+	const struct DatabaseConfig*	m_config;			//! configuration of SQL database 
+	DataBaseThreadStatus			m_status;			//! status of the thread
+	class DatabaseTask*				m_current;			//! current task is processing
+	Queue<class DatabaseTask*>		m_queue;			//! queue of database query
 };
 
 #endif	//	DATABASE_THREAD_DEFINED

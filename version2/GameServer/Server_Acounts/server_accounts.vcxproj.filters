@@ -17,9 +17,6 @@
     <ClCompile Include="Database.cpp">
       <Filter>Database</Filter>
     </ClCompile>
-    <ClCompile Include="Database_Result.cpp">
-      <Filter>Database</Filter>
-    </ClCompile>
     <ClCompile Include="Database_Task.cpp">
       <Filter>Database</Filter>
     </ClCompile>
@@ -46,9 +43,6 @@
       <Filter>sxNet</Filter>
     </ClInclude>
     <ClInclude Include="Database.h">
-      <Filter>Database</Filter>
-    </ClInclude>
-    <ClInclude Include="Database_Result.h">
       <Filter>Database</Filter>
     </ClInclude>
     <ClInclude Include="Database_Task.h">

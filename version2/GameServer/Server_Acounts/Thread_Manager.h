@@ -27,14 +27,10 @@ public:
 	//! add a task to manager and return the thread object. it will create a new thread object if needed. return null on failed
 	DatabaseThread* AddTask( const uint threadId, const struct DatabaseConfig* databaseConfig, const char* msg, const uint msgsize );
 
-	//! update thread which is specified with id
-	void Update( const uint threadId, class Connection* connection );
-
 	//! update thread's time for dead connection detection
-	void CheckThreadsTime( const double elpsTime );
+	void Update( void );
 
 public:
-	double						m_timeout;		//! time out for idle thread to be destroyed
 	Array<DatabaseThread*>		m_threads;		//! list of threads used for iteration
 	Map<uint, DatabaseThread*>	m_threadsMap;	//! map of threads to find a connection so fast
 };

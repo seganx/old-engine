@@ -7,6 +7,7 @@
 #include <Windows.h>
 #endif
 
+extern Timer* g_timer = null;
 extern bool	callstack_end;
 
 
@@ -43,6 +44,8 @@ SEGAN_INLINE void lib_leave_cs( void )
 // initialize internal library
 void sx_lib_initialize( void )
 {
+	g_timer = sx_new Timer;
+
 #if SEGAN_CRITICAL_SECTION
 	lib_init_cs();
 #endif
@@ -89,5 +92,7 @@ void sx_lib_finalize( void )
 #if SEGAN_CRITICAL_SECTION
 	lib_finit_cs();
 #endif
+
+	sx_safe_delete_and_null(g_timer);
 }
 

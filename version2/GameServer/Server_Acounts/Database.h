@@ -10,7 +10,6 @@
 #define GUARD_Database_HEADER_FILE
 
 #include "../Net.h"
-#include "Database_Result.h"
 
 //////////////////////////////////////////////////////////////////////////
 //	database configuration
@@ -22,6 +21,7 @@ struct DatabaseConfig
 	char		name[128];				//	name of database
 	char		user[128];				//	user name of database
 	char		pass[128];				//	user pass of database
+	uint		threadTimeout;			//	timeout for unused thread in milliseconds
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -37,8 +37,11 @@ public:
 	//	initialize the database
 	bool initalize( const DatabaseConfig* config );
 
-	//  send command to mySql server and fill out destination buffer with retrieved data. return number of rows
-	uint Command( DatabaseResult& dest, const char* command, ... );
+	//  send command to mySql server and fill out destination buffer with retrieved data. return data size in byte
+	uint Command(char* dest, const uint destsize, const char* command);
+
+	//  send command to mySql server and fill out destination buffer with retrieved data. return data size in byte
+	uint FormatCommand( char* dest, const uint destsize, const char* command, ... );
 
 public:
 	struct st_mysql* m_mysql;

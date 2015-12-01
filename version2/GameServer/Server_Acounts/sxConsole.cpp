@@ -30,20 +30,22 @@ LRESULT WINAPI DefaultMsgProc(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 		case WM_CREATE:
-		{
 			create_log_text_control(hWnd);
-		}
 		break;
 
 		case WM_SIZE:
 		{
 			RECT rc;
-
 			GetClientRect(hWnd, &rc);
 			SetWindowPos(s_logText, 0, 10, 10, rc.right - 20, rc.bottom - 20, 0);
 		}
+		break;
+
+		case WM_CLOSE:
+			PostMessage(hWnd, WM_QUIT, 0, 0);
 			break;
 	}
+
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 

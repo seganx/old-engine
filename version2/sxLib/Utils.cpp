@@ -6,6 +6,98 @@
 #include <time.h>
 
 
+#define RSTS			sizeof(SX_RAW_SIZE_TYPE)
+#define getsize(raw)	(*((SX_RAW_SIZE_TYPE*)raw))
+
+//////////////////////////////////////////////////////////////////////////
+//	RAW DATA TOOLS
+//////////////////////////////////////////////////////////////////////////
+SEGAN_LIB_API const char* sx_raw_read(char* dest, const SX_RAW_SIZE_TYPE destsize, const char* src)
+{
+	SX_RAW_SIZE_TYPE size = getsize(src);
+	if ( size > 0 && size <= destsize )
+	{
+		src += RSTS;
+		sx_mem_copy( dest, src, size );
+		src += size;
+		return src;
+	}
+	return null;
+}
+
+SEGAN_LIB_API bool sx_raw_read(char* dest, const SX_RAW_SIZE_TYPE destsize, const char* src, const uint dataindex)
+{
+	for ( uint i = 0; i < dataindex; ++i )
+	{
+		SX_RAW_SIZE_TYPE size = getsize(src);
+		if ( size > 0 )
+			src += RSTS + size;
+		else return false;
+	}
+
+	SX_RAW_SIZE_TYPE size = getsize(src);
+	if (size > 0 && size <= destsize)
+	{
+		src += RSTS;
+		sx_mem_copy(dest, src, size);
+		return true;
+	}
+	
+	return false;
+}
+
+SEGAN_LIB_API uint sx_raw_write(char* dest, const uint destsize, const char* data, const SX_RAW_SIZE_TYPE datasize)
+{
+	uint occupied = 0;
+	SX_RAW_SIZE_TYPE size = getsize(dest);
+	while (size > 0)
+	{
+		size += RSTS;
+		dest += size;
+		occupied += size;
+		size = getsize(dest);
+	}
+
+	uint res = occupied + datasize + RSTS;
+	if (res <= destsize)
+	{
+		sx_mem_copy( dest, &datasize, RSTS );
+		dest += RSTS;
+		sx_mem_copy( dest, data, datasize );
+		return res;
+	}
+
+	return 0;
+}
+
+SEGAN_LIB_API uint sx_raw_write_text(char* dest, const uint destsize, const char* text)
+{
+	if (!text) return 0;
+	return sx_raw_write(dest, destsize, text, sx_str_len(text));
+}
+
+SEGAN_LIB_API void sx_raw_print(const char* src)
+{
+	printf("\nRaw Data:\n");
+
+	while (1)
+	{
+		char buffer[1024] = {0};
+		SX_RAW_SIZE_TYPE size = getsize(src);
+		if (size > 0 && size < 1024)
+		{
+			src += RSTS;
+			sx_mem_copy(buffer, src, size);
+			printf("%u : %s\n", size, buffer);
+			src += size;
+		}
+		else return;		
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+//	STRING TOOLS
+//////////////////////////////////////////////////////////////////////////
 SEGAN_LIB_API bool sx_load_string( String& dest, const wchar* filename )
 {
 	FILE* f = 0;

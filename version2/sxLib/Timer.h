@@ -34,4 +34,6 @@ private:
 	double m_lastTime;
 };
 
+extern class Timer* g_timer;
+
 #endif	//	SX_TIMER_DEFINED

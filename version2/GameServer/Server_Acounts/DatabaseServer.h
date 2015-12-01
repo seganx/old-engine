@@ -30,7 +30,6 @@ public:
 	void Update( void );
 
 public:
-	class Timer*			m_timer;
 	class Server*			m_server;
 	class ThreadManager*	m_threadMan;
 	struct NetConfig*		m_netConfig;
