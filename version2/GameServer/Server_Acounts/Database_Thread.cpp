@@ -24,20 +24,28 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 				{
 					dt->m_status = DBTS_WAITING;
 					
+#if 0
 					char* s = dt->m_current->m_msg;
 
 					char deviceID[64] = { 0 };
-					for ( int i = 0; i< 64 && *s != '#'; ++i )
-							deviceID[i] = *s++;
+					for (int i = 0; i < 64 && *s != '#'; ++i)
+						deviceID[i] = *s++;
 
 					s++;
 
 					char nickName[64] = { 0 };
 					for (int i = 0; i < 64 && *s != 0; ++i)
 						nickName[i] = *s++;
+#else
+					char deviceID[64] = { 0 };
+					char nickName[64] = { 0 };
 
-					dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "INSERT INTO players(deviceId, nickname) VALUES('%s', '%s')", deviceID, nickName);
-					//dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "SELECT COUNT(*) FROM players;");
+					const char* tmp = sx_raw_read(deviceID, 64, dt->m_current->m_msg);
+					tmp = sx_raw_read(nickName, 64, tmp);
+#endif
+
+					//dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "INSERT INTO players(deviceId, nickname) VALUES('%s', '%s')", deviceID, nickName);
+					dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "SELECT COUNT(*) FROM players;");
 					
 					dt->m_status = DBTS_RECEIVED;
 				}

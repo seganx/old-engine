@@ -2,6 +2,7 @@
 
 #include "../Server.h"
 #include "DatabaseServer.h"
+#include "Thread_Manager.h"
 #include "sxConsole.h"
 
 #define NET_ID 32
@@ -44,6 +45,8 @@ int wmain(int argc, wchar* argv[])
 				L"Total Connections: %d\r\n"
 				L"Current Connections: %d\r\n"
 				L"Max Concurrent Connections: %d\r\n"
+				L"Current Threads: %d\r\n"
+				L"Cycle Per Second: %d\r\n"
 				L"Max Cycle Per Second: %d\r\n"
 				L"Min Cycle Per Second: %d\r\n"
 				L"Socket Queued Packets: %d\r\n"
@@ -53,6 +56,8 @@ int wmain(int argc, wchar* argv[])
 				dbServer.m_server->m_stats.total_connections,
 				dbServer.m_server->m_stats.curr_connections,
 				dbServer.m_server->m_stats.max_connections,
+				dbServer.m_threadMan->m_threads.m_count,
+				dbServer.m_server->m_stats.cycle_per_sec,
 				dbServer.m_server->m_stats.max_cycle_per_sec,
 				dbServer.m_server->m_stats.min_cycle_per_sec,
 				dbServer.m_server->m_stats.socket_queued_packs,

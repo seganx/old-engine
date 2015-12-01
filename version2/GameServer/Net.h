@@ -119,12 +119,6 @@ word sx_net_compute_checksum( const void* buffer, const uint size );
 //! return true if the packet is a valid message
 bool sx_net_verify_packet( const void* buffer, const uint size );
 
-//! return system timer with high frequency
-double sx_net_get_timer( void );
-
-//! return the current system time
-dword sx_net_get_time( void );
-
 
 #endif	//	GUARD_Net_HEADER_FILE
 

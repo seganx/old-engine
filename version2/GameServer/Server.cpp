@@ -32,7 +32,7 @@ void Server::Initialize( const NetConfig* config /*= null*/, CBServer add /*= nu
 	}
 	else m_sendSocket = m_recvSocket;
 
-	m_stats.start_time = sx_net_get_time();
+	m_stats.start_time = sx_time_counter() / 1000;
 
 	sx_print( L"Info: Server initialized." );
 
@@ -193,7 +193,7 @@ void Server::PeekReceivedMessages(void)
 void Server::UpdateStatistics( void )
 {
 	m_stats.helper_cps++;
-	m_stats.curr_time = sx_net_get_time();
+	m_stats.curr_time = sx_time_counter() / 1000;
 
 	//	verify that one second has been passed
 	if (m_stats.curr_time - m_stats.helper_timer < 1000) return;

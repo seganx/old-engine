@@ -25,7 +25,8 @@ bool LoadConfigs(NetConfig* netConfig, DatabaseConfig* dbConfig, const wchar* fi
 	if (!sx_str_get_value(dbConfig->name, 128, strFile, L"database.name")) return false;
 	if (!sx_str_get_value(dbConfig->user, 128, strFile, L"database.user")) return false;
 	if (!sx_str_get_value(dbConfig->pass, 128, strFile, L"database.pass")) return false;
-	dbConfig->threadTimeout = sx_str_get_value_uint(strFile, L"database.threadTimeout", 5000);
+
+	dbConfig->threadTimeout = sx_str_get_value_uint(strFile, L"threads.timeout", 5000);
 
 	return true;
 }
