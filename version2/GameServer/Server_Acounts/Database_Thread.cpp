@@ -12,48 +12,48 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 	if ( db.initalize( dt->m_config ) == false )
 		goto _exit;
 
-	while ( dt->m_status != DBTS_JOBSDONE )
+	while ( !dt->m_status.jobsdone )
 	{
-		Sleep(1);
-
-		switch ( dt->m_status )
+		if ( dt->m_status.ready )
 		{
-			case DBTS_NONE: continue;
-			case DBTS_READY:
-				if (dt->m_current)
-				{
-					dt->m_status = DBTS_WAITING;
-					
+			dt->m_status.ready = false;
+			if (dt->m_current)
+			{
+				dt->m_status.waiting = true;
 #if 0
-					char* s = dt->m_current->m_msg;
+				char* s = dt->m_current->m_msg;
 
-					char deviceID[64] = { 0 };
-					for (int i = 0; i < 64 && *s != '#'; ++i)
-						deviceID[i] = *s++;
+				char deviceID[64] = { 0 };
+				for (int i = 0; i < 64 && *s != '#'; ++i)
+					deviceID[i] = *s++;
 
-					s++;
+				s++;
 
-					char nickName[64] = { 0 };
-					for (int i = 0; i < 64 && *s != 0; ++i)
-						nickName[i] = *s++;
+				char nickName[64] = { 0 };
+				for (int i = 0; i < 64 && *s != 0; ++i)
+					nickName[i] = *s++;
 #else
-					char deviceID[64] = { 0 };
-					char nickName[64] = { 0 };
+				char deviceID[64] = { 0 };
+				char nickName[64] = { 0 };
 
-					const char* tmp = sx_raw_read(deviceID, 64, dt->m_current->m_msg);
-					tmp = sx_raw_read(nickName, 64, tmp);
+				const char* tmp = sx_raw_read(deviceID, 64, dt->m_current->m_msg);
+				tmp = sx_raw_read(nickName, 64, tmp);
 #endif
 
-					//dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "INSERT INTO players(deviceId, nickname) VALUES('%s', '%s')", deviceID, nickName);
-					dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "SELECT COUNT(*) FROM players;");
-					
-					dt->m_status = DBTS_RECEIVED;
-				}
+				dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "INSERT INTO players(deviceId, nickname) VALUES('%s', '%s')", deviceID, nickName);
+				dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "SELECT COUNT(*) FROM players;");
+				
+				dt->m_status.waiting = false;
+				dt->m_status.received = true;
+			}
+			else dt->m_status.idle = true;
 		}
+
+		//Sleep(1);
 	}
 
 	_exit:
-	dt->m_status = DBTS_JOBSDONE;
+	dt->m_status.dead = true;
 	return 0;
 }
 
@@ -62,8 +62,7 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 //	DATABASE THREAD OBJECT
 //////////////////////////////////////////////////////////////////////////
 DatabaseThread::DatabaseThread(void)
-	: m_status(DBTS_NONE)
-	, m_current(null)
+	: m_current(null)
 	, m_id(0)
 	, m_thread(null)
 	, m_config(null)
@@ -112,44 +111,45 @@ void DatabaseThread::Add( DatabaseTask* task )
 uint DatabaseThread::PeekResult(char* dest, const uint destsize)
 {
 	uint res = 0;
-	switch (m_status)
+	if (m_status.received)
 	{
-		case DBTS_RECEIVED:
-			if (m_current)
+		m_status.received = false;
+		if (m_current)
+		{
+			if ( m_current->m_ressize > 0 && m_current->m_ressize <= destsize )
 			{
-				if ( m_current->m_ressize > 0 && m_current->m_ressize <= destsize )
-				{
-					sx_mem_copy( dest, m_current->m_res, m_current->m_ressize );
-					res = m_current->m_ressize;
-				}
-				sx_delete_and_null( m_current );
+				sx_mem_copy( dest, m_current->m_res, m_current->m_ressize );
+				res = m_current->m_ressize;
 			}
-			m_status = DBTS_NONE;
-			break;
+			sx_delete_and_null( m_current );
+		}
+		m_status.idle = true;
 	}
 	return res;
 }
 
 void DatabaseThread::Update(void)
 {
-	switch (m_status)
+	if (m_status.idle)
 	{
-		case DBTS_NONE:
-			if (m_current == null)
+		if (m_current == null)
+		{
+			if (m_queue.pop(m_current))
 			{
-				if (m_queue.pop(m_current))
+				m_deadtime = m_maxdeadtime;
+				m_status.idle = false;
+				m_status.ready = true;
+			}
+			else
+			{
+				m_deadtime -= g_timer->m_elpsTime;
+				if (m_deadtime < 0)
 				{
-					m_deadtime = m_maxdeadtime;
-					m_status = DBTS_READY;
-				}
-				else
-				{
-					m_deadtime -= g_timer->m_elpsTime;
-					if (m_deadtime < 0)
-						m_status = DBTS_JOBSDONE;
+					m_status.idle = false;
+					m_status.jobsdone = true;
 				}
 			}
-			break;
+		}
 	}
 }
 

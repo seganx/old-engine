@@ -52,12 +52,10 @@ void ThreadManager::Update(void)
 
 		dbThread->Update();
 
-		switch (dbThread->m_status)
+		if (dbThread->m_status.dead)
 		{
-			case DBTS_JOBSDONE:	//	remove the database thread
-					Remove(dbThread);
-					--i;
-				break;
+			Remove(dbThread);
+			--i;
 		}
 	}
 }

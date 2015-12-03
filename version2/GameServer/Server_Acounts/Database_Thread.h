@@ -12,13 +12,16 @@
 
 #include "../Net.h"
 
-enum DataBaseThreadStatus
+struct DataBaseThreadStatus
 {
-	DBTS_NONE = 0,		//! thread is not initialized
-	DBTS_READY,			//! thread has a query and it's ready to process
-	DBTS_WAITING,		//! thread is waiting for SQL answer
-	DBTS_RECEIVED,		//! query was responded and received data is available
-	DBTS_JOBSDONE,		//! thread just finished his job and ready to destroyed
+	bool idle;			//! thread is not initialized
+	bool ready;			//! thread has a query and it's ready to process
+	bool waiting;		//! thread is waiting for SQL answer
+	bool received;		//! query was responded and received data is available
+	bool jobsdone;		//! thread just finished his job and ready for dead
+	bool dead;			//! thread has been dead and ready to remove
+
+	DataBaseThreadStatus(): idle(true), ready(false), waiting(false), received(false), jobsdone(false), dead(false) {} 
 };
 
 class DatabaseThread

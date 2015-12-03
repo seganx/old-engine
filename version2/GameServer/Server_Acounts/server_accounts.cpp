@@ -68,7 +68,7 @@ int wmain(int argc, wchar* argv[])
 			sx_window_set_text( stats );
 		}
 
-		Sleep(1);
+		//Sleep(1);
 	}
 
 	dbServer.Finalize();
