@@ -36,7 +36,7 @@ public:
 
 	~Array( void )
 	{
-		mem_free( m_item );
+		sx_mem_free( m_item );
 	}
 
 	SEGAN_LIB_INLINE void clear( void )
@@ -119,6 +119,7 @@ public:
 		if ( m_count > 1 ) quick_sort( cmpFunc, 0, m_count-1 );
 	}
 
+	//! return the index of an item from the array. return -1 of no item found
 	SEGAN_LIB_INLINE sint index_of( const T& item )
 	{
 		for ( sint i=0; i<m_count; i++ ) {
@@ -194,13 +195,13 @@ private:
 		{
 			if ( newsize > m_size || ( m_size - newsize ) > m_sampler ) {
 				m_size = sint( newsize / m_sampler  + 1 ) * m_sampler;
-				mem_realloc( (void*&)m_item, m_size * sizeof(T) );
+				m_item = (T*)sx_mem_realloc( m_item, m_size * sizeof(T) );
 			}
 		}
 		else
 		{
 			m_size = newsize;
-			mem_realloc( (void*&)m_item, m_size * sizeof(T) );
+			m_item = (T*)sx_mem_realloc( m_item, m_size * sizeof(T) );
 		}
 		
 	}

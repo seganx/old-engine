@@ -40,7 +40,7 @@ void Logger_Log( const wchar* format, ... )
 	wchar tmp1[400000];
 	tmp1[0] = 0;
 
-	sx_mem_realloc( m_buffer, 1024 );
+	m_buffer = (wchar*)sx_mem_realloc( m_buffer, 1024 );
 
 	va_list argList;
 	va_start(argList, format);
@@ -76,6 +76,23 @@ int main(int argc, char* argv[])
 			printf( "%d ", rnd.get_i( 1000 ) );
 		}
 		printf( "\n" );
+
+
+		printf("%d\n", sx_sqr_i(-2));
+		printf( "%d\n", sx_cube_i(-2) );
+		printf( "%d\n", sx_abs_i(-2) );
+
+		for ( int i = 0; i < 70; i++ )
+			printf( "%d\n", power(i, i*i) );
+		printf( "\n" );
+
+		for ( int i=0; i<100; i++ )
+			printf( "%.2f\n", sx_random_f( 20.0f ) );
+		printf( "\n" );
+
+		for ( int i=0; i<100; i++ )
+			printf( "%d\n", sx_random_i( 20 ) );
+		printf( "\n" );
 	}
 #endif
 
@@ -99,30 +116,55 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-#if 0
+#if 1
+	Array<int> array_i;
 	{
-		Array<int> array_i;
+		Randomer rnd;
+		for (uint i = 0; i < 10000000; ++i)
+		{
+			int val = rnd.get_i(255);
+			int index = array_i.index_of(val);
+			if (index >= 0)
+			{
+				//printf("remove %d, %u\n", index, val);
+				array_i.remove(val);
+			}
+			else
+			{
+				index = array_i.m_count - 1;
+				array_i.push_back( val );
+				//printf("insert %d, %u\n", index, val);
+			}
+		}
 
-		array_i.push_back(3);
-		sx_callstack_param(array_i.PushBack(3));
-		int i= array_i[0];
-
-		printf( "%d\n", sx_sqr_i(-2) );
-		printf( "%d\n", sx_cube_i(-2) );
-		printf( "%d\n", sx_abs_i(-2) );
-
-		for ( int i = 0; i < 7; i++ )
-			printf( "%d\n", power(i, i*i) );
-		printf( "\n" );
-
-		for ( int i=0; i<10; i++ )
-			printf( "%.2f\n", sx_random_f( 20.0f ) );
-		printf( "\n" );
-
-		for ( int i=0; i<10; i++ )
-			printf( "%d\n", sx_random_i( 20 ) );
-		printf( "\n" );
+		printf("\nArray test done!");
 	}
+	array_i.clear();
+#endif
+
+#if 1
+	Map<byte, uint> map;
+	{
+		Randomer rnd;
+		for (uint i =0; i<10000000; ++i)
+		{
+			byte key = rnd.get_i(255);
+			uint val = i;
+			if (map.find( key, val ))
+			{
+				//printf("remove %d, %u\n", key, val);
+				map.remove( key );
+			}
+			else
+			{
+				map.insert( key, val );
+				//printf("insert %d, %u\n", key, val);
+			}
+		}
+
+		printf("\nMap test done!");
+	}
+	map.clear();
 #endif
 
 #if 0
@@ -242,7 +284,7 @@ int main(int argc, char* argv[])
 #endif
 
 
-#if 1
+#if 0
 	{
 		Table<int> table;
 

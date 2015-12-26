@@ -34,15 +34,17 @@ public:
 	Database( void );
 	~Database( void );
 
-	//	initialize the database
+	//	initialize the SQL connection
 	bool initalize( const DatabaseConfig* config );
+
+	//	finalize the SQL connection
+	void Finalize(void);
 
 	//  send command to mySql server and fill out destination buffer with retrieved data. return data size in byte
 	uint Command(char* dest, const uint destsize, const char* command);
 
 	//  send command to mySql server and fill out destination buffer with retrieved data. return data size in byte
 	uint FormatCommand( char* dest, const uint destsize, const char* command, ... );
-
 public:
 	struct st_mysql* m_mysql;
 };

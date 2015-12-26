@@ -1,164 +1,48 @@
 #include "String.h"
-#include "Assert.h"
+#include "Callstack.h"
 
 #include <string>
 
-SEGAN_INLINE uint sx_str_len( const wchar* str )
-{
-	uint len = 0;
-	if ( str )
-	{
-		while ( *str++ ) ++len;
-	}
-	return len;
+#define char_upper(c) { if ( 'a' <= c && c <= 'z' ) c += 'A' - 'a'; return c; }
+#define char_lower(c) { if ( 'A' <= c && c <= 'Z' ) c += 'a' - 'A'; return c; }
+#define str_len(str) { uint len = 0; if ( str ) while ( *str++ ) ++len; return len; }
+
+#define str_cmp(str1, str2) {\
+	if ( str1 && str2 )	{\
+		sint res;\
+		do res = (sint)(*str1 - *str2), ++str1, ++str2; while ( !res && *str1 && *str2 );\
+		return res; }\
+	else if ( str1 ) return 1; else if ( str2 ) return -1; else return 0; }
+
+#define str_copy(dest, dest_size_in_word, src) {\
+	sx_assert(dest);\
+	sint res = 0;\
+	if (src) {\
+		for (sint m = dest_size_in_word - 1; res < m; ++res) {\
+			dest[res] = src[res];\
+			if (dest[res] == 0) break; }\
+		dest[res] = 0; }\
+	return res;\
 }
 
-SEGAN_INLINE uint sx_str_len( const char* str )
-{
-	uint len = 0;
-	if ( str )
-	{
-		while ( *str++ ) ++len;
-	}
-	return len;
-}
+SEGAN_INLINE uint sx_str_len(const char* str) { str_len(str) }
+SEGAN_INLINE uint sx_str_len(const wchar* str) { str_len(str) }
 
-SEGAN_INLINE sint sx_str_cmp( const wchar* str1, const wchar* str2 )
-{
-	sint res;
-	if ( str1 && str2 )
-	{
-		res = (sint)(*str1 - *str2);
-		while( !res && *str1 && *str2 )
-			++str1, ++str2, res = (sint)(*str1 - *str2);
-	}
-	else if ( str1 )	res = 1;
-	else if ( str2 )	res = -1;
-	else				res = 0;
-	return res;
-}
+SEGAN_INLINE sint sx_str_cmp(const char* str1, const char* str2) { str_cmp(str1, str2) }
+SEGAN_INLINE sint sx_str_cmp(const char* str1, const wchar* str2) { str_cmp(str1, str2) }
+SEGAN_INLINE sint sx_str_cmp(const wchar* str1, const char* str2) { str_cmp(str1, str2) }
+SEGAN_INLINE sint sx_str_cmp( const wchar* str1, const wchar* str2 ) { str_cmp(str1, str2) }
 
-SEGAN_INLINE sint sx_str_cmp( const char* str1, const char* str2 )
-{
-	sint res;
-	if ( str1 && str2 )
-	{
-		res = (sint)(*str1 - *str2);
-		while( !res && *str1 && *str2 )
-			++str1, ++str2, res = (sint)(*str1 - *str2);
-	}
-	else if ( str1 )	res = 1;
-	else if ( str2 )	res = -1;
-	else				res = 0;
-	return res;
-}
+SEGAN_INLINE sint sx_str_copy(char* dest, const sint dest_size_in_byte, const char* src) { str_copy(dest, dest_size_in_byte, src) }
+SEGAN_INLINE sint sx_str_copy(wchar* dest, const sint dest_size_in_word, const char* src) { str_copy(dest, dest_size_in_word, src) }
+SEGAN_INLINE sint sx_str_copy(wchar* dest, const sint dest_size_in_word, const wchar* src) { str_copy(dest, dest_size_in_word, src) }
+SEGAN_INLINE sint sx_str_copy(char* dest, const sint dest_size_in_word, const wchar* src) { str_copy(dest, dest_size_in_word, src) }
 
-SEGAN_INLINE sint sx_str_cmp( const wchar* str1, const char* str2 )
-{
-	sint res;
-	if ( str1 && str2 )
-	{
-		res = (sint)(*str1 - *str2);
-		while( !res && *str1 && *str2 )
-			++str1, ++str2, res = (sint)(*str1 - *str2);
-	}
-	else if ( str1 )	res = 1;
-	else if ( str2 )	res = -1;	
-	else				res = 0;
-	return res;
-}
+SEGAN_INLINE wchar sx_str_upper(wchar c) { char_upper(c) }
+SEGAN_INLINE char sx_str_upper(char c) { char_upper(c) }
 
-SEGAN_INLINE sint sx_str_copy( wchar* dest, const sint dest_size_in_word, const wchar* src )
-{
-	sx_assert(dest);
-	sint res = 0;
-	if ( src )
-	{
-		for ( sint m = dest_size_in_word - 1; res < m; ++res )
-		{
-			dest[res] = src[res];
-			if ( dest[res] == 0 ) break;
-		}
-		dest[res] = 0;
-	}
-	return res;
-}
-
-SEGAN_INLINE sint sx_str_copy( wchar* dest, const sint dest_size_in_word, const char* src )
-{
-	sx_assert(dest);
-	sint res = 0;
-	if ( src )
-	{
-		for ( sint m = dest_size_in_word - 1; res < m; ++res )
-		{
-			dest[res] = src[res];
-			if ( dest[res] == 0 ) break;
-		}
-		dest[res] = 0;
-	}
-	return res;
-}
-
-SEGAN_INLINE sint sx_str_copy( char* dest, const sint dest_size_in_word, const wchar* src )
-{
-	sx_assert(dest);
-	sint res = 0;
-	if ( src )
-	{
-		for ( sint m = dest_size_in_word - 1; res < m; ++res )
-		{
-			dest[res] = (char)src[res];
-			if ( dest[res] == 0 ) break;
-		}
-		dest[res] = 0;
-	}
-	return res;
-}
-
-SEGAN_INLINE sint sx_str_copy( char* dest, const sint dest_size_in_byte, const char* src )
-{
-	sx_assert(dest);
-	sint res = 0;
-	if ( src )
-	{
-		for ( sint m = dest_size_in_byte - 1; res < m; ++res )
-		{
-			dest[res] = src[res];
-			if ( dest[res] == 0 ) break;
-		}
-		dest[res] = 0;
-	}
-	return res;
-}
-
-SEGAN_INLINE wchar sx_str_upper( wchar c )
-{
-	if ( 'a' <= c && c <= 'z' )
-		c += 'A' - 'a';
-	return c;
-}
-
-SEGAN_INLINE wchar sx_str_lower( wchar c )
-{
-	if ( 'A' <= c && c <= 'Z' )
-		c += 'a' - 'A';
-	return c;
-}
-
-SEGAN_INLINE char sx_str_upper( char c )
-{
-	if ( 'a' <= c && c <= 'z' )
-		c += 'A' - 'a';
-	return c;
-}
-
-SEGAN_INLINE char sx_str_lower( char c )
-{
-	if ( 'A' <= c && c <= 'Z' )
-		c += 'a' - 'A';
-	return c;
-}
+SEGAN_INLINE wchar sx_str_lower(wchar c) { char_lower(c) }
+SEGAN_INLINE char sx_str_lower(char c) { char_lower(c) }
 
 SEGAN_INLINE sint sx_str_to_int( const wchar* str, const sint defaul_val /*= 0 */ )
 {

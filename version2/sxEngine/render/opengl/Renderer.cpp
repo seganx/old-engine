@@ -55,7 +55,7 @@ void Renderer::set_scene( const d3dScene* scene )
 
 }
 
-void Renderer::update( float elpstime )
+void Renderer::update( double elpstime )
 {
 	static float timer = 20000;
 	timer += elpstime;
@@ -64,9 +64,9 @@ void Renderer::update( float elpstime )
 	matrix proj = sx_perspective_fov( PI/3.0f, aspect, 0.5f, 1000.0f );
 	matrix view = sx_lookat(
 		float3(
-		3 + sx_sin(timer * 0.0001f) * 8.0f, 
+		3 + sx_sin(timer * 0.1f) * 8.0f, 
 		8.0f,
-		3 + sx_cos(timer * 0.0001f) * 8.0f
+		3 + sx_cos(timer * 0.1f) * 8.0f
 		),
 		float3(3, 3, 3), 
 		float3(0, 1.0f, 0)

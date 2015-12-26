@@ -131,7 +131,7 @@ public:
 	SEGAN_LIB_INLINE bool insert( const T_key& key, const T_data& item, bool overwrite = false )
 	{
 		if ( m_root == 0 ) {
-			m_root = (Leaf*)mem_alloc( sizeof(Leaf) );
+			m_root = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 			m_root->init( key, item );
 			m_count++;
 			return true;
@@ -146,7 +146,7 @@ public:
 	SEGAN_LIB_INLINE bool insert_multi( const T_key& key, const T_data& item )
 	{
 		if ( m_root == 0 ) {
-			m_root = (Leaf*)mem_alloc( sizeof(Leaf) );
+			m_root = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 			m_root->init( key, item );
 			m_count++;
 			return true;
@@ -178,7 +178,7 @@ private:
 		if ( !leaf ) return;
 		_clear( leaf->left );
 		_clear( leaf->right );
-		mem_free( leaf );
+		sx_mem_free( leaf );
 		leaf = null;
 	}
 
@@ -192,7 +192,7 @@ private:
 			}
 			else
 			{
-				root->right = (Leaf*)mem_alloc( sizeof(Leaf) );
+				root->right = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 				root->right->init( key, item );
 			}
 			break;
@@ -203,7 +203,7 @@ private:
 			}
 			else
 			{
-				root->left = (Leaf*)mem_alloc( sizeof(Leaf) );
+				root->left = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 				root->left->init( key, item );
 			}
 			break;
@@ -233,7 +233,7 @@ private:
 			}
 			else
 			{
-				root->right = (Leaf*)mem_alloc( sizeof(Leaf) );
+				root->right = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 				root->right->init( key, item );
 			}
 			break;
@@ -244,7 +244,7 @@ private:
 			}
 			else
 			{
-				root->left = (Leaf*)mem_alloc( sizeof(Leaf) );
+				root->left = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
 				root->left->init( key, item );
 			}
 			break;
@@ -284,11 +284,11 @@ private:
 			if ( !root->right ) {
 				root = root->left;
 				delOK = true;
-				mem_free( leaf );
+				sx_mem_free( leaf );
 			} else if ( !root->left ) {
 				root = root->right;
 				delOK = true;
-				mem_free( leaf );
+				sx_mem_free( leaf );
 			} else {
 				_remove_both_children( root, root->left, delOK );
 				if ( delOK ) {
@@ -308,7 +308,7 @@ private:
 			root->data = curr->data;
 			Leaf* leaf = curr;
 			curr = curr->left;
-			mem_free( leaf );
+			sx_mem_free( leaf );
 			delOK = true;
 		} else {
 			_remove_both_children( root, curr->right, delOK );

@@ -10,11 +10,11 @@
 #if ( defined(_DEBUG) || SEGAN_CALLSTACK || SEGAN_ASSERT )
 
 
-SEGAN_INLINE sint lib_assert( const wchar* expression, const wchar* file, const sint line )
+SEGAN_INLINE sint lib_assert( const char* expression, const char* file, const sint line )
 {
 
 #if ( SEGAN_CALLSTACK == 1 )
-	_CallStack _callstack( line, file, L"assertion '%s'", expression );
+	_CallStack _callstack( line, file, "assertion '%s'", expression );
 #endif
 
 #if defined(_DEBUG)
@@ -41,16 +41,16 @@ any other service so we need a pool and fill it consecutively. */
 
 struct CallStackData
 {
-	wchar	name[512];
-	wchar*	function;
-	wchar*	file;
+	char	name[512];
+	char*	function;
+	char*	file;
 	sint	line;
 };
 CallStackData	callstack_pool[CALLSTACK_MAX];
 uint			callstack_index = 0;
 extern bool		callstack_end	= false;
 
-SEGAN_INLINE void callstack_clean( CallStackData *csd )
+SEGAN_INLINE void callstack_clean(CallStackData *csd)
 {
 	csd->file = null;
 	csd->line = 0;
@@ -58,70 +58,74 @@ SEGAN_INLINE void callstack_clean( CallStackData *csd )
 	csd->function = null;
 }
 
-SEGAN_INLINE _CallStack::_CallStack( const wchar* file, const sint line, const wchar* function )
+CallStackData* callstack_push_pop(bool push)
 {
 	sx_enter_cs();
+	CallStackData* res = null;
 
-	if ( callstack_index < CALLSTACK_MAX )
+	if ( push )
 	{
+		if ( callstack_index > 0 )
+			callstack_clean( &callstack_pool[--callstack_index] );
+	}
+	else 
+	{
+		if (callstack_index < CALLSTACK_MAX)
+			res = &callstack_pool[callstack_index++];
+	}
 
-		CallStackData* csd = &callstack_pool[callstack_index++];
+	sx_leave_cs();
+	return res;
+}
 
-		csd->file = (wchar*)file;
+SEGAN_INLINE _CallStack::_CallStack( const char* file, const sint line, const char* callfunction )
+{
+	CallStackData* csd = callstack_push_pop(false);
+	if ( csd )
+	{
+		csd->file = (char*)file;
 		csd->line = line;
 		csd->name[0] = 0;
-		if ( function )
-		{
-			csd->function = (wchar*)function;
-		}
+		if ( callfunction )
+			csd->function = (char*)callfunction;
 		else
 			csd->function = null;
 	}
-	sx_leave_cs();
 }
 
-SEGAN_INLINE _CallStack::_CallStack( const sint line, const wchar* file, const wchar* function, ... )
+SEGAN_INLINE _CallStack::_CallStack( const sint line, const char* file, const char* callfunction, ... )
 {
-	sx_enter_cs();
-
-	if ( callstack_index < CALLSTACK_MAX )
+	CallStackData* csd = callstack_push_pop(false);
+	if (csd)
 	{
-		CallStackData* csd = &callstack_pool[callstack_index++];
-
-		csd->file = (wchar*)file;
+		csd->file = (char*)file;
 		csd->line = line;
 		csd->function = null;
-		if ( function )
+		if ( callfunction )
 		{
 			va_list argList;
-			va_start( argList, function );
-			sint len = _vscwprintf( function, argList);
+			va_start( argList, callfunction );
+			sint len = _vscprintf( callfunction, argList);
 			if ( len < 1023 )
-				vswprintf_s( csd->name, 1023, function, argList );
+			{
+				vsprintf_s( csd->name, 1023, callfunction, argList );
+			}
 			else
 			{
 				uint i = 0;
-				for ( ; i<1022 && function[i]; ++i )
-					csd->name[i] = function[i];
+				for ( ; i<1022 && callfunction[i]; ++i )
+					csd->name[i] = callfunction[i];
 				csd->name[i] = 0;
 			}
 			va_end( argList );
 		}
-		else
-		{
-			csd->name[0] = 0;
-		}
+		else csd->name[0] = 0;
 	}
-
-	sx_leave_cs();
 }
 
 SEGAN_INLINE _CallStack::~_CallStack( void )
 {
-	if ( callstack_index > 0 )
-	{
-		callstack_clean( &callstack_pool[--callstack_index] );
-	}
+	callstack_push_pop(true);
 }
 
 void callstack_report( CB_CallStack callback )
@@ -139,9 +143,7 @@ void callstack_report( CB_CallStack callback )
 void callstack_clear( void )
 {
 	for ( int i=0; i<CALLSTACK_MAX; i++ )
-	{
 		callstack_clean( &callstack_pool[i] );
-	}
 }
 
 void detect_crash( void )
@@ -183,7 +185,7 @@ void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ 
 			if ( csd->line && csd->file )
 			{
 				wchar tmp[1024] = {0};
-				const sint len = swprintf_s( tmp, 1024, L"%s(%d) : ", csd->file, csd->line );
+				const sint len = swprintf_s( tmp, 1024, L"%S(%d) : ", csd->file, csd->line );
 				if ( maxlength < len )
 					maxlength = len;
 			}
@@ -197,7 +199,7 @@ void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ 
 			if ( csd->line && csd->file )
 			{
 				wchar tmp[1024] = {0};
-				sint len = swprintf_s( tmp, 1024, L"%s(%d) : ", csd->file, csd->line );
+				sint len = swprintf_s( tmp, 1024, L"%S(%d) : ", csd->file, csd->line );
 
 				{
 					sint spaces = maxlength + 5 - len;
@@ -206,13 +208,13 @@ void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ 
 					len += spaces;
 				}
 
-				wchar* c = null;
+				char* c = null;
 				if ( csd->function )
 					c = csd->function;
 				else if ( csd->name[0] )
 					c = csd->name;
 				else
-					c = L"no name !";
+					c = "no name !";
 
 				while ( *c && len < 1022 )
 					tmp[len++] = *c++;

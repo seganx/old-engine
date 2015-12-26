@@ -42,7 +42,7 @@ public:
 	void set_scene( const d3dScene* scene );
 
 	//!	update renderer
-	void update( float elpstime );
+	void update( double elpstime );
 
 	//!	start to draw the scene
 	void begin_draw( const Color& bgcolor );

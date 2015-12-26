@@ -1,5 +1,4 @@
 #include <windows.h>
-
 #include "../Server.h"
 #include "DatabaseServer.h"
 #include "Thread_Manager.h"
@@ -14,7 +13,7 @@ int wmain(int argc, wchar* argv[])
 {
 	sx_callstack();
 	sx_net_initialize();
-
+	
 	DatabaseServer dbServer;
 	dbServer.LoadConfig(argc > 1 ? argv[1] : L"config.txt");
 	dbServer.Initialize();
@@ -68,7 +67,7 @@ int wmain(int argc, wchar* argv[])
 			sx_window_set_text( stats );
 		}
 
-		//Sleep(1);
+		Sleep(1);
 	}
 
 	dbServer.Finalize();

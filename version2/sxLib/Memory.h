@@ -15,15 +15,15 @@
 //////////////////////////////////////////////////////////////////////////
 //	BASIC MEMORY FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-typedef void (*CB_Memory)(const wchar* file, const uint line, const uint size, const uint tag, const bool corrupted);
+typedef void (*CB_Memory)(const char* file, const uint line, const uint size, const uint tag, const bool corrupted);
 
 SEGAN_LIB_API void		mem_set_manager( const class MemMan* manager );
 SEGAN_LIB_API MemMan*	mem_get_manager( void );
 
 SEGAN_LIB_API void*		mem_alloc( const uint sizeinbyte );
-SEGAN_LIB_API void		mem_realloc( void*& p, const uint newsizeinbyte );
+SEGAN_LIB_API void*		mem_realloc( void* p, const uint newsizeinbyte );
 SEGAN_LIB_API uint		mem_size( const void* p );
-SEGAN_LIB_API void		mem_free( const void* p );
+SEGAN_LIB_API void*		mem_free( const void* p );
 SEGAN_LIB_API void		mem_copy( void* dest, const void* src, const uint size );
 SEGAN_LIB_API void		mem_set( void* dest, const sint val, const uint size );
 
@@ -35,15 +35,15 @@ SEGAN_LIB_API void		mem_set( void* dest, const sint val, const uint size );
 #if ( SEGAN_MEMLEAK == 1 )
 
 SEGAN_LIB_API void		mem_enable_debug( const bool enable, const uint tag = 0 );
-SEGAN_LIB_API void*		mem_alloc_dbg( const uint sizeinbyte, const wchar* file, const int line );
-SEGAN_LIB_API void		mem_realloc_dbg( void*& p, const uint newsizeinbyte, const wchar* file, const int line );
-SEGAN_LIB_API void		mem_free_dbg( const void* p );
+SEGAN_LIB_API void*		mem_alloc_dbg( const uint sizeinbyte, const char* file, const int line );
+SEGAN_LIB_API void*		mem_realloc_dbg( void* p, const uint newsizeinbyte, const char* file, const int line );
+SEGAN_LIB_API void*		mem_free_dbg( const void* p );
 SEGAN_LIB_API void		mem_report_debug( CB_Memory callback, const uint tag = 0 );
 SEGAN_LIB_API void		mem_report_debug_to_file( const wchar* fileName, const uint tag = 0 );
 SEGAN_LIB_API void		mem_clear_debug( void );
 
-inline	  void*		operator new ( uint size, const wchar* file, int line ){ return mem_alloc_dbg( size, file, line ); }
-inline    void		operator delete( void *p, const wchar* file, int line ){ mem_free_dbg(p); }
+inline	  void*		operator new ( uint size, const char* file, int line ){ return mem_alloc_dbg( size, file, line ); }
+inline    void		operator delete( void *p, const char* file, int line ){ mem_free_dbg(p); }
 inline    void		operator delete( void *p ){ mem_free_dbg(p); }
 
 //! enable memory debugger and set a new tag. pass -1 to restore previews tag
@@ -59,13 +59,13 @@ inline    void		operator delete( void *p ){ mem_free_dbg(p); }
 #define sx_mem_report_debug_to_file( fileName, tag )	mem_report_debug_to_file( fileName, tag )
 
 
-#define sx_mem_alloc( sizeinbyte )				mem_alloc_dbg( sizeinbyte, _CRT_WIDE(__FILE__), __LINE__ )
-#define sx_mem_realloc( p, newsizeinbyte )		mem_realloc_dbg( (void*&)p, newsizeinbyte, _CRT_WIDE(__FILE__), __LINE__ )
+#define sx_mem_alloc( sizeinbyte )				mem_alloc_dbg( sizeinbyte, __FILE__, __LINE__ )
+#define sx_mem_realloc( p, newsizeinbyte )		mem_realloc_dbg( p, newsizeinbyte, __FILE__, __LINE__ )
 #define sx_mem_size( p )						mem_size( p )
 #define sx_mem_free( p )						mem_free_dbg( p )
 #define sx_mem_free_and_null( p )				{ mem_free_dbg( p ); p = null; }
 
-#define sx_new									new( _CRT_WIDE(__FILE__), __LINE__ )
+#define sx_new									new( __FILE__, __LINE__ )
 #define sx_delete								delete
 #define sx_delete_and_null( obj )				{ delete(obj); obj = null; }
 #define sx_safe_delete( obj )					{ if (obj) { delete(obj); } }				
@@ -82,10 +82,10 @@ inline	  void		operator delete ( void *p ){ mem_free(p); }
 #define sx_mem_report_debug_to_file( fileName, tag )
 
 #define sx_mem_alloc( sizeinbyte )				mem_alloc( sizeinbyte )
-#define sx_mem_realloc( p, newsizeinbyte )		mem_realloc( (void*&)p, newsizeinbyte )
+#define sx_mem_realloc( p, newsizeinbyte )		mem_realloc( p, newsizeinbyte )
 #define sx_mem_size( p )						mem_size( p )
-#define sx_mem_free( p )						mem_free( (void*&)p )
-#define sx_mem_free_and_null( p )				{ mem_free( p ); p = null }
+#define sx_mem_free( p )						mem_free( p )
+#define sx_mem_free_and_null( p )				{ mem_free( p ); p = null; }
 
 #define sx_new									new
 #define sx_delete								delete
@@ -111,7 +111,7 @@ public:
 	virtual ~MemMan( void ) {}
 	virtual void* alloc( const uint sizeInByte )					= 0;
 	virtual void* realloc( const void* p, const uint sizeInByte )	= 0;
-	virtual void free( const void* p )								= 0;
+	virtual void* free( const void* p )								= 0;
 	virtual uint size( const void* p )								= 0;
 };
 
@@ -133,7 +133,7 @@ public:
 	
 	void* alloc( const uint sizeInByte );
 	void* realloc( const void* p, const uint sizeInByte );
-	void free( const void* p );
+	void* free( const void* p );
 	uint size( const void* p );
 
 public:

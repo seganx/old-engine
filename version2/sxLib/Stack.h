@@ -86,11 +86,11 @@ private:
 		if ( m_sampler ) {
 			if ( newSize > m_size || ( m_size - newSize ) > m_sampler ) {
 				m_size = sint( newSize / m_sampler ) * m_sampler + m_sampler;
-				mem_realloc( (void*&)m_item, m_size * sizeof(T) );
+				m_item = (T*)mem_realloc( m_item, m_size * sizeof(T) );
 			}
 		} else {
 			m_size = newSize;
-			mem_realloc( (void*&)m_item, m_size * sizeof(T) );
+			m_item = (T*)mem_realloc( m_item, m_size * sizeof(T) );
 		}
 	}
 

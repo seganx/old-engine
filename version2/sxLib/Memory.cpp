@@ -1,15 +1,13 @@
 #include <memory>
 #include "Memory.h"
-#include "Assert.h"
+#include "Callstack.h"
 
 #if defined(_WIN32)
 #include <Windows.h>
 #endif
 
 
-#ifndef min
-#define min(a,b) (((a)<(b))?(a):(b))
-#endif
+#define mem_min_size(a,b) (((a)<(b))?(a):(b))
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -32,41 +30,28 @@ SEGAN_INLINE void* mem_alloc( const uint sizeinbyte )
 	return s_manager ? s_manager->alloc( sizeinbyte ) : ::malloc( sizeinbyte );
 }
 
-SEGAN_INLINE void mem_realloc( void*& p, const uint newsizeinbyte )
+SEGAN_INLINE void* mem_realloc( void* p, const uint newsizeinbyte )
 {
 	if ( !newsizeinbyte )
-	{
-		mem_free( p );
-		p = null;
-		return;
-	}
+		return mem_free( p );
 
 	if ( s_manager )
-	{
-		s_manager->realloc( p, newsizeinbyte );
-		return;
-	}
+		return s_manager->realloc( p, newsizeinbyte );
 
 	void* newptr = ::realloc( p, newsizeinbyte );
-	if ( newptr )
-	{
-		p = newptr;
-	}
-	else
+	if ( !newptr )
 	{
 		if ( p )
 		{
 			//  if reallocate function failed then try to allocate new one and copy last data to new pool
 			newptr = ::malloc( newsizeinbyte );
-			memcpy( newptr, p, min( sx_mem_size( p ), newsizeinbyte ) );
+			memcpy( newptr, p, mem_min_size( sx_mem_size( p ), newsizeinbyte ) );
 			::free( p );
-			p = newptr;
 		}
-		else
-		{
-			p = ::malloc( newsizeinbyte );
-		}
+		else newptr = ::malloc( newsizeinbyte );
 	}
+	
+	return newptr;
 }
 
 SEGAN_INLINE uint mem_size( const void* p )
@@ -75,23 +60,19 @@ SEGAN_INLINE uint mem_size( const void* p )
 	return s_manager ? s_manager->size( p ) : (uint)::_msize( (void*)p );	
 }
 
-SEGAN_INLINE void mem_free( const void* p )
+SEGAN_INLINE void* mem_free( const void* p )
 {
 	if ( s_manager )
-	{
-		s_manager->free( p );
-	}
+		return s_manager->free( p );
 	else
-	{
 		::free( (void*)p );
-	}
+	return null;
 }
 
 SEGAN_INLINE void mem_copy( void* dest, const void* src, const uint size )
 {
 	memcpy( dest, src, size );
 }
-
 
 SEGAN_INLINE void mem_set( void* dest, const sint val, const uint size )
 {
@@ -106,8 +87,8 @@ SEGAN_INLINE void mem_set( void* dest, const sint val, const uint size )
 
 struct MemBlock
 {
-	char		sign[16];
-	wchar*		file;
+	char		sign[16];		//! sign to check if the block is a memory block. It's different from protection sign
+	char*		file;
 	uint		line;
 	uint		size;
 	uint		tag;
@@ -119,8 +100,8 @@ static MemBlock*		s_mem_root			= null;
 static bool				s_mem_enable_leak	= false;
 static uint				s_mem_tag			= 0;
 static uint				s_mem_last_tag		= 0;
-static char*			s_mem_protection	= "!protected area!";
-static uint				s_mem_protect_size	= 16;
+static const char*		s_mem_protection	= "!protected area!";
+static const uint		s_mem_protect_size	= 16;
 static sint				s_mem_corruptions	= 0;
 
 
@@ -129,6 +110,14 @@ struct MemCodeReport
 	void*		p;		//	user coded memory
 	MemBlock*	mb;		//	memory block for log
 };
+
+SEGAN_INLINE void mem_block_to_str( wchar* dest, const int destsize, MemBlock* mb )
+{
+	if (mb->corrupted)
+		swprintf_s(dest, destsize, L"%S(%d): error! memory corrupted - size = %d - tag = %d\n", mb->file, mb->line, mb->size, mb->tag);
+	else
+		swprintf_s(dest, destsize, L"%S(%d): warning! memory leak - size = %d - tag = %d\n", mb->file, mb->line, mb->size, mb->tag);
+}
 
 SEGAN_INLINE void mem_check_protection( MemBlock* mb )
 {
@@ -143,10 +132,7 @@ SEGAN_INLINE void mem_check_protection( MemBlock* mb )
 	{
 		//	check end of memory block
 		p += s_mem_protect_size + mb->size;
-		if ( memcmp( p , s_mem_protection, s_mem_protect_size ) )
-			mb->corrupted = true;
-		else
-			mb->corrupted = false;
+		mb->corrupted = memcmp( p , s_mem_protection, s_mem_protect_size ) != 0;
 	}
 }
 
@@ -160,11 +146,11 @@ SEGAN_INLINE MemCodeReport mem_code_protection( void* p, const uint realsizeinby
 		return res;
 	}
 
-	// extract mem block
+	// extract memory block
 	res.mb = (MemBlock*)p;
 	res.mb->corrupted = false;
 
-	//	set protection sign for mem block
+	//	set protection sign for memory block
 	memcpy( res.mb->sign, s_mem_protection, s_mem_protect_size );
 
 	// prepare the result
@@ -192,7 +178,7 @@ SEGAN_INLINE MemCodeReport mem_decode_protection( const void* p )
 	else
 	{
 		res.mb	= (MemBlock*)( pbyte(p) - s_mem_protect_size - sizeof(MemBlock) );
-		res.p	= res.mb;
+		res.p	= (void*)p;
 
 		// check protection sign for memory block
 		if ( memcmp( res.mb->sign, s_mem_protection, s_mem_protect_size ) )
@@ -202,11 +188,10 @@ SEGAN_INLINE MemCodeReport mem_decode_protection( const void* p )
 		}
 		else mem_check_protection( res.mb );
 	}
-
 	return res;
 }
 
-SEGAN_INLINE void mem_debug_push( MemBlock* mb )
+SEGAN_INLINE void mem_debug_push_unsafe( MemBlock* mb )
 {
 	if ( !s_mem_root )
 	{
@@ -223,7 +208,7 @@ SEGAN_INLINE void mem_debug_push( MemBlock* mb )
 	}
 }
 
-SEGAN_INLINE void mem_debug_pop( MemBlock* mb )
+SEGAN_INLINE void mem_debug_pop_unsafe( MemBlock* mb )
 {
 	if ( s_mem_root )
 	{
@@ -243,6 +228,17 @@ SEGAN_INLINE void mem_debug_pop( MemBlock* mb )
 	}
 }
 
+SEGAN_INLINE void mem_debug_push_pop(MemBlock* mb, const bool pop = false)
+{
+	sx_enter_cs();
+	if ( pop )
+		mem_debug_pop_unsafe( mb );
+	else
+		mem_debug_push_unsafe( mb );
+	sx_leave_cs();
+}
+
+
 SEGAN_INLINE void mem_enable_debug( const bool enable, const uint tag /*= 0 */ )
 {
 	s_mem_enable_leak = enable;
@@ -257,56 +253,43 @@ SEGAN_INLINE void mem_enable_debug( const bool enable, const uint tag /*= 0 */ )
 	}
 }
 
-SEGAN_INLINE void* mem_alloc_dbg( const uint sizeinbyte, const wchar* file, const int line )
+SEGAN_INLINE void* mem_alloc_dbg( const uint sizeinbyte, const char* file, const int line )
 {
 	void* res = null;
 
 	if ( s_mem_enable_leak )
 	{
-		sx_enter_cs();
-
-		//	first block for holding data, second block for protection, memory and close with other protection
+		//	first block for holding data, second block for protection and memory, then close with other protection
 		res = mem_alloc( sizeof(MemBlock) + s_mem_protect_size + sizeinbyte + s_mem_protect_size );
+		sx_assert( res );
+		
+		//	sign memory to check memory corruption
+		MemCodeReport memreport = mem_code_protection( res, sizeinbyte );
 
-		if ( res )
+		//	store memory block to link list
+		if ( memreport.mb )
 		{
-			//	sign memory to check memory corruption
-			MemCodeReport memreport = mem_code_protection( res, sizeinbyte );
+			memreport.mb->file	= (char*)file;
+			memreport.mb->line	= line;
+			memreport.mb->size	= sizeinbyte;
+			memreport.mb->tag	= s_mem_tag;
 
-			//	store memory block to link list
-			if ( memreport.mb )
-			{
-				memreport.mb->file	= (wchar*)file;
-				memreport.mb->line	= line;
-				memreport.mb->size	= sizeinbyte;
-				memreport.mb->tag	= s_mem_tag;
-
-				mem_debug_push( memreport.mb );
-			}
-
-			//	set user memory as result
-			res = memreport.p;
+			// push the block
+			mem_debug_push_pop( memreport.mb );
 		}
 
-		sx_leave_cs();
+		//	set user memory as result
+		res = memreport.p;
 	}
-	else
-	{
-		res = mem_alloc( sizeinbyte );
-	}
+	else res = mem_alloc( sizeinbyte );
 
 	return res;
 }
 
-SEGAN_INLINE void mem_realloc_dbg( void*& p, const uint newsizeinbyte, const wchar* file, const int line )
+SEGAN_INLINE void* mem_realloc_dbg( void* p, const uint newsizeinbyte, const char* file, const int line )
 {
 	if ( !newsizeinbyte )
-	{
-		mem_free_dbg( p );
-		return;
-	}
-
-	sx_enter_cs();
+		return mem_free_dbg( p );
 
 	MemCodeReport memreport = mem_decode_protection( p );
 
@@ -322,71 +305,67 @@ SEGAN_INLINE void mem_realloc_dbg( void*& p, const uint newsizeinbyte, const wch
 
 #if ( defined(_DEBUG) || SEGAN_ASSERT )
 			//	report call stack
-			lib_assert( L"memory block has been corrupted !", memreport.mb->file, memreport.mb->line );
+			lib_assert( "memory block has been corrupted !", memreport.mb->file, memreport.mb->line );
 #endif
 		}
 		else
 		{
 			//	pop memory block from the list
-			mem_debug_pop( memreport.mb );
+			mem_debug_push_pop( memreport.mb, true );
 		}
 
 		//	realloc the memory block
-		mem_realloc( memreport.p, sizeof(MemBlock) + s_mem_protect_size + newsizeinbyte + s_mem_protect_size );
+		void* tmp = mem_realloc( memreport.mb, sizeof(MemBlock) + s_mem_protect_size + newsizeinbyte + s_mem_protect_size );
 
 		//	sign memory to check protection
-		memreport = mem_code_protection( memreport.p, newsizeinbyte );
+		memreport = mem_code_protection( tmp, newsizeinbyte );
 
 		if ( memreport.mb )
 		{
-			memreport.mb->file = (wchar*)file;
+			memreport.mb->file = (char*)file;
 			memreport.mb->line = line;
 			memreport.mb->size = newsizeinbyte;
 			memreport.mb->tag = s_mem_tag;
 
-			mem_debug_push( memreport.mb );
+			//	push new block
+			mem_debug_push_pop( memreport.mb );
 		}
 
 		//	set as result
-		p = memreport.p;
+		return memreport.p;
 	}
 	else
 	{
 		if ( s_mem_enable_leak )
 		{
 			//	realloc the memory block
-			mem_realloc( p, sizeof(MemBlock) + s_mem_protect_size + newsizeinbyte + s_mem_protect_size );
+			p = mem_realloc( p, sizeof(MemBlock) + s_mem_protect_size + newsizeinbyte + s_mem_protect_size );
 
 			//	sign memory to check protection
 			memreport = mem_code_protection( p, newsizeinbyte );
 
 			if ( memreport.mb )
 			{
-				memreport.mb->file = (wchar*)file;
+				memreport.mb->file = (char*)file;
 				memreport.mb->line = line;
 				memreport.mb->size = newsizeinbyte;
 				memreport.mb->tag = s_mem_tag;
 
-				mem_debug_push( memreport.mb );
+				//	push the block
+				mem_debug_push_pop( memreport.mb );
 			}
 
 			//	set as result
-			p = memreport.p;
-		}
-		else
-		{
-			mem_realloc( p, newsizeinbyte );
+			return memreport.p;
 		}
 	}
 
-	sx_leave_cs();
+	return mem_realloc( p, newsizeinbyte );
 }
 
-SEGAN_INLINE void mem_free_dbg( const void* p )
+SEGAN_INLINE void* mem_free_dbg( const void* p )
 {
-	if ( !p ) return;
-
-	sx_enter_cs();
+	if ( !p ) return null;
 
 	MemCodeReport memreport = mem_decode_protection( p );
 
@@ -402,19 +381,19 @@ SEGAN_INLINE void mem_free_dbg( const void* p )
 
 #if ( defined(_DEBUG) || SEGAN_ASSERT )
 			//	report call stack
-			lib_assert( L"memory block has been corrupted !", memreport.mb->file, memreport.mb->line );
+			lib_assert( "memory block has been corrupted !", memreport.mb->file, memreport.mb->line );
 #endif
 		}
 		else
 		{
-			//	pop mem block from the list
-			mem_debug_pop( memreport.mb );
-			mem_free( memreport.p );
+			//	pop memory block from the list
+			mem_debug_push_pop( memreport.mb, true );
+			mem_free( memreport.mb );
 		}
 	}
 	else mem_free( p );
 
-	sx_leave_cs();
+	return null;
 }
 
 uint mem_report_compute_num( const uint tag )
@@ -504,13 +483,8 @@ void mem_report_debug_to_window( const uint tag /*= 0 */ )
 			if ( leaf->tag == tag )
 			{
 				mem_check_protection( leaf );
-
-				wchar tmp[1024] = {0};
-				if ( leaf->corrupted )
-					swprintf_s( tmp, 1024, L"%s(%d): error : memory corrupted - size = %d - tag = %d\n", leaf->file, leaf->line, leaf->size, leaf->tag );
-				else
-					swprintf_s( tmp, 1024, L"%s(%d): warning : memory leak - size = %d - tag = %d\n", leaf->file, leaf->line, leaf->size, leaf->tag );
-
+				wchar tmp[1024] = { 0 };
+				mem_block_to_str(tmp, 1024, leaf);
 				OutputDebugString( tmp );
 			}
 			leaf = leaf->next;
@@ -521,15 +495,9 @@ void mem_report_debug_to_window( const uint tag /*= 0 */ )
 		while ( leaf )
 		{
 			mem_check_protection( leaf );
-
 			wchar tmp[1024] = {0};
-			if ( leaf->corrupted )
-				swprintf_s( tmp, 1024, L"%s(%d): error : memory corrupted - size = %d - tag = %d\n", leaf->file, leaf->line, leaf->size, leaf->tag );
-			else
-				swprintf_s( tmp, 1024, L"%s(%d): warning : memory leak - size = %d - tag = %d\n", leaf->file, leaf->line, leaf->size, leaf->tag );
-
+			mem_block_to_str(tmp, 1024, leaf);
 			OutputDebugString( tmp );
-
 			leaf = leaf->next;
 		}
 	}
@@ -563,7 +531,7 @@ SEGAN_INLINE void mem_report_debug_to_file( const wchar* fileName, const uint ta
 					if ( leaf->corrupted )
 					{
 						wchar tmp[1024] = {0};
-						swprintf_s( tmp, 1024, L"%s(%d): error : memory corrupted - size = %d - tag = %d\n", leaf->file, leaf->line, leaf->size, leaf->tag );
+						mem_block_to_str(tmp, 1024, leaf);
 						fputws( tmp, f );
 					}
 
@@ -577,13 +545,8 @@ SEGAN_INLINE void mem_report_debug_to_file( const wchar* fileName, const uint ta
 					if ( leaf->tag == tag )
 					{
 						mem_check_protection( leaf );
-
 						wchar tmp[1024] = {0};
-						if ( leaf->corrupted )
-							swprintf_s( tmp, 1024, L"%s(%d): error : memory corrupted - size = %d - tag = %d\n", leaf->file, leaf->line, leaf->size, leaf->tag );
-						else
-							swprintf_s( tmp, 1024, L"%s(%d): warning : memory leak - size = %d - tag = %d\n", leaf->file, leaf->line, leaf->size, leaf->tag );
-
+						mem_block_to_str(tmp, 1024, leaf);
 						fputws( tmp, f );
 					}
 					leaf = leaf->next;
@@ -595,15 +558,9 @@ SEGAN_INLINE void mem_report_debug_to_file( const wchar* fileName, const uint ta
 			while ( leaf )
 			{
 				mem_check_protection( leaf );
-
 				wchar tmp[1024] = {0};
-				if ( leaf->corrupted )
-					swprintf_s( tmp, 1024, L"%s(%d): error : memory corrupted - size = %d - tag = %d\n", leaf->file, leaf->line, leaf->size, leaf->tag );
-				else
-					swprintf_s( tmp, 1024, L"%s(%d): warning : memory leak - size = %d - tag = %d\n", leaf->file, leaf->line, leaf->size, leaf->tag );
-
+				mem_block_to_str(tmp, 1024, leaf);
 				fputws( tmp, f );
-
 				leaf = leaf->next;
 			}
 		}
@@ -617,9 +574,7 @@ SEGAN_INLINE void mem_clear_debug( void )
 	while ( leaf )
 	{
 		s_mem_root = leaf->next;
-
 		mem_free( leaf );
-
 		leaf = s_mem_root;
 	}
 }
@@ -707,15 +662,15 @@ SEGAN_INLINE void* MemMan_Pool::realloc( const void* p, const uint sizeInByte )
 	{
 		sx_assert( pbyte(p) > m_pool && pbyte(p) < ( m_pool + mem_size(m_pool) ) );
 		void* tmp = alloc( sizeInByte );
-		mem_copy( tmp, p, min( size(p), sizeInByte ) );
+		mem_copy( tmp, p, mem_min_size( size(p), sizeInByte ) );
 		free( p );
 		return tmp;
 	}
 }
 
-SEGAN_INLINE void MemMan_Pool::free( const void* p )
+SEGAN_INLINE void* MemMan_Pool::free( const void* p )
 {
-	if ( !p ) return;
+	if ( !p ) return null;
 	sx_assert( pbyte(p) > m_pool && pbyte(p) < ( m_pool + mem_size(m_pool) ) );
 
 	Chunk* ch = PChunk( pbyte(p) - sizeof(Chunk) );
@@ -748,13 +703,14 @@ SEGAN_INLINE void MemMan_Pool::free( const void* p )
 #ifdef _DEBUG
 			mem_set( ch, 0, sizeof(Chunk) );
 #endif
-			return;	//	this one is already exist in list
+			return null;	//	this one is already exist in list
 		}
 	}
 
 	//	push to free list
 	ch->state = CS_EMPTY;
 	push( ch );
+	return null;
 }
 
 SEGAN_INLINE uint MemMan_Pool::size( const void* p )

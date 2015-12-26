@@ -57,6 +57,9 @@
     <ClInclude Include="..\Timer.h">
       <Filter>lib</Filter>
     </ClInclude>
+    <ClInclude Include="..\Assert.h">
+      <Filter>lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Callstack.cpp">
@@ -82,6 +85,9 @@
     </ClCompile>
     <ClCompile Include="sxlib.cpp" />
     <ClCompile Include="..\Timer.cpp">
+      <Filter>lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Assert.cpp">
       <Filter>lib</Filter>
     </ClCompile>
   </ItemGroup>

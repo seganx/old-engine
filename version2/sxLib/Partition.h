@@ -59,7 +59,7 @@ public:
 		{
 			node->box = this;
 			node->index = count++;
-			sx_mem_realloc(nodes, count * sizeof(Node*));
+			nodes = (Node**)sx_mem_realloc(nodes, count * sizeof(Node*));
 			nodes[node->index] = node;
 		}
 
@@ -71,7 +71,7 @@ public:
 			nodes[index] = nodes[--count];
 			nodes[index]->index = index;
 			if (count)
-				sx_mem_realloc(nodes, count * sizeof(Node*));
+				nodes = (Node**)sx_mem_realloc(nodes, count * sizeof(Node*));
 			else
 				sx_mem_free_and_null(nodes);
 		}
@@ -98,7 +98,7 @@ public:
 		m_length = length;
 		m_boxCount = m_width * m_height * m_length;
 		const uint msize = m_boxCount * sizeof(Box);
-		sx_mem_realloc(m_boxes, msize);
+		m_boxes = (Box*)sx_mem_realloc(m_boxes, msize);
 		sx_mem_set(m_boxes, 0, msize);
 
 #if _DEBUG

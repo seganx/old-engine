@@ -430,7 +430,7 @@ public:
 	virtual void set_scene( const d3dScene* scene ) = 0;
 
 	//!	update renderer
-	virtual void update( float elpstime ) = 0;
+	virtual void update( double elpstime ) = 0;
 
 	//!	start to draw the scene
 	virtual void begin_draw( const Color& bgcolor ) = 0;

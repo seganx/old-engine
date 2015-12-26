@@ -51,6 +51,7 @@ DatabaseServer::DatabaseServer(void)
 
 DatabaseServer::~DatabaseServer(void)
 {
+	sx_safe_delete_and_null( g_timer );
 	sx_safe_delete_and_null(m_dbConfig);
 	sx_safe_delete_and_null(m_netConfig);
 }

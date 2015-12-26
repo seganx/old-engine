@@ -87,6 +87,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Array.h" />
+    <ClInclude Include="..\Assert.h" />
     <ClInclude Include="..\Callstack.h" />
     <ClInclude Include="..\Def.h" />
     <ClInclude Include="..\Lib.h" />
@@ -104,6 +105,7 @@
     <ClInclude Include="..\Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Assert.cpp" />
     <ClCompile Include="..\Callstack.cpp" />
     <ClCompile Include="..\Lib.cpp" />
     <ClCompile Include="..\Logger.cpp" />

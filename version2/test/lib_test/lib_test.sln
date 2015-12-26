@@ -1,12 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_test", "lib_test.vcproj", "{12262ABF-A1BD-4AFD-B758-847797CC4AAC}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF} = {E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_test", "lib_test.vcxproj", "{12262ABF-A1BD-4AFD-B758-847797CC4AAC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxlib", "..\..\sxLib\win32dll\sxlib.vcproj", "{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxlib", "..\..\sxLib\win32dll\sxlib.vcxproj", "{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -72,8 +72,10 @@ SEGAN_LIB_API uint sx_raw_write(char* dest, const uint destsize, const char* dat
 
 SEGAN_LIB_API uint sx_raw_write_text(char* dest, const uint destsize, const char* text)
 {
-	if (!text) return 0;
-	return sx_raw_write(dest, destsize, text, sx_str_len(text));
+	if (text)
+		return sx_raw_write(dest, destsize, text, sx_str_len(text));
+	else
+		return sx_raw_write(dest, destsize, "", 1);
 }
 
 SEGAN_LIB_API void sx_raw_print(const char* src)

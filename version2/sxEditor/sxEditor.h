@@ -13,5 +13,6 @@
 
 #include "ImportEngine.h"
 
+extern Timer* g_timer = null;
 
 #endif	//	GUARD_sxEditor_HEADER_FILE

@@ -10,7 +10,7 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 
 	Database db;
 	if ( db.initalize( dt->m_config ) == false )
-		goto _exit;
+		dt->m_status.jobsdone = true;
 
 	while ( !dt->m_status.jobsdone )
 	{
@@ -20,7 +20,7 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 			if (dt->m_current)
 			{
 				dt->m_status.waiting = true;
-#if 0
+#if 1
 				char* s = dt->m_current->m_msg;
 
 				char deviceID[64] = { 0 };
@@ -41,7 +41,7 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 #endif
 
 				dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "INSERT INTO players(deviceId, nickname) VALUES('%s', '%s')", deviceID, nickName);
-				dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "SELECT COUNT(*) FROM players;");
+				//dt->m_current->m_ressize = db.FormatCommand(dt->m_current->m_res, SX_DB_RESULT_SIZE, "SELECT COUNT(*) FROM players;");
 				
 				dt->m_status.waiting = false;
 				dt->m_status.received = true;
@@ -49,11 +49,10 @@ DWORD WINAPI ThreadProc(__in  LPVOID lpParameter)
 			else dt->m_status.idle = true;
 		}
 
-		//Sleep(1);
+		Sleep(1);
 	}
-
-	_exit:
-	dt->m_status.dead = true;
+	
+	db.Finalize();
 	return 0;
 }
 
@@ -149,6 +148,15 @@ void DatabaseThread::Update(void)
 					m_status.jobsdone = true;
 				}
 			}
+		}
+	}
+	else if (m_status.jobsdone)
+	{
+		DWORD exitCode = 0;
+		if ( GetExitCodeThread(m_thread, &exitCode) )
+		{
+			if ( exitCode != STILL_ACTIVE )
+				m_status.dead = true;
 		}
 	}
 }

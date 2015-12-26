@@ -30,7 +30,7 @@ typedef byte				*pbyte;
 //  functions type and classes type preprocessors
 //////////////////////////////////////////////////////////////////////////
 
-// SeganX is unicode
+// SeganX is Unicode
 #ifndef UNICODE
 	#define UNICODE
 #endif
@@ -79,7 +79,7 @@ typedef byte				*pbyte;
 
 #define SEGAN_ASSERT						1		//	check and log some special events on containers
 
-#define SEGAN_CRITICAL_SECTION				0		//	use critical section for multi threaded safety
+#define SEGAN_CRITICAL_SECTION				1		//	use critical section for multi threaded safety
 
 
 
@@ -166,9 +166,7 @@ SEGAN_LIB_API void lib_leave_cs( void );
 
 // assertion
 #if ( defined(_DEBUG) || SEGAN_ASSERT )
-#define sx_assert(expression)	((!!(expression)) || lib_assert(_CRT_WIDE(#expression), _CRT_WIDE(__FILE__), __LINE__))
-//! assertion function will stop application and report call stack
-SEGAN_LIB_API sint lib_assert( const wchar* expression, const wchar* file, const sint line );
+#define sx_assert(expression)	((!!(expression)) || lib_assert(#expression, __FILE__, __LINE__))
 #else
 #define sx_assert(expression)
 #endif

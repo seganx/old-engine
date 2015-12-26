@@ -18,13 +18,13 @@
 class SEGAN_LIB_API _CallStack
 {
 public:
-	_CallStack( const wchar* file, const sint line, const wchar* function );
-	_CallStack( const sint line, const wchar* file, const wchar* function, ... );
+	_CallStack( const char* file, const sint line, const char* function );
+	_CallStack( const sint line, const char* file, const char* function, ... );
 	~_CallStack( void );
 };
 
 //! callback function for call stack
-typedef void (*CB_CallStack)( const wchar* file, const sint line, const wchar* function );
+typedef void (*CB_CallStack)( const char* file, const sint line, const char* function );
 SEGAN_LIB_API void callstack_report_to_file( const wchar* name, const wchar* title = L" " );
 SEGAN_LIB_API void callstack_report( CB_CallStack callback );
 SEGAN_LIB_API void callstack_clear( void );
@@ -32,10 +32,10 @@ SEGAN_LIB_API void detect_crash(void);
 
 
 //! create a new call stack for function with out parameters
-#define sx_callstack()								_CallStack sx_unique_name(callstack)( __FILEW__, __LINE__, __FUNCTIONW__ )
+#define sx_callstack()								_CallStack sx_unique_name(callstack)( __FILE__, __LINE__, __FUNCTION__ );
 
 //! create new call stack for function with name and parameters
-#define sx_callstack_param(function,...)			_CallStack sx_unique_name(callstack)( __LINE__, __FILEW__, _CRT_WIDE(#function), __VA_ARGS__ )
+#define sx_callstack_param(function,...)			_CallStack sx_unique_name(callstack)( __LINE__, __FILE__, _CRT_WIDE(#function), __VA_ARGS__ );
 
 //! report call stack to a file
 #define sx_callstack_report_to_file(name, tag)		callstack_report_to_file( name, tag )
@@ -58,6 +58,10 @@ SEGAN_LIB_API void detect_crash(void);
 #define sx_callstack_clear()
 #define sx_detect_crash()
 
+#endif
+
+#if ( defined(_DEBUG) || SEGAN_ASSERT ) //! assertion function will stop application and report call stack
+SEGAN_LIB_API sint lib_assert(const char* expression, const char* file, const sint line);
 #endif
 
 #endif	//	GUARD_Callstack_HEADER_FILE

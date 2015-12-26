@@ -46,7 +46,7 @@ public:
 
 	SEGAN_LIB_INLINE void push( const T& newItem )
 	{
-		Iterator* node = (Iterator*)mem_alloc( sizeof(Iterator) );
+		Iterator* node = (Iterator*)sx_mem_alloc( sizeof(Iterator) );
 		node->data = newItem;
 		node->prev = null;
 		node->next = m_back;
@@ -99,7 +99,7 @@ private:
 		if ( node->next )		node->next->prev = node->prev;
 		if ( node == m_front )	m_front = node->prev;
 		if ( node == m_back )	m_back = node->next;
-		mem_free( node );
+		sx_mem_free( node );
 		m_count--;
 	}
 

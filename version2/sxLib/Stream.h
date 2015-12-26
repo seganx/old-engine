@@ -349,11 +349,11 @@ private:
 		if ( m_sampler ) {
 			if ( newsize >= m_capacity || ( m_capacity - newsize ) > m_sampler ) {
 				m_capacity = sint( newsize / m_sampler + 1 ) * m_sampler;
-				mem_realloc( (void*&)m_buffer, m_capacity );
+				m_buffer = (pbyte)mem_realloc( m_buffer, m_capacity );
 			}
 		} else {
 			m_capacity = newsize;
-			mem_realloc( (void*&)m_buffer, m_capacity );
+			m_buffer = (pbyte)mem_realloc( m_buffer, m_capacity );
 		}
 		
 	}

@@ -18,12 +18,13 @@ Database::Database(void) : m_mysql(null)
 
 Database::~Database(void)
 {
-	if (m_mysql)
-		mysql_close(m_mysql);
+	Finalize();
 }
 
 bool Database::initalize(const DatabaseConfig* config)
 {
+	return true;
+
 	m_mysql = mysql_init(NULL);
 
 	if (mysql_real_connect(m_mysql, config->host, config->user, config->pass, config->name, config->port, NULL, 0) == null)
@@ -34,6 +35,13 @@ bool Database::initalize(const DatabaseConfig* config)
 		return false;
 	}
 	return true;
+}
+
+void Database::Finalize(void)
+{
+	if (m_mysql)
+		mysql_close(m_mysql);
+	m_mysql = null;
 }
 
 uint Database::Command(char* dest, const uint destsize, const char* command)
@@ -50,7 +58,7 @@ uint Database::Command(char* dest, const uint destsize, const char* command)
 	MYSQL_RES *result = mysql_store_result(m_mysql);
 	if (!result) return 0;
 
-	uint c = mysql_field_count(m_mysql);
+	uint fieldc = mysql_num_fields(result);
 
 	uint res = 0;
 	while (true)
@@ -58,17 +66,16 @@ uint Database::Command(char* dest, const uint destsize, const char* command)
 		MYSQL_ROW row = mysql_fetch_row(result);
 		if (row)
 		{
-			for ( uint i = 0; i < c; ++i )
+			for ( uint i = 0; i < fieldc; ++i )
 			{
-				uint size = sx_raw_write_text( dest, destsize, *row );
-				if (size > 0)
-					res += size, row++;
-				else break;
+				uint size = sx_raw_write_text( dest, destsize, row[i] );
+				res += size;
 			}
 		}
 		else break;
 	}
 	mysql_free_result(result);
+
 	return res;
 }
 
@@ -82,9 +89,9 @@ uint Database::FormatCommand(char* dest, const uint destsize, const char* comman
 	va_start(argList, command);
 
 	sint strLen = _vscprintf(command, argList);
-	if (strLen > 1023) return false;
+	if (strLen > 2047) return false;
 
-	char sqlcommand[1024] = { 0 };
+	char sqlcommand[2048] = { 0 };
 	strLen = vsprintf_s(sqlcommand, strLen + 1, command, argList);
 	va_end(argList);
 
