@@ -5,31 +5,6 @@
 #include "Callstack.h"
 #include "Assert.h"
 
-
-
-#if ( defined(_DEBUG) || SEGAN_CALLSTACK || SEGAN_ASSERT )
-
-
-SEGAN_INLINE sint lib_assert( const char* expression, const char* file, const sint line )
-{
-
-#if ( SEGAN_CALLSTACK == 1 )
-	_CallStack _callstack( line, file, "assertion '%s'", expression );
-#endif
-
-#if defined(_DEBUG)
-	__debugbreak();	//	just move your eyes down and look at the call stack list in IDE to find out what happened !
-#elif ( SEGAN_CALLSTACK == 1 )
-	callstack_report_to_file( L"sx_assertion", L"assertion failed !" );
-#endif
-
-	return 0;
-}
-
-#endif
-
-
-
 #if SEGAN_CALLSTACK
 
 //////////////////////////////////////////////////////////////////////////
@@ -46,8 +21,8 @@ struct CallStackData
 	char*	file;
 	sint	line;
 };
-CallStackData	callstack_pool[CALLSTACK_MAX];
-uint			callstack_index = 0;
+CallStackData	s_callstack_pool[CALLSTACK_MAX];
+uint			s_callstack_index = 0;
 extern bool		callstack_end	= false;
 
 SEGAN_INLINE void callstack_clean(CallStackData *csd)
@@ -65,13 +40,13 @@ CallStackData* callstack_push_pop(bool push)
 
 	if ( push )
 	{
-		if ( callstack_index > 0 )
-			callstack_clean( &callstack_pool[--callstack_index] );
+		if ( s_callstack_index > 0 )
+			callstack_clean( &s_callstack_pool[--s_callstack_index] );
 	}
 	else 
 	{
-		if (callstack_index < CALLSTACK_MAX)
-			res = &callstack_pool[callstack_index++];
+		if (s_callstack_index < CALLSTACK_MAX)
+			res = &s_callstack_pool[s_callstack_index++];
 	}
 
 	sx_leave_cs();
@@ -134,7 +109,7 @@ void callstack_report( CB_CallStack callback )
 
 	for ( int i=0; i<CALLSTACK_MAX; i++ )
 	{
-		CallStackData* csd = &callstack_pool[i];
+		CallStackData* csd = &s_callstack_pool[i];
 		if ( csd->line && csd->file )
 			(*callback)( csd->file, csd->line, csd->function ? csd->function : csd->name );
 	}
@@ -143,7 +118,7 @@ void callstack_report( CB_CallStack callback )
 void callstack_clear( void )
 {
 	for ( int i=0; i<CALLSTACK_MAX; i++ )
-		callstack_clean( &callstack_pool[i] );
+		callstack_clean( &s_callstack_pool[i] );
 }
 
 void detect_crash( void )
@@ -153,7 +128,7 @@ void detect_crash( void )
 
 void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ )
 {
-	if ( callstack_pool[0].line < 1 || callstack_pool[0].file == null ) return;
+	if ( s_callstack_pool[0].line < 1 || s_callstack_pool[0].file == null ) return;
 
 	sx_enter_cs();
 
@@ -181,7 +156,7 @@ void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ 
 		sint maxlength = 0;
 		for ( int i=0; i<CALLSTACK_MAX; i++ )
 		{
-			CallStackData* csd = &callstack_pool[i];
+			CallStackData* csd = &s_callstack_pool[i];
 			if ( csd->line && csd->file )
 			{
 				wchar tmp[1024] = {0};
@@ -195,7 +170,7 @@ void callstack_report_to_file( const wchar* name, const wchar* title /*= L" "*/ 
 		//	write lines to the file
 		for ( int i=0; i<CALLSTACK_MAX; i++ )
 		{
-			CallStackData* csd = &callstack_pool[i];
+			CallStackData* csd = &s_callstack_pool[i];
 			if ( csd->line && csd->file )
 			{
 				wchar tmp[1024] = {0};

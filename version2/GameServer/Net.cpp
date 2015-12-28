@@ -1,11 +1,11 @@
 #if defined(_WIN32)
 
-#include "Net.h"
-
-
 #include <stdio.h>
 #include <winsock2.h>
 #pragma comment(lib,"ws2_32.lib")
+
+#include "Net.h"
+
 
 //////////////////////////////////////////////////////////////////////////
 //	network functions

@@ -12,9 +12,6 @@
     <ClInclude Include="..\Array.h">
       <Filter>lib</Filter>
     </ClInclude>
-    <ClInclude Include="..\Callstack.h">
-      <Filter>lib</Filter>
-    </ClInclude>
     <ClInclude Include="..\Def.h">
       <Filter>lib</Filter>
     </ClInclude>
@@ -60,11 +57,11 @@
     <ClInclude Include="..\Assert.h">
       <Filter>lib</Filter>
     </ClInclude>
+    <ClInclude Include="..\Crash.h">
+      <Filter>lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Callstack.cpp">
-      <Filter>lib</Filter>
-    </ClCompile>
     <ClCompile Include="..\Lib.cpp">
       <Filter>lib</Filter>
     </ClCompile>
@@ -88,6 +85,9 @@
       <Filter>lib</Filter>
     </ClCompile>
     <ClCompile Include="..\Assert.cpp">
+      <Filter>lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Crash.cpp">
       <Filter>lib</Filter>
     </ClCompile>
   </ItemGroup>

@@ -13,7 +13,7 @@
 #include "Math.h"
 #include "Assert.h"
 #include "Memory.h"
-#include "Callstack.h"
+#include "Crash.h"
 #include "Array.h"
 #include "Queue.h"
 #include "Stack.h"
@@ -26,12 +26,11 @@
 #include "Timer.h"
 #include "Utils.h"
 
-
 // initialize internal library
-void sx_lib_initialize( void );
+SEGAN_LIB_API void sx_lib_initialize( void );
 
 // finalize internal library
-void sx_lib_finalize( void );
+SEGAN_LIB_API void sx_lib_finalize( void );
 
 
 #endif	//	GUARD_Lib_HEADER_FILE

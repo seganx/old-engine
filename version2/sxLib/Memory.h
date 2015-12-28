@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////
 //	BASIC MEMORY FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-typedef void (*CB_Memory)(const char* file, const uint line, const uint size, const uint tag, const bool corrupted);
+typedef void (*CB_Memory)(void* userdata, const char* file, const uint line, const uint size, const uint tag, const bool corrupted);
 
 SEGAN_LIB_API void		mem_set_manager( const class MemMan* manager );
 SEGAN_LIB_API MemMan*	mem_get_manager( void );
@@ -38,7 +38,7 @@ SEGAN_LIB_API void		mem_enable_debug( const bool enable, const uint tag = 0 );
 SEGAN_LIB_API void*		mem_alloc_dbg( const uint sizeinbyte, const char* file, const int line );
 SEGAN_LIB_API void*		mem_realloc_dbg( void* p, const uint newsizeinbyte, const char* file, const int line );
 SEGAN_LIB_API void*		mem_free_dbg( const void* p );
-SEGAN_LIB_API void		mem_report_debug( CB_Memory callback, const uint tag = 0 );
+SEGAN_LIB_API void		mem_report_debug( CB_Memory callback, void* userdata, const uint tag = 0 );
 SEGAN_LIB_API void		mem_report_debug_to_file( const wchar* fileName, const uint tag = 0 );
 SEGAN_LIB_API void		mem_clear_debug( void );
 
@@ -50,7 +50,7 @@ inline    void		operator delete( void *p ){ mem_free_dbg(p); }
 #define sx_mem_enable_debug( enable, tag )				mem_enable_debug( enable, tag )
 
 //! report memory debugger. pass 0 to show all tags
-#define sx_mem_report_debug( callback, tag )			mem_report_debug( callback, tag )
+#define sx_mem_report_debug( callback, userdata, tag )	mem_report_debug( callback, userdata, tag )
 
 //! report memory debugger to output window
 #define sx_mem_report_debug_to_window( tag )			mem_report_debug_to_window( tag )

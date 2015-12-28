@@ -87,6 +87,8 @@ bool DatabaseServer::LoadConfig(const wchar* configFile)
 
 void DatabaseServer::Update()
 {
+	sx_callstack();
+
 	char buffer[SX_NET_BUFF_SIZE];
 
 	// update server

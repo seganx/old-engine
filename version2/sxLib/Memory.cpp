@@ -1,6 +1,6 @@
 #include <memory>
 #include "Memory.h"
-#include "Callstack.h"
+#include "Assert.h"
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -440,7 +440,7 @@ uint mem_report_compute_num( const uint tag )
 	return result;
 }
 
-SEGAN_INLINE void mem_report_debug( CB_Memory callback, const uint tag /*= 0 */ )
+SEGAN_INLINE void mem_report_debug( CB_Memory callback, void* userdata, const uint tag /*= 0 */ )
 {
 	if ( !s_mem_root || !callback ) return;
 
@@ -452,7 +452,7 @@ SEGAN_INLINE void mem_report_debug( CB_Memory callback, const uint tag /*= 0 */ 
 			if ( leaf->tag == tag )
 			{
 				mem_check_protection( leaf );
-				(*callback)( leaf->file, leaf->line, leaf->size, leaf->tag, leaf->corrupted );
+				(*callback)( userdata, leaf->file, leaf->line, leaf->size, leaf->tag, leaf->corrupted );
 			}
 			leaf = leaf->next;
 		}
@@ -462,7 +462,7 @@ SEGAN_INLINE void mem_report_debug( CB_Memory callback, const uint tag /*= 0 */ 
 		while ( leaf )
 		{
 			mem_check_protection( leaf );
-			(*callback)( leaf->file, leaf->line, leaf->size, leaf->tag, leaf->corrupted );
+			(*callback)( userdata, leaf->file, leaf->line, leaf->size, leaf->tag, leaf->corrupted );
 			leaf = leaf->next;
 		}
 	}

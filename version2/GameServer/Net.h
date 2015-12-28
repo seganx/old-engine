@@ -13,7 +13,6 @@
 
 #include "../sxLib/Lib.h"
 
-
 #define SX_NET_ID				31
 #define SX_NET_BROADCAST		0
 #define SX_NET_BUFF_SIZE		256		//! maximum size of a packet in bytes

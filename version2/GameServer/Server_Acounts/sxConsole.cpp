@@ -51,6 +51,8 @@ LRESULT WINAPI DefaultMsgProc(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam)
 
 HWND sx_create_window(const wchar* windowsName)
 {
+	sx_callstack();
+
 	WNDCLASS m_windowClass;
 	sx_mem_set(&m_windowClass, 0, sizeof(m_windowClass));
 

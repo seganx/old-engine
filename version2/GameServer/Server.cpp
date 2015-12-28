@@ -70,6 +70,8 @@ void Server::Finalize(void)
 
 void Server::Update( void )
 {
+	sx_callstack();
+
 	// peek packets on the port
 	PeekReceivedMessages();
 

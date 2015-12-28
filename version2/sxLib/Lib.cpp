@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
 #if defined(_WIN32)
 #include <Windows.h>
 #endif
@@ -38,7 +39,59 @@ SEGAN_INLINE void lib_leave_cs( void )
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
+#if SEGAN_CRASHRPT
+void memory_callbacl_default(void* userdata, const char* file, const uint line, const uint size, const uint tag, const bool corrupted)
+{
+	FILE* f = (FILE*)userdata;
+	if (corrupted)
+		fprintf_s(f, "%s(%d): size = %d - CORRUPTED!\n", file, line, size);
+	else
+		fprintf_s(f, "%s(%d): size = %d\n", file, line, size);
+	fflush(f);
+}
+void sx_crash_callback_default(CrashReport* rc)
+{
+	char currtime[64];
 
+	//	get the current time
+	{
+		time_t rawTime;
+		time(&rawTime);
+		struct tm timeInfo;
+		localtime_s(&timeInfo, &rawTime);
+		strftime(currtime, 64, "%Y/%m/%d %H:%M:%S", &timeInfo);
+	}
+
+	//	report called functions in the file
+	FILE* f = null;
+	if (fopen_s(&f, "seganx_crash_report.txt", "a+") == 0)
+	{
+		fprintf_s(f, "Application crashes on %s\n\n", currtime);
+
+		fprintf_s(f, "Code: %u\n", rc->code);
+		fprintf_s(f, "Reason: %s\n\n", sx_crash_translate(rc->reason));
+		fflush(f);
+
+#if SEGAN_CRASHRPT_CALLSTACK
+		if (rc->callstack->file != null)
+		{
+			fprintf_s(f, "Available callstack:\n");
+			for ( CrashCallStack* cs = rc->callstack; cs->file != null; ++cs )
+				fprintf_s(f, "%s(%d): %s\n", cs->file, cs->line, (cs->func ? cs->func : cs->param));
+		}
+		fprintf_s(f, "\n");
+		fflush(f);
+#endif
+#if SEGAN_MEMLEAK
+		fprintf_s(f, "Allocated memory report:\n");
+		sx_mem_report_debug(memory_callbacl_default, f, 0);
+#endif
+		fprintf_s(f, "\n========================================================================\n");
+
+		fclose(f);
+	}
+}
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // initialize internal library
@@ -54,8 +107,8 @@ void sx_lib_initialize( void )
 	mem_enable_debug( true, 0 );
 #endif
 
-#if SEGAN_CALLSTACK
-	callstack_clear();
+#if SEGAN_CRASHRPT_CALLSTACK
+	sx_crash_callback(sx_crash_callback_default);
 #endif
 
 }
@@ -63,28 +116,9 @@ void sx_lib_initialize( void )
 // finalize internal library
 void sx_lib_finalize( void )
 {
-
-#if SEGAN_CALLSTACK
-	if ( !callstack_end )	//	verify that application crashed
-	{
-		callstack_report_to_file( L"sx_crash_report", L"application closed unexpectedly !" );
+	sx_print_a("seganx library finalized!\n");
 
 #if SEGAN_MEMLEAK
-		mem_report_debug_to_file( L"sx_mem_corruption_report.txt", -1 );
-		mem_clear_debug();
-#endif
-
-	}
-#if SEGAN_MEMLEAK
-	else
-	{
-	mem_report_debug_to_file( L"sx_memleak_report.txt", 0 );
-	mem_clear_debug();
-	}
-#endif
-
-	callstack_clear();
-#elif SEGAN_MEMLEAK
 	mem_report_debug_to_file( L"sx_memleak_report.txt", 0 );
 	mem_clear_debug();
 #endif

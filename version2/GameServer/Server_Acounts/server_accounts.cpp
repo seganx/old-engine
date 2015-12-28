@@ -1,4 +1,5 @@
 #include <windows.h>
+
 #include "../Server.h"
 #include "DatabaseServer.h"
 #include "Thread_Manager.h"
@@ -12,13 +13,18 @@ extern Timer* g_timer = null;
 int wmain(int argc, wchar* argv[])
 {
 	sx_callstack();
+
 	sx_net_initialize();
 	
 	DatabaseServer dbServer;
 	dbServer.LoadConfig(argc > 1 ? argv[1] : L"config.txt");
 	dbServer.Initialize();
 
+	int* a = (int*)sx_mem_alloc(8);
+	a[3] = 0;
+
 	sx_create_window(L"Stats");
+
 
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
@@ -73,7 +79,5 @@ int wmain(int argc, wchar* argv[])
 	dbServer.Finalize();
 
 	sx_net_finalize();
-
-	sx_detect_crash();
 	return 0;
 }
