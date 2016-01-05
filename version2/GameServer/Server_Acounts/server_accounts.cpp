@@ -20,11 +20,7 @@ int wmain(int argc, wchar* argv[])
 	dbServer.LoadConfig(argc > 1 ? argv[1] : L"config.txt");
 	dbServer.Initialize();
 
-	int* a = (int*)sx_mem_alloc(8);
-	a[3] = 0;
-
 	sx_create_window(L"Stats");
-
 
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));

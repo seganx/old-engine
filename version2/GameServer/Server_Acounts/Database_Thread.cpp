@@ -129,6 +129,7 @@ uint DatabaseThread::PeekResult(char* dest, const uint destsize)
 
 void DatabaseThread::Update(void)
 {
+	sx_callstack();
 	if (m_status.idle)
 	{
 		if (m_current == null)

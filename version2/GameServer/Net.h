@@ -14,24 +14,12 @@
 #include "../sxLib/Lib.h"
 
 #define SX_NET_ID				31
-#define SX_NET_BROADCAST		0
 #define SX_NET_BUFF_SIZE		256		//! maximum size of a packet in bytes
 #define SX_NET_OPTN_SAFESEND	0x01	//! used in message header and indicates that the message should be resend till other sides confirms
 #define SX_NET_OPTN_CONFIRMED	0x02	//! used in message header and indicates that the message is confirmation by the other sides
+#define SX_NET_OPTN_RESEND		0x04	//! used in message header and indicates that the receiver request to resend a lost packet
+#define SX_NET_RUDP_WINSIZE		4		//! window size of selective repeat protocol
 
-
-//! describe net configuration
-struct NetConfig
-{
-	word		id;						//!	net id helps to avoid servers conflicts
-	uint		recv_port;				//! server port for receiving packets
-	uint		send_port;				//! server port for sending packets
-	uint		packs_per_sec;			//!	number of sent packets per second. 0 means unlimited packets sent
-	uint		retry_time;				//! resend time in milliseconds for critical packets that should be confirmed by client
-	uint		retry_timeout;			//! time out in milliseconds for stop resending packets and close the connection
-
-	NetConfig( void ): id(31), recv_port(31000), send_port(32000), packs_per_sec(10), retry_time(100), retry_timeout(10000) {}
-};
 
 //! report network statistics
 struct NetStats
@@ -89,19 +77,35 @@ struct NetAddress
 struct NetHeader
 {
 	word	netId;			//!	net id helps to avoid servers conflicts
-	word	number;			//! message number
 	word	option;			//! message option contains message flag
+	word	number;			//! message number
 	word	checksum;		//! checksum of the content data
 };
 
 //! describe a packet content
 struct NetPacket
 {
+	NetHeader*	header;						//! no allocation needed. It just points to data
 	uint		size;						//! size of all data contain header and user data
 	char		data[SX_NET_BUFF_SIZE];		//! it also contains header
-	NetHeader*	header;						//! no allocation needed. It just points to data
 };
 
+//! describe net configuration
+class NetConfig
+{
+public:
+	NetConfig(void) : m_id(31), m_recv_port(31000), m_send_port(31001), m_ack_port(31002), m_packs_per_sec(10), m_retry_time(5000), m_retry_timeout(10000) {}
+
+public:
+	word	m_id;					//!	net id helps to avoid servers conflicts
+	uint	m_recv_port;			//! server port for receiving packets
+	uint	m_send_port;			//! server port for sending packets
+	uint	m_ack_port;				//! acknowledge port for send/receive ACK
+	uint	m_packs_per_sec;		//!	number of sent packets per second. 0 means unlimited packets sent
+	uint	m_retry_time;			//! resend time in seconds for critical packets that should be confirmed by client
+	uint	m_retry_timeout;		//! time out in seconds for stop resending packets and close the connection
+};
+extern NetConfig * g_net;			//! global network configuration variable
 
 //! initialize network system
 bool sx_net_initialize( void );

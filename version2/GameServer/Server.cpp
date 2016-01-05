@@ -22,17 +22,17 @@ void Server::Initialize( const NetConfig* config /*= null*/, CBServer add /*= nu
 
 	sx_print( L"Info: Opening receiver port:" );
 	m_recvSocket = sx_new Socket;
-	m_recvSocket->Open( m_config->recv_port );
+	m_recvSocket->Open( m_config->m_recv_port, true );
 
-	if (m_config->send_port != m_config->recv_port)
+	if (m_config->m_send_port != m_config->m_recv_port)
 	{
 		sx_print(L"Info: Opening sender port:");
 		m_sendSocket = sx_new Socket;
-		m_sendSocket->Open(m_config->send_port);
+		m_sendSocket->Open( m_config->m_send_port, false );
 	}
 	else m_sendSocket = m_recvSocket;
 
-	m_stats.start_time = sx_time_counter() / 1000;
+	m_stats.start_time = (uint)(sx_time_counter() / 1000);
 
 	sx_print( L"Info: Server initialized." );
 
@@ -104,9 +104,9 @@ Connection* Server::AddConnection( const NetAddress& address )
 	Connection* res = sx_new Connection;
 
 	//	set properties
-	res->SetSpeed( m_config->packs_per_sec );
-	res->SetRetryTime( m_config->retry_time / 1000.0 );
-	res->SetTimeOut( m_config->retry_timeout / 1000.0 );
+	res->SetSpeed( m_config->m_packs_per_sec );
+	res->SetRetryTime( m_config->m_retry_time );
+	res->SetTimeOut( m_config->m_retry_timeout );
 	res->Open( address );
 
 	//	add connection to the connection list
@@ -140,7 +140,7 @@ void Server::PeekReceivedMessages(void)
 	sx_callstack();
 	NetAddress address;
 	char buffer[SX_NET_BUFF_SIZE] = {0};
-	
+
 	m_stats.socket_queued_packs = 0;
 	while ( true )
 	{
@@ -195,7 +195,7 @@ void Server::PeekReceivedMessages(void)
 void Server::UpdateStatistics( void )
 {
 	m_stats.helper_cps++;
-	m_stats.curr_time = sx_time_counter() / 1000;
+	m_stats.curr_time = (uint)(sx_time_counter() / 1000);
 
 	//	verify that one second has been passed
 	if (m_stats.curr_time - m_stats.helper_timer < 1000) return;

@@ -46,6 +46,8 @@ DatabaseThread* ThreadManager::AddTask(const uint threadId, const struct Databas
 
 void ThreadManager::Update(void)
 {
+	sx_callstack();
+
 	for (sint i = 0; i < m_threads.m_count; ++i)
 	{
 		DatabaseThread* dbThread = m_threads[i];

@@ -25,7 +25,7 @@ public:
 	~Socket( void );
  
 	//! open a UPD socket and bind it to the specified port
-	bool Open( const word port );
+	bool Open( const word port, const bool bind, const bool broadcast = false );
 
 	//! close opened socket
 	void Close( void );

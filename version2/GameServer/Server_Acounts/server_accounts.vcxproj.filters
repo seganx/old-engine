@@ -28,6 +28,12 @@
     <ClCompile Include="sxConsole.cpp">
       <Filter>sxConsole</Filter>
     </ClCompile>
+    <ClCompile Include="..\Sender.cpp">
+      <Filter>sxNet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Receiver.cpp">
+      <Filter>sxNet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Connection.h">
@@ -55,6 +61,12 @@
     <ClInclude Include="DatabaseServer.h" />
     <ClInclude Include="sxConsole.h">
       <Filter>sxConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sender.h">
+      <Filter>sxNet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Receiver.h">
+      <Filter>sxNet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

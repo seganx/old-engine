@@ -6,6 +6,7 @@
 
 #include "Net.h"
 
+extern NetConfig* g_net = null;
 
 //////////////////////////////////////////////////////////////////////////
 //	network functions
@@ -14,6 +15,8 @@ bool sx_net_initialize( void )
 {
 	sx_callstack();
 	bool netInitialized = true;
+
+	g_net = sx_new NetConfig();
 
 	//  initialize windows socket
 	WSADATA wsaData;
@@ -81,6 +84,9 @@ void sx_net_finalize( void )
 	sx_callstack();
 
 	WSACleanup();
+
+	sx_delete_and_null(g_net);
+
 	sx_print(L"Network system Finalized.");
 }
 

@@ -13,12 +13,12 @@ bool LoadConfigs(NetConfig* netConfig, DatabaseConfig* dbConfig, const wchar* fi
 	String strFile;
 	if (sx_load_string(strFile, filename) == false) return false;
 
-	netConfig->id = sx_str_get_value_uint(strFile, L"network.id", netConfig->id);
-	netConfig->packs_per_sec = sx_str_get_value_uint(strFile, L"network.packs_per_sec", netConfig->packs_per_sec);
-	netConfig->recv_port = sx_str_get_value_uint(strFile, L"network.recv_port", netConfig->recv_port);
-	netConfig->retry_time = sx_str_get_value_uint(strFile, L"network.retry_time", netConfig->retry_time);
-	netConfig->retry_timeout = sx_str_get_value_uint(strFile, L"network.retry_timeout", netConfig->retry_timeout);
-	netConfig->send_port = sx_str_get_value_uint(strFile, L"network.send_port", netConfig->send_port);
+	netConfig->m_id = sx_str_get_value_uint(strFile, L"network.id", netConfig->m_id);
+	netConfig->m_packs_per_sec = sx_str_get_value_uint(strFile, L"network.packs_per_sec", netConfig->m_packs_per_sec);
+	netConfig->m_recv_port = sx_str_get_value_uint(strFile, L"network.recv_port", netConfig->m_recv_port);
+	netConfig->m_retry_time = sx_str_get_value_uint(strFile, L"network.retry_time", netConfig->m_retry_time);
+	netConfig->m_retry_timeout = sx_str_get_value_uint(strFile, L"network.retry_timeout", netConfig->m_retry_timeout);
+	netConfig->m_send_port = sx_str_get_value_uint(strFile, L"network.send_port", netConfig->m_send_port);
 
 	dbConfig->port = sx_str_get_value_uint(strFile, L"database.port", 0);
 	if (!sx_str_get_value(dbConfig->host, 128, strFile, L"database.host")) return false;

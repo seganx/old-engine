@@ -32,7 +32,7 @@ public:
 public:
 	class Server*			m_server;
 	class ThreadManager*	m_threadMan;
-	struct NetConfig*		m_netConfig;
+	class NetConfig*		m_netConfig;
 	struct DatabaseConfig*	m_dbConfig;
 };
 

@@ -23,7 +23,7 @@ Database::~Database(void)
 
 bool Database::initalize(const DatabaseConfig* config)
 {
-	return true;
+	sx_callstack();
 
 	m_mysql = mysql_init(NULL);
 
@@ -84,7 +84,6 @@ uint Database::FormatCommand(char* dest, const uint destsize, const char* comman
 	sx_callstack();
 	if (m_mysql == null) return 0;
 
-	// send query to SQL
 	va_list argList;
 	va_start(argList, command);
 
@@ -92,8 +91,7 @@ uint Database::FormatCommand(char* dest, const uint destsize, const char* comman
 	if (strLen > 2047) return false;
 
 	char sqlcommand[2048] = { 0 };
-	strLen = vsprintf_s(sqlcommand, strLen + 1, command, argList);
-	va_end(argList);
+	vsprintf_s(sqlcommand, strLen + 1, command, argList);
 
 	return Command(dest, destsize, sqlcommand);
 }
