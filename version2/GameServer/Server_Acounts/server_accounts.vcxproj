@@ -88,8 +88,6 @@
   <ItemGroup>
     <ClCompile Include="..\Connection.cpp" />
     <ClCompile Include="..\Net.cpp" />
-    <ClCompile Include="..\Receiver.cpp" />
-    <ClCompile Include="..\Sender.cpp" />
     <ClCompile Include="..\Server.cpp" />
     <ClCompile Include="..\Socket.cpp" />
     <ClCompile Include="Database.cpp" />
@@ -103,8 +101,6 @@
   <ItemGroup>
     <ClInclude Include="..\Connection.h" />
     <ClInclude Include="..\Net.h" />
-    <ClInclude Include="..\Receiver.h" />
-    <ClInclude Include="..\Sender.h" />
     <ClInclude Include="..\Server.h" />
     <ClInclude Include="..\Socket.h" />
     <ClInclude Include="Database.h" />

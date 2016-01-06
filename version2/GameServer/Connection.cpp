@@ -214,7 +214,7 @@ void Connection::AppendReceivedMessage( class Socket* socket, const void* buffer
 	NetHeader* ch = (NetHeader*)buffer;
 
 	//	we are waiting for received confirmation from the other side
-	if ( ch->option & SX_NET_OPTN_CONFIRMED )
+	if ( ch->option & SX_NET_OPTN_DELIVERED )
 	{
 		if ( ch->number == m_confirmNumber && ch->checksum == m_confirmChecksum )
 		{
@@ -239,7 +239,7 @@ void Connection::AppendReceivedMessage( class Socket* socket, const void* buffer
 	if (ch->option & SX_NET_OPTN_SAFESEND)
 	{
 		NetHeader tmp = *ch;
-		tmp.option = SX_NET_OPTN_CONFIRMED;
+		tmp.option = SX_NET_OPTN_DELIVERED;
 		connection_socket_send(socket, &tmp, m_destination);
 	}
 

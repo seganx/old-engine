@@ -8,14 +8,11 @@
 #include <Windows.h>
 #endif
 
-extern Timer* g_timer = null;
-extern bool	callstack_end;
-
+extern Library* g_lib = null;
 
 #if ( SEGAN_CRITICAL_SECTION == 1 )
 
 #if defined(_WIN32)
-#include <Windows.h>
 CRITICAL_SECTION	s_mem_cs;
 SEGAN_INLINE void lib_init_cs( void )
 {
@@ -49,6 +46,7 @@ void memory_callbacl_default(void* userdata, const char* file, const uint line, 
 		fprintf_s(f, "%s(%d): size = %d\n", file, line, size);
 	fflush(f);
 }
+
 void sx_crash_callback_default(CrashReport* rc)
 {
 	char currtime[64];
@@ -85,20 +83,48 @@ void sx_crash_callback_default(CrashReport* rc)
 #if SEGAN_MEMLEAK
 		fprintf_s(f, "Allocated memory report:\n");
 		sx_mem_report_debug(memory_callbacl_default, f, 0);
+		fprintf_s(f, "\n");
 #endif
-		fprintf_s(f, "\n========================================================================\n");
+
+		fprintf_s(f, "========================================================================\n");
 
 		fclose(f);
 	}
+
+	// just terminate crashed process
+#if _DEBUG
+
+#else
+	TerminateProcess(GetCurrentProcess(), 0);
+#endif
 }
 #endif
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//	global singleton class
+//////////////////////////////////////////////////////////////////////////
+Library::Library(void)
+{
+	m_timer = sx_new Timer();
+	m_randomer = sx_new Randomer();
+	m_logger = sx_new Logger();
+}
+
+Library* Library::GetSingelton(void)
+{
+	static Library* instance = null;
+	if (instance == null)
+		instance = sx_new Library();
+	return instance;
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // initialize internal library
 void sx_lib_initialize( void )
 {
-	g_timer = sx_new Timer;
-
 #if SEGAN_CRITICAL_SECTION
 	lib_init_cs();
 #endif
@@ -111,11 +137,18 @@ void sx_lib_initialize( void )
 	sx_crash_callback(sx_crash_callback_default);
 #endif
 
+	//	create basic objects
+	g_lib = Library::GetSingelton();
 }
 
 // finalize internal library
 void sx_lib_finalize( void )
 {
+	sx_delete_and_null(g_lib->m_logger);
+	sx_delete_and_null(g_lib->m_randomer);
+	sx_delete_and_null(g_lib->m_timer);
+	sx_delete_and_null(g_lib);
+
 	sx_print_a("seganx library finalized!\n");
 
 #if SEGAN_MEMLEAK
@@ -127,6 +160,5 @@ void sx_lib_finalize( void )
 	lib_finit_cs();
 #endif
 
-	sx_safe_delete_and_null(g_timer);
 }
 

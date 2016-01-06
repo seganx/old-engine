@@ -24,17 +24,15 @@ public:
 	uint64 GetCurrTime( void );
 
 public:
-	double m_time;					//! time from starting the timer
-	double m_elpsTime;				//! elapsed time in the loop
-	double m_elpsTime_smoothed;		//! smoothed elapsed time in the loop
+	double m_time;					//! time from starting the timer in seconds
+	double m_elpsTime;				//! elapsed time in the loop in seconds
+	double m_elpsTime_smoothed;		//! smoothed elapsed time in the loop in seconds
 	double m_speed;					//! speed of time. default is 1
 	double m_speedFactor;			//! a simple factor of the speed. default is 1
 
 private:
 	double m_lastTime;
 };
-
-extern class Timer* g_timer;
 
 
 //////////////////////////////////////////////////////////////////////////

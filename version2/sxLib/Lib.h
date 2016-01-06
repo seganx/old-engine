@@ -26,11 +26,32 @@
 #include "Timer.h"
 #include "Utils.h"
 
+
+//////////////////////////////////////////////////////////////////////////
+//	global singleton class
+//////////////////////////////////////////////////////////////////////////
+class SEGAN_LIB_API Library
+{
+private:
+	Library( void );
+	SEGAN_STERILE_CLASS(Library);
+
+public:
+	static Library* GetSingelton(void);
+
+public:
+	Randomer*	m_randomer;
+	Timer*		m_timer;
+	Logger*		m_logger;
+};
+extern Library* g_lib;
+
+
 // initialize internal library
-SEGAN_LIB_API void sx_lib_initialize( void );
+void sx_lib_initialize( void );
 
 // finalize internal library
-SEGAN_LIB_API void sx_lib_finalize( void );
+void sx_lib_finalize( void );
 
 
 #endif	//	GUARD_Lib_HEADER_FILE

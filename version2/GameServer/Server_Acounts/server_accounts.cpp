@@ -8,14 +8,16 @@
 #define NET_ID 32
 #define BUF_SZ 1024	
 
-extern Timer* g_timer = null;
+extern Library* g_lib = null;
 
 int wmain(int argc, wchar* argv[])
 {
-	sx_callstack();
+	g_lib = Library::GetSingelton();
 
 	sx_net_initialize();
-	
+
+	sx_callstack();
+
 	DatabaseServer dbServer;
 	dbServer.LoadConfig(argc > 1 ? argv[1] : L"config.txt");
 	dbServer.Initialize();
@@ -37,7 +39,7 @@ int wmain(int argc, wchar* argv[])
 			msg.message = 0;
 		}
 
-		g_timer->Update();
+		g_lib->m_timer->Update();
 		dbServer.Update();
 
 		{
@@ -75,5 +77,6 @@ int wmain(int argc, wchar* argv[])
 	dbServer.Finalize();
 
 	sx_net_finalize();
+
 	return 0;
 }

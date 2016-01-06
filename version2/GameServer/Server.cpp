@@ -4,8 +4,7 @@
 
 
 
-Server::Server(void) 
-	: m_config(0)
+Server::Server(void)
 {
 	sx_mem_set( &m_stats, 0, sizeof(m_stats) );
 	m_stats.min_cycle_per_sec = 9999999;
@@ -18,17 +17,15 @@ void Server::Initialize( const NetConfig* config /*= null*/, CBServer add /*= nu
 	sx_callstack();
 	sx_print( L"\nInfo: Initializing server:");
 
-	m_config = (NetConfig*)config;
-
 	sx_print( L"Info: Opening receiver port:" );
 	m_recvSocket = sx_new Socket;
-	m_recvSocket->Open( m_config->m_recv_port, true );
+	m_recvSocket->Open( g_net->m_recv_port, true );
 
-	if (m_config->m_send_port != m_config->m_recv_port)
+	if (g_net->m_send_port != g_net->m_recv_port)
 	{
 		sx_print(L"Info: Opening sender port:");
 		m_sendSocket = sx_new Socket;
-		m_sendSocket->Open( m_config->m_send_port, false );
+		m_sendSocket->Open( g_net->m_send_port, false );
 	}
 	else m_sendSocket = m_recvSocket;
 
@@ -77,7 +74,7 @@ void Server::Update( void )
 
 	// update connections
 	for ( int i = 0; i < m_connections.m_count; ++i )
-		m_connections[i]->Update( m_sendSocket, g_timer->m_elpsTime );
+		m_connections[i]->Update( m_sendSocket, g_lib->m_timer->m_elpsTime );
 
 	// remove lost connections from the list
 	for (int i = 0; i < m_connections.m_count; ++i)
@@ -104,9 +101,9 @@ Connection* Server::AddConnection( const NetAddress& address )
 	Connection* res = sx_new Connection;
 
 	//	set properties
-	res->SetSpeed( m_config->m_packs_per_sec );
-	res->SetRetryTime( m_config->m_retry_time );
-	res->SetTimeOut( m_config->m_retry_timeout );
+	res->SetSpeed( g_net->m_packs_per_sec );
+	res->SetRetryTime( g_net->m_retry_time );
+	res->SetTimeOut( g_net->m_retry_timeout );
 	res->Open( address );
 
 	//	add connection to the connection list

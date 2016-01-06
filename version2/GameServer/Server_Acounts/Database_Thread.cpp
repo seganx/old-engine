@@ -142,7 +142,7 @@ void DatabaseThread::Update(void)
 			}
 			else
 			{
-				m_deadtime -= g_timer->m_elpsTime;
+				m_deadtime -= g_lib->m_timer->m_elpsTime;
 				if (m_deadtime < 0)
 				{
 					m_status.idle = false;

@@ -38,22 +38,15 @@ bool LoadConfigs(NetConfig* netConfig, DatabaseConfig* dbConfig, const wchar* fi
 DatabaseServer::DatabaseServer(void)
 	: m_server(0)
 	, m_threadMan(0)
-	, m_netConfig(0)
 	, m_dbConfig(0)
 {
-	if (g_timer == null)
-		g_timer = sx_new Timer;
-
 	// create configuration file
-	m_netConfig = sx_new NetConfig;
 	m_dbConfig = sx_new DatabaseConfig;
 }
 
 DatabaseServer::~DatabaseServer(void)
 {
-	sx_safe_delete_and_null( g_timer );
 	sx_safe_delete_and_null(m_dbConfig);
-	sx_safe_delete_and_null(m_netConfig);
 }
 
 void DatabaseServer::Initialize(void)
@@ -63,7 +56,7 @@ void DatabaseServer::Initialize(void)
 	m_threadMan = sx_new ThreadManager;
 
 	//	initialize objects
-	m_server->Initialize(m_netConfig);
+	m_server->Initialize();
 }
 
 void DatabaseServer::Finalize(void)
@@ -77,7 +70,7 @@ void DatabaseServer::Finalize(void)
 bool DatabaseServer::LoadConfig(const wchar* configFile)
 {
 	//	try to load configuration file
-	if (LoadConfigs(m_netConfig, m_dbConfig, configFile) == false)
+	if (LoadConfigs(g_net, m_dbConfig, configFile) == false)
 	{
 		sx_print(L"ERROR: Can't read the configuration file %s", configFile);
 		return false;

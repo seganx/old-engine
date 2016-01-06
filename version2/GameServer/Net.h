@@ -16,9 +16,7 @@
 #define SX_NET_ID				31
 #define SX_NET_BUFF_SIZE		256		//! maximum size of a packet in bytes
 #define SX_NET_OPTN_SAFESEND	0x01	//! used in message header and indicates that the message should be resend till other sides confirms
-#define SX_NET_OPTN_CONFIRMED	0x02	//! used in message header and indicates that the message is confirmation by the other sides
-#define SX_NET_OPTN_RESEND		0x04	//! used in message header and indicates that the receiver request to resend a lost packet
-#define SX_NET_RUDP_WINSIZE		4		//! window size of selective repeat protocol
+#define SX_NET_OPTN_DELIVERED	0x02	//! used in message header and indicates that the message is confirmation by the other sides
 
 
 //! report network statistics

@@ -1,5 +1,5 @@
 #include "Assert.h"
-#include "Callstack.h"
+#include "Crash.h"
 
 
 #if ( defined(_DEBUG) || SEGAN_ASSERT )

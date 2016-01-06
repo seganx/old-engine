@@ -13,7 +13,7 @@
 
 #include "Socket.h"
 
-//! selective repeat receiver for RUPD
+//! Receiver class for selective repeat protocol
 class Receiver
 {
 public:
@@ -21,19 +21,11 @@ public:
 	Receiver( void );
 	~Receiver( void );
  
-	//! initialize with specified address and socket for sending ACK
-	void Init( const NetAddress& destination, Socket* ackSocket );
-
-	//! handle received packets
-	void Received( NetPacket* packet );
-	
-	//! update the sender to handle timers and sent ACKs
-	void Update( void );
+	//! return true if message has been received
+	bool IsDublicated(NetHeader* nh);
 
 public:
-	NetAddress			m_address;		//! destination address
-	Socket*				m_socket;		//! sending ACK socket
-	Array<NetPacket*>	m_packets;		//!	list of buffered packets
+	word	m_acks[SX_NET_RUDP_BUFFSIZE];	//! window buffer
 };
 
 #endif	//	RUDP_RECEIVER_DEFINED
