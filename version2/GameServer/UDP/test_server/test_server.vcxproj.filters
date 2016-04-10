@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="test_server.cpp" />
+    <ClCompile Include="..\Connection.cpp">
+      <Filter>GameServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Net.cpp">
+      <Filter>GameServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Server.cpp">
+      <Filter>GameServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Socket.cpp">
+      <Filter>GameServer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="GameServer">
+      <UniqueIdentifier>{e236e74f-e140-48ba-ace5-f47f60c964b9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Socket.h">
+      <Filter>GameServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Connection.h">
+      <Filter>GameServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Net.h">
+      <Filter>GameServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Server.h">
+      <Filter>GameServer</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
