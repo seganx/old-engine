@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{84eb3117-073f-4f71-941e-55b1561054ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins">
+      <UniqueIdentifier>{34945dc2-37ec-4e0c-94ab-c37e9509b7d4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mongoose.c">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="mongoose_config.cpp">
+      <Filter>ThirdParty</Filter>
+    </ClCompile>
+    <ClCompile Include="plugin.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="plugin_manager.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mongoose.h">
+      <Filter>ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="mongoose_config.h">
+      <Filter>ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="plugin.h">
+      <Filter>Plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="plugin_manager.h">
+      <Filter>Plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="shared.h" />
+    <ClInclude Include="imports.h" />
+  </ItemGroup>
+</Project>
