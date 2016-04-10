@@ -1,0 +1,7 @@
+Here is some basic requires of server:
+
+	- Realtime config: Reconfigurate the server on the fly.
+	- Time management: Authentic time value in client and server.
+	- Monitorin system: Including a good filtering to find the issue.
+	- Command center: Easily send commands to servers and catch results.
+	- Update process: All server updating features including maintenance, force update, block version, custom messages and costum actions on client.
