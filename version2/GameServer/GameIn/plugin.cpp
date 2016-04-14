@@ -1,33 +1,10 @@
 #include <windows.h>
 #include "plugin.h"
 
-typedef	int(__cdecl * pGetPriority)(void);
-typedef	int(__cdecl * pInitialize)(void);
-typedef	int(__cdecl * pFinalize)(void);
-typedef	int(__cdecl * pReset)(void);
-typedef	int(__cdecl * pHandleRequest)(class RequestObject* request);
-
-//////////////////////////////////////////////////////////////////////////
-//	helper function
-//////////////////////////////////////////////////////////////////////////
-int loading_function_error(Plugin* p, const wchar* filename, const char* func)
-{
-	sx_print(L"Error: Can't load function '%S' from plugin %s!", func, filename);
-
-	p->Initialize = null;
-	p->Finalize = null;
-	p->Reset = null;
-	p->HandleRequest = null;
-	if (p->m_module)
-		FreeLibrary((HMODULE)p->m_module);
-	p->m_module = null;
-
-	return 0;
-}
-
-Plugin::Plugin()
+Plugin::Plugin(): m_priority(0), m_module(null), m_func(null)
 {
 	sx_mem_set(m_name, 0, sizeof(m_name));
+	sx_mem_set(m_desc, 0, sizeof(m_desc));
 }
 
 Plugin::~Plugin()
@@ -40,7 +17,9 @@ int Plugin::Load(const wchar* filename)
 {
 	if (m_module)
 	{
-		sx_print(L"Error: Plugin %s already loaded! Discard loading %s", m_name, filename);
+		char name[256] = {0};
+		ProcessMsg(GAMEIN_PLUGIN_NAME, name);
+		sx_print(L"Error: Plugin %S already loaded! Discard loading %s", name, filename);
 		return 0;
 	}
 
@@ -53,24 +32,38 @@ int Plugin::Load(const wchar* filename)
 	}
 
 	//	load functions
-	Initialize = (pInitialize)GetProcAddress((HMODULE)m_module, "initialize");
-	if (!Initialize) return loading_function_error(this, filename, "initialize");
+	m_func = (pfunc)GetProcAddress((HMODULE)m_module, "_process_msg@8");
+	if (!m_func) 
+	{
+		sx_print(L"Error: Can't load function 'process_msg' from plugin %s!", filename);
 
-	Finalize = (pFinalize)GetProcAddress((HMODULE)m_module, "finalize");
-	if (!Finalize) return loading_function_error(this, filename, "finalize");
+		m_func = null;
+		if (m_module)
+			FreeLibrary((HMODULE)m_module);
+		m_module = null;
 
-	Reset = (pReset)GetProcAddress((HMODULE)m_module, "reset");
-	if (!Reset) return loading_function_error(this, filename, "reset");
+		return 0;
+	}
 
-	HandleRequest = (pHandleRequest)GetProcAddress((HMODULE)m_module, "handle_request");
-	if (!HandleRequest) return loading_function_error(this, filename, "handle_request");
+	//	get plugin name
+	m_func(GAMEIN_PLUGIN_NAME, m_name);
+	m_func(GAMEIN_PLUGIN_DESC, m_desc);
 
-	//	load and set priority
-	pGetPriority func_priority = (pGetPriority)GetProcAddress((HMODULE)m_module, "get_priority");
-	if (!func_priority) return loading_function_error(this, filename, "get_priority");
-	m_priority = func_priority();
+	//	get plugin priority
+	m_priority = m_func(GAMEIN_PLUGIN_PRIORITY, null);
 
-	//	finally load name
-	const wchar* name = sx_str_exclude_extension(sx_str_extract_filename(filename));
-	sx_str_copy(m_name, 128, name);
+	return 1;
+}
+
+int Plugin::ProcessMsg(GAMEIN_PLUGIN_ int msg, void* data)
+{
+	if (m_module)
+	{
+		return m_func(msg, data);
+	}
+	else
+	{
+		sx_print_a("Plugin not loaded! Class pointer: 0x%x", (uint)this)
+		return 0;
+	}
 }

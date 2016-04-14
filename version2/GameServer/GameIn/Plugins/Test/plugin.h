@@ -9,28 +9,19 @@
 #ifndef DEFINED_plugin
 #define DEFINED_plugin
 
-#define PLUGINAPI			__declspec(dllexport)
-#define FUNCCONV			__cdecl
-//#define FUNCCONV			__stdcall
+#define GAMEIN_PLUGIN_INITIALIZE	1	//! initialize parameters of plugin
+#define GAMEIN_PLUGIN_FINALIZE		2	//! finalize the loaded plugin
+#define GAMEIN_PLUGIN_NAME			3	//! get name of the plugin. data is pointer to char string
+#define GAMEIN_PLUGIN_DESC			4	//! get description of the plugin. data is pointer to char string
+#define GAMEIN_PLUGIN_PRIORITY		5	//! get description of the plugin. data is pointer to int
+#define GAMEIN_PLUGIN_RESRT			6	//! reset plugin content
+#define GAMEIN_PLUGIN_REQUEST		7	//! handle the request. data is pointer to RequestObject. NOTE: This function called in a separate thread so it must be thread-safe
 
+//!	process the message
 extern "C"
 {
-	//! initialize parameters of plugin
-	PLUGINAPI int FUNCCONV get_priority(void);
-
-	//! initialize parameters of plugin
-	PLUGINAPI int FUNCCONV initialize(void);
-
-	//! finalize the loaded plugin
-	PLUGINAPI int FUNCCONV finalize(void);
-
-	//! reset plugin content
-	PLUGINAPI int FUNCCONV reset(void);
-
-	//! handle the request. This function called in a separate thread so it must be thread-safe
-	PLUGINAPI int FUNCCONV handle_request(class RequestObject* request);
-};
-
+	__declspec(dllexport) int __stdcall process_msg(int msg, void* data);
+}
 
 #endif // DEFINED_plugin
 

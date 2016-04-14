@@ -11,6 +11,18 @@
 
 #include "imports.h"
 
+#define GAMEIN_PLUGIN_
+#define GAMEIN_PLUGIN_INITIALIZE	1	//! initialize parameters of plugin
+#define GAMEIN_PLUGIN_FINALIZE		2	//! finalize the loaded plugin
+#define GAMEIN_PLUGIN_NAME			3	//! get name of the plugin. data is pointer to char string as destination
+#define GAMEIN_PLUGIN_DESC			4	//! get description of the plugin. data is pointer to char string as destination
+#define GAMEIN_PLUGIN_PRIORITY		5	//! return priority of plugin. data is null
+#define GAMEIN_PLUGIN_RESRT			6	//! reset plugin content
+#define GAMEIN_PLUGIN_REQUEST		7	//! handle the request. data is pointer to RequestObject. NOTE: This function called in a separate thread so it must be thread-safe
+
+
+typedef int(_stdcall * pfunc)(int msg, void* data);
+
 //! represent loaded plugin as a class
 class Plugin
 {
@@ -21,23 +33,16 @@ public:
 	//! load library from specified file to the Plugin object. return less that 1 if failed loading
 	int Load(const wchar* filename);
 
-public:	
-	//! initialize parameters of plugin
-	int(__cdecl * Initialize)(void) = 0;
-
-	//! finalize the loaded plugin
-	int(__cdecl * Finalize)(void) = 0;
-
-	//! reset plugin content
-	int(__cdecl * Reset)(void) = 0;
-
-	//! handle the request. This function called in a separate thread so it must be thread-safe
-	int(__cdecl * HandleRequest)(class RequestObject* request) = 0;
-
+	//!	process the message
+	int ProcessMsg(GAMEIN_PLUGIN_ int msg, void* data);
+	
 public:
-	wchar	m_name[128];		//! name of the plugin
-	int		m_priority = 0;		//! plugin priority indicates when this plugin handle request
-	handle	m_module = null;	//! module handle
+	char	m_name[64];		//! name of the plugin
+	char	m_desc[256];	//! description of the module
+	bool	m_active;		//! status of the plugin. Deactivated plugin will not call to process messages
+	int		m_priority;		//! plugin priority indicates when this plugin handle request
+	handle	m_module;		//! module handle
+	pfunc	m_func;			//! pointer to the main function is plugin
 };
 
 #endif // DEFINED_plugin

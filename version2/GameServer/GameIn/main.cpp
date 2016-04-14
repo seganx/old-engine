@@ -6,6 +6,8 @@
 #include "mongoose.h"
 #include "mongoose_config.h"
 #include "plugin.h"
+#include "plugin_manager.h"
+
 
 int callback_log(const struct mg_connection * conn, const char *message)
 {
@@ -54,11 +56,12 @@ int get_command(char* command)
 int main(void)
 {
 	{
-		Plugin* p = sx_new Plugin();
-		p->Load(L"Test.dll");
-		if (p->m_module)
-			sx_print(L"Plugin %s has priority %d", p->m_name, p->m_priority);
-		sx_delete_and_null(p);
+		PluginMan* pman = sx_new PluginMan();
+		pman->Add(L"Test.dll");
+		Plugin* p = pman->Get(0);
+		sx_print_a("Plugin %s : %s\nPlugin priority %d", p->m_name, p->m_desc, p->m_priority);
+
+		sx_delete_and_null(pman);
 	}
 
 	sx_callstack();

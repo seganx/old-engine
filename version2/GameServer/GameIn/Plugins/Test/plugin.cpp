@@ -2,31 +2,37 @@
 #include "plugin.h"
 
 
-PLUGINAPI int FUNCCONV get_priority(void)
+int __stdcall process_msg(int msg, void* data)
 {
-	return 32;
-}
+	switch (msg)
+	{
+		case GAMEIN_PLUGIN_INITIALIZE: 
+			return 1;
 
-PLUGINAPI int FUNCCONV initialize(void)
-{
-	return 1;
-}
+		case GAMEIN_PLUGIN_FINALIZE: 
+			return 1;
 
-PLUGINAPI int FUNCCONV finalize(void)
-{
-	return 1;
-}
+		case GAMEIN_PLUGIN_NAME:
+			strcpy((char*)data, "First Plugin");
+			return 1;
 
-PLUGINAPI int FUNCCONV reset(void)
-{
-	return 1;
-}
+		case GAMEIN_PLUGIN_DESC:
+			strcpy((char*)data, "This is a test plugin");
+			return 1;
 
-PLUGINAPI int FUNCCONV handle_request(class RequestObject* request)
-{
-	return 1;
-}
+		case GAMEIN_PLUGIN_PRIORITY: 
+			return 2;
 
+		case GAMEIN_PLUGIN_RESRT: 
+			return 1;
+			
+		case GAMEIN_PLUGIN_REQUEST: 
+			return 1;
+
+	}
+
+	return 0;
+}
 
 
 //////////////////////////////////////////////////////////////////////////

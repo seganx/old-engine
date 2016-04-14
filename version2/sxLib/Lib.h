@@ -24,6 +24,7 @@
 #include "Table.h"
 #include "Partition.h"
 #include "Timer.h"
+#include "Mutex.h"
 #include "Utils.h"
 
 

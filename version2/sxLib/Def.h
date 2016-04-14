@@ -81,7 +81,7 @@ typedef byte				*pbyte;
 
 #define SEGAN_CRASHRPT_CALLSTACK			1		//	enable call stack system to log stack of function
 
-#define SEGAN_CRITICAL_SECTION				1		//	use critical section for multi threaded safety
+#define SEGAN_CRITICAL_SECTION				0		//	use critical section for multi threaded safety
 
 
 
