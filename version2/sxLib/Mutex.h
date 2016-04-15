@@ -20,10 +20,10 @@ public:
 	~Mutex();
 
 	//! lock this mutex object
-	void Lock();
+	void lock();
 
 	//! unlock this mutex object
-	void Unlock();
+	void unlock();
 
 private:
 	handle	m_mutex;	//! pointer to OS dependent mutex object

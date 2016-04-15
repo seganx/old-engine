@@ -13,21 +13,16 @@
       <Filter>ThirdParty</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="mongoose_config.cpp">
-      <Filter>ThirdParty</Filter>
-    </ClCompile>
     <ClCompile Include="plugin.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
     <ClCompile Include="plugin_manager.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
+    <ClCompile Include="gamein.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mongoose.h">
-      <Filter>ThirdParty</Filter>
-    </ClInclude>
-    <ClInclude Include="mongoose_config.h">
       <Filter>ThirdParty</Filter>
     </ClInclude>
     <ClInclude Include="plugin.h">
@@ -36,7 +31,8 @@
     <ClInclude Include="plugin_manager.h">
       <Filter>Plugins</Filter>
     </ClInclude>
-    <ClInclude Include="shared.h" />
     <ClInclude Include="imports.h" />
+    <ClInclude Include="gamein.h" />
+    <ClInclude Include="request.h" />
   </ItemGroup>
 </Project>

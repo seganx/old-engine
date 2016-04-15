@@ -19,14 +19,14 @@ Mutex::~Mutex()
 #endif
 }
 
-void Mutex::Lock()
+void Mutex::lock()
 {
 #if defined(_WIN32)
 	WaitForSingleObject(m_mutex, INFINITE);
 #endif
 }
 
-void Mutex::Unlock()
+void Mutex::unlock()
 {
 #if defined(_WIN32)
 	ReleaseMutex(m_mutex);

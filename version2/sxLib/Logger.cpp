@@ -38,7 +38,6 @@ void Logger::initialize( const bool console, const wchar* filename, CB_Logger ca
 void Logger::log( const wchar* format, ... )
 {
 	if ( !format ) return;
-	sx_enter_cs();
 
 	va_list argList;
 	va_start(argList, format);
@@ -87,14 +86,11 @@ void Logger::log( const wchar* format, ... )
 	}
 
 	free( buffer );
-
-	sx_leave_cs();
 }
 
 void Logger::log_( const wchar* format, ... )
 {
 	if ( !format ) return;
-	sx_enter_cs();
 
 	va_list argList;
 	va_start(argList, format);
@@ -126,6 +122,4 @@ void Logger::log_( const wchar* format, ... )
 	}
 
 	free( buffer );
-
-	sx_leave_cs();
 }

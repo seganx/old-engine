@@ -18,10 +18,10 @@ public:
 	Timer( void );
 
 	//! update the timer. this function should be in loop
-	void Update( void );
+	void update( void );
 
 	//! return OS timer in high frequency
-	uint64 GetCurrTime( void );
+	uint64 get_curr_time( void );
 
 public:
 	double m_time;					//! time from starting the timer in seconds

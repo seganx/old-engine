@@ -3,11 +3,40 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Windows.h>
+
 #include "mongoose.h"
-#include "mongoose_config.h"
 #include "plugin.h"
 #include "plugin_manager.h"
+#include "gamein.h"
+#include "request.h"
 
+
+int callback_request_send(void* connection, const void* buffer, int size)
+{
+	struct mg_connection* conn = (struct mg_connection*)connection;
+
+	//////////////////////////////////////////////////////////////////////////
+	//	this block can't be here because each plugin will send header separately
+	//////////////////////////////////////////////////////////////////////////
+	if (false)
+	{
+		//	prepare HTTP header
+		char* header =
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Type: application/x-zip-compressed\r\n"
+			"Accept-Ranges: bytes\r\n"
+			"Content-Length: %u\r\n\r\n";
+
+		//	prepare message and send
+		mg_printf(conn, header, size);
+	}
+
+	return mg_write(conn, buffer, size);
+}
+
+void callback_upload(struct mg_connection * conn, const char *file_name) {  }
+int callback_websocket(const struct mg_connection * conn) { return 1; }
+const char* callback_open_file(const struct mg_connection * conn, const char *path, size_t *data_len) { return 0; }
 
 int callback_log(const struct mg_connection * conn, const char *message)
 {
@@ -22,96 +51,62 @@ int callback_log(const struct mg_connection * conn, const char *message)
 }
 
 
-int begin_request(struct mg_connection * conn)
+int callback_begin_request(struct mg_connection * conn)
 {
 	sx_callstack();
 
 	mg_request_info * header = mg_get_request_info(conn);
 	if (!header->uri) return 1;
 	if (sx_str_len(header->uri) > 256) return 1;
+	if (!header->user_data) return 1;
 
-	//	place codes here
+	//	get server object as user data to access all parts
+	GameIn* gamein = (GameIn*)header->user_data;
 
-
-	return 0;
-}
-void callback_end_request(const struct mg_connection *, int reply_status_code){}
-void callback_upload(struct mg_connection * conn, const char *file_name) {  }
-int callback_websocket(const struct mg_connection * conn) { return 1; }
-const char* callback_open_file(const struct mg_connection * conn, const char *path, size_t *data_len) { return 0; }
-
-int get_command(char* command)
-{
-	int i = 0;
-	while (true)
+	//	collect activated plugins from plugin manager
+	if (gamein->m_plugins->count())
 	{
-		if ((command[i++] = getchar()) == 10)
-		{
-			command[--i] = 0;
-			return i;
-		}
-	};
+		Plugin* activePlugins[32] = { 0 };
+		gamein->m_plugins->get_plugins(activePlugins, 32);
+
+		//	prepare request message to throw in all plugins
+		Request reqobj;
+		reqobj.connection = conn;
+		reqobj.send = callback_request_send;
+
+		//	count on all plugins to handle the request 
+		for (int i = 0; i < 32 && activePlugins[i]; ++i)
+			activePlugins[i]->process_msg(GAMEIN_PLUGIN_REQUEST, &reqobj);
+
+	}
+	return 1;
 }
+
+void callback_end_request(const struct mg_connection *, int reply_status_code)
+{
+
+}
+
+
+
 
 int main(void)
 {
-	{
-		PluginMan* pman = sx_new PluginMan();
-		pman->Add(L"Test.dll");
-		Plugin* p = pman->Get(0);
-		sx_print_a("Plugin %s : %s\nPlugin priority %d", p->m_name, p->m_desc, p->m_priority);
-
-		sx_delete_and_null(pman);
-	}
-
 	sx_callstack();
-	printf("GameIn web api server version 0.1\n\n");
-
-	// load options
-	char* options[MG_MAX_OPTIONS] = { 0 };
-	if (!mg_load_command_line_arguments(options))
-	{
-		printf("fatal error : can't find gamein.config\n");
-		if (mg_create_config_file(MG_CONFIG_FILE))
-			printf("info : gameup.config has been created.\n\nplease modify that file and start the server again\n");
-		else
-			printf("fatal error : can't create gameup.config\n");
-		getchar();
-		return 0;
-	}
+	printf("GameIn web-api server version 0.1\n\n");
 
 	// prepare callbacks structure for mongoose
 	struct mg_callbacks callbacks;
 	memset(&callbacks, 0, sizeof(callbacks));
-	callbacks.begin_request = &begin_request;
+	callbacks.begin_request = &callback_begin_request;
 	callbacks.end_request = &callback_end_request;
 	callbacks.open_file = &callback_open_file;
 	callbacks.log_message = &callback_log;
 	callbacks.upload = &callback_upload;
 	callbacks.websocket_connect = &callback_websocket;
 
-	// start the web server.
-	mg_context* con = mg_start(&callbacks, NULL, (const char**)options);
-
-	while (true)
-	{
-		char command[300] = { 0 };
-		int len = get_command(command);
-
-		if (strcmp(command, "exit") == 0)
-		{
-			printf("are you sure (yes,no)? ");
-			len = get_command(command);
-			if (strcmp(command, "yes") == 0)
-			{
-				printf("shutting down ...\n");
-				break;
-			}
-		}
-	}
-
-	// Stop the server.
-	mg_stop(con);
+	GameIn gin;
+	gin.start(L"gamein.config", &callbacks);
 
 	return 0;
 }

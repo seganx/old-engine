@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include "plugin.h"
-#include "../../request.h"
+#include "database.h"
 
 
 int __stdcall process_msg(int msg, void* data)
@@ -16,15 +16,15 @@ int __stdcall process_msg(int msg, void* data)
 			return 1;
 
 		case GAMEIN_PLUGIN_NAME:
-			strcpy_s((char*)data, 64, "First Plugin");
+			strcpy_s((char*)data, 64, "Player Profile V1");
 			return 1;
 
 		case GAMEIN_PLUGIN_DESC:
-			strcpy_s((char*)data, 256, "This is a test plugin");
+			strcpy_s((char*)data, 256, "Retrieve player profile from database");
 			return 1;
 
 		case GAMEIN_PLUGIN_PRIORITY:
-			return 2;
+			return 10;
 
 		case GAMEIN_PLUGIN_COMMAND:
 			if (data)
@@ -37,9 +37,10 @@ int __stdcall process_msg(int msg, void* data)
 		case GAMEIN_PLUGIN_REQUEST:
 			if (data)
 			{
-				char* msg = "Here is test plugin!\n";
+				char* msg = "Here is profile plugin!\n";
+
 				Request* req = (Request*)data;
-				req->send(req->connection, msg, strlen(msg));
+				req->send(req->connection, msg, sx_str_len(msg));
 			}
 			return 1;
 

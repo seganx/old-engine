@@ -23,19 +23,19 @@ public:
 	~PluginMan();
 
 	//! add a plugin to system
-	Plugin* Add(const wchar* filename);
+	Plugin* add(const wchar* filename);
 
 	//! remove a plugin from system
-	void Delete(const wchar* name);
+	void remove(const wchar* name);
 
-	//! remove a plugin from system
-	void RemoveAt(const int index);
+	//! return number of plugins loaded
+	int count();
 
 	//! return plugin specified by index. return null for invalid index 
-	Plugin* Get(const int index);
+	Plugin* get(const int index);
 
 	//! fill out the array of activated plugins. this function is multi threaded safe
-	void GetPlugins(Plugin* dest[], const int destSize);
+	void get_plugins(Plugin* dest[], const int destSize);
 
 private:
 	Mutex			m_mutex;			//	make this object multi threaded safe

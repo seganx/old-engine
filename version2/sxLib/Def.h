@@ -81,7 +81,9 @@ typedef byte				*pbyte;
 
 #define SEGAN_CRASHRPT_CALLSTACK			1		//	enable call stack system to log stack of function
 
-#define SEGAN_CRITICAL_SECTION				0		//	use critical section for multi threaded safety
+#define SEGAN_LIB_MULTI_THREADED			1		//	enable library multi threaded safe 
+
+
 
 
 
@@ -153,18 +155,6 @@ typedef byte				*pbyte;
 #define sx_print(fmt, ...)		{ wprintf(fmt, __VA_ARGS__); printf(" - %s(%d)\n", _FILE_, __LINE__); }
 #define sx_print_a(fmt, ...)	{ printf(fmt, __VA_ARGS__);  printf(" - %s(%d)\n", _FILE_, __LINE__); }
 
-
-#if ( SEGAN_CRITICAL_SECTION == 1 )
-SEGAN_LIB_API void lib_enter_cs( void );
-SEGAN_LIB_API void lib_leave_cs( void );
-//! enter critical section
-#define sx_enter_cs()		lib_enter_cs()
-//! leave critical section
-#define sx_leave_cs()		lib_leave_cs()
-#else
-#define sx_enter_cs()
-#define sx_leave_cs()
-#endif
 
 // assertion
 #if ( defined(_DEBUG) || SEGAN_ASSERT )

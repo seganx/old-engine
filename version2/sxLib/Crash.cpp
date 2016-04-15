@@ -5,6 +5,10 @@
 
 #include "Crash.h"
 
+#if SEGAN_LIB_MULTI_THREADED
+#include "Mutex.h"
+#endif
+
 #if SEGAN_CRASHRPT
 
 #if SEGAN_CRASHRPT_CALLSTACK
@@ -37,8 +41,12 @@ int callstack_clear( void )
 
 CrashCallStack* callstack_push_pop(bool push)
 {
-	sx_enter_cs();
 	CrashCallStack* res = null;
+
+#if SEGAN_LIB_MULTI_THREADED
+	static Mutex s_mutex;
+	s_mutex.lock();
+#endif
 
 	if (push)
 	{
@@ -51,7 +59,10 @@ CrashCallStack* callstack_push_pop(bool push)
 			res = &s_callstack_pool[s_callstack_index++];
 	}
 
-	sx_leave_cs();
+#if SEGAN_LIB_MULTI_THREADED
+	s_mutex.unlock();
+#endif
+
 	return res;
 }
 

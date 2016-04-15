@@ -1,11 +1,15 @@
 #include <memory>
-#include "Memory.h"
-#include "Assert.h"
 
 #if defined(_WIN32)
 #include <Windows.h>
 #endif
 
+#include "Memory.h"
+#include "Assert.h"
+
+#if SEGAN_LIB_MULTI_THREADED
+#include "Mutex.h"
+#endif
 
 #define mem_min_size(a,b) (((a)<(b))?(a):(b))
 
@@ -230,12 +234,19 @@ SEGAN_INLINE void mem_debug_pop_unsafe( MemBlock* mb )
 
 SEGAN_INLINE void mem_debug_push_pop(MemBlock* mb, const bool pop = false)
 {
-	sx_enter_cs();
+#if SEGAN_LIB_MULTI_THREADED
+	static Mutex s_mutex;
+	s_mutex.lock();
+#endif
+
 	if ( pop )
 		mem_debug_pop_unsafe( mb );
 	else
 		mem_debug_push_unsafe( mb );
-	sx_leave_cs();
+	
+#if SEGAN_LIB_MULTI_THREADED
+	s_mutex.unlock();
+#endif
 }
 
 

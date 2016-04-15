@@ -13,12 +13,12 @@ Plugin::~Plugin()
 		FreeLibrary((HMODULE)m_module);
 }
 
-int Plugin::Load(const wchar* filename)
+int Plugin::load(const wchar* filename)
 {
 	if (m_module)
 	{
 		char name[256] = {0};
-		ProcessMsg(GAMEIN_PLUGIN_NAME, name);
+		process_msg(GAMEIN_PLUGIN_NAME, name);
 		sx_print(L"Error: Plugin %S already loaded! Discard loading %s", name, filename);
 		return 0;
 	}
@@ -55,7 +55,7 @@ int Plugin::Load(const wchar* filename)
 	return 1;
 }
 
-int Plugin::ProcessMsg(GAMEIN_PLUGIN_ int msg, void* data)
+int Plugin::process_msg(GAMEIN_PLUGIN_ int msg, void* data)
 {
 	if (m_module)
 	{

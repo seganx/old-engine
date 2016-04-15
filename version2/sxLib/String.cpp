@@ -1,6 +1,10 @@
 #include "String.h"
 #include "Assert.h"
 
+#if SEGAN_LIB_MULTI_THREADED
+#include "Mutex.h"
+#endif
+
 #include <string>
 
 #define char_upper(c) { if ( 'a' <= c && c <= 'z' ) c += 'A' - 'a'; return c; }
@@ -24,6 +28,7 @@
 		dest[res] = 0; }\
 	return res;\
 }
+
 
 SEGAN_INLINE uint sx_str_len(const char* str) { str_len(str) }
 SEGAN_INLINE uint sx_str_len(const wchar* str) { str_len(str) }
@@ -121,12 +126,20 @@ wchar* str_pop( void )
 	typedef wchar StrItem[1024];
 	static StrItem str_pool[512];
 	static sint index = 0;
-	sx_enter_cs();
+
+#if SEGAN_LIB_MULTI_THREADED
+	static Mutex s_mutex;
+	s_mutex.lock();
+#endif
+
 	if ( index >= 512 ) index = 0;
 	wchar* res = str_pool[index++];
-	sx_leave_cs();
-	return res;
+	
+#if SEGAN_LIB_MULTI_THREADED
+	s_mutex.lock();
+#endif
 
+	return res;
 }
 
 SEGAN_INLINE uint sx_wchar_to_utf8( char* dest, const uint destsize, const uint ch )

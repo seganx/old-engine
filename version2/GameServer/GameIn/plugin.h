@@ -17,7 +17,7 @@
 #define GAMEIN_PLUGIN_NAME			3	//! get name of the plugin. data is pointer to char string as destination
 #define GAMEIN_PLUGIN_DESC			4	//! get description of the plugin. data is pointer to char string as destination
 #define GAMEIN_PLUGIN_PRIORITY		5	//! return priority of plugin. data is null
-#define GAMEIN_PLUGIN_RESRT			6	//! reset plugin content
+#define GAMEIN_PLUGIN_COMMAND		6	//! user command from console. data is pointer to char string
 #define GAMEIN_PLUGIN_REQUEST		7	//! handle the request. data is pointer to RequestObject. NOTE: This function called in a separate thread so it must be thread-safe
 
 
@@ -31,10 +31,10 @@ public:
 	~Plugin();
 
 	//! load library from specified file to the Plugin object. return less that 1 if failed loading
-	int Load(const wchar* filename);
+	int load(const wchar* filename);
 
 	//!	process the message
-	int ProcessMsg(GAMEIN_PLUGIN_ int msg, void* data);
+	int process_msg(GAMEIN_PLUGIN_ int msg, void* data);
 	
 public:
 	char	m_name[64];		//! name of the plugin

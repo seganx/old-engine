@@ -457,8 +457,7 @@ static const char *config_options[] = {
   "enable_directory_listing", "yes",
   "error_log_file", NULL,
   "global_auth_file", NULL,
-  "index_files",
-    "index.html,index.htm,index.cgi,index.shtml,index.php,index.lp",
+  "index_files", "index.html,index.htm,index.cgi,index.shtml,index.php,index.lp",
   "enable_keep_alive", "no",
   "access_control_list", NULL,
   "extra_mime_types", NULL,
@@ -4205,7 +4204,9 @@ static void handle_request(struct mg_connection *conn) {
   } else if (is_websocket_request(conn)) {
     handle_websocket_request(conn);
 #endif
-  } else if (!strcmp(ri->request_method, "OPTIONS")) {
+  } 
+#if HIDE_FOR_GAMEIN
+  else if (!strcmp(ri->request_method, "OPTIONS")) {
     send_options(conn);
   } else if (conn->ctx->config[DOCUMENT_ROOT] == NULL) {
     send_http_error(conn, 404, "Not Found", "Not Found");
@@ -4230,8 +4231,7 @@ static void handle_request(struct mg_connection *conn) {
               "Location: %s/\r\n\r\n", ri->uri);
   } else if (!strcmp(ri->request_method, "PROPFIND")) {
     handle_propfind(conn, path, &file);
-  } else if (file.is_directory &&
-             !substitute_index_file(conn, path, sizeof(path), &file)) {
+  } else if (file.is_directory && !substitute_index_file(conn, path, sizeof(path), &file)) {
     if (!mg_strcasecmp(conn->ctx->config[ENABLE_DIRECTORY_LISTING], "yes")) {
       handle_directory_request(conn, path);
     } else {
@@ -4261,7 +4261,18 @@ static void handle_request(struct mg_connection *conn) {
     handle_ssi_file_request(conn, path);
   } else if (is_not_modified(conn, &file)) {
     send_http_error(conn, 304, "Not Modified", "%s", "");
-  } else {
+  } 
+#endif // HIDE_FOR_GAMEIN
+  else if (file.is_directory && !substitute_index_file(conn, path, sizeof(path), &file)) {
+	  if (!mg_strcasecmp(conn->ctx->config[ENABLE_DIRECTORY_LISTING], "yes")) {
+		  handle_directory_request(conn, path);
+	  }
+	  else {
+		  send_http_error(conn, 403, "Directory Listing Denied",
+			  "Directory listing denied");
+	  }
+  }
+  else {
     handle_file_request(conn, path, &file);
   }
 }
