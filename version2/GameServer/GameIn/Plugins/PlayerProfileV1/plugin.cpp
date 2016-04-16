@@ -30,7 +30,7 @@ int __stdcall process_msg(int msg, void* data)
 			if (data)
 			{
 				char* cmd = (char*)data;
-				printf("Command received to plugin : %s", cmd);
+				printf("Command received to profile plugin : %s\n", cmd);
 			}
 			return 1;
 

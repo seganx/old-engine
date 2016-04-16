@@ -58,7 +58,7 @@ Plugin* PluginMan::add(const wchar* filename)
 	sx_print_a("Plugin %s has been added to system", p->m_name);
 }
 
-void PluginMan::remove(const wchar* name)
+void PluginMan::remove(const char* name)
 {
 	//	verify that there is a plugin with given name
 	for (int i = 0; i < m_plugins.m_count; ++i)
@@ -108,5 +108,20 @@ void PluginMan::get_plugins(Plugin* dest[], const int destSize)
 	}
 
 	m_mutex.unlock();
+}
+
+void PluginMan::print_plugins()
+{
+	if (m_plugins.m_count > 0)
+	{
+		printf("\nTotal plugin(s) loaded: %d\n", m_plugins.m_count);
+		for (int i = 0; i < m_plugins.m_count; ++i)
+		{
+			Plugin* p = m_plugins[i];
+			const char* ac = p->m_active ? "yes" : "no";
+			printf("\nPriority: %d\nActive: %s\nName: %s\nDesc: %s\n", p->m_priority, ac, p->m_name, p->m_desc);
+		}
+	}
+	else printf("No plugin loaded to the system!");
 }
 

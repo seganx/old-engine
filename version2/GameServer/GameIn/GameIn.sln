@@ -14,10 +14,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxlib", "..\..\sxLib\win32d
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Plugins\Test\Test.vcxproj", "{FF0CEE65-57F3-4960-A7E8-5B1E72F9E55E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PlayerProfileV1", "Plugins\PlayerProfileV1\PlayerProfileV1.vcxproj", "{282ABFF3-E024-42EF-B7D7-95A30CB6324C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF} = {E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Plugin_PlayerProfileV1", "Plugins\PlayerProfileV1\Plugin_PlayerProfileV1.vcxproj", "{282ABFF3-E024-42EF-B7D7-95A30CB6324C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

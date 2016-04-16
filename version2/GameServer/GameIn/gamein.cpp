@@ -38,13 +38,8 @@ PluginMan* plugin_manager_start(const wchar* config)
 		else break;
 	}
 
-	if (pm->count() > 0)
-	{
-		sx_print_a("\nTotal plugin(s) loaded: %d", pm->count());
-		for (int i = 0; i < pm->count(); ++i)
-			sx_print_a("\nPriority: %d\nName: %s\nDesc: %s", pm->get(i)->m_priority, pm->get(i)->m_name, pm->get(i)->m_desc);
-	}
-	else sx_print_a("No plugin loaded to the system!");
+	//! report loaded plugins
+	pm->print_plugins();
 
 	return pm;
 }
@@ -127,7 +122,7 @@ void GameIn::start(const wchar* configFile, struct mg_callbacks* mgcallbacks)
 
 	while (true)
 	{
-		char command[300] = { 0 };
+		char command[256] = { 0 };
 		int len = gi_get_command(command);
 
 		if (sx_str_cmp(command, "exit") == 0)
@@ -139,6 +134,47 @@ void GameIn::start(const wchar* configFile, struct mg_callbacks* mgcallbacks)
 				printf("shutting down ...\n");
 				break;
 			}
+		}
+		else if (sx_str_cmp(command, "plugins all") == 0)
+		{
+			m_plugins->print_plugins();
+		}
+		else if (sx_str_cmp(command, "plugins add") == 0)
+		{
+			printf("enter plugin filename (plugin.dll): ");
+			len = gi_get_command(command);
+			if (len)
+			{
+				wchar filename[256] = { 0 };
+				sx_str_copy(filename, 256, command);
+				m_plugins->add(filename);
+			}
+		}
+		else if (sx_str_cmp(command, "plugins rem") == 0)
+		{
+			printf("enter plugin name: ");
+			len = gi_get_command(command);
+			if (len)
+				m_plugins->remove(command);
+
+		}
+		else if (sx_str_cmp(command, "plugins active") == 0)
+		{
+			printf("enter plugin name: ");
+			len = gi_get_command(command);
+			if (len)
+				for (int i = 0; i < m_plugins->count(); ++i)
+					if (sx_str_cmp(m_plugins->get(i)->m_name, command))
+						m_plugins->get(i)->m_active = true;
+		}
+		else if (sx_str_cmp(command, "plugins deactive") == 0)
+		{
+			printf("enter plugin name: ");
+			len = gi_get_command(command);
+			if (len)
+				for (int i = 0; i < m_plugins->count(); ++i)
+					if (sx_str_cmp(m_plugins->get(i)->m_name, command))
+						m_plugins->get(i)->m_active = false;
 		}
 		else if (*command)
 		{

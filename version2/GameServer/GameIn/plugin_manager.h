@@ -26,7 +26,7 @@ public:
 	Plugin* add(const wchar* filename);
 
 	//! remove a plugin from system
-	void remove(const wchar* name);
+	void remove(const char* name);
 
 	//! return number of plugins loaded
 	int count();
@@ -36,6 +36,9 @@ public:
 
 	//! fill out the array of activated plugins. this function is multi threaded safe
 	void get_plugins(Plugin* dest[], const int destSize);
+
+	//! print all plugins
+	void print_plugins();
 
 private:
 	Mutex			m_mutex;			//	make this object multi threaded safe

@@ -27,7 +27,7 @@ int Plugin::load(const wchar* filename)
 	m_module = LoadLibrary(filename);
 	if (!m_module) 
 	{
-		sx_print(L"Error: Can't load plugin %s du to %u", filename, GetLastError());
+		sx_print(L"Error: Can't load plugin %s due to code: %u", filename, GetLastError());
 		return 0;
 	}
 

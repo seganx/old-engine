@@ -4,6 +4,18 @@
 #include "plugin.h"
 #include "../../request.h"
 
+int gi_get_command(char* command)
+{
+	int i = 0;
+	while (true)
+	{
+		if ((command[i++] = getchar()) == 10)
+		{
+			command[--i] = 0;
+			return i;
+		}
+	};
+}
 
 int __stdcall process_msg(int msg, void* data)
 {
@@ -30,7 +42,14 @@ int __stdcall process_msg(int msg, void* data)
 			if (data)
 			{
 				char* cmd = (char*)data;
-				printf("Command received to plugin : %s", cmd);
+				if (strcmp( cmd, "plugin test" ) == 0)
+				{
+					printf("enter the command for plugin test: ");
+					char command[256] = {0};
+					int len = gi_get_command(command);
+					printf("Command handled in plugin test: %s\n", command);
+				}
+				
 			}
 			return 1;
 
