@@ -23,8 +23,10 @@
 #include "Logger.h"
 #include "Table.h"
 #include "Partition.h"
+#include "Protocol.h"
 #include "Timer.h"
 #include "Mutex.h"
+#include "Md5.h"
 #include "Utils.h"
 
 

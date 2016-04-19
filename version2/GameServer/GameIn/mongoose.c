@@ -5091,9 +5091,7 @@ void mg_stop(struct mg_context *ctx) {
 #endif // _WIN32
 }
 
-struct mg_context *mg_start(const struct mg_callbacks *callbacks,
-                            void *user_data,
-                            const char **options) {
+struct mg_context *mg_start(const struct mg_callbacks *callbacks, void *user_data, const char **options) {
   struct mg_context *ctx;
   const char *name, *value, *default_value;
   int i;

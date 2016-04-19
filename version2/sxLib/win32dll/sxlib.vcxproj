@@ -92,9 +92,11 @@
     <ClInclude Include="..\Logger.h" />
     <ClInclude Include="..\Map.h" />
     <ClInclude Include="..\Math.h" />
+    <ClInclude Include="..\Md5.h" />
     <ClInclude Include="..\Memory.h" />
     <ClInclude Include="..\Mutex.h" />
     <ClInclude Include="..\Partition.h" />
+    <ClInclude Include="..\Protocol.h" />
     <ClInclude Include="..\Queue.h" />
     <ClInclude Include="..\Stack.h" />
     <ClInclude Include="..\Stream.h" />
@@ -109,8 +111,10 @@
     <ClCompile Include="..\Lib.cpp" />
     <ClCompile Include="..\Logger.cpp" />
     <ClCompile Include="..\Math.cpp" />
+    <ClCompile Include="..\Md5.cpp" />
     <ClCompile Include="..\Memory.cpp" />
     <ClCompile Include="..\Mutex.cpp" />
+    <ClCompile Include="..\Protocol.cpp" />
     <ClCompile Include="..\String.cpp" />
     <ClCompile Include="..\Timer.cpp" />
     <ClCompile Include="..\Utils.cpp" />

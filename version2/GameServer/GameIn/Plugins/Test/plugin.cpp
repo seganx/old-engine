@@ -28,7 +28,7 @@ int __stdcall process_msg(int msg, void* data)
 			return 1;
 
 		case GAMEIN_PLUGIN_NAME:
-			strcpy_s((char*)data, 64, "First Plugin");
+			strcpy_s((char*)data, 64, "Test Plugin");
 			return 1;
 
 		case GAMEIN_PLUGIN_DESC:

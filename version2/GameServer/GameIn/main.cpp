@@ -95,6 +95,9 @@ int main(void)
 	sx_callstack();
 	printf("GameIn web-api server version 0.1\n\n");
 
+	char md5[34] = { 0 };
+	sx_md5(md5, "0123456789", null);
+
 	// prepare callbacks structure for mongoose
 	struct mg_callbacks callbacks;
 	memset(&callbacks, 0, sizeof(callbacks));

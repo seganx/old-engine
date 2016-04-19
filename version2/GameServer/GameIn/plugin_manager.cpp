@@ -56,6 +56,7 @@ Plugin* PluginMan::add(const wchar* filename)
 	m_mutex.unlock();
 
 	sx_print_a("Plugin %s has been added to system", p->m_name);
+	return p;
 }
 
 void PluginMan::remove(const char* name)
