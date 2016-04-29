@@ -1,400 +1,130 @@
 /********************************************************************
-	created:	2013/11/05
+	created:	2016/4/29
 	filename: 	Table.h
-	Author:		Sajad Beigjani
-	eMail:		sajad.b@gmail.com
+	author:		Sajad Beigjani
+	email:		sajad.b@gmail.com
 	Site:		www.SeganX.com
-	Desc:		This file contain a simple table to store and retrieve
-				data by name
+	Desc:		This file contain a fixed sized indexed table class
+				to access data by specified index. Useful for hash
+				tables as base container. It's allocation free in 
+				add/remove operations.
 *********************************************************************/
-#ifndef GUARD_Table_HEADER_FILE
-#define GUARD_Table_HEADER_FILE
-
+#ifndef DEFINED_Table
+#define DEFINED_Table
 
 #include "Def.h"
 
-
-#define	TABLE_CASE_INSENSITIVE	1		//!	make the table case insensitive in names
-
-template<typename T_data>
+template<typename T>
 class Table
 {
-	SEGAN_STERILE_CLASS( Table );
+	SEGAN_STERILE_CLASS(Table);
 public:
 
-	//! use this callback function to iterate through rows. return true to continue and false to stop iteration
-	typedef bool (*CB_Table)(void* usedata, const wchar* name, T_data& data);
-
-	//! since we don't know the size of data type, so maybe it's better to allocate the memory block separately
-	struct Row
+	Table( uint capacity = 0 )
+		: m_slots(null)
+		, m_stack(null)
+		, m_numfree(0)
+		, m_size(0)
 	{
-		T_data	data;
-	};
-
-	//!	leaf of the string tree
-	struct Leaf
+		set_size( capacity );
+	}
+	
+	~Table( void )
 	{
-		wchar	label;
-		Leaf*	right;
-		Leaf*	down;
-		Row*	row;
+		mem_free(m_slots);
+		mem_free(m_stack);
+	}
 
-		void init( const wchar _label )
+	//! set a new capacity for the manager
+	void set_size( uint cap )
+	{
+		if ( cap < 1 )
 		{
-#if TABLE_CASE_INSENSITIVE
-			label	= sx_str_lower( _label );
-#else
-			label	= _label;
-#endif
-			down	= null;
-			right	= null;
-			row		= null;
+			mem_free( m_slots );
+			mem_free( m_stack );
+			m_size = 0;
+			m_numfree = 0;
+			return;
 		}
 
-		bool can_remove( void )
-		{
-			return ( !right && !row );
-		}
-	};
+		// reallocate needed memory
+		m_slots = (T*)mem_realloc( m_slots, cap * sizeof(T) );
+		m_stack = (uint*)mem_realloc( m_stack, cap * sizeof(uint) );
 
-	Table( void ): m_root(0), m_count(0) {}
-	~Table( void ) { clear(); }
+		// set zero allocated memory
+		if ( cap > m_size )
+			mem_set( &m_slots[m_size], 0, (cap - m_size) * sizeof(T) );
+		m_size = cap;
 
-	void clear( void )
-	{
-		_free( m_root );
-		m_root = 0;
-		m_count = 0;
+		// fill out stack by free slots
+		m_numfree = 0;
+		for ( int i = m_size - 1; i >= 0; --i )
+			if ( !m_slots[i] )
+				m_stack[m_numfree++] = i;
 	}
 
-	bool insert( const wchar* name, const T_data& data )
+	//! return current capacity
+	SEGAN_LIB_INLINE uint size( void )
 	{
-		sx_assert( name );
-		if ( !name ) return false;
-		if ( !m_root )
-		{
-			m_root = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
-			m_root->init( name[0] );
-		}
-		return _put( m_root, 0, name, data );
+		return m_size;
 	}
 
-	bool insert_sort( const wchar* name, const T_data& data )
+	//! return current number of items in container
+	SEGAN_LIB_INLINE uint count( void )
 	{
-		sx_assert( name );
-		if ( !name ) return false;
-		if ( !m_root )
-		{
-			m_root = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
-			m_root->init( name[0] );
-		}
-		return _put_sort( null, m_root, 0, name, data );
+		return m_size - m_numfree;
 	}
 
-	bool remove( const wchar* name )
+	//! add a new item to the table and return the index of that
+	SEGAN_LIB_INLINE uint add( const T& item )
 	{
-		sx_assert( name );
-		if ( !name || !m_root ) return false;
-		return _putaway( m_root, 0, name );
+		sx_assert(m_numfree);
+		uint index = m_stack[--m_numfree];
+		m_slots[index] = item;
+		return index;
 	}
 
-	SEGAN_LIB_INLINE bool find( const wchar* name, T_data& result )
+	//! return an item specified by index. return 0 if item not found
+	SEGAN_LIB_INLINE T& get( uint index )
 	{
-		sx_assert( name );
-		if ( !name || !m_root ) return false;
-		return _pickup( m_root, 0, name, result );
+		sx_assert(index < m_size);
+		return m_slots[index];
 	}
 
-	SEGAN_LIB_INLINE T_data get( const wchar* name, const T_data& failed )
+	//! return the index of an item from the array. return -1 of no item found
+	SEGAN_LIB_INLINE uint index_of( const T& item )
 	{
-		sx_assert( name );
-		if ( !name || !m_root ) return failed;
-		T_data res;
-		if ( _pickup( m_root, 0, name, res ) )
-			return res;
-		else
-			return failed;
+		for ( uint i = 0; i < m_size; ++i )
+			if ( m_slots[i] == item )
+				return i;
+		return -1;
 	}
 
-	void iterate( void* userdata, CB_Table callback )
+	//! remove a session from the manager by index
+	SEGAN_LIB_INLINE bool remove( const T& item )
 	{
-		if ( !m_root ) return;
-		wchar name[1024];
-		_traverse( m_root, userdata, callback, name, 0 );
+		uint index = index_of( item );
+		if ( index == (uint)-1 ) return false;
+		remove_index( index );
+		return true;
 	}
 
-#if _DEBUG
-	void print( Leaf* leaf, int index )
+	//! remove a session from the manager by index
+	SEGAN_LIB_INLINE void remove_index( uint index )
 	{
-		if ( !leaf ) return;
-
-		if ( leaf->row )
-			printf( "%c", toupper(leaf->label) );
-		else
-			printf( "%c", tolower(leaf->label) );
-
-		if ( leaf->right )
-			print( leaf->right, index + 1 );
-
-		if ( leaf->down )
-		{
-			printf( "\n" );
-			for ( int i=0; i<index; ++i )
-				printf( " " );
-			print( leaf->down, index );
-		}
+		sx_assert(index < m_size);
+		m_slots[index] = null;
+		m_stack[m_numfree++] = index;
 	}
-#endif
+
+public:
+	T*			m_slots;			//! item slots in table
+	uint		m_size;				//! capacity of the container
 
 private:
-
-	void _free( Leaf* leaf )
-	{
-		if ( !leaf ) return;
-		if ( leaf->row )
-			sx_mem_free( leaf->row );
-		_free( leaf->right );
-		_free( leaf->down );
-		sx_mem_free( leaf );
-	}
-
-	SEGAN_LIB_INLINE bool _put( Leaf* leaf, uint index, const wchar* name, const T_data& data )
-	{
-#if TABLE_CASE_INSENSITIVE
-		wchar label = sx_str_lower( name[index] );
-#else
-		wchar label = name[index];
-#endif
-		//	search through other leafs
-		while ( leaf->label != label && leaf->down )
-		{
-			leaf = leaf->down;
-		}
-
-		//	no leaf has been found, so just create new one
-		if ( leaf->label != label )
-		{
-			leaf->down = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
-			leaf->down->init( label );
-			leaf = leaf->down;
-		}
-
-		//	just put the data or go to the next index
-		label = name[index+1];
-		if ( label == 0 )
-		{
-			//	we are in position. verify the row and put the data
-			if ( !leaf->row )
-			{
-				leaf->row = (Row*)sx_mem_alloc( sizeof(Row) );
-				leaf->row->data = data;
-				++m_count;
-				return true;
-			}
-			else return false;
-		}
-		else
-		{
-			//	just go deeper leaf
-			if ( !leaf->right )
-			{
-				leaf->right =  (Leaf*)sx_mem_alloc( sizeof(Leaf) );
-				leaf->right->init( label );
-			}
-			return _put( leaf->right, index+1, name, data );
-		}
-	}
-
-	SEGAN_LIB_INLINE bool _put_sort( Leaf* left, Leaf* leaf, uint index, const wchar* name, const T_data& data )
-	{
-#if TABLE_CASE_INSENSITIVE
-		wchar label = tolower( name[index] );
-#else
-		wchar label = name[index];
-#endif
-		//	search through other leafs
-		Leaf* parent = null;
-		while ( label > leaf->label && leaf->down )
-		{
-			parent = leaf;
-			leaf = leaf->down;
-		}
-
-		//	no leaf has been found, so just create new one
-		if ( leaf->label != label )
-		{
-			Leaf* newone = (Leaf*)sx_mem_alloc( sizeof(Leaf) );
-			newone->init( label );
-			
-			if ( label < leaf->label )
-			{
-				if ( left && left->right == leaf )
-				{
-					left->right = newone;
-					newone->down = leaf;
-				}
-				else
-				{
-					if ( parent )
-					{
-						parent->down = newone;
-						newone->down = leaf;
-					}
-					else
-					{
-						m_root = newone;
-						newone->down = leaf;
-					}
-				}
-			}
-			else leaf->down = newone;
-
-			leaf = newone;
-		}
-
-		//	just put the data or go to the next index
-		label = name[index+1];
-		if ( label == 0 )
-		{
-			//	we are in position. verify the row and put the data
-			if ( !leaf->row )
-			{
-				leaf->row = (Row*)sx_mem_alloc( sizeof(Row) );
-				leaf->row->data = data;
-				++m_count;
-				return true;
-			}
-			else return false;
-		}
-		else
-		{
-			//	just go deeper leaf
-			if ( !leaf->right )
-			{
-				leaf->right =  (Leaf*)sx_mem_alloc( sizeof(Leaf) );
-				leaf->right->init( label );
-			}
-			return _put_sort( leaf, leaf->right, index+1, name, data );
-		}
-	}
-
-	SEGAN_LIB_INLINE bool _pickup( Leaf* leaf, uint index, const wchar* name, T_data& data )
-	{
-#if TABLE_CASE_INSENSITIVE
-		wchar label = sx_str_lower( name[index] );
-#else
-		wchar label = name[index];
-#endif
-		//	search through other leafs
-		while ( leaf && leaf->label != label )
-		{
-			leaf = leaf->down;
-		}
-		if ( !leaf ) return false;
-
-		//	just look for data or go to the next index
-		label = name[index+1];
-		if ( label == 0 )
-		{
-			//	we are in position. verify the row and pick the data up
-			if ( leaf->row )
-			{
-				data = leaf->row->data;
-				return true;
-			}
-			else return false;
-		}
-		else
-		{
-			//	just go deeper leaf
-			if ( leaf->right )
-				return _pickup( leaf->right, index+1, name, data );
-			else
-				return false;
-		}
-	}
-
-	SEGAN_LIB_INLINE bool _putaway( Leaf* leaf, uint index, const wchar* name )
-	{
-		if ( !leaf ) return false;
-
-#if TABLE_CASE_INSENSITIVE
-		wchar label = tolower( name[index] );
-#else
-		wchar label = name[index];
-#endif
-		//	search through other leafs
-		if ( leaf->label != label )
-		{
-			bool res = _putaway( leaf->down, index, name );
-			if ( res && leaf->down->can_remove() )
-			{
-				Leaf* tmp = leaf->down->down;
-				sx_mem_free( leaf->down );
-				leaf->down = tmp;
-			}
-			return res;
-		}
-
-		//	just look for data or go to the next index
-		label = name[index+1];
-		if ( label == 0 )
-		{
-			//	we are in position. verify the row and remove the row
-			if ( leaf->row )
-			{
-				sx_mem_free( leaf->row );
-				leaf->row = null;
-				--m_count;
-				return true;
-			}
-			else return false;
-		}
-		else
-		{
-			//	just go deeper leaf
-			if ( leaf->right )
-			{
-				bool res = _putaway( leaf->right, index+1, name );
-				if ( res && leaf->right->can_remove() )
-				{
-					Leaf* tmp = leaf->right->down;
-					sx_mem_free( leaf->right );
-					leaf->right = tmp;
-				}
-				return res;
-			}
-			else
-				return false;
-		}
-	}
-
-	SEGAN_LIB_INLINE bool _traverse( const Leaf* leaf, void* userdata, CB_Table callback, wchar* name, uint index )
-	{
-		if ( !leaf ) return true;
-
-		sx_assert( index < 1023 );
-		name[index] = leaf->label;
-
-		bool res = true;
-		if ( leaf->row )
-		{
-			name[index+1] = 0;
-			res = callback( userdata, name, leaf->row->data );
-		}
-
-		if ( res && leaf->right )
-			res = _traverse( leaf->right, userdata, callback, name, index+1 );
-
-		if ( res && leaf->down )
-			res = _traverse( leaf->down, userdata, callback, name, index );
-
-		return res;
-	}
-
-public:
-	Leaf*	m_root;
-	uint	m_count;
+	uint*		m_stack;			//! indices of free slots
+	uint		m_numfree;			//! number of free slots in stack
 };
 
-#endif GUARD_Table_HEADER_FILE
+#endif // DEFINED_Table
+

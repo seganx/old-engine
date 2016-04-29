@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <stdio.h>
 
-#include "plugin.h"
+#include "../plugin.h"
 #include "../../request.h"
 
 int gi_get_command(char* command)

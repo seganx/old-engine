@@ -12,12 +12,9 @@
 #include "Def.h"
 
 
-/*!
-MD5 hash given strings. Buffer 'buffer' must be 33 bytes long. 
-args is a NULL terminated list of ASCIIz strings like sx_md5(buffer, "a", "b", null);
-*/
-SEGAN_LIB_API char* sx_md5(char buf[33], ...);
-
+/*! MD5 hash given strings. Buffer 'buffer' must be 33 bytes long
+args is a NULL terminated list of ASCIIz strings like sx_md5(buffer, "a", "b", null) */
+SEGAN_LIB_API char* sx_md5( char buf[33], ... );
 
 #endif // DEFINED_Md5
 

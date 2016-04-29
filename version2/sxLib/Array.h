@@ -36,7 +36,7 @@ public:
 
 	~Array( void )
 	{
-		sx_mem_free( m_item );
+		mem_free( m_item );
 	}
 
 	SEGAN_LIB_INLINE void clear( void )
@@ -195,13 +195,13 @@ private:
 		{
 			if ( newsize > m_size || ( m_size - newsize ) > m_sampler ) {
 				m_size = sint( newsize / m_sampler  + 1 ) * m_sampler;
-				m_item = (T*)sx_mem_realloc( m_item, m_size * sizeof(T) );
+				m_item = (T*)mem_realloc( m_item, m_size * sizeof(T) );
 			}
 		}
 		else
 		{
 			m_size = newsize;
-			m_item = (T*)sx_mem_realloc( m_item, m_size * sizeof(T) );
+			m_item = (T*)mem_realloc( m_item, m_size * sizeof(T) );
 		}
 		
 	}

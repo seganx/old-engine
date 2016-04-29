@@ -24,7 +24,7 @@ uint64 Timer::get_curr_time( void )
 	return sx_time_counter();
 }
 
-SEGAN_LIB_API uint64 sx_time_counter(void)
+uint64 sx_time_counter(void)
 {
 #if _WIN32 || _WIN64
 	static LARGE_INTEGER ferquency;

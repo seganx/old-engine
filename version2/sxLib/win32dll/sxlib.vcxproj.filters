@@ -42,9 +42,6 @@
     <ClInclude Include="..\String.h">
       <Filter>lib</Filter>
     </ClInclude>
-    <ClInclude Include="..\Table.h">
-      <Filter>lib</Filter>
-    </ClInclude>
     <ClInclude Include="..\Utils.h">
       <Filter>utils</Filter>
     </ClInclude>
@@ -67,6 +64,15 @@
       <Filter>utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Md5.h">
+      <Filter>lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Json.h">
+      <Filter>lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dictionary.h">
+      <Filter>lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Table.h">
       <Filter>lib</Filter>
     </ClInclude>
   </ItemGroup>
@@ -106,6 +112,9 @@
       <Filter>utils</Filter>
     </ClCompile>
     <ClCompile Include="..\Md5.cpp">
+      <Filter>lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Json.cpp">
       <Filter>lib</Filter>
     </ClCompile>
   </ItemGroup>

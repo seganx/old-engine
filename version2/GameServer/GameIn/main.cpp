@@ -71,12 +71,17 @@ int callback_begin_request(struct mg_connection * conn)
 
 		//	prepare request message to throw in all plugins
 		Request reqobj;
+		reqobj.uri = header->uri;
+		reqobj.size = mg_read(conn, reqobj.data, sizeof(reqobj.data));
+		reqobj.handled = false;
+		reqobj.player = null;
 		reqobj.connection = conn;
 		reqobj.send = callback_request_send;
 
 		//	count on all plugins to handle the request 
 		for (int i = 0; i < 32 && activePlugins[i]; ++i)
-			activePlugins[i]->process_msg(GAMEIN_PLUGIN_REQUEST, &reqobj);
+			if (activePlugins[i]->process_msg(GAMEIN_PLUGIN_REQUEST, &reqobj))
+				break;
 
 	}
 	return 1;
@@ -87,16 +92,32 @@ void callback_end_request(const struct mg_connection *, int reply_status_code)
 
 }
 
-
-
-
 int main(void)
 {
 	sx_callstack();
-	printf("GameIn web-api server version 0.1\n\n");
 
-	char md5[34] = { 0 };
-	sx_md5(md5, "0123456789", null);
+	for (int i = 0; i < 0; ++i)
+	{
+		char c[25] = { 0 };
+		int r = sx_random_i_limit(0, 999999999);
+		printf("%9u ", r);
+		sx_hash_write_index(c, 24, r);
+		printf("%s ", c);
+		int indx = sx_hash_read_index(c, 0);
+		printf("%u\n", indx);
+		Sleep(10);
+	}
+
+	if (false)
+	{
+		const char *json_string_test = "{\"user\": \"johndoe\", \"admin\": false, \"uid\": 1000, \"groups\": [{\"n\":11, \"m\":12}, {\"n\":21, \"m\":22}]}";
+		Json json;
+		json.parse(json_string_test);
+		json.print();
+		printf("%d\n", json.find("groups")->childs);
+	}
+
+	printf("GameIn web-api server version 0.1\n\n");
 
 	// prepare callbacks structure for mongoose
 	struct mg_callbacks callbacks;

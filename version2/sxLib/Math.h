@@ -185,7 +185,7 @@ SEGAN_LIB_INLINE float sx_hermite_lerp( const float x0, const float x1, const fl
 }
 
 //! fast float to sint conversion but uses current FPU round mode (default round nearest)
-SEGAN_LIB_INLINE float sx_round( const float x )
+SEGAN_LIB_INLINE sint sx_round( const float x )
 {
 #if defined(_WIN32)
 	sint t;
@@ -193,9 +193,9 @@ SEGAN_LIB_INLINE float sx_round( const float x )
 		fld  x
 		fistp t
 	}
-	return static_cast<float>(t);
+	return t;
 #else
-	return (sint)x;
+	return (sint)(x + 0.5f);
 #endif
 }
 
@@ -358,7 +358,7 @@ SEGAN_LIB_INLINE float sx_random_f_limit( const float minRange, const float maxR
 //! return integer random number between min and max
 SEGAN_LIB_INLINE sint sx_random_i_limit( const sint minRange, const sint maxRange )
 {
-	sint len = maxRange - minRange + 1;
+	sint len = maxRange - minRange;
 	return sx_random_i( len ) + minRange;
 }
 
@@ -401,13 +401,15 @@ public:
 	//! return float random number
 	float get_f( const float range )
 	{
-		return  ( range * (float)generate() ) / (float)RAND_MAX;
+		float r = (float)generate() / (float)RAND_MAX;
+		return  ( range * r );
 	}
 
 	//! return integer random number
 	sint get_i( const sint range )
 	{
-		return  ( range * generate() ) / RAND_MAX;
+		float r = (float)generate() / (float)RAND_MAX;
+		return sx_round( range * r );
 	}
 
 	//! return float random number between min and max

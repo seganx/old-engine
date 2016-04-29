@@ -52,12 +52,14 @@ SEGAN_INLINE void sx_sin_cos_fast( const float IN x, float& OUT s, float& OUT c)
 //////////////////////////////////////////////////////////////////////////
 SEGAN_INLINE float sx_random_f( const float range )
 {
-	return  ( range * (float)rand() ) / (float)RAND_MAX;
+	float r = (float)rand() / (float)RAND_MAX;
+	return  ( range * r );
 }
 
 SEGAN_INLINE sint sx_random_i( const sint range )
 {
-	return  ( range * rand() ) / RAND_MAX;
+	float r = (float)rand() / (float)RAND_MAX;
+	return sx_round( range * r );
 }
 
 
@@ -251,6 +253,7 @@ bool sx_lib_init_math( void )
 	}
 
 	//  initialize random seed
+	Randomer
 	srand( (uint)time(NULL) );
 
 	//	initialize crc32 table

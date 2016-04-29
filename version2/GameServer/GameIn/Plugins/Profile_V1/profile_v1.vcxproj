@@ -78,8 +78,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\plugin.h" />
     <ClInclude Include="database.h" />
-    <ClInclude Include="plugin.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="database.cpp" />

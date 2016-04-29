@@ -78,6 +78,11 @@ SEGAN_INLINE void mem_copy( void* dest, const void* src, const uint size )
 	memcpy( dest, src, size );
 }
 
+SEGAN_LIB_API sint mem_cmp( void* src1, const void* src2, const uint size )
+{
+	return memcmp( src1, src2, size );
+}
+
 SEGAN_INLINE void mem_set( void* dest, const sint val, const uint size )
 {
 	memset( dest, val, size );

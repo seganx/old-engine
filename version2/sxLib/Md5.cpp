@@ -41,7 +41,7 @@ static void MD5Init(MD5_CTX *ctx) {
 }
 
 
-static void MD5Transform(uint buf[4], uint const in[16]) 
+static void MD5Transform(uint buf[4], uint const in[16])
 {
 	register uint a, b, c, d;
 
@@ -202,12 +202,12 @@ static void MD5Final(unsigned char digest[16], MD5_CTX *ctx) {
 	MD5Transform(ctx->buf, (uint *)ctx->in);
 	byteReverse((unsigned char *)ctx->buf, 4);
 	memcpy(digest, ctx->buf, 16);
-	memset((char *)ctx, 0, sizeof(*ctx));
 }
 
 // Stringify binary data. Output buffer must be twice as big as input,
 // because each byte takes 2 bytes in string representation
-static void bin2str(char *to, const unsigned char *p, size_t len) {
+static void bin2str(char *to, const unsigned char *p, size_t len) 
+{
 	static const char *hex = "0123456789abcdef";
 
 	for (; len--; p++) {
@@ -219,21 +219,18 @@ static void bin2str(char *to, const unsigned char *p, size_t len) {
 
 char* sx_md5(char buf[33], ...)
 {
-	unsigned char hash[16];
-	const char *p;
-	va_list ap;
 	MD5_CTX ctx;
-
 	MD5Init(&ctx);
 
+	va_list ap;
 	va_start(ap, buf);
-	while ((p = va_arg(ap, const char *)) != NULL) {
+	const char *p;
+	while ((p = va_arg(ap, const char *)) != NULL)
 		MD5Update(&ctx, (const unsigned char *)p, (unsigned)strlen(p));
-	}
 	va_end(ap);
 
+	unsigned char hash[16];
 	MD5Final(hash, &ctx);
 	bin2str(buf, hash, sizeof(hash));
 	return buf;
 }
-

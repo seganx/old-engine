@@ -76,15 +76,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="plugin.h" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="authenticator.cpp" />
     <ClCompile Include="plugin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\sxLib\win32dll\sxlib.vcxproj">
       <Project>{e1c1fbb3-5741-4900-a5bd-e47ba3c27ccf}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\plugin.h" />
+    <ClInclude Include="authenticator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

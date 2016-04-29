@@ -25,11 +25,13 @@ SEGAN_LIB_API void*		mem_realloc( void* p, const uint newsizeinbyte );
 SEGAN_LIB_API uint		mem_size( const void* p );
 SEGAN_LIB_API void*		mem_free( const void* p );
 SEGAN_LIB_API void		mem_copy( void* dest, const void* src, const uint size );
+SEGAN_LIB_API sint		mem_cmp( const void* src1, const void* src2, const uint size );
 SEGAN_LIB_API void		mem_set( void* dest, const sint val, const uint size );
 
 #define sx_mem_set_manager( manager )			mem_set_manager( manager )
 #define sx_mem_get_manager()					mem_get_manager()
 #define sx_mem_copy(dest, src, size)			mem_copy( dest, src, size )
+#define sx_mem_cmp(src1, src2, size)			mem_cmp( src1, src2, size )
 #define sx_mem_set(dest, val, size)				mem_set( dest, val, size )
 
 #if ( SEGAN_MEMLEAK == 1 )

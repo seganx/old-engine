@@ -19,17 +19,16 @@ typedef int(*request_callback)(void* connection, const void* buffer, int size);
 
 struct Request
 {
-	bool			handled = false;	//! indicated that the request has been handled
-	char*			userid = 0;			//! user id specified in authentication process and point to the player id
-	int				version = 0;		//! version of the request specified by the client
-	char*			func = 0;			//! function name. can be null.
-	char*			params = 0;			//! function parameter. can be null.
-	int				paramsize = 0;		//! size of the parameter in byte.
+	//	data from client
+	const char*		uri;				//! URL-decoded URI
+	char			data[1024];			//! data from the client
+	int				size = 0;			//! size of data in byte
 
 	//	helper parameters
-	class Player*		player = 0;		//! player object indicated that which player called the request. can be null.
-	void*				connection = 0;	//! pointer to the connection.
-	request_callback	send = 0;		//! callback function to send data to client. pass connection to the callback function as first parameter.
+	bool				handled;		//! indicated that the request has been handled
+	class Player*		player;			//! player object indicated that which player called the request. can be null.
+	void*				connection;		//! pointer to the connection.
+	request_callback	send;			//! callback function to send data to client. pass connection to the callback function as first parameter.
 };
 
 #endif // DEFINED_request

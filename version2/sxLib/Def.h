@@ -81,7 +81,7 @@ typedef byte				*pbyte;
 
 #define SEGAN_CRASHRPT_CALLSTACK			1		//	enable call stack system to log stack of function
 
-#define SEGAN_LIB_MULTI_THREADED			1		//	enable library multi threaded safe 
+#define SEGAN_LIB_MULTI_THREADED			1		//	enable core library multi-threaded safe 
 
 
 
@@ -116,6 +116,12 @@ typedef byte				*pbyte;
 #define sx_2th_word_of(var)					( ( (word*)(&var) )[1] )
 
 #define sx_fourcc(ch0, ch1, ch2, ch3)		( (dword)(byte)(ch0) | ((dword)(byte)(ch1) << 8) | ((dword)(byte)(ch2) << 16) | ((dword)(byte)(ch3) << 24 ) )
+
+//!	takes a structure name s, and a field name f in s
+#define sx_offset_of(s, f)			( (dword)&( ((s *)0)->f ) )
+
+//! return number of items in a static array
+#define sx_array_count(x)					( sizeof(x) / sizeof(x[0]) )
 
 
 //	some crazy macro to define unique names

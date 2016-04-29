@@ -88,6 +88,7 @@
     <ClInclude Include="..\Assert.h" />
     <ClInclude Include="..\Crash.h" />
     <ClInclude Include="..\Def.h" />
+    <ClInclude Include="..\Json.h" />
     <ClInclude Include="..\Lib.h" />
     <ClInclude Include="..\Logger.h" />
     <ClInclude Include="..\Map.h" />
@@ -101,6 +102,7 @@
     <ClInclude Include="..\Stack.h" />
     <ClInclude Include="..\Stream.h" />
     <ClInclude Include="..\String.h" />
+    <ClInclude Include="..\Dictionary.h" />
     <ClInclude Include="..\Table.h" />
     <ClInclude Include="..\Timer.h" />
     <ClInclude Include="..\Utils.h" />
@@ -108,6 +110,7 @@
   <ItemGroup>
     <ClCompile Include="..\Assert.cpp" />
     <ClCompile Include="..\Crash.cpp" />
+    <ClCompile Include="..\Json.cpp" />
     <ClCompile Include="..\Lib.cpp" />
     <ClCompile Include="..\Logger.cpp" />
     <ClCompile Include="..\Math.cpp" />

@@ -13,9 +13,9 @@
 
 #define str_cmp(str1, str2) {\
 	if ( str1 && str2 )	{\
-		sint res;\
-		do res = (sint)(*str1 - *str2), ++str1, ++str2; while ( !res && *str1 && *str2 );\
-		return res; }\
+		sint res = (sint)(*str1 - *str2);\
+		while (!res && *str1++ && *str2++) res = (sint)(*str1 - *str2);\
+		return res;	}\
 	else if ( str1 ) return 1; else if ( str2 ) return -1; else return 0; }
 
 #define str_copy(dest, dest_size_in_word, src) {\
@@ -341,6 +341,14 @@ SEGAN_INLINE uint sx_utf8_to_str( wchar* dest, const uint destwords, const char*
 	return wclen;
 }
 
+
+SEGAN_INLINE uint sx_str_format(char* dest, const uint destsize, const char* format, ...)
+{
+	sx_assert(null && "should be implemented!");
+	return 0;
+}
+
+
 SEGAN_INLINE const wchar* sx_utf8_to_str( const char* src )
 {
 	wchar* tmp = str_pop();
@@ -613,9 +621,21 @@ SEGAN_LIB_API sint sx_str_get_value_int( const wchar* str, const wchar* key, con
 	return sx_str_to_int( c, default_val );
 }
 
+SEGAN_LIB_API sint sx_str_get_value_int(const char* str, const char* key, const sint default_val)
+{
+	const char* c = sx_str_get_value(str, key);
+	return sx_str_to_int(c, default_val);
+}
+
 SEGAN_LIB_API uint sx_str_get_value_uint(const wchar* str, const wchar* key, const uint default_val)
 {
 	const wchar* c = sx_str_get_value(str, key);
+	return sx_str_to_uint(c, default_val);
+}
+
+SEGAN_LIB_API uint sx_str_get_value_uint(const char* str, const char* key, const uint default_val)
+{
+	const char* c = sx_str_get_value(str, key);
 	return sx_str_to_uint(c, default_val);
 }
 

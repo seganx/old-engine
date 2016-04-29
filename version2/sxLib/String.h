@@ -50,12 +50,6 @@ SEGAN_LIB_API uint64 sx_str_to_uint64( const char* str, const uint64 defaul_val 
 
 SEGAN_LIB_API float sx_str_to_float( const wchar* str, const float defaul_val = 0 );
 
-/*! return true if entry string is type of file path and end with '/' or '\'*/
-SEGAN_LIB_API const bool sx_str_is_pathstyle( const wchar* filepath );
-
-/*! return true if entry string is as complete filename*/
-SEGAN_LIB_API const bool sx_str_is_fullpath( const wchar* filepath );
-
 /*! convert one wide char to a UTF-8 character and return the length of the converted UTF-8 character in bytes.*/
 SEGAN_LIB_API uint sx_wchar_to_utf8( char* dest, const uint destsize, const uint ch );
 
@@ -67,6 +61,10 @@ SEGAN_LIB_API uint sx_utf8_to_wchar( wchar* dest, const uint destwords, const ch
 
 /*! convert UTF-8 string to the wide character string and return the size of the converted string in wide chars.*/
 SEGAN_LIB_API uint sx_utf8_to_str( wchar* dest, const uint destwords, const char* src );
+
+/* write formatted data to a destination buffer string and return the final length of string */
+SEGAN_LIB_API uint sx_str_format( char* dest, const uint destsize, const char* format, ... );
+
 
 /*! convert UTF-8 string to the wide character string.
 NOTE: maximum length of wide character string is 1024
@@ -93,6 +91,12 @@ SEGAN_LIB_API const wchar* sx_uint64_to_str( const uint64 number );
 /*! convert float number to string with specified precision.
 NOTE: this function uses string memory pool and the returned string will be deleted in the next calls*/
 SEGAN_LIB_API const wchar* sx_float_to_str( float number, sint precision = 3 );
+
+/*! return true if entry string is type of file path and end with '/' or '\'*/
+SEGAN_LIB_API const bool sx_str_is_pathstyle(const wchar* filepath);
+
+/*! return true if entry string is as complete filename*/
+SEGAN_LIB_API const bool sx_str_is_fullpath(const wchar* filepath);
 
 /*! extract file path from full filename.
 NOTE: this function uses string memory pool and the returned string will be deleted in the next call*/
@@ -131,9 +135,9 @@ SEGAN_LIB_API bool sx_str_get_value(char* dest, const uint dest_size_in_byte, co
 
 //! find key in string and return the value
 SEGAN_LIB_API sint sx_str_get_value_int( const wchar* str, const wchar* key, const sint default_val );
-SEGAN_LIB_API uint sx_str_get_value_uint(const wchar* str, const wchar* key, const uint default_val );
-
-
+SEGAN_LIB_API sint sx_str_get_value_int( const char* str, const char* key, const sint default_val );
+SEGAN_LIB_API uint sx_str_get_value_uint( const wchar* str, const wchar* key, const uint default_val );
+SEGAN_LIB_API uint sx_str_get_value_uint( const char* str, const char* key, const uint default_val );
 /*! 
 string class stores strings of wide characters
 */
