@@ -82,7 +82,6 @@ int callback_begin_request(struct mg_connection * conn)
 		for (int i = 0; i < 32 && activePlugins[i]; ++i)
 			if (activePlugins[i]->process_msg(GAMEIN_PLUGIN_REQUEST, &reqobj))
 				break;
-
 	}
 	return 1;
 }
@@ -92,9 +91,70 @@ void callback_end_request(const struct mg_connection *, int reply_status_code)
 
 }
 
+#define dfhlm_buflen	32
+#define dfhlm_g			7
+#define dfhlm_p			23
+
+struct diffiehellman
+{
+	char secret_key[dfhlm_buflen + 1];
+	char public_key[dfhlm_buflen + 1];
+	char final_key[dfhlm_buflen + 1];
+};
+
+
 int main(void)
 {
 	sx_callstack();
+	sx_randomize((uint)sx_time_counter());
+
+	if (true)
+	{
+		diffiehellman bob;	sx_mem_set(&bob, 0, sizeof(bob));
+		diffiehellman alc;	sx_mem_set(&alc, 0, sizeof(alc));
+
+		sx_dh_secret_Key(bob.secret_key, dfhlm_buflen);
+		sx_dh_secret_Key(alc.secret_key, dfhlm_buflen);
+		printf("generated secret key:\nbob: %s\nalc: %s\n\n", bob.secret_key, alc.secret_key);
+
+		sx_dh_public_key(bob.public_key, bob.secret_key, dfhlm_buflen, dfhlm_g, dfhlm_p);
+		sx_dh_public_key(alc.public_key, alc.secret_key, dfhlm_buflen, dfhlm_g, dfhlm_p);
+		printf("public key for share:\nbob: %s\nalc: %s\n\n", bob.public_key, alc.public_key);
+
+		sx_dh_final_key(bob.final_key, bob.secret_key, alc.public_key, dfhlm_buflen, dfhlm_p);
+		sx_dh_final_key(alc.final_key, alc.secret_key, bob.public_key, dfhlm_buflen, dfhlm_p);
+		printf("final key:\nbob: %s\nalc: %s\n", bob.final_key, alc.final_key);
+
+		printf("\ncompare final keys: %d\n", sx_mem_cmp(bob.final_key, alc.final_key, sizeof(bob.final_key)));
+
+		uint ch = sx_checksum(bob.final_key, 64);
+		printf("\nencryption key: %u\n", ch);
+		getchar();
+	}
+
+	if (false)
+	{
+		byte data[10] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+		byte dest[10] = { 0 };
+		byte finl[10] = { 0 };
+
+		printf("ch: %u\n", sx_checksum(data, 10, 1363));
+
+		sx_encrypt(dest, data, 10, 1363);
+		for (int i = 0; i < 10; ++i) printf("%4d ", dest[i]); printf("\n");
+		sx_decrypt(finl, dest, 10, 1363);
+		for (int i = 0; i < 10; ++i) printf("%4d ", finl[i]); printf("\n");
+
+		sx_encrypt(dest, data, 10, 123456789);
+		for (int i = 0; i < 10; ++i) printf("%4d ", dest[i]); printf("\n");
+		sx_decrypt(finl, dest, 10, 123456789);
+		for (int i = 0; i < 10; ++i) printf("%4d ", finl[i]); printf("\n");
+
+		sx_encrypt(dest, data, 10, 131234563);
+		for (int i = 0; i < 10; ++i)
+			printf("%4d ", dest[i]);
+		printf("\n");
+	}
 
 	for (int i = 0; i < 0; ++i)
 	{
@@ -133,4 +193,4 @@ int main(void)
 	gin.start(L"gamein.config", &callbacks);
 
 	return 0;
-}
+			}

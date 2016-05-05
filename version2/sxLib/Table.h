@@ -14,6 +14,7 @@
 
 #include "Def.h"
 
+//! fixed sized indexed table class to access data by specified index.
 template<typename T>
 class Table
 {

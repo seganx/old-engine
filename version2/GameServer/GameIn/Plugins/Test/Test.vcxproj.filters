@@ -3,7 +3,4 @@
   <ItemGroup>
     <ClCompile Include="plugin.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\plugin.h" />
-  </ItemGroup>
 </Project>

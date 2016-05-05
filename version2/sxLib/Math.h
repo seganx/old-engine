@@ -342,6 +342,9 @@ SEGAN_LIB_API float sx_cos_fast( const float x );
 //! compute sine and cosine of the angle x in same time. maximum absolute error is 0.001f
 SEGAN_LIB_API void sx_sin_cos_fast( const float IN x, float& OUT s, float& OUT c);
 
+//! randomize internal random by time as seed
+SEGAN_LIB_API void sx_randomize( const uint& seed );
+
 //! return float random number
 SEGAN_LIB_API float sx_random_f( const float range );
 
@@ -383,6 +386,14 @@ SEGAN_LIB_API void sx_encrypt( void* dest, const void* src, const uint size, con
 //! decrypt src data to the dest using key value
 SEGAN_LIB_API void sx_decrypt( void* dest, const void* src, const uint size, const uint key = 1363 );
 
+//! generate Diffie-Hellman secret key
+SEGAN_LIB_API void sx_dh_secret_Key( char* dest, const int& dest_size );
+
+//! generate Diffie-Hellman public key based on secret key to share with the other
+SEGAN_LIB_API void sx_dh_public_key( char* dest, const char* secret_key, const int& buff_size, const uint& g, const uint& p );
+
+//! generate Diffie-Hellman final key based on secret key and received public key
+SEGAN_LIB_API void sx_dh_final_key( char* dest, const char* secret_key, const char* public_key, const int& buff_size, const uint& p );
 
 //! a simple class to generate random numbers
 class SEGAN_LIB_API Randomer

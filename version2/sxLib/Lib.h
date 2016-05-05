@@ -30,6 +30,7 @@
 #include "Utils.h"
 #include "Json.h"
 #include "Table.h"
+#include "Bigint.h"
 
 //////////////////////////////////////////////////////////////////////////
 //	global singleton class

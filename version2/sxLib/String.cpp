@@ -52,13 +52,17 @@ SEGAN_INLINE char sx_str_lower(char c) { char_lower(c) }
 SEGAN_INLINE sint sx_str_to_int( const wchar* str, const sint defaul_val /*= 0 */ )
 {
 	if ( !str ) return defaul_val;
-	return _wtoi( str );
+	sint res = defaul_val;
+	swscanf_s( str, L"%d", &res, sizeof(res) );
+	return res;
 }
 
 SEGAN_INLINE sint sx_str_to_int( const char* str, const sint defaul_val /*= 0 */ )
 {
 	if ( !str ) return defaul_val;
-	return atoi( str );
+	sint res = defaul_val;
+	sscanf_s( str, "%d", &res, sizeof(res) );
+	return res;
 }
 
 SEGAN_INLINE uint sx_str_to_uint( const wchar* str, const uint defaul_val /*= 0 */ )
@@ -533,6 +537,16 @@ SEGAN_LIB_API const char* sx_str_get_filename(const char* filename)
 	return res;
 }
 
+SEGAN_LIB_API const char* sx_str_get_token(char* dest, const uint dest_size_in_byte, const char* src, const char splitter)
+{
+	uint i = 0;
+	const char* c = src;
+	for (; (i < dest_size_in_byte - 1) && (*c != splitter) && (*c != 0); ++i)
+		dest[i] = *c++;
+	dest[i] = 0;
+	return c;
+}
+
 SEGAN_LIB_API const wchar* sx_str_get_value(const wchar* str, const wchar* key)
 {
 	if ( str != null )
@@ -610,6 +624,24 @@ SEGAN_LIB_API bool sx_str_get_value(char* dest, const uint dest_size_in_byte, co
 			else break;
 		}
 		dest[i] = 0;
+		return true;
+	}
+	return false;
+}
+
+SEGAN_LIB_API bool sx_str_get_value(char* dest, const uint dest_size_in_byte, const char* str, const char* key)
+{
+	const char* c = sx_str_get_value(str, key);
+	if ( c )
+	{
+		uint i = 0;
+		for ( ; i < dest_size_in_byte; ++i )
+		{
+			if ( *c == '"' ) ++c;
+			if ( *c == '\n' || *c == ',' ) break;
+			dest[i] = *c++;
+		}
+		if ( i < dest_size_in_byte ) dest[i] = 0;
 		return true;
 	}
 	return false;

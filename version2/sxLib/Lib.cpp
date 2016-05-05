@@ -101,6 +101,12 @@ void sx_crash_callback_default(CrashReport* rc)
 #endif
 
 
+SEGAN_LIB_API Bigint<128> sx_power(const uint64& x, const uint64& y)
+{
+	Bigint<128> res;
+	return res.power(x, y);
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //	global singleton class

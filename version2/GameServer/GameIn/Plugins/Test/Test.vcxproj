@@ -78,9 +78,6 @@
   <ItemGroup>
     <ClCompile Include="plugin.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\plugin.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

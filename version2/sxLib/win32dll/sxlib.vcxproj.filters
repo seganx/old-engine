@@ -75,6 +75,9 @@
     <ClInclude Include="..\Table.h">
       <Filter>lib</Filter>
     </ClInclude>
+    <ClInclude Include="..\Bigint.h">
+      <Filter>lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Lib.cpp">

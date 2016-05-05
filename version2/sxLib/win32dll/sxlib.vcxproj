@@ -86,6 +86,7 @@
   <ItemGroup>
     <ClInclude Include="..\Array.h" />
     <ClInclude Include="..\Assert.h" />
+    <ClInclude Include="..\Bigint.h" />
     <ClInclude Include="..\Crash.h" />
     <ClInclude Include="..\Def.h" />
     <ClInclude Include="..\Json.h" />

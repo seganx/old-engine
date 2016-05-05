@@ -122,16 +122,24 @@ SEGAN_LIB_API const wchar* sx_str_make_pathstyle( const wchar* filepath );
 SEGAN_LIB_API const wchar* sx_str_get_filename( const wchar* filename );
 SEGAN_LIB_API const char* sx_str_get_filename( const char* filename );
 
+/*! fill out the destination with value till splitter char seen or end of string and return pointer to end of token
+NOTE: this function does not convert UNICODE characters to UTF-8 characters. Don't use to read UNICODE strings*/
+SEGAN_LIB_API const char* sx_str_get_token( char* dest, const uint dest_size_in_byte, const char* src, const char splitter );
+
 //! find key in string and return the pointer of starting value
 SEGAN_LIB_API const wchar* sx_str_get_value( const wchar* str, const wchar* key );
-SEGAN_LIB_API const char* sx_str_get_value(const char* str, const char* key);
+SEGAN_LIB_API const char* sx_str_get_value( const char* str, const char* key );
 
 //! return true if key found in string and fill out the destination with value
 SEGAN_LIB_API bool sx_str_get_value( wchar* dest, const uint dest_size_in_word, const wchar* str, const wchar* key );
 
 /*! return true if key found in string and fill out the destination with value
 NOTE: this function does not convert UNICODE characters to UTF-8 characters. Don't use to read UNICODE strings*/
-SEGAN_LIB_API bool sx_str_get_value(char* dest, const uint dest_size_in_byte, const wchar* str, const wchar* key);
+SEGAN_LIB_API bool sx_str_get_value( char* dest, const uint dest_size_in_byte, const wchar* str, const wchar* key );
+
+/*! return true if key found in string and fill out the destination with value
+NOTE: this function does not convert UNICODE characters to UTF-8 characters. Don't use to read UNICODE strings*/
+SEGAN_LIB_API bool sx_str_get_value( char* dest, const uint dest_size_in_byte, const char* str, const char* key );
 
 //! find key in string and return the value
 SEGAN_LIB_API sint sx_str_get_value_int( const wchar* str, const wchar* key, const sint default_val );

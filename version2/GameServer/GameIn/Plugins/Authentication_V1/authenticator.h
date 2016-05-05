@@ -12,26 +12,15 @@
 
 #include "../../imports.h"
 
-//! here is the object to pair game and secret key
-struct GameKeys
-{
-	uint	id;			//! id of the game
-	char	key[16];	//! secret key of the game	
-};
+#define diffie_hellman_l	32
+#define diffie_hellman_g	7
+#define diffie_hellman_p	23
 
-struct AuthenKeys
+//! this object holds access key for clients
+struct AuthenSession
 {
-	uint	id;					//! id of the authentication key
-	uint	time_out;			//! time out to delete object
-	char	game_key[16];		//! secret key of the game
-	char	recv_key[16];		//! received key from client
-	char	gnrt_key[16];		//! generated key for send to client	
-};
-
-//! this object holds access code for clients
-struct AccessCode
-{
-	char	access_code[16];	//! access code to the system
+	uint	session_id;			//! id of the session
+	uint	access_key;			//! access key used in cryptography
 	uint	time_out;			//! time to left
 };
 
@@ -42,23 +31,18 @@ public:
 	Authenticator();
 	~Authenticator();
 
-	//! return the secret key of the game. return null for invalid id
-	const char* get_key_of_game(uint id);
-
 	//! update should call every one second
-	void Update( void );
+	void update( void );
+
+	//! print all keys to screen
+	void print_keys( void );
 
 public:
-	uint				m_authen_timeout;	//! maximum time in seconds for authentication
-	uint				m_access_timeout;	//! maximum time in seconds for access code validation
+	uint					m_authen_timeout;	//! maximum time in seconds for authentication
+	uint					m_access_timeout;	//! maximum time in seconds for access code validation
 
-	GameKeys			m_game_keys[8];		//! array of game-key	
-
-	Table<AuthenKeys*>	m_keys;				//! table of objects contain authentication keys 
-	Mutex				m_mutex_keys;		//! used for multi-threading
-
-	Table<AccessCode*>	m_codes;			//! table of objects contain access codes
-	Mutex				m_mutex_sess;		//! used for multi-threading
+	Table<AuthenSession*>	m_sessions;			//! table of sessions contain authentication keys
+	Mutex					m_mutex;			//! used for multi-threading
 };
 
 extern Authenticator* g_authen;
