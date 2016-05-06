@@ -8,6 +8,8 @@
 
 #include "authenticator.h"
 
+
+// worker thread used to update time of all sessions
 void worker_authen(void* user_data)
 {
 	while (g_authen)
@@ -17,7 +19,7 @@ void worker_authen(void* user_data)
 	}
 }
 
-int process_step_1(Request* req, const uint user_data)
+int handle_authen(Request* req, const uint user_data)
 {
 	char rcvdkey[diffie_hellman_l] = { 0 };
 	if (sx_str_get_value(rcvdkey, diffie_hellman_l, req->data, "public_key") == false)
@@ -60,12 +62,36 @@ int process_step_1(Request* req, const uint user_data)
 	//  send session id and public key to the client
 	char sid[16];
 	sx_hash_write_index(sid, 16, as->session_id);
+	as->session_id_chk = sx_checksum(sid, 16, session_checksum);
 
 	char msg[128] = { 0 };
-	int len = sprintf_s(msg, 128, "{user_data:%u,id:%.*s,key:%.*s}", user_data, 16, sid, diffie_hellman_l, public_key);
+	int len = sprintf_s(msg, 128, "{\"user_data\":%u,\"id\":\"%.*s\",\"key\":\"%.*s\"}", user_data, 16, sid, diffie_hellman_l, public_key);
 	req->send(req->connection, msg, len);
 
 	return 1;
+}
+
+int handle_access(Request* req)
+{
+	uint sid = sx_hash_read_index(&req->uri[1], 0);
+	if ( sid < 1 ) return 1;
+
+	//  retrieve session from table
+	g_authen->m_mutex.lock();
+	AuthenSession* as = g_authen->m_sessions.get(sid);
+	g_authen->m_mutex.unlock();
+	if (as == null) return 1;
+
+	//	verify that request URI is a real session id
+	if (as->session_id_chk != sx_checksum(&req->uri[1], 16, session_checksum))
+		return 1;
+
+	//	update session time
+	as->time_out = g_authen->m_access_timeout;
+
+	req->send(req->connection, "Hello", 6);
+
+	return 0;
 }
 
 int gi_get_command(char* command)
@@ -126,13 +152,14 @@ int __stdcall process_msg(int msg, void* data)
 				{
 					uint userdata = sx_str_get_value_uint(req->data, "user_data", 0);
 					if ( userdata )
-						return process_step_1(req, userdata);
+						return handle_authen(req, userdata);
 					else
 						return 1;
 				}
+				else if ( sx_str_len(req->uri) == 17 )
+					return handle_access(req);
 				else
-				{
-				}
+					return 1;
 			}
 			return 0;
 

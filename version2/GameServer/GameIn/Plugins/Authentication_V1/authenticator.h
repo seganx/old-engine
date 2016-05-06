@@ -16,10 +16,13 @@
 #define diffie_hellman_g	7
 #define diffie_hellman_p	23
 
+#define session_checksum	238746
+
 //! this object holds access key for clients
 struct AuthenSession
 {
 	uint	session_id;			//! id of the session
+	uint	session_id_chk;		//! checksum of the session id string sent to client
 	uint	access_key;			//! access key used in cryptography
 	uint	time_out;			//! time to left
 };

@@ -108,7 +108,7 @@ int main(void)
 	sx_callstack();
 	sx_randomize((uint)sx_time_counter());
 
-	if (true)
+	if (false)
 	{
 		diffiehellman bob;	sx_mem_set(&bob, 0, sizeof(bob));
 		diffiehellman alc;	sx_mem_set(&alc, 0, sizeof(alc));

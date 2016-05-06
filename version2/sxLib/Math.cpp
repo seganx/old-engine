@@ -196,7 +196,7 @@ SEGAN_INLINE uint sx_checksum(const void* data, const uint size, const uint key 
 	const char* d = (char*)data;
 	CSRandom randomer(key);
 	for (uint i = 0; i < size; ++i)
-		r += d[i] + randomer.generate() * 654897 + key;
+		r += d[i] * 0xabcdef12 + randomer.generate() + d[i] + key;
 	return r;
 }
 

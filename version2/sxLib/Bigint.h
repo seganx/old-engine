@@ -50,7 +50,7 @@ public:
 
 	byte& operator[](const uint& index)
 	{
-		return number[index];
+		return m_number[index];
 	}
 
 	uint operator% (uint v) const 
@@ -86,6 +86,7 @@ public:
 			}
 			k++;
 		}
+		m_number[m] = 10;
 
 		return *this;
 	}

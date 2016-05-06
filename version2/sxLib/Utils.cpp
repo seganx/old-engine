@@ -1,6 +1,7 @@
 #include "Memory.h"
 #include "Math.h"
 #include "Utils.h"
+#include "Timer.h"
 
 #include <memory>
 #include <time.h>
@@ -199,4 +200,9 @@ SEGAN_LIB_API uint sx_hash_read_index(const char* hash, const uint defaul_val)
 	uint res = defaul_val;
 	sscanf_s(tmp, "%u", &res, sizeof(res));
 	return res;
+}
+
+SEGAN_INLINE void sx_randomize_by_time(void)
+{
+	sx_randomize( (uint)sx_time_counter() );
 }

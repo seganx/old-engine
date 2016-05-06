@@ -8,6 +8,11 @@ Authenticator::Authenticator()
 	m_access_timeout = 3600;
 
 	m_sessions.set_size(200000);
+
+	//	add first empty session
+	AuthenSession* as = (AuthenSession*)sx_mem_alloc(sizeof(AuthenSession));
+	sx_mem_set(as, 0, sizeof(AuthenSession));
+	m_sessions.add(as);
 }
 
 Authenticator::~Authenticator()
@@ -20,7 +25,7 @@ void Authenticator::update(void)
 {
 	m_mutex.lock();
 
-	for (uint i = 0; i < m_sessions.m_size; ++i )
+	for (uint i = 1; i < m_sessions.m_size; ++i )
 	{
 		AuthenSession* as = m_sessions.m_slots[i];
 		if ( as )
