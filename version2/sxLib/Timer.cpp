@@ -33,6 +33,17 @@ uint64 sx_time_counter(void)
 	if (useHighPerformance && QueryPerformanceCounter(&counter))
 		return (1000000 * counter.QuadPart) / ferquency.QuadPart;
 	else
-		return GetTickCount();
+		return 0;
 #endif
+}
+
+SEGAN_LIB_API uint sx_time_milliseconds(void)
+{
+	uint64 t = sx_time_counter() / 1000;
+	return (uint)t;
+}
+
+SEGAN_LIB_API uint sx_time_seconds(void)
+{
+	return sx_time_milliseconds() / 1000;
 }

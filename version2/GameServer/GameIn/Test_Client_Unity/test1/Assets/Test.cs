@@ -10,40 +10,42 @@ public class Test : MonoBehaviour
 
     [Header("CryptoService")]
     public string text;
-    public uint key = 1363;
 
     [System.Serializable]
     public class JsonAuthenRec
     {
         public string user_data;
-        public string id;
+        public string token;
         public string key;
     }
 
     IEnumerator AuthenSendRequest()
     {
-        byte[] secretKey = AuthenService.SecretKey(32);
-        byte[] publicKey = AuthenService.PublicKey(secretKey, 7, 23);
-        string msg = "{\"user_data\":63,\"public_key\":" + System.Text.ASCIIEncoding.ASCII.GetString(publicKey) + "}";
-
-        Debug.Log("sending: " + msg);
-        WWW ws = new WWW(serverAddress + authenUri, System.Text.Encoding.ASCII.GetBytes(msg));
-        yield return ws;
-
-        Debug.Log("received: " + ws.text);
-
-        JsonAuthenRec jsk = JsonUtility.FromJson<JsonAuthenRec>(ws.text);
-        if (jsk.user_data == "63")
+        while (true)
         {
-            byte[] rcvd_key = System.Text.Encoding.ASCII.GetBytes(jsk.key);
-            byte[] final_key = AuthenService.FinalKey(secretKey, rcvd_key, 23);
+            byte[] secretKey = AuthenService.SecretKey(32);
+            byte[] publicKey = AuthenService.PublicKey(secretKey, 7, 23);
+            string msg = "{\"user_data\":63,\"public_key\":" + System.Text.ASCIIEncoding.ASCII.GetString(publicKey) + "}";
 
-            uint key = CryptoService.Checksum(final_key);
-            Debug.Log("Key: " + key);
+            Debug.Log("sending: " + msg);
+            WWW ws = new WWW(serverAddress + authenUri, System.Text.Encoding.ASCII.GetBytes(msg));
+            yield return ws;
 
-            WWW d = new WWW(serverAddress + '/' + jsk.id);
-            yield return d;
-            Debug.Log(d.text);
+            Debug.Log("received: " + ws.text);
+
+            JsonAuthenRec jsk = JsonUtility.FromJson<JsonAuthenRec>(ws.text);
+            if (jsk.user_data == "63")
+            {
+                byte[] rcvd_key = System.Text.Encoding.ASCII.GetBytes(jsk.key);
+                byte[] final_key = AuthenService.FinalKey(secretKey, rcvd_key, 23);
+
+                uint key = CryptoService.Checksum(final_key);
+                Debug.Log("Key: " + key);
+
+                WWW d = new WWW(serverAddress + "/" + jsk.token);
+                yield return d;
+                Debug.Log(d.text);
+            }
         }
     }
 

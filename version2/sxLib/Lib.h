@@ -31,6 +31,7 @@
 #include "Json.h"
 #include "Table.h"
 #include "Bigint.h"
+#include "Base64.h"
 
 //////////////////////////////////////////////////////////////////////////
 //	global singleton class

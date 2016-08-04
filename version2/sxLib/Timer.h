@@ -42,5 +42,10 @@ private:
 //! return OS timer in high frequency
 SEGAN_LIB_API uint64 sx_time_counter( void );
 
+//! return OS time in milliseconds
+SEGAN_LIB_API uint sx_time_milliseconds( void );
+
+//! return OS time in seconds
+SEGAN_LIB_API uint sx_time_seconds( void );
 
 #endif	//	SX_TIMER_DEFINED

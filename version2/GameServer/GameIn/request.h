@@ -31,5 +31,7 @@ struct Request
 	request_callback	send;			//! callback function to send data to client. pass connection to the callback function as first parameter.
 };
 
+#define request_send(request, buffer, size)		request->send(request->connection, buffer, size)
+
 #endif // DEFINED_request
 

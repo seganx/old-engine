@@ -395,6 +395,8 @@ SEGAN_LIB_API void sx_dh_public_key( char* dest, const char* secret_key, const i
 //! generate Diffie-Hellman final key based on secret key and received public key
 SEGAN_LIB_API void sx_dh_final_key( char* dest, const char* secret_key, const char* public_key, const int& buff_size, const uint& p );
 
+//! 
+
 //! a simple class to generate random numbers
 class SEGAN_LIB_API Randomer
 {

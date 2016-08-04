@@ -9,6 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameIn", "GameIn.vcxproj", 
 		{08033880-10EB-44B3-B8D1-8ACF8A87ADB1} = {08033880-10EB-44B3-B8D1-8ACF8A87ADB1}
 		{B5554995-4A1B-4E96-A099-BD355EAC2368} = {B5554995-4A1B-4E96-A099-BD355EAC2368}
 		{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF} = {E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}
+		{57F4CFE4-261C-455F-98D2-21570A4AA27B} = {57F4CFE4-261C-455F-98D2-21570A4AA27B}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sxlib", "..\..\sxLib\win32dll\sxlib.vcxproj", "{E1C1FBB3-5741-4900-A5BD-E47BA3C27CCF}"
@@ -18,6 +19,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "profile_v1", "Plugins\profile_v1\profile_v1.vcxproj", "{B5554995-4A1B-4E96-A099-BD355EAC2368}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authentication_v1", "Plugins\authentication_v1\authentication_v1.vcxproj", "{08033880-10EB-44B3-B8D1-8ACF8A87ADB1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "authentication_v2", "Plugins\Authentication_V2\authentication_v2.vcxproj", "{57F4CFE4-261C-455F-98D2-21570A4AA27B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +72,14 @@ Global
 		{08033880-10EB-44B3-B8D1-8ACF8A87ADB1}.Release|Win32.ActiveCfg = Release|Win32
 		{08033880-10EB-44B3-B8D1-8ACF8A87ADB1}.Release|Win32.Build.0 = Release|Win32
 		{08033880-10EB-44B3-B8D1-8ACF8A87ADB1}.Release|x64.ActiveCfg = Release|Win32
+		{57F4CFE4-261C-455F-98D2-21570A4AA27B}.Debug|ARM.ActiveCfg = Debug|Win32
+		{57F4CFE4-261C-455F-98D2-21570A4AA27B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{57F4CFE4-261C-455F-98D2-21570A4AA27B}.Debug|Win32.Build.0 = Debug|Win32
+		{57F4CFE4-261C-455F-98D2-21570A4AA27B}.Debug|x64.ActiveCfg = Debug|Win32
+		{57F4CFE4-261C-455F-98D2-21570A4AA27B}.Release|ARM.ActiveCfg = Release|Win32
+		{57F4CFE4-261C-455F-98D2-21570A4AA27B}.Release|Win32.ActiveCfg = Release|Win32
+		{57F4CFE4-261C-455F-98D2-21570A4AA27B}.Release|Win32.Build.0 = Release|Win32
+		{57F4CFE4-261C-455F-98D2-21570A4AA27B}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

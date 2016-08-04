@@ -85,7 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Array.h" />
-    <ClInclude Include="..\Assert.h" />
+    <ClInclude Include="..\Base64.h" />
     <ClInclude Include="..\Bigint.h" />
     <ClInclude Include="..\Crash.h" />
     <ClInclude Include="..\Def.h" />
@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Assert.cpp" />
+    <ClCompile Include="..\Base64.cpp" />
     <ClCompile Include="..\Crash.cpp" />
     <ClCompile Include="..\Json.cpp" />
     <ClCompile Include="..\Lib.cpp" />
