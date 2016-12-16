@@ -419,7 +419,16 @@ sx::gui::Label* create_label( sx::gui::Control* parent, const uint text, const f
 	{
 		sx::gui::Label* res =  sx_new( sx::gui::Label );
 		res->SetParent( parent );
-		res->SetSize( float2(width, height) );
+
+		if ( gameString->w > 1 && gameString->h > 1 )
+			res->SetSize(float2(gameString->w, gameString->h));
+		else if ( gameString->w > 1 )
+			res->SetSize(float2(gameString->w, height));
+		if ( gameString->h > 1)
+			res->SetSize(float2(width, gameString->h));
+		else
+			res->SetSize(float2(width, height));
+
 		res->SetAlign( gameString->align );
 		res->GetElement(0)->Color().a = 0.1f;
 		res->GetElement(1)->Color() = 0xffffffff;
@@ -460,6 +469,13 @@ sx::gui::Label* update_label( sx::gui::Label* label, const uint text )
 	{
 		label->SetFont( gameString->font );
 		label->SetAlign( gameString->align );
+
+		if ( gameString->w > 1 && gameString->h > 1 )
+			label->SetSize(float2(gameString->w, gameString->h));
+		else if ( gameString->w > 1 )
+			label->SetSize(float2(gameString->w, label->GetSize().y));
+		if ( gameString->h > 1)
+			label->SetSize(float2(label->GetSize().x, gameString->h));
 		
 		if ( wcsstr( gameString->text, L"//" ) == null )
 			label->SetText( gameString->text );

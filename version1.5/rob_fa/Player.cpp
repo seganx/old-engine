@@ -125,6 +125,7 @@ void Player::ProcessInput( bool& inputHandled, float elpsTime )
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYUP( 0, SX_INPUT_KEY_M ) )
 	{		
 		g_game->m_strings->Load( Config::GetData()->language );
+		update_all_labels();
 		g_game->m_gui->m_info->MsgProc(0, GMT_LEVEL_LOADED, g_game);
 	}
 	if ( SEGAN_KEYHOLD(0, SX_INPUT_KEY_LCONTROL) && SEGAN_KEYDOWN(0, SX_INPUT_KEY_R) )

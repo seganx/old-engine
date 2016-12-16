@@ -580,6 +580,7 @@ void MenuMain::Show( void )
 	g_game->m_gui->m_settings->Hide();
 	Menu::Show();
 	m_time = 200;
+	update_all_labels();
 }
 
 void MenuMain::Hide( void )
@@ -1288,7 +1289,7 @@ void MenuProfile::Initialize( void )
 		SEGAN_GUI_SET_ONEXIT( lbl, MenuProfile::OnExit );
 
 		//	label to show total stars
-		create_label( m_profPanel[i], 24, 40, 30, 120.0f, -22.0f, true )->GetElement(1)->Color().a = 0.8f;
+		create_label( m_profPanel[i], 24, 40, 30, 120.0f, -18.0f, true )->GetElement(1)->Color().a = 0.8f;
 
 		//	label to show total people
 		create_label( m_profPanel[i], 24, 100, 30, 230.0f, -18.0f, true )->GetElement(1)->Color().a = 0.8f;

@@ -101,6 +101,8 @@ GameIn::~GameIn()
 
 void GameIn::start(const wchar* configFile, struct mg_callbacks* mgcallbacks)
 {
+	sx_callstack();
+
 	//	try to load configuration file
 	{
 		String config;

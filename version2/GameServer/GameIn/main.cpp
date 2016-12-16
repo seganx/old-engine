@@ -108,75 +108,6 @@ int main(void)
 	sx_callstack();
 	sx_randomize((uint)sx_time_counter());
 
-	if (false)
-	{
-		diffiehellman bob;	sx_mem_set(&bob, 0, sizeof(bob));
-		diffiehellman alc;	sx_mem_set(&alc, 0, sizeof(alc));
-
-		sx_dh_secret_Key(bob.secret_key, dfhlm_buflen);
-		sx_dh_secret_Key(alc.secret_key, dfhlm_buflen);
-		printf("generated secret key:\nbob: %s\nalc: %s\n\n", bob.secret_key, alc.secret_key);
-
-		sx_dh_public_key(bob.public_key, bob.secret_key, dfhlm_buflen, dfhlm_g, dfhlm_p);
-		sx_dh_public_key(alc.public_key, alc.secret_key, dfhlm_buflen, dfhlm_g, dfhlm_p);
-		printf("public key for share:\nbob: %s\nalc: %s\n\n", bob.public_key, alc.public_key);
-
-		sx_dh_final_key(bob.final_key, bob.secret_key, alc.public_key, dfhlm_buflen, dfhlm_p);
-		sx_dh_final_key(alc.final_key, alc.secret_key, bob.public_key, dfhlm_buflen, dfhlm_p);
-		printf("final key:\nbob: %s\nalc: %s\n", bob.final_key, alc.final_key);
-
-		printf("\ncompare final keys: %d\n", sx_mem_cmp(bob.final_key, alc.final_key, sizeof(bob.final_key)));
-
-		uint ch = sx_checksum(bob.final_key, 64);
-		printf("\nencryption key: %u\n", ch);
-		getchar();
-	}
-
-	if (false)
-	{
-		byte data[10] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-		byte dest[10] = { 0 };
-		byte finl[10] = { 0 };
-
-		printf("ch: %u\n", sx_checksum(data, 10, 1363));
-
-		sx_encrypt(dest, data, 10, 1363);
-		for (int i = 0; i < 10; ++i) printf("%4d ", dest[i]); printf("\n");
-		sx_decrypt(finl, dest, 10, 1363);
-		for (int i = 0; i < 10; ++i) printf("%4d ", finl[i]); printf("\n");
-
-		sx_encrypt(dest, data, 10, 123456789);
-		for (int i = 0; i < 10; ++i) printf("%4d ", dest[i]); printf("\n");
-		sx_decrypt(finl, dest, 10, 123456789);
-		for (int i = 0; i < 10; ++i) printf("%4d ", finl[i]); printf("\n");
-
-		sx_encrypt(dest, data, 10, 131234563);
-		for (int i = 0; i < 10; ++i)
-			printf("%4d ", dest[i]);
-		printf("\n");
-	}
-
-	for (int i = 0; i < 0; ++i)
-	{
-		char c[25] = { 0 };
-		int r = sx_random_i_limit(0, 999999999);
-		printf("%9u ", r);
-		sx_hash_write_index(c, 24, r);
-		printf("%s ", c);
-		int indx = sx_hash_read_index(c, 0);
-		printf("%u\n", indx);
-		Sleep(10);
-	}
-
-	if (false)
-	{
-		const char *json_string_test = "{\"user\": \"johndoe\", \"admin\": false, \"uid\": 1000, \"groups\": [{\"n\":11, \"m\":12}, {\"n\":21, \"m\":22}]}";
-		Json json;
-		json.parse(json_string_test);
-		json.print();
-		printf("%d\n", json.find("groups")->childs);
-	}
-
 	printf("GameIn web-api server version 0.1\n\n");
 
 	// prepare callbacks structure for mongoose
@@ -193,4 +124,4 @@ int main(void)
 	gin.start(L"gamein.config", &callbacks);
 
 	return 0;
-			}
+}
