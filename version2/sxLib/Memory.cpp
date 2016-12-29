@@ -8,7 +8,7 @@
 #include "Assert.h"
 
 #if SEGAN_LIB_MULTI_THREADED
-#include "Mutex.h"
+#include "Thread.h"
 #endif
 
 #define mem_min_size(a,b) (((a)<(b))?(a):(b))

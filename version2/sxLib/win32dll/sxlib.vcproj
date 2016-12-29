@@ -177,15 +177,47 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Callstack.cpp"
+				RelativePath="..\Assert.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Callstack.h"
+				RelativePath="..\Assert.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Base64.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Base64.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Bigint.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Crash.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Crash.h"
 				>
 			</File>
 			<File
 				RelativePath="..\Def.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Dictionary.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Json.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Json.h"
 				>
 			</File>
 			<File
@@ -217,11 +249,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Md5.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Md5.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Memory.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Memory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Partition.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Protocol.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Protocol.h"
 				>
 			</File>
 			<File
@@ -246,6 +298,22 @@
 			</File>
 			<File
 				RelativePath="..\Table.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Thread.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Thread.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Timer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Timer.h"
 				>
 			</File>
 		</Filter>

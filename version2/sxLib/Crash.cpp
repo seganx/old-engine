@@ -6,7 +6,7 @@
 #include "Crash.h"
 
 #if SEGAN_LIB_MULTI_THREADED
-#include "Mutex.h"
+#include "Thread.h"
 #endif
 
 #if SEGAN_CRASHRPT

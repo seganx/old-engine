@@ -2,7 +2,7 @@
 #include "Assert.h"
 
 #if SEGAN_LIB_MULTI_THREADED
-#include "Mutex.h"
+#include "Thread.h"
 #endif
 
 #include <string>

@@ -1,7 +1,7 @@
-#include "Timer.h"
 #include <windows.h>
+#include "Timer.h"
 
-Timer::Timer(void): m_time(0), m_elpsTime(0), m_elpsTime_smoothed(0), m_speed(1), m_speedFactor(1), m_lastTime(INFINITY) 
+Timer::Timer(void): m_time(0), m_elpsTime(0), m_elpsTime_smoothed(0), m_speed(1), m_speedFactor(1), m_lastTime(1e30f) 
 { 
 	update();
 }

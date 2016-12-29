@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-#if 1
+#if 0
 	Array<int> array_i;
 	{
 		Randomer rnd;
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
 	array_i.clear();
 #endif
 
-#if 1
+#if 0
 	Map<byte, uint> map;
 	{
 		Randomer rnd;
@@ -283,7 +283,6 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-
 #if 0
 	{
 		Table<int> table;
@@ -324,7 +323,6 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-
 #if 0
 	{
 		String tmp;
@@ -343,8 +341,9 @@ int main(int argc, char* argv[])
 	}
 #endif
 
+	
+
 	getchar();
-	sx_detect_crash();
 
 	return 0;
 }
