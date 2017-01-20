@@ -3,97 +3,98 @@
 	filename: 	Def.h
 	Author:		Sajad Beigjani
 	eMail:		sajad.b@gmail.com
-	Site:		www.SeganX.com
+	Site:		www.seganx.com
 	Desc:		Perprocess defines will be here
 *********************************************************************/
-#ifndef GUARD_Def_HEADER_FILE
-#define GUARD_Def_HEADER_FILE
+#ifndef HEADER_DEFINED_def
+#define HEADER_DEFINED_def
 
 //////////////////////////////////////////////////////////////////////////
 //  basic type definitions
 //////////////////////////////////////////////////////////////////////////
 
-typedef unsigned __int8		u8,			byte;
-typedef unsigned __int16	u16,		word;
-typedef __int32				i32,		sint;
-typedef unsigned __int32	u32,		uint, 		dword;
-typedef __int64				i64,		int64;
-typedef unsigned __int64	u64,		uint64;
-typedef void				*pvoid, 	*handle;
-typedef wchar_t				wchar;
-typedef int					hresult;
-typedef byte				*pbyte;
+typedef unsigned char		    u8,			byte,   *pbyte;
+typedef unsigned short		    u16,		word;
+typedef unsigned int		    u32,		uint,	dword;
+typedef int					    i32,		sint;
+typedef long				    i64,		int64;
+typedef unsigned long		    u64,		uint64;
+typedef long long			    i128,       int128;
+typedef unsigned long long	    u128,       uint128;
+typedef void				    *pvoid, 	*handle;
+typedef wchar_t				    wchar;
+typedef int					    hresult;
 
 
 
 //////////////////////////////////////////////////////////////////////////
 //  functions type and classes type preprocessors
 //////////////////////////////////////////////////////////////////////////
-
-// SeganX is Unicode
-#ifndef UNICODE
-	#define UNICODE
-#endif
-
-#ifndef _UNICODE
-	#define _UNICODE
-#endif
-
-#ifndef IN
-	#define IN
-#endif
-
-#ifndef OUT
-	#define OUT
-#endif
-
-#ifndef IN_OUT
-	#define IN_OUT
-#endif
-
 #define NOMINMAX
+
+#ifdef IN
+#undef IN
+#endif
+#define IN
+
+#ifdef OUT
+#undef OUT
+#endif
+#define OUT
+
+#ifdef IN_OUT
+#undef IN_OUT
+#endif
+#define IN_OUT
 
 #if defined(null)
 	#undef null
 #endif
-#define null	0
+#define null	NULL
 
 //////////////////////////////////////////////////////////////////////////
 //!!!    CHANGE THESE PREPROCESSORS TO CHANGE COMPILER BEHAVIOR      !!!//
 //////////////////////////////////////////////////////////////////////////
+#if defined(_WIN32)
 #if defined( SEGAN_IMPORT )
 	#define SEGAN_LIB_API					__declspec(dllimport)
 #else
 	#define SEGAN_LIB_API					__declspec(dllexport)
 #endif
+#else
+	#define SEGAN_LIB_API
+#endif
 
+#if defined(_WIN32)
 #define SEGAN_LIB_INLINE					__forceinline
+#else
+#define SEGAN_LIB_INLINE					inline
+#endif
 
 #define SEGAN_INLINE						inline
 
-#define SEGAN_ALIGN_16						__declspec(align(16))
+#if defined(_WIN32)
+	#define SEGAN_ALIGN_16					__declspec(align(16))
+#else
+	#define SEGAN_ALIGN_16
+#endif
 
-#define SEGAN_MEMLEAK						1		//	use first version of memory leak detector
+#define SEGAN_MEMLEAK						0		//	use first version of memory leak detector
 
-#define SEGAN_ASSERT						1		//	check and log some special events on containers
+#define SEGAN_ASSERT						0		//	check and log some special events on containers
 
-#define SEGAN_CRASHRPT						1		//	allow the crash reporter system to install it's handlers
+#define SEGAN_CRASHRPT						0		//	allow the crash reporter system to install it's handlers
 
-#define SEGAN_CRASHRPT_CALLSTACK			1		//	enable call stack system to log stack of function
+#define SEGAN_CRASHRPT_CALLSTACK			0		//	enable call stack system to log stack of function
 
-#define SEGAN_LIB_MULTI_THREADED			1		//	enable core library multi-threaded safe 
+#define SEGAN_LIB_MULTI_THREADED			0		//	enable core library multi-threaded safe 
 
-
-
+#define SX_LIB_SINGLETON                    0
 
 
 //////////////////////////////////////////////////////////////////////////
 //!!!  DO NOT CHANGE THIS AREA ANY MORE	 !!!//
 //////////////////////////////////////////////////////////////////////////
-
-//! avoid class from copy constructor and assign operator
-#define SEGAN_STERILE_CLASS(classname)		private: classname(classname& obj); void operator= (classname& obj);
-
 
 // release preprocessors
 #define sx_release(Obj)						{ if (Obj) { Obj->Release(); } }
@@ -118,11 +119,13 @@ typedef byte				*pbyte;
 #define sx_fourcc(ch0, ch1, ch2, ch3)		( (dword)(byte)(ch0) | ((dword)(byte)(ch1) << 8) | ((dword)(byte)(ch2) << 16) | ((dword)(byte)(ch3) << 24 ) )
 
 //!	takes a structure name s, and a field name f in s
-#define sx_offset_of(s, f)			( (dword)&( ((s *)0)->f ) )
+#define sx_offset_of(s, f)		        	( (dword)&( ((s *)0)->f ) )
 
 //! return number of items in a static array
 #define sx_array_count(x)					( sizeof(x) / sizeof(x[0]) )
 
+//! avoid class from copy constructor and assign operator
+#define sx_sterile_class(classname)		    private: classname(classname& obj); void operator= (classname& obj)
 
 //	some crazy macro to define unique names
 #define PP_CAT(a, b) PP_CAT_I(a, b)
@@ -139,33 +142,25 @@ typedef byte				*pbyte;
 #endif
 #endif
 
+#if defined(_WIN32)
 //! disable container warnings
 #pragma warning(disable:4251)
 #pragma warning(disable:4275)
-
+#endif
 
 //! includes
-#include <wchar.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
 
-
 //////////////////////////////////////////////////////////////////////////
-//	basic functions
-//////////////////////////////////////////////////////////////////////////
-#define _FILE_ sx_str_get_filename(__FILE__)
-
-#define sx_print(fmt, ...)		{ wprintf(fmt, __VA_ARGS__); printf(" - %s(%d)\n", _FILE_, __LINE__); }
-#define sx_print_a(fmt, ...)	{ printf(fmt, __VA_ARGS__);  printf(" - %s(%d)\n", _FILE_, __LINE__); }
-
-
 // assertion
 #if ( defined(_DEBUG) || SEGAN_ASSERT )
 #define sx_assert(expression)	((!!(expression)) || lib_assert(#expression, __FILE__, __LINE__))
 #else
 #define sx_assert(expression)
 #endif
-#endif	//	GUARD_Def_HEADER_FILE
+
+#endif	//	HEADER_DEFINED_def

@@ -161,10 +161,11 @@ public:
 	//	update the node position
 	void update_node(void* obj, const float x, const float y, const float z)
 	{
-		sx_assert(node);
 		if (!verify_position(x, y, z)) return;
 
 		Node* node = (Node*)obj;
+		sx_assert(node);
+
 		Box* box = node->box;
 
 		//	update the position
@@ -235,7 +236,7 @@ public:
 	//	return number of objects in the spherical area
 	uint get_count_in_sphere(const float x, const float y, const float z, const float radius)
 	{
-
+		return 0;
 	}
 
 	SEGAN_LIB_INLINE Box* get_box_by_index(uint index)
@@ -297,4 +298,4 @@ public:
 	Box		m_tmpBox;
 };
 
-#endif GUARD_Partition_HEADER_FILE
+#endif // GUARD_Partition_HEADER_FILE

@@ -48,6 +48,9 @@ private:
 	handle	m_broadcast;
 };
 
+SEGAN_LIB_API uint sx_process_currentId();
+
+SEGAN_LIB_API uint sx_thread_currentId();
 
 
 #endif // DEFINED_Thread

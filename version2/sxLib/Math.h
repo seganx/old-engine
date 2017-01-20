@@ -422,7 +422,7 @@ public:
 	sint get_i( const sint range )
 	{
 		float r = (float)generate() / (float)RAND_MAX;
-		return sx_round( range * r );
+		return sx_round( r * (float)range );
 	}
 
 	//! return float random number between min and max

@@ -1,9 +1,12 @@
-#include "Thread.h"
-
 #if defined(_WIN32)
 #include <windows.h>
+#else
+#include <sys/types.h> 
+#include <unistd.h>
+#include <pthread.h>
 #endif
 
+#include "Thread.h"
 
 //////////////////////////////////////////////////////////////////////////
 //	MUTEXT IMPLEMENTATION
@@ -78,5 +81,23 @@ int Condition::Broadcast()
 	// Implementation with PulseEvent() has race condition, see
 	// http://www.cs.wustl.edu/~schmidt/win32-cv-1.html
 	return PulseEvent(m_broadcast) == 0 ? -1 : 0;
+#endif
+}
+
+SEGAN_LIB_API uint sx_process_currentId()
+{
+#if defined(_WIN32)
+	return SEGAN_LIB_API uint();
+#else
+	return (uint)getpid();
+#endif
+}
+
+SEGAN_LIB_API uint sx_thread_currentId()
+{
+#if defined(_WIN32)
+	return SEGAN_LIB_API uint();
+#else
+	return (uint)pthread_self();		 
 #endif
 }

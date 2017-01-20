@@ -83,7 +83,7 @@ typedef void (* CrashCallback)(CrashReport* crashreport);
 SEGAN_LIB_API CrashCallback crash_reporter_callback(CrashCallback callback);
 SEGAN_LIB_API uint crash_reporter_install_process( void );
 SEGAN_LIB_API uint crash_reporter_install_thread( void );
-SEGAN_LIB_API char* crash_reporter_translate( ECrashReason reason );
+SEGAN_LIB_API const char* crash_reporter_translate( ECrashReason reason );
 
 #if SEGAN_CRASHRPT_CALLSTACK
 //! create a new call stack for function with out parameters

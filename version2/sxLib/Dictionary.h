@@ -396,4 +396,4 @@ public:
 	uint	m_count;
 };
 
-#endif GUARD_Dictionary_HEADER_FILE
+#endif // GUARD_Dictionary_HEADER_FILE

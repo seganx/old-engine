@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="lib">
+      <UniqueIdentifier>{9d2ea328-b1c4-4fd4-a6a2-4e0dc605bde7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Def.h" />
+    <ClInclude Include="..\Lib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Lib.cpp" />
+    <ClCompile Include="sxlib.cpp" />
+  </ItemGroup>
+</Project>

@@ -174,7 +174,7 @@ int jsmn_parse(Json *parser, const char *js, uint len, Json::Node *tokens, uint 
 				Json::Node *token = jsmn_alloc_token(parser, tokens, num_tokens);
 				if (token == null)
 					return Json::ERROR_NOMEM;
-				if (parser->m_toksuper != -1)
+				if (parser->m_toksuper != (uint)-1)
 				{
 					tokens[parser->m_toksuper].childs++;
 					token->parent = parser->m_toksuper;
@@ -219,7 +219,7 @@ int jsmn_parse(Json *parser, const char *js, uint len, Json::Node *tokens, uint 
 				int r = jsmn_parse_string(parser, js, len, tokens, num_tokens);
 				if (r < 0) return r;
 				count++;
-				if (parser->m_toksuper != -1 && tokens != null)
+				if (parser->m_toksuper != (uint)-1 && tokens != null)
 					tokens[parser->m_toksuper].childs++;
 			}
 			break;
@@ -227,7 +227,7 @@ int jsmn_parse(Json *parser, const char *js, uint len, Json::Node *tokens, uint 
 			case '\t': case '\r': case '\n': case ' ': break;
 			case ':': parser->m_toksuper = parser->m_toknext - 1; break;
 			case ',':
-				if (tokens != null && parser->m_toksuper != -1 && tokens[parser->m_toksuper].type != Json::ARRAY && tokens[parser->m_toksuper].type != Json::OBJECT)
+				if (tokens != null && parser->m_toksuper != (uint)-1 && tokens[parser->m_toksuper].type != Json::ARRAY && tokens[parser->m_toksuper].type != Json::OBJECT)
 					parser->m_toksuper = tokens[parser->m_toksuper].parent;
 				break;
 
@@ -236,7 +236,7 @@ int jsmn_parse(Json *parser, const char *js, uint len, Json::Node *tokens, uint 
 				int r = jsmn_parse_primitive(parser, js, len, tokens, num_tokens);
 				if (r < 0) return r;
 				count++;
-				if (parser->m_toksuper != -1 && tokens != null)
+				if (parser->m_toksuper != (uint)-1 && tokens != null)
 					tokens[parser->m_toksuper].childs++;
 			}
 			break;
@@ -357,7 +357,7 @@ Json::Node* Json::find(const char* name)
 
 int Json::read_string(char* dest, const int dest_size, Node* node)
 {
-	return sprintf_s(dest, dest_size, "%.*s", (node->down->end - node->down->start), (m_string + node->down->start));
+	return sx_sprintf(dest, dest_size, "%.*s", (node->down->end - node->down->start), (m_string + node->down->start));
 }
 
 int Json::read_int(Node* node, const int& default_value)

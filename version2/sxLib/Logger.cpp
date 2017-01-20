@@ -1,4 +1,3 @@
-#include <share.h>
 #include <time.h>
 #include <memory>
 #include <cwchar>
@@ -14,7 +13,7 @@ Logger::Logger( void )
 :	m_console(0)
 ,	m_callback(0)
 {
-	memset( m_filename, 0, sizeof(m_filename) );
+	memc( m_filename, 0, sizeof(m_filename) );
 }
 
 void Logger::initialize( const bool console, const wchar* filename, CB_Logger callback )

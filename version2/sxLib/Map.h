@@ -249,7 +249,7 @@ private:
 			}
 			break;
 		default :
-			sx_assert("map:compareFunction must return -1 or 0 or 1 ! "<0);
+			sx_assert("map:compareFunction must return -1 or 0 or 1 ! " < 0);
 			return false;
 		}
 		_compute_balance( root );

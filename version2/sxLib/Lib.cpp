@@ -1,49 +1,25 @@
 #include "Lib.h"
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 
 #if defined(_WIN32)
 #include <Windows.h>
 #endif
 
+#if SX_LIB_SINGLETON
 extern Library* g_lib = null;
-
-#if ( SEGAN_CRITICAL_SECTION == 1 )
-
-#if defined(_WIN32)
-CRITICAL_SECTION	s_mem_cs;
-SEGAN_INLINE void lib_init_cs( void )
-{
-	InitializeCriticalSection( &s_mem_cs );
-}
-SEGAN_INLINE void lib_finit_cs( void )
-{
-	DeleteCriticalSection( &s_mem_cs );
-}
-SEGAN_INLINE void lib_enter_cs( void )
-{
-	EnterCriticalSection( &s_mem_cs );
-}
-SEGAN_INLINE void lib_leave_cs( void )
-{
-	LeaveCriticalSection( &s_mem_cs );
-}
 #endif
 
-#endif
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 #if SEGAN_CRASHRPT
-void memory_callbacl_default(void* userdata, const char* file, const uint line, const uint size, const uint tag, const bool corrupted)
+void memory_callback_default(void* userdata, const char* file, const uint line, const uint size, const uint tag, const bool corrupted)
 {
 	FILE* f = (FILE*)userdata;
 	if (corrupted)
-		fprintf_s(f, "%s(%d): size = %d - CORRUPTED!\n", file, line, size);
+		sx_fprintf(f, "%s(%d): size = %d - CORRUPTED!\n", file, line, size);
 	else
-		fprintf_s(f, "%s(%d): size = %d\n", file, line, size);
+		sx_fprintf(f, "%s(%d): size = %d\n", file, line, size);
 	fflush(f);
 }
 
@@ -56,37 +32,37 @@ void sx_crash_callback_default(CrashReport* rc)
 		time_t rawTime;
 		time(&rawTime);
 		struct tm timeInfo;
-		localtime_s(&timeInfo, &rawTime);
+		sx_localtime(&timeInfo, &rawTime);
 		strftime(currtime, 64, "%Y/%m/%d %H:%M:%S", &timeInfo);
 	}
 
 	//	report called functions in the file
-	FILE* f = null;
-	if (fopen_s(&f, "seganx_crash_report.txt", "a+") == 0)
+	FILE* f = fopen("seganx_crash_report.txt", "a+");
+	if (f != null)
 	{
-		fprintf_s(f, "Application crashes on %s\n\n", currtime);
+		sx_fprintf(f, "Application crashes on %s\n\n", currtime);
 
-		fprintf_s(f, "Code: %u\n", rc->code);
-		fprintf_s(f, "Reason: %s\n\n", sx_crash_translate(rc->reason));
+		sx_fprintf(f, "Code: %u\n", rc->code);
+		sx_fprintf(f, "Reason: %s\n\n", sx_crash_translate(rc->reason));
 		fflush(f);
 
 #if SEGAN_CRASHRPT_CALLSTACK
 		if (rc->callstack->file != null)
 		{
-			fprintf_s(f, "Available callstack:\n");
+			sx_fprintf(f, "Available callstack:\n", "");
 			for ( CrashCallStack* cs = rc->callstack; cs->file != null; ++cs )
-				fprintf_s(f, "%s(%d): %s\n", cs->file, cs->line, (cs->func ? cs->func : cs->param));
+				sx_fprintf(f, "%s(%d): %s\n", cs->file, cs->line, (cs->func ? cs->func : cs->param));
 		}
-		fprintf_s(f, "\n");
+		sx_fprintf(f, "\n");
 		fflush(f);
 #endif
 #if SEGAN_MEMLEAK
-		fprintf_s(f, "Allocated memory report:\n");
+		sx_fprintf(f, "Allocated memory report:\n");
 		sx_mem_report_debug(memory_callbacl_default, f, 0);
-		fprintf_s(f, "\n");
+		sx_fprintf(f, "\n");
 #endif
 
-		fprintf_s(f, "========================================================================\n");
+		sx_fprintf(f, "========================================================================\n");
 
 		fclose(f);
 	}
@@ -95,18 +71,24 @@ void sx_crash_callback_default(CrashReport* rc)
 #if _DEBUG
 
 #else
+#if defined(_WIN32)
 	TerminateProcess(GetCurrentProcess(), 0);
+#else
+
+#endif
 #endif
 }
 #endif
 
-
+#if 0
 SEGAN_LIB_API Bigint<128> sx_power(const uint64& x, const uint64& y)
 {
 	Bigint<128> res;
 	return res.power(x, y);
 }
+#endif
 
+#if SX_LIB_SINGLETON
 
 //////////////////////////////////////////////////////////////////////////
 //	global singleton class
@@ -118,6 +100,13 @@ Library::Library(void)
 	m_logger = sx_new Logger();
 }
 
+Library::~Library(void)
+{
+    sx_delete_and_null(m_logger);
+    sx_delete_and_null(m_randomer);
+    sx_delete_and_null(m_timer);
+}
+
 Library* Library::GetSingelton(void)
 {
 	static Library* instance = null;
@@ -125,16 +114,12 @@ Library* Library::GetSingelton(void)
 		instance = sx_new Library();
 	return instance;
 }
-
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // initialize internal library
 void sx_lib_initialize( void )
 {
-#if SEGAN_CRITICAL_SECTION
-	lib_init_cs();
-#endif
-
 #if SEGAN_MEMLEAK
 	mem_enable_debug( true, 0 );
 #endif
@@ -143,28 +128,24 @@ void sx_lib_initialize( void )
 	sx_crash_callback(sx_crash_callback_default);
 #endif
 
+#if SX_LIB_SINGLETON
 	//	create basic objects
 	g_lib = Library::GetSingelton();
+#endif
 }
 
 // finalize internal library
 void sx_lib_finalize( void )
 {
-	sx_delete_and_null(g_lib->m_logger);
-	sx_delete_and_null(g_lib->m_randomer);
-	sx_delete_and_null(g_lib->m_timer);
+#if SX_LIB_SINGLETON
 	sx_delete_and_null(g_lib);
+#endif
 
-	sx_print_a("seganx library finalized!\n");
+	sx_print("seganx library finalized!\n");
 
 #if SEGAN_MEMLEAK
 	mem_report_debug_to_file( L"sx_memleak_report.txt", 0 );
 	mem_clear_debug();
 #endif
-
-#if SEGAN_CRITICAL_SECTION
-	lib_finit_cs();
-#endif
-
 }
 

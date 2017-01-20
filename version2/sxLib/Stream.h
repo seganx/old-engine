@@ -299,7 +299,7 @@ public:
 			m_size = m_pointer + size;
 			_realloc_buffer( m_size );
 		}
-		memcpy( m_buffer + m_pointer, buf, size );
+		sx_mem_copy( m_buffer + m_pointer, buf, size );
 		m_pointer += size;
 		return size;
 	}
@@ -310,7 +310,7 @@ public:
 		uint readSize = size; 
 		if ( m_pointer + readSize > m_size )
 			readSize = m_size - m_pointer;
-		memcpy( buf, m_buffer + m_pointer, readSize );
+		sx_mem_copy( buf, m_buffer + m_pointer, readSize );
 		m_pointer += readSize;
 		return readSize;
 	}
@@ -333,7 +333,7 @@ public:
 		uint res = sizeinbyte ? sizeinbyte : m_size;
 		if ( m_pointer + res > m_size )
 			res = m_size - m_pointer;
-		memcpy( dest, m_buffer + m_pointer, res );
+		sx_mem_copy( dest, m_buffer + m_pointer, res );
 		m_pointer += res;
 		return res;
 	}
