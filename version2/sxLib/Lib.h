@@ -11,28 +11,28 @@
 
 #include "Def.h"
 #include "Platform.h"
-//#include "Math.h"
-//#include "Assert.h"
-//#include "Memory.h"
-//#include "Crash.h"
-//#include "Array.h"
-//#include "Queue.h"
-//#include "Stack.h"
-//#include "Map.h"
-//#include "String.h"
-//#include "Stream.h"
-//#include "Logger.h"
-//#include "Dictionary.h"
-//#include "Partition.h"
-//#include "Protocol.h"
-//#include "Timer.h"
-//#include "Thread.h"
-//#include "Md5.h"
-//#include "Utils.h"
-//#include "Json.h"
-//#include "Table.h"
-//#include "Bigint.h"
-//#include "Base64.h"
+#include "Math.h"
+#include "Assert.h"
+#include "Memory.h"
+#include "Crash.h"
+#include "Array.h"
+#include "Queue.h"
+#include "Stack.h"
+#include "Map.h"
+#include "String.h"
+#include "Stream.h"
+#include "Logger.h"
+#include "Dictionary.h"
+#include "Partition.h"
+#include "Protocol.h"
+#include "Timer.h"
+#include "Thread.h"
+#include "Md5.h"
+#include "Utils.h"
+#include "Json.h"
+#include "Table.h"
+#include "Bigint.h"
+#include "Base64.h"
 
 //////////////////////////////////////////////////////////////////////////
 //	global singleton class
@@ -43,7 +43,7 @@ class SEGAN_LIB_API Library
 private:
     Library(void);
     ~Library( void );
-	SEGAN_STERILE_CLASS(Library);
+	sx_sterile_class(Library);
 
 public:
 	static Library* GetSingelton(void);

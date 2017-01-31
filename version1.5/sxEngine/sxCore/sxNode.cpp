@@ -513,8 +513,8 @@ namespace sx { namespace core {
 			m_Member[i]->MsgProc(MT_COVERBOX, &m_aaBox);
 
 		//  verify that box has been updated
-		if (abs(m_aaBox.Min.x - math::MAX) < 1.0f || abs(m_aaBox.Min.y - math::MAX) < 1.0f || abs(m_aaBox.Min.z - math::MAX) < 1.0f || 
-			abs(m_aaBox.Max.x - math::MAX) < 1.0f || abs(m_aaBox.Max.y - math::MAX) < 1.0f || abs(m_aaBox.Max.z - math::MAX) < 1.0f )
+		if (sx_abs_f(m_aaBox.Min.x - math::MAX) < 1.0f || sx_abs_f(m_aaBox.Min.y - math::MAX) < 1.0f || sx_abs_f(m_aaBox.Min.z - math::MAX) < 1.0f ||
+            sx_abs_f(m_aaBox.Max.x - math::MAX) < 1.0f || sx_abs_f(m_aaBox.Max.y - math::MAX) < 1.0f || sx_abs_f(m_aaBox.Max.z - math::MAX) < 1.0f )
 		{
 			m_aaBox.Min.Set(-0.1f, -0.1f, -0.1f);
 			m_aaBox.Max.Set( 0.1f,  0.1f,  0.1f);
@@ -670,7 +670,7 @@ namespace sx { namespace core {
 					AABox box = m_aaBox;
 					
 					//  verify joint is empty ?
-					if ( abs(box.Max.x - box.Min.x)<EPSILON && abs(box.Max.y - box.Min.y)<EPSILON )
+					if (sx_abs_f(box.Max.x - box.Min.x)<EPSILON && sx_abs_f(box.Max.y - box.Min.y)<EPSILON )
 					{
 						box.Max.Set( 0.1f,  0.1f,  0.1f);
 						box.Min.Set(-0.1f, -0.1f, -0.1f);

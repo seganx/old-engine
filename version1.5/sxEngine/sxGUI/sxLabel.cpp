@@ -136,7 +136,7 @@ namespace sx { namespace gui {
 
 	void Label::SetSize( float2 sz )
 	{
-		if ( abs(m_Size.x - sz.x)<5 && abs(m_Size.y - sz.y)<5 ) return;
+		if ( sx_abs_f(m_Size.x - sz.x)<5 && sx_abs_f(m_Size.y - sz.y)<5 ) return;
 
 		Control::SetSize(sz);
 		RectF rc = Control::GetRect();
@@ -304,7 +304,7 @@ namespace sx { namespace gui {
 		float4 q;
 		m_Mtrx.GetRotationQ(q.x, q.y, q.z, q.w);
 		if (m_Option & SX_GUI_PROPERTY_PIXELALIGN && !SEGAN_SET_HAS(m_Option, _SX_GUI_IN_3DSPACE_) && 
-			abs(q.x)<0.01f && abs(q.y)<0.01f && abs(q.z)<0.01f)
+			sx_abs_f(q.x)<0.01f && sx_abs_f(q.y)<0.01f && sx_abs_f(q.z)<0.01f)
 		{
 			d3d::Device3D::RS_TextureFilter(false);
 			d3d::Device3D::DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_numChar*4, 0, m_numChar*2);
@@ -594,7 +594,7 @@ namespace sx { namespace gui {
 				maxSize.y += float(m_font->GetDesc().lineHeight);
 			}
 
-			if ( abs(m_Size.x - maxSize.x)>5 || abs(m_Size.y - maxSize.y)>5 )
+			if ( sx_abs_f(m_Size.x - maxSize.x)>5 || sx_abs_f(m_Size.y - maxSize.y)>5 )
 				SetSize(maxSize);
 		}
 

@@ -27,7 +27,7 @@ This class will be ancestor of other stream class type like MemoryStream, FileSt
 */
 class Stream
 {
-	SEGAN_STERILE_CLASS(Stream);
+	sx_sterile_class(Stream);
 
 public:
 	Stream( void ): m_size(0) {}
@@ -268,7 +268,7 @@ MemoryStream is free type sequential data container which useful for easy read/w
 */
 class MemoryStream : public Stream
 {
-	SEGAN_STERILE_CLASS(MemoryStream);
+	sx_sterile_class(MemoryStream);
 
 public:
 	MemoryStream( sint sampler = 0 )

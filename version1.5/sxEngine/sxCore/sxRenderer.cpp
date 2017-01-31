@@ -309,10 +309,10 @@ namespace sx { namespace core {
 		static float4 curCam(math::VEC4_MAX);
 
 		//  check to see if camera position is changed, restart validation process
-		if (abs(s_Camera.Eye.x - curCam.x) > s_validationParam.camPosThreshold	|| 
-			abs(s_Camera.Eye.y - curCam.y) > s_validationParam.camPosThreshold	|| 
-			abs(s_Camera.Eye.z - curCam.z) > s_validationParam.camPosThreshold	|| 
-			abs(s_Camera.FOV - curCam.w)>0.1f				||
+		if (sx_abs_f(s_Camera.Eye.x - curCam.x) > s_validationParam.camPosThreshold	||
+            sx_abs_f(s_Camera.Eye.y - curCam.y) > s_validationParam.camPosThreshold	||
+            sx_abs_f(s_Camera.Eye.z - curCam.z) > s_validationParam.camPosThreshold	||
+            sx_abs_f(s_Camera.FOV - curCam.w)>0.1f				||
 			curPos > V_COUNT								)
 		{
 			curCam.x = s_Camera.Eye.x;
@@ -450,9 +450,9 @@ namespace sx { namespace core {
 		static float3 curCam(math::VEC3_MAX);
 
 		//  check to see if camera position is changed, restart invalidation process
-		if (abs(s_Camera.Eye.x - curCam.x) > s_validationParam.camPosThreshold * 2.0f || 
-			abs(s_Camera.Eye.y - curCam.y) > s_validationParam.camPosThreshold * 2.0f || 
-			abs(s_Camera.Eye.z - curCam.z) > s_validationParam.camPosThreshold * 2.0f ||
+		if (sx_abs_f(s_Camera.Eye.x - curCam.x) > s_validationParam.camPosThreshold * 2.0f ||
+            sx_abs_f(s_Camera.Eye.y - curCam.y) > s_validationParam.camPosThreshold * 2.0f ||
+            sx_abs_f(s_Camera.Eye.z - curCam.z) > s_validationParam.camPosThreshold * 2.0f ||
 			curRadius > IV_MAXRANGE								   )
 		{
 			curCam.x = s_Camera.Eye.x;

@@ -32,7 +32,7 @@ namespace sx { namespace cmn {
 	{
 		a = (1 - w) * m_Vel;
 		
-		if ( abs(a) > 0.00001 || m_Amp >= 1.0f )
+		if ( sx_abs_f(a) > 0.00001 || m_Amp >= 1.0f )
 		{
 			v += a * (elpsTime * 0.06f);
 			w = (w + v) * m_Amp;

@@ -393,6 +393,8 @@ namespace sx { namespace math {
 			};
 		};
 
+        Frustum(void) {};
+
 		//! normalize frustum f to this
 		void Normalize( const Frustum& f );
 

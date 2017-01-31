@@ -18,7 +18,7 @@ so it's suitable for pointers which has no copy constructor to decrease function
 template<typename T>
 class Stack
 {
-	SEGAN_STERILE_CLASS(Stack);
+	sx_sterile_class(Stack);
 
 public:
 	Stack( sint sampler = 0 )

@@ -58,7 +58,7 @@ FORCEINLINE bool Matrix::EqualTo( const Matrix& mat )
 	{
 		for (j=0; i<4; i++)
 		{
-			if(abs(m[i][j] - mat.m[i][j]) > EPSILON) return false;
+			if(sx_abs_f(m[i][j] - mat.m[i][j]) > EPSILON) return false;
 		}
 	}
 

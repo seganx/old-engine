@@ -107,7 +107,7 @@ namespace sx { namespace core {
 	void Shadow_direction::ComputeLightFrustum( OUT Frustum& frustum, Camera& sceneCamera, float3& lightDir, float shadowRange )
 	{
 		//  avoid UP direction ambiguities
-		if ( abs(lightDir.x) < 0.001f && abs(lightDir.z) < 0.001f )
+		if (sx_abs_f(lightDir.x) < 0.001f && sx_abs_f(lightDir.z) < 0.001f )
 		{
 			lightDir.x = 0.001f;
 			lightDir.z = 0.001f;
@@ -268,7 +268,7 @@ namespace sx { namespace core {
 		matLight.Multiply( m_matView, m_matProj );
 
 		//  apply bias matrix
-		float zBias = - 0.25f * abs( m_matProj._33 );
+		float zBias = - 0.25f * sx_abs_f( m_matProj._33 );
 		switch (m_Width)
 		{
 		case 1024:	zBias *= 2.25;	break;

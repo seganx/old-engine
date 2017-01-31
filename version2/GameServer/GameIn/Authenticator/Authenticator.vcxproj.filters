@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\..\sxLib\Assert.cpp">
+      <Filter>sxLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sxLib\Crash.cpp">
+      <Filter>sxLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sxLib\Memory.cpp">
+      <Filter>sxLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sxLib\Platform.c">
+      <Filter>sxLib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="sxLib">
+      <UniqueIdentifier>{dc5a0b08-d0c9-4581-95d7-361d2a9832d6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\sxLib\Assert.h">
+      <Filter>sxLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Crash.h">
+      <Filter>sxLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Def.h">
+      <Filter>sxLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Memory.h">
+      <Filter>sxLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Platform.h">
+      <Filter>sxLib</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

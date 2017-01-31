@@ -103,7 +103,7 @@ namespace sx { namespace gui {
 		{
 			fTime += elpsTime;
 			math::Vector3 pos(m_elements[2]->Matrix()._41, m_elements[2]->Matrix()._42, m_elements[2]->Matrix()._43);
-			m_elements[2]->Matrix().Scale(1.0f, 0.5f * abs(sin(fTime/100)) * (float)m_font->GetDesc().lineHeight , 1.0f);
+			m_elements[2]->Matrix().Scale(1.0f, 0.5f * sx_abs_f(sin(fTime/100)) * (float)m_font->GetDesc().lineHeight , 1.0f);
 			m_elements[2]->Matrix().SetTranslation(pos.x, pos.y, pos.z);
 		}
 	}

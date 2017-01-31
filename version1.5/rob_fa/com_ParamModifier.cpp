@@ -241,7 +241,7 @@ void com_ParamModifier::Update( float elpsTime )
 		m_owner->m_curAttack.physicalArmor += m_physicalArmor;
 		m_owner->m_curAttack.electricalArmor += m_electricalArmor;
 
-		if ( abs(m_offsetY) > 0.1f )
+		if ( sx_abs_f(m_offsetY) > 0.1f )
 		{
 			m_owner->m_posOffset.y += ( m_offsetY - m_owner->m_posOffset.y ) * elpsTime * 0.0015f;
 		}

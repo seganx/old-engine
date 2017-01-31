@@ -41,9 +41,9 @@ SEGAN_LIB_API void		mem_report_debug( CB_Memory callback, const uint tag = 0 );
 SEGAN_LIB_API void		mem_report_debug_to_file( const wchar* fileName, const uint tag = 0 );
 SEGAN_LIB_API void		mem_clear_debug( void );
 
-inline	  void*		operator new ( uint size, const wchar* file, int line ){ return mem_alloc_dbg( size, file, line ); }
-inline    void		operator delete( void *p, const wchar* file, int line ){ mem_free_dbg(p); }
-inline    void		operator delete( void *p ){ mem_free_dbg(p); }
+inline      void*		operator new ( uint size, const wchar* file, int line ){ return mem_alloc_dbg( size, file, line ); }
+inline      void		operator delete( void *p, const wchar* file, int line ){ mem_free_dbg(p); }
+inline      void		operator delete( void *p ){ mem_free_dbg(p); }
 
 //! enable memory debugger and set a new tag. pass -1 to restore previews tag
 #define sx_mem_enable_debug( enable, tag )				mem_enable_debug( enable, tag )

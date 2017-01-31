@@ -18,7 +18,7 @@
 template<typename T>
 class Table
 {
-	SEGAN_STERILE_CLASS(Table);
+	sx_sterile_class(Table);
 public:
 
 	Table( uint capacity = 0 )

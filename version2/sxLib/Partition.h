@@ -17,7 +17,7 @@
 template<typename T>
 class Partition
 {
-	SEGAN_STERILE_CLASS(Partition);
+	sx_sterile_class(Partition);
 public:
 
 	//! use this callback function to iterate through rows. return true to continue and false to stop iteration

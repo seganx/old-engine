@@ -62,7 +62,7 @@ SEGAN_LIB_INLINE uint sx_str_to_uint( const wchar* str )
 {
 	if ( !str ) return 0;
 	uint res = 0;
-	swscanf_s( str, L"%u", &res, sizeof(res) );
+	swscanf_s( str, L"%u", &res );
 	return res;
 }
 

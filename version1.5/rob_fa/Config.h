@@ -19,7 +19,7 @@
 #define USE_HASH_LOCK		0
 #define USE_STEAM_LINK		0
 #define USE_DEV_CHEAT		1		//	development cheats
-#define USE_CHEAT_CODE		1		//	player cheats
+#define USE_CHEAT_CODE		0		//	player cheats
 
 #define USE_STEAM_SDK		0
 
@@ -30,14 +30,14 @@
 #define USE_SITE_STATS		0
 #define SITE_STATS_TAG		0		//	0:Steam - 1:USA/UK - 2:Germany - 3:Poland - 4:Czech
 
-#define USE_UPDATE_1		salam chetori		//	switch to first update of the game
+#define USE_UPDATE_1		0		//	switch to first update of the game
 #define USE_ENCRPT_STR		0		//	force to use encrypted text
 
 
 #if VER_USERDEMO
 #define GAME_TITLE		L"Rush for Glory - demo version"
 #else
-#define GAME_TITLE		L"Rush for Glory"
+#define GAME_TITLE		L"Roads of battle"
 #endif
 
 #if VER_PREVIEW

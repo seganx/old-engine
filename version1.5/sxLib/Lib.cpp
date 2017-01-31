@@ -948,7 +948,7 @@ SEGAN_LIB_API const wchar* FloatToStr( float number, int precision )
 {
 	lib_enter_cs();
 	static str128 res;
-	if ( abs(number)<0.000001f )
+	if ( sx_abs_f(number)<0.000001f )
 		number = 0;
 	char tmp[64];
 	int decimal, sign;

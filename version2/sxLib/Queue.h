@@ -18,7 +18,7 @@ Queue container classes that use double linked List to hold data.
 template<typename T>
 class Queue
 {
-	SEGAN_STERILE_CLASS(Queue);
+	sx_sterile_class(Queue);
 
 public:
 

@@ -20,7 +20,7 @@ NOTE : Compare function should return -1:less  0:equal  +1:more
 template<typename T>
 class Array
 {
-	SEGAN_STERILE_CLASS(Array);
+    sx_sterile_class(Array);
 
 public:
 	typedef sint (*compFunc)( const T& item1, const T& item2 );

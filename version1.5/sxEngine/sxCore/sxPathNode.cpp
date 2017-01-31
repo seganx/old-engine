@@ -406,7 +406,7 @@ namespace sx { namespace core {
 			PPathNode pnode = poolPathNodes[i];
 
 			float3 p = pnode->GetPosition();
-			if ( abs(p.x - pos.x)<threshold && abs(p.z - pos.z)<threshold && abs(p.y - pos.y)<threshold )
+			if ( sx_abs_f(p.x - pos.x)<threshold && sx_abs_f(p.z - pos.z)<threshold && sx_abs_f(p.y - pos.y)<threshold )
 			{
 
 				if ( id )

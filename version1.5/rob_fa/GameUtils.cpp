@@ -430,8 +430,10 @@ sx::gui::Label* create_label( sx::gui::Control* parent, const uint text, const f
 			res->SetSize(float2(width, height));
 
 		res->SetAlign( gameString->align );
+
 		res->GetElement(0)->Color().a = 0.1f;
-		res->GetElement(1)->Color() = 0xffffffff;
+		
+        res->GetElement(1)->Color() = 0xffffffff;
 		res->SetFont( gameString->font );
 		res->AddProperty( SX_GUI_PROPERTY_MULTILINE );
 		res->AddProperty( SX_GUI_PROPERTY_WORDWRAP );

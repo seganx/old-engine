@@ -26,7 +26,7 @@ NOTE : Compare function MUST return -1:less  0:equal  +1:more
 template<typename T_key, typename T_data>
 class Map
 {
-	SEGAN_STERILE_CLASS(Map);
+	sx_sterile_class(Map);
 
 	static sint map_cmpfnc_default( const T_key& v1, const T_key& v2 )
 	{

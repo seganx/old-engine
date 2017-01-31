@@ -1,4 +1,5 @@
 #include <memory>
+#include <string.h>
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -31,7 +32,7 @@ SEGAN_INLINE MemMan* mem_get_manager( void )
 
 SEGAN_INLINE void* mem_alloc( const uint sizeinbyte )
 {
-	return s_manager ? s_manager->alloc( sizeinbyte ) : ::malloc( sizeinbyte );
+	return s_manager ? s_manager->alloc( sizeinbyte ) : malloc( sizeinbyte );
 }
 
 SEGAN_INLINE void* mem_realloc( void* p, const uint newsizeinbyte )
@@ -42,26 +43,24 @@ SEGAN_INLINE void* mem_realloc( void* p, const uint newsizeinbyte )
 	if ( s_manager )
 		return s_manager->realloc( p, newsizeinbyte );
 
-	void* newptr = ::realloc( p, newsizeinbyte );
+	void* newptr = realloc( p, newsizeinbyte );
 	if ( !newptr )
 	{
+        printf("WARNING: Can't reallocate memory!\n");
+
 		if ( p )
 		{
 			//  if reallocate function failed then try to allocate new one and copy last data to new pool
-			newptr = ::malloc( newsizeinbyte );
-			memcpy( newptr, p, mem_min_size( sx_mem_size( p ), newsizeinbyte ) );
+			newptr = malloc( newsizeinbyte );
+#ifdef _WIN32
+			memcpy( newptr, p, mem_min_size( _msize( p ), newsizeinbyte ) );
+#endif
 			::free( p );
 		}
-		else newptr = ::malloc( newsizeinbyte );
+		else newptr = malloc( newsizeinbyte );
 	}
 	
 	return newptr;
-}
-
-SEGAN_INLINE uint mem_size( const void* p )
-{
-	if ( !p ) return 0;
-	return s_manager ? s_manager->size( p ) : (uint)::_msize( (void*)p );	
 }
 
 SEGAN_INLINE void* mem_free( const void* p )
@@ -599,7 +598,6 @@ SEGAN_INLINE void mem_clear_debug( void )
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-
 
 
 

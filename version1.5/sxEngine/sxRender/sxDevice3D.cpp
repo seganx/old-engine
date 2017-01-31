@@ -874,7 +874,7 @@ e_reset:
 		static float s_eTime	= 0;
 
 		float curTime = sys::GetSysTime();
-		s_eTime+= abs(curTime - s_iTime);
+		s_eTime+= sx_abs_f(curTime - s_iTime);
 		s_iTime = curTime;
 		if (s_eTime>=1000)
 		{

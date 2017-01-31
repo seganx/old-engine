@@ -100,7 +100,7 @@ namespace sx { namespace gui {
 		m_ValueScroll += (m_Value - m_ValueScroll) * (elpsTime * 0.06f) * 0.15f;
 		SEGAN_CLAMP(m_ValueScroll, 0, m_Max);
 
-		if ( !(m_Option & SX_GUI_PROPERTY_PROGRESSCIRCLE) && abs( m_ValueScroll - m_Value) > EPSILON )
+		if ( !(m_Option & SX_GUI_PROPERTY_PROGRESSCIRCLE) && sx_abs_f( m_ValueScroll - m_Value) > EPSILON )
 		{
 			float val;
 			if (m_Max)

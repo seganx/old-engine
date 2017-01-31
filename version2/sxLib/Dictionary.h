@@ -18,7 +18,7 @@
 template<typename T_data>
 class Dictionary
 {
-	SEGAN_STERILE_CLASS( Dictionary );
+	sx_sterile_class( Dictionary );
 public:
 
 	//! use this callback function to iterate through rows. return true to continue and false to stop iteration
