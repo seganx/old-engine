@@ -6,13 +6,24 @@
 	Site:		www.SeganX.com
 	Desc:		This file contain macros and functions for assertion
 *********************************************************************/
-#ifndef GUARD_Assert_HEADER_FILE
-#define GUARD_Assert_HEADER_FILE
+#ifndef HEADER_ASSERT
+#define HEADER_ASSERT
 
 #include "Def.h"
 
-#if ( defined(_DEBUG) || SEGAN_ASSERT ) //! assertion function will stop application and report call stack
-SEGAN_LIB_API sint lib_assert(const char* expression, const char* file, const sint line);
+//////////////////////////////////////////////////////////////////////////
+// assertion
+#if ( defined(_DEBUG) || SEGAN_ASSERT )
+#define sx_assert(expression)	((!!(expression)) || lib_assert(#expression, __FILE__, __LINE__))
+
+//! assertion function will stop application and report call stack
+SEGAN_LIB_API int lib_assert(const char* expression, const char* file, const int line);
+
+#else
+
+#define sx_assert(expression)
+
 #endif
 
-#endif	//	GUARD_Assert_HEADER_FILE
+
+#endif	//	HEADER_ASSERT

@@ -24,7 +24,6 @@
 any other service so we need a pool and fill it consecutively. */
 int callstack_clear(void);
 #define CALLSTACK_MAX	128
-
 CrashCallStack	s_callstack_pool[CALLSTACK_MAX];
 uint			s_callstack_index = callstack_clear();	//	a trick to initialize call-stack pool
 
@@ -125,7 +124,7 @@ SEGAN_INLINE _CallStack::~_CallStack(void)
 
 static CrashCallback s_crash_callback = null;
 
-void crash_call_callback(ECrashReason reason, dword code = 0)
+void crash_call_callback(crash_reason reason, dword code = 0)
 {
 	if (s_crash_callback == null) return;
 	CrashReport cr;
@@ -271,7 +270,7 @@ SEGAN_LIB_API uint crash_reporter_install_thread(void)
 	return sx_thread_currentId();
 }
 
-SEGAN_LIB_API const char* crash_reporter_translate(ECrashReason reason)
+SEGAN_LIB_API const char* crash_reporter_translate(crash_reason reason)
 {
 	switch (reason)
 	{

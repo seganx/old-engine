@@ -13,7 +13,7 @@
 //  basic type definitions
 //////////////////////////////////////////////////////////////////////////
 
-typedef unsigned char		    u8,			byte,   *pbyte;
+typedef unsigned char		    u8,			byte;
 typedef unsigned short		    u16,		word;
 typedef unsigned int		    u32,		uint,	dword;
 typedef int					    i32,		sint;
@@ -21,10 +21,24 @@ typedef long				    i64,		int64;
 typedef unsigned long		    u64,		uint64;
 typedef long long			    i128,       int128;
 typedef unsigned long long	    u128,       uint128;
-typedef void				    *pvoid, 	*handle;
-typedef wchar_t				    wchar;
+typedef void*                   handle;
 typedef int					    hresult;
 
+#if __cplusplus
+#else
+#ifdef bool
+#undef bool
+#endif
+#ifdef true
+#undef true
+#endif
+#ifdef false
+#undef false
+#endif
+typedef unsigned char bool;
+#define true 1
+#define false 0
+#endif
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -47,8 +61,8 @@ typedef int					    hresult;
 #endif
 #define IN_OUT
 
-#if defined(null)
-	#undef null
+#ifdef null
+#undef null
 #endif
 #define null	NULL
 
@@ -79,7 +93,7 @@ typedef int					    hresult;
 	#define SEGAN_ALIGN_16
 #endif
 
-#define SEGAN_MEMLEAK						0		//	use first version of memory leak detector
+#define SEGAN_MEMLEAK						1		//	use first version of memory leak detector
 
 #define SEGAN_ASSERT						0		//	check and log some special events on containers
 
@@ -90,6 +104,12 @@ typedef int					    hresult;
 #define SEGAN_LIB_MULTI_THREADED			0		//	enable core library multi-threaded safe 
 
 #define SX_LIB_SINGLETON                    0
+
+#define SEGANX_TRACE_CRASHRPT               0
+
+#define SEGANX_TRACE_CALLSTACK              1
+
+#define SEGANX_TRACE_PROFILER               1
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -154,13 +174,5 @@ typedef int					    hresult;
 #include <stdlib.h>
 #include <math.h>
 
-
-//////////////////////////////////////////////////////////////////////////
-// assertion
-#if ( defined(_DEBUG) || SEGAN_ASSERT )
-#define sx_assert(expression)	((!!(expression)) || lib_assert(#expression, __FILE__, __LINE__))
-#else
-#define sx_assert(expression)
-#endif
 
 #endif	//	HEADER_DEFINED_def

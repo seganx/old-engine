@@ -4,7 +4,7 @@
 
 #if ( defined(_DEBUG) || SEGAN_ASSERT )
 
-SEGAN_INLINE sint lib_assert( const char* expression, const char* file, const sint line )
+SEGAN_INLINE int lib_assert( const char* expression, const char* file, const int line )
 {
 
 #if ( SEGAN_CALLSTACK == 1 )

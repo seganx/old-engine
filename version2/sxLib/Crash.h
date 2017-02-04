@@ -14,7 +14,7 @@
 
 #if SEGAN_CRASHRPT
 
-enum ECrashReason
+enum crash_reason
 {
 	ECR_UNKNOWN = 0,
 	ECR_MEMORY_ALLOC,
@@ -59,7 +59,7 @@ struct CrashCallStack
 struct CrashReport 
 {
 	dword code;
-	ECrashReason reason;
+	crash_reason reason;
 
 #if SEGAN_CRASHRPT_CALLSTACK
 	CrashCallStack* callstack;	// array of call-stack ended with cleaned one
@@ -83,7 +83,7 @@ typedef void (* CrashCallback)(CrashReport* crashreport);
 SEGAN_LIB_API CrashCallback crash_reporter_callback(CrashCallback callback);
 SEGAN_LIB_API uint crash_reporter_install_process( void );
 SEGAN_LIB_API uint crash_reporter_install_thread( void );
-SEGAN_LIB_API const char* crash_reporter_translate( ECrashReason reason );
+SEGAN_LIB_API const char* crash_reporter_translate( crash_reason reason );
 
 #if SEGAN_CRASHRPT_CALLSTACK
 //! create a new call stack for function with out parameters

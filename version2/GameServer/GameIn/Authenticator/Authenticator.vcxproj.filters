@@ -8,10 +8,13 @@
     <ClCompile Include="..\..\..\sxLib\Crash.cpp">
       <Filter>sxLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\sxLib\Memory.cpp">
+    <ClCompile Include="..\..\..\sxLib\Platform.c">
       <Filter>sxLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\sxLib\Platform.c">
+    <ClCompile Include="..\..\..\sxLib\Memory.c">
+      <Filter>sxLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sxLib\Trace.c">
       <Filter>sxLib</Filter>
     </ClCompile>
   </ItemGroup>
@@ -34,6 +37,9 @@
       <Filter>sxLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\sxLib\Platform.h">
+      <Filter>sxLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Trace.h">
       <Filter>sxLib</Filter>
     </ClInclude>
   </ItemGroup>

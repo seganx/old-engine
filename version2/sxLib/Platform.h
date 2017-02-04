@@ -1,3 +1,12 @@
+/********************************************************************
+created:	2017/01/20
+filename: 	Platform.h
+Author:		Sajad Beigjani
+eMail:		sajad.b@gmail.com
+Site:		www.seganx.com
+Desc:		This file contains some basic wraper functions that are
+            depend on operating system
+*********************************************************************/
 #ifndef HEADER_PLATFORM
 #define HEADER_PLATFORM
 
@@ -6,7 +15,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-
 
 #ifndef SEGAN_LIB_API
 #define SEGAN_LIB_API
@@ -108,8 +116,6 @@ SEGAN_LIB_API int sx_threadpool_destroy(struct sx_threadpool * threadpool);
 SEGAN_LIB_API int sx_threadpool_add_job(struct sx_threadpool * threadpool, sx_thread_func func, void * param);
 SEGAN_LIB_API uint sx_threadpool_num_jobs(struct sx_threadpool * threadpool);
 SEGAN_LIB_API uint sx_threadpool_num_busy_threads(struct sx_threadpool * threadpool);
-
-
 
 SEGAN_LIB_API void sx_sleep(const uint seconds);
 
