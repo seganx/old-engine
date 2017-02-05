@@ -14,6 +14,8 @@
 
 #if (SEGANX_TRACE_CRASHRPT || SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER)
 
+#define sx_trace_attach(stack_size)         trace_attach(stack_size)
+#define sx_trace_detach()                   trace_detach()
 #define sx_trace()                          { trace_push( __FILE__, __LINE__, __FUNCTION__ ); }
 #define sx_trace_param(function,...)        { trace_push_param( __FILE__, __LINE__, #function, __VA_ARGS__ ); }
 #define sx_return(expression)               { trace_pop(); return expression; }
@@ -22,7 +24,7 @@
 extern "C" {
 #endif
 
-SEGAN_LIB_API void trace_attach( uint stack_size );
+SEGAN_LIB_API void trace_attach( uint stack_size, const char* filename );
 SEGAN_LIB_API void trace_detach( void );
 SEGAN_LIB_API void trace_push( const char* file, const int line, const char* function );
 SEGAN_LIB_API void trace_push_param( const char* file, const int line, const char* function, ... );
@@ -32,9 +34,10 @@ SEGAN_LIB_API void trace_pop( void );
 }
 #endif
 
-
 #else
 
+#define sx_trace_attach(stack_size)
+#define sx_trace_detach()
 #define sx_trace
 #define sx_trace_param(function,...)
 #define sx_return(expression)               return

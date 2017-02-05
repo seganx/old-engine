@@ -105,7 +105,7 @@ typedef unsigned char bool;
 
 #define SX_LIB_SINGLETON                    0
 
-#define SEGANX_TRACE_CRASHRPT               0
+#define SEGANX_TRACE_CRASHRPT               1
 
 #define SEGANX_TRACE_CALLSTACK              1
 
@@ -167,6 +167,7 @@ typedef unsigned char bool;
 #pragma warning(disable:4251)
 #pragma warning(disable:4275)
 #endif
+
 
 //! includes
 #include <stdarg.h>
