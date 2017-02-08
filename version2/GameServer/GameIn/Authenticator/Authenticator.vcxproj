@@ -65,6 +65,9 @@
     <RemoteCppCompileToolExe>g++</RemoteCppCompileToolExe>
     <RemoteLdToolExe>g++</RemoteLdToolExe>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <RemoteCCompileToolExe>gcc</RemoteCCompileToolExe>
+  </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\sxLib\Assert.cpp" />
     <ClCompile Include="..\..\..\sxLib\Crash.cpp" />
@@ -109,6 +112,8 @@
     <ClCompile>
       <RuntimeTypeInfo />
       <ThreadSafeStatics />
+      <CLanguageStandard>gnu99</CLanguageStandard>
+      <CppLanguageStandard>c++98</CppLanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalOptions>-pthread %(AdditionalOptions)</AdditionalOptions>

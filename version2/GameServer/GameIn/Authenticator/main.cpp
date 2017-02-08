@@ -6,6 +6,9 @@ void memreport(void* userdata, const char* file, const int line, const uint size
 {
     sx_trace();
 
+    int* a = 0;
+    *a = 1;
+
     if (corrupted)
         printf("%s(%d): error: memory corrupted %d b\n", file, line, size);
     else
@@ -18,9 +21,10 @@ int main()
 {
     printf("hello from Authenticator!\n");
 
-    trace_attach(32);
+    trace_attach(32, "trace_test.txt");
+    sx_trace();
 
-    memreport(null, __FILE__, __LINE__, 10, true);
+    memreport(null, __FILE__, __LINE__, 23, true);
 
     trace_detach();
     

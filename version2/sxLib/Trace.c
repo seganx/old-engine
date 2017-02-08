@@ -2,12 +2,11 @@
 #include <Windows.h>
 #endif
 
-#include "Trace.h"
-
-#define _GNU_SOURCE
 #include <string.h>
 #include <time.h>
 #include <signal.h>
+
+#include "Trace.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -52,7 +51,8 @@ trace_object;
 #ifdef _WIN32
 __declspec(thread) struct trace_object * s_current_object = null;
 #else
-static __thread struct trace_object * s_current_object = null;
+//static __thread struct trace_object * s_current_object = null;
+static struct trace_object * s_current_object = null;
 #endif
 
 #endif
@@ -85,7 +85,7 @@ SEGAN_LIB_API void trace_attach(uint stack_size, const char* filename)
 
 #if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER)
     s_current_object->callstack_count = stack_size;
-    s_current_object->callstack_array = (struct trace_info*)calloc(stack_size, sizeof(struct trace_info*));
+    s_current_object->callstack_array = (struct trace_info*)calloc(stack_size, sizeof(struct trace_info));
 #endif
 
     trace_set_crash_handler();
@@ -93,6 +93,14 @@ SEGAN_LIB_API void trace_attach(uint stack_size, const char* filename)
 #endif
 
 #if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER)
+static SEGAN_INLINE const char* trace_get_filename(const char* filename)
+{
+    const char* res = filename;
+    for (const char* c = filename; *c != 0; ++c)
+        if (*c == '/' || *c == '\\')
+            res = c + 1;
+    return res;
+}
 
 static SEGAN_INLINE struct trace_info* trace_object_pop()
 {
@@ -113,9 +121,13 @@ SEGAN_LIB_API void trace_detach( void )
 SEGAN_LIB_API void trace_push( const char * file, const int line, const char * function )
 {
     struct trace_info* tinfo = trace_object_pop(s_current_object);
-    tinfo->file = (char*)file;
+#if DEBUG
+    tinfo->file = file;
+#else
+    tinfo->file = trace_get_filename(file);
+#endif
     tinfo->line = line;
-    tinfo->func = (char*)function;
+    tinfo->func = function;
 #if SEGANX_TRACE_CALLSTACK
     tinfo->param[0] = 0;
 #endif
@@ -127,7 +139,11 @@ SEGAN_LIB_API void trace_push( const char * file, const int line, const char * f
 SEGAN_LIB_API void trace_push_param( const char * file, const int line, const char * function, ... )
 {
     struct trace_info* tinfo = trace_object_pop(s_current_object);
-    tinfo->file = (char*)file;
+#if DEBUG
+    tinfo->file = file;
+#else
+    tinfo->file = trace_get_filename(file);
+#endif
     tinfo->line = line;
 
 #if SEGANX_TRACE_CALLSTACK
@@ -248,11 +264,12 @@ static void trace_signal_handler(int sig, siginfo_t* sinfo, void *ucontext)
     if (fstr == null)
         fstr = stderr;
 
-    fprintf(fstr, "Received SIG%s (%u)", _strsignal(sig), sig);
+    // TODO: Add time alog the string below..
+    fprintf(fstr, "Program received SIG%s (%u)", strsignal(sig), sig);
     if (sinfo->si_code == SI_USER)
-        fprintf(fstr, " sent by user %u from process %u\n", sinfo->si_uid, sinfo->si_pid);
+        fprintf(fstr, " sent by user %u from process %u", sinfo->si_uid, sinfo->si_pid);
     else if (sinfo->si_code == SI_TKILL)
-        fprintf(fstr, " sent by tkill\n");
+        fprintf(fstr, " sent by tkill");
     else if (sinfo->si_code == SI_KERNEL)
         fprintf(fstr, " sent by kernel");
     else 
@@ -335,10 +352,19 @@ static void trace_signal_handler(int sig, siginfo_t* sinfo, void *ucontext)
         default: reason = "unknown"; break;
         }
 
-        fprintf(fstr, "Fault at memory location 0x%x due to %s (%x).\n", sinfo->si_addr, reason, sinfo->si_code);
+        fprintf(fstr, "\nFault at memory location 0x%x due to %s (%x).\n", sinfo->si_addr, reason, sinfo->si_code);
     }
 
-    _exit(EXIT_FAILURE);
+#if SEGANX_TRACE_CALLSTACK
+    fprintf(fstr, "User defined callstack:\n");
+    for (int i = 0; i < s_current_object->callstack_index; ++i)
+    {
+        for (int j = 0; j < i; ++j) fprintf(fstr, "  ");
+        fprintf(fstr, "%s: %s(%d)\n", s_current_object->callstack_array[i].func, s_current_object->callstack_array[i].file, s_current_object->callstack_array[i].line);
+    }
+#endif
+
+    exit(EXIT_FAILURE);
 }
 
 #endif // __linux__
