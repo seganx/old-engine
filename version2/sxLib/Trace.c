@@ -6,6 +6,7 @@
 #include <time.h>
 #include <signal.h>
 
+#include "Memory.h"
 #include "Trace.h"
 
 
@@ -17,16 +18,16 @@ typedef struct trace_info
 {
     const char*	func;		    //	function name
     const char*	file;           //  file name
-    int	    line;           //  line number
+    int	        line;           //  line number
 #if SEGANX_TRACE_PROFILER
-    long    time;           // time consumed will be computed on return
+    long        time;           // time consumed will be computed on return
 #endif
 #if SEGANX_TRACE_CALLSTACK
-    char	param[128];	    //	function parameters
+    char	    param[128];	    //	function parameters
 #endif
 }
 trace_info;
-#endif
+#endif // (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER)
 
 #if SEGANX_TRACE_PROFILER
 typedef struct trace_func_profile 
@@ -34,33 +35,97 @@ typedef struct trace_func_profile
 
 }
 trace_func_profile;
-#endif
+#endif // SEGANX_TRACE_PROFILER
 
-#if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER || SEGANX_TRACE_CRASHRPT)
+#if SEGANX_TRACE_MEMORY
+
+#define MEM_PROTECTION_SIZE     16
+#define MEM_PROTECTION_SIGN     "!protected area!"
+
+typedef struct memory_block
+{
+    char                    sign[16];		//! sign to check if the block is a memory block. It's different from protection sign
+    char*                   file;
+    int                     line;
+    uint                    size;
+    bool                    corrupted;
+    struct memory_block*    next;
+    struct memory_block*    prev;
+}
+memory_block;
+
+typedef struct memory_tracker
+{
+    struct memory_block*    root;
+    bool                    enable;
+    sint                    num_corruptions;
+}
+memory_tracker;
+
+typedef struct MemCodeReport
+{
+    void*   	            p;		//	user coded memory
+    struct memory_block*    mb;		//	memory block for log
+}
+MemCodeReport;
+
+#endif // SEGANX_TRACE_MEMORY
+
+
+#if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER || SEGANX_TRACE_CRASHRPT || SEGANX_TRACE_MEMORY)
 typedef struct trace_object
 {
-#if SEGANX_TRACE_CRASHRPT
+#if (SEGANX_TRACE_CRASHRPT || SEGANX_TRACE_MEMORY)
     const char*            filename;
 #endif
+#if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER)
     uint                   callstack_count;
     uint                   callstack_index;
     struct trace_info*     callstack_array;
+#endif
+#if SEGANX_TRACE_MEMORY
+    struct memory_tracker *     mem_tracker;
+#endif
 }
 trace_object;
 
 #ifdef _WIN32
 __declspec(thread) struct trace_object * s_current_object = null;
 #else
-//static __thread struct trace_object * s_current_object = null;
-static struct trace_object * s_current_object = null;
+static __thread struct trace_object * s_current_object = null;
 #endif
+
+static SEGAN_INLINE const char* trace_get_filename(const char* filename)
+{
+    const char* res = filename;
+    for (const char* c = filename; *c != 0; ++c)
+        if (*c == '/' || *c == '\\')
+            res = c + 1;
+    return res;
+}
+
+#endif // (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER || SEGANX_TRACE_CRASHRPT || SEGANX_TRACE_MEMORY)
+
+
+#if ( defined(_DEBUG) || SEGAN_ASSERT )
+
+SEGAN_INLINE int lib_assert(const char* expression, const char* file, const int line)
+{
+#if defined(_DEBUG)
+    __debugbreak();	//	just move your eyes down and look at the call stack list in IDE to find out what happened !
+#elif ( SEGAN_CALLSTACK == 1 )
+    callstack_report_to_file(L"sx_assertion", L"assertion failed !");
+#endif
+
+    return 0;
+}
 
 #endif
 
 
 #if SEGANX_TRACE_CRASHRPT
 static void trace_set_crash_handler(void);
-#endif
+#endif // SEGANX_TRACE_CRASHRPT
 
 #if SEGANX_TRACE_PROFILER
 static SEGAN_INLINE long trace_get_current_tick() 
@@ -74,9 +139,75 @@ static SEGAN_INLINE long trace_get_current_tick()
         return 0;
 #endif
 }
-#endif
+#endif // SEGANX_TRACE_PROFILER
 
-#if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER || SEGANX_TRACE_CRASHRPT)
+#if SEGANX_TRACE_MEMORY
+
+static SEGAN_INLINE void mem_check_protection(memory_block* mb)
+{
+    byte* p = (byte*)mb + sizeof(memory_block);
+
+    //	check beginning of memory block
+    if (memcmp(p, MEM_PROTECTION_SIGN, MEM_PROTECTION_SIZE))
+    {
+        mb->corrupted = true;
+    }
+    else
+    {
+        //	check end of memory block
+        p += MEM_PROTECTION_SIZE + mb->size;
+        mb->corrupted = memcmp(p, MEM_PROTECTION_SIGN, MEM_PROTECTION_SIZE) != 0;
+    }
+}
+
+static uint mem_report_compute_num(bool only_corrupted)
+{
+    if (!s_current_object->mem_tracker->root) return 0;
+
+    uint result = 0;
+    memory_block* leaf = s_current_object->mem_tracker->root;
+    while (leaf)
+    {
+        mem_check_protection(leaf);
+        if (only_corrupted)
+        {
+            if (leaf->corrupted)
+                result++;
+        }
+        else result++;
+        leaf = leaf->next;
+    }
+
+    return result;
+}
+
+static SEGAN_INLINE void mem_dbg_report(FILE* f, bool only_corrupted)
+{
+    if (!s_current_object->mem_tracker->root || mem_report_compute_num(only_corrupted) < 1) return;
+    fputs("\nseganx memory debug report:\n", f);
+    struct memory_block* leaf = s_current_object->mem_tracker->root;
+    while (leaf)
+    {
+        mem_check_protection(leaf);
+        if (only_corrupted && !leaf->corrupted)
+        {
+            leaf = leaf->next;
+            continue;
+        }
+
+        if (leaf->corrupted)
+            fprintf(f, "%s(%d): error! memory corrupted - size = %d\n", trace_get_filename(leaf->file), leaf->line, leaf->size);
+        else
+            fprintf(f, "%s(%d): warning! memory leak - size = %d\n", trace_get_filename(leaf->file), leaf->line, leaf->size);
+        leaf = leaf->next;
+    }
+}
+
+#endif // SEGANX_TRACE_MEMORY
+
+
+
+#if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER || SEGANX_TRACE_CRASHRPT|| SEGANX_TRACE_MEMORY)
 SEGAN_LIB_API void trace_attach(uint stack_size, const char* filename)
 {
     if (s_current_object != null) return;
@@ -88,34 +219,48 @@ SEGAN_LIB_API void trace_attach(uint stack_size, const char* filename)
     s_current_object->callstack_array = (struct trace_info*)calloc(stack_size, sizeof(struct trace_info));
 #endif
 
-    trace_set_crash_handler();
-}
+#if SEGANX_TRACE_MEMORY
+    s_current_object->mem_tracker = (struct memory_tracker*)calloc(1, sizeof(struct memory_tracker));
+    s_current_object->mem_tracker->enable = true;
 #endif
 
-#if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER)
-static SEGAN_INLINE const char* trace_get_filename(const char* filename)
-{
-    const char* res = filename;
-    for (const char* c = filename; *c != 0; ++c)
-        if (*c == '/' || *c == '\\')
-            res = c + 1;
-    return res;
+#if SEGANX_TRACE_CRASHRPT
+    trace_set_crash_handler();
+#endif
 }
 
-static SEGAN_INLINE struct trace_info* trace_object_pop()
-{
-    return &s_current_object->callstack_array[s_current_object->callstack_index++];
-}
-
-SEGAN_LIB_API void trace_detach( void )
+SEGAN_LIB_API void trace_detach(void)
 {
     if (s_current_object)
     {
+#if SEGANX_TRACE_MEMORY
+        mem_dbg_report(stderr, false);
+        if (s_current_object->filename && mem_report_compute_num(false) > 0)
+        {
+            FILE* fstr = fopen(s_current_object->filename, "a+, ccs=UTF-8");
+            if (fstr) {
+                mem_dbg_report(fstr, false);
+                fclose(fstr);
+            }
+        }
+        free(s_current_object->mem_tracker);
+#endif // SEGANX_TRACE_MEMORY
+
+#if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER)
         if (s_current_object->callstack_array)
             free(s_current_object->callstack_array);
+#endif  //  (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER)
         free(s_current_object);
     }
     s_current_object = null;
+}
+#endif // SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER || SEGANX_TRACE_CRASHRPT|| SEGANX_TRACE_MEMORY
+
+
+#if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER)
+static SEGAN_INLINE struct trace_info* trace_object_pop()
+{
+    return &s_current_object->callstack_array[s_current_object->callstack_index++];
 }
 
 SEGAN_LIB_API void trace_push( const char * file, const int line, const char * function )
@@ -175,7 +320,7 @@ SEGAN_LIB_API void trace_pop( void )
     struct trace_info* tinfo = &s_current_object->callstack_array[--s_current_object->callstack_index];
     tinfo->time = trace_get_current_tick() - tinfo->time;
 #else
-    --s_current_object->callstack_index
+    --s_current_object->callstack_index;
 #endif
 }
 
@@ -265,7 +410,7 @@ static void trace_signal_handler(int sig, siginfo_t* sinfo, void *ucontext)
         fstr = stderr;
 
     // TODO: Add time alog the string below..
-    fprintf(fstr, "Program received SIG%s (%u)", strsignal(sig), sig);
+    fprintf(fstr, "Program received %s (%u)", strsignal(sig), sig);
     if (sinfo->si_code == SI_USER)
         fprintf(fstr, " sent by user %u from process %u", sinfo->si_uid, sinfo->si_pid);
     else if (sinfo->si_code == SI_TKILL)
@@ -406,4 +551,241 @@ static void trace_set_crash_handler(void)
 #endif
 
 
+////////////////////////////////////////////////////////////
+//	debug allocator used to detect memory leaks
+#if SEGANX_TRACE_MEMORY
 
+static SEGAN_INLINE MemCodeReport mem_code_protection(void* p, const uint realsizeinbyte)
+{
+    MemCodeReport res;
+    if (!p)
+    {
+        res.p = null;
+        res.mb = null;
+        return res;
+    }
+
+    // extract memory block
+    res.mb = (memory_block*)p;
+    res.mb->corrupted = false;
+
+    //	set protection sign for memory block
+    memcpy(res.mb->sign, MEM_PROTECTION_SIGN, MEM_PROTECTION_SIZE);
+
+    // prepare the result
+    p = (byte*)p + sizeof(memory_block);
+    res.p = (byte*)p + MEM_PROTECTION_SIZE;
+
+    //	sign beginning of memory block
+    memcpy(p, MEM_PROTECTION_SIGN, MEM_PROTECTION_SIZE);
+
+    //	sign end of memory block
+    memcpy((byte*)res.p + realsizeinbyte, MEM_PROTECTION_SIGN, MEM_PROTECTION_SIZE);
+
+    return res;
+}
+
+
+static SEGAN_INLINE MemCodeReport mem_decode_protection(const void* p)
+{
+    MemCodeReport res;
+    if (!p)
+    {
+        res.p = null;
+        res.mb = null;
+    }
+    else
+    {
+        res.mb = (memory_block*)((byte*)p - MEM_PROTECTION_SIZE - sizeof(memory_block));
+        res.p = (void*)p;
+
+        // check protection sign for memory block
+        if (memcmp(res.mb->sign, MEM_PROTECTION_SIGN, MEM_PROTECTION_SIZE))
+        {
+            res.p = null;
+            res.mb = null;
+        }
+        else mem_check_protection(res.mb);
+    }
+    return res;
+}
+
+static SEGAN_INLINE void mem_debug_push(memory_block* mb)
+{
+    if (!s_current_object->mem_tracker->root)
+    {
+        mb->next = null;
+        mb->prev = null;
+        s_current_object->mem_tracker->root = mb;
+    }
+    else
+    {
+        s_current_object->mem_tracker->root->prev = mb;
+        mb->next = s_current_object->mem_tracker->root;
+        mb->prev = null;
+        s_current_object->mem_tracker->root = mb;
+    }
+}
+
+static SEGAN_INLINE void mem_debug_pop(memory_block* mb)
+{
+    if (s_current_object->mem_tracker->root)
+    {
+        // unlink from the list
+        if (mb == s_current_object->mem_tracker->root)
+        {
+            s_current_object->mem_tracker->root = s_current_object->mem_tracker->root->next;
+            if (s_current_object->mem_tracker->root)
+                s_current_object->mem_tracker->root->prev = null;
+        }
+        else
+        {
+            mb->prev->next = mb->next;
+            if (mb->next)
+                mb->next->prev = mb->prev;
+        }
+    }
+}
+
+SEGAN_INLINE void* mem_alloc_dbg(const uint size_in_byte, const char* file, const int line)
+{
+    void* res = null;
+
+    if (s_current_object->mem_tracker->enable)
+    {
+        //	first block for holding data, second block for protection and memory, then close with other protection
+        res = mem_alloc(sizeof(memory_block) + MEM_PROTECTION_SIZE + size_in_byte + MEM_PROTECTION_SIZE);
+        sx_assert(res);
+
+        //	sign memory to check memory corruption
+        MemCodeReport memreport = mem_code_protection(res, size_in_byte);
+
+        //	store memory block to link list
+        if (memreport.mb)
+        {
+            memreport.mb->file = (char*)file;
+            memreport.mb->line = line;
+            memreport.mb->size = size_in_byte;
+
+            // push the block
+            mem_debug_push(memreport.mb);
+        }
+
+        //	set user memory as result
+        res = memreport.p;
+    }
+    else res = mem_alloc(size_in_byte);
+
+    return res;
+}
+
+SEGAN_INLINE void* mem_realloc_dbg(void* p, const uint new_size_in_byte, const char* file, const int line)
+{
+    if (!new_size_in_byte)
+        return mem_free_dbg(p);
+
+    MemCodeReport memreport = mem_decode_protection(p);
+
+    if (memreport.mb)
+    {
+        //	if memory has been corrupted we should hold the corrupted memory info
+        if (memreport.mb->corrupted)
+        {
+            //	report memory allocations to file
+            mem_dbg_report(stderr, true);
+
+#if ( defined(_DEBUG) || SEGAN_ASSERT )
+            //	report call stack
+            lib_assert("memory block has been corrupted !", memreport.mb->file, memreport.mb->line);
+#endif
+        }
+        else
+        {
+            //	pop memory block from the list
+            mem_debug_pop(memreport.mb);
+        }
+
+        //	realloc the memory block
+        void* tmp = mem_realloc(memreport.mb, sizeof(memory_block) + MEM_PROTECTION_SIZE + new_size_in_byte + MEM_PROTECTION_SIZE);
+
+        //	sign memory to check protection
+        memreport = mem_code_protection(tmp, new_size_in_byte);
+
+        if (memreport.mb)
+        {
+            memreport.mb->file = (char*)file;
+            memreport.mb->line = line;
+            memreport.mb->size = new_size_in_byte;
+
+            //	push new block
+            mem_debug_push(memreport.mb);
+        }
+
+        //	set as result
+        return memreport.p;
+    }
+    else
+    {
+        if (s_current_object->mem_tracker->enable)
+        {
+            //	realloc the memory block
+            p = mem_realloc(p, sizeof(memory_block) + MEM_PROTECTION_SIZE + new_size_in_byte + MEM_PROTECTION_SIZE);
+
+            //	sign memory to check protection
+            memreport = mem_code_protection(p, new_size_in_byte);
+
+            if (memreport.mb)
+            {
+                memreport.mb->file = (char*)file;
+                memreport.mb->line = line;
+                memreport.mb->size = new_size_in_byte;
+
+                //	push the block
+                mem_debug_push(memreport.mb);
+            }
+
+            //	set as result
+            return memreport.p;
+        }
+    }
+
+    return mem_realloc(p, new_size_in_byte);
+}
+
+SEGAN_INLINE void* mem_free_dbg(const void* p)
+{
+    if (!p) return null;
+
+    MemCodeReport memreport = mem_decode_protection(p);
+
+    if (memreport.mb)
+    {
+        //	if memory has been corrupted we should hold the corrupted memory info
+        if (memreport.mb->corrupted)
+        {
+            //	report memory allocations to file
+            mem_dbg_report(stderr, true);
+
+#if ( defined(_DEBUG) || SEGAN_ASSERT )
+            //	report call stack
+            lib_assert("memory block has been corrupted !", memreport.mb->file, memreport.mb->line);
+#endif
+        }
+        else
+        {
+            //	pop memory block from the list
+            mem_debug_pop(memreport.mb);
+            mem_free(memreport.mb);
+        }
+    }
+    else mem_free(p);
+
+    return null;
+}
+
+
+
+#endif
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////

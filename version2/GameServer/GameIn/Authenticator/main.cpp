@@ -1,18 +1,17 @@
 #include <cstdio>
 
+#include "../../../sxLib/Memory.h"
 #include "../../../sxLib/Trace.h"
 
-void memreport(void* userdata, const char* file, const int line, const uint size, const bool corrupted)
+void memreport()
 {
     sx_trace();
 
-    int* a = 0;
-    *a = 1;
+    int* b = (int*)sx_mem_alloc(4);
+    b[6] = 4;
 
-    if (corrupted)
-        printf("%s(%d): error: memory corrupted %d b\n", file, line, size);
-    else
-        printf("%s(%d): warning: memory leak %d b\n", file, line, size);
+    b = 0;
+    b[0] = 4;
 
     sx_return();
 }
@@ -21,12 +20,15 @@ int main()
 {
     printf("hello from Authenticator!\n");
 
-    trace_attach(32, "trace_test.txt");
+    sx_trace_attach(32, null);
     sx_trace();
 
-    memreport(null, __FILE__, __LINE__, 23, true);
+    int* a = (int*)sx_mem_alloc(16);
+    a[4] = 0;
 
-    trace_detach();
+    memreport();
+
+    sx_trace_detach();
     
     getchar();
     return 0;
