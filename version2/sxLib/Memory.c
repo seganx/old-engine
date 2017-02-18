@@ -3,6 +3,7 @@
 #endif
 #include <string.h>
 
+#include "Trace.h"
 #include "Memory.h"
 
 
@@ -27,13 +28,13 @@ SEGAN_INLINE struct sx_memory_manager* mem_get_manager(void)
 
 SEGAN_INLINE void* mem_alloc(const uint size_in_byte)
 {
-    return s_manager ? s_manager->alloc(size_in_byte) : malloc(size_in_byte);
+    return s_manager ? s_manager->alloc(s_manager, size_in_byte) : malloc(size_in_byte);
 }
 
 SEGAN_INLINE void* mem_realloc(void* p, const uint new_size_in_byte)
 {
     if (s_manager)
-        return s_manager->realloc(p, new_size_in_byte);
+        return s_manager->realloc(s_manager, p, new_size_in_byte);
 
     if (!new_size_in_byte)
         return mem_free(p);
@@ -60,7 +61,7 @@ SEGAN_INLINE void* mem_realloc(void* p, const uint new_size_in_byte)
 SEGAN_INLINE void* mem_free(const void* p)
 {
     if (s_manager)
-        return s_manager->free(p);
+        return s_manager->free(s_manager, p);
     else
         free((void*)p);
     return null;
@@ -84,16 +85,19 @@ SEGAN_INLINE void mem_set(void* dest, const sint val, const uint size)
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-#if 0
-
-#define mem_min_size(a,b) (((a)<(b))?(a):(b))
-
+//	MEMORY MANAGER : FREE LIST POOL
+//	a fast general memory pool which allocates a memory block in 
+//	initialization from OS and uses the allocated 
+//	memory pool in any allocation call. using this memory manager has 
+//	restriction of block protection.
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
 typedef enum
 {
-    MCS_NULL = 0xf0f0f0f0,
-    MCS_EMPTY = 0xfefefefe,
-    MCS_FULL = 0xfafafafa
+    CS_NULL = 0xf0f0f0f0,
+    CS_EMPTY = 0xfefefefe,
+    CS_FULL = 0xfafafafa
 }
 memory_chunk_state;
 
@@ -107,115 +111,90 @@ typedef struct memory_chunk
 }
 memory_chunk;
 
-typedef struct sx_memorypool
+typedef struct memory_pool
 {
-    byte*                   pool;
     struct memory_chunk*    root;
+    byte*                   data;
+    uint                    size;
 }
-sx_memorypool;
+memory_pool;
 
 
-//////////////////////////////////////////////////////////////////////////
-//	MEMORY MANAGER : FREE LIST POOL
-//	a fast general memory pool which allocates a memory block in 
-//	initialization from OS and uses the allocated 
-//	memory pool in any allocation call. using this memory manager has 
-//	restriction of block protection.
-//////////////////////////////////////////////////////////////////////////
-MemMan_Pool::MemMan_Pool(const uint poolSizeInBytes) : MemMan()
+static SEGAN_INLINE void memory_pool_push(struct memory_pool* pool, struct memory_chunk* ch)
 {
-    uint memsize = poolSizeInBytes + 0x0fff * sizeof(Chunk);
-    m_pool = (pbyte)mem_alloc(memsize);
-    sx_assert(m_pool);
-#ifdef _DEBUG
-    mem_set(m_pool, 0, memsize);
-#endif
-    //  set first empty chunk
-    Chunk* ch = PChunk(m_pool);
-    ch->state = CS_EMPTY;
-    ch->size = memsize - 2 * sizeof(Chunk);
-
-    //  create last inactive chuck
-    Chunk*	ich = PChunk(m_pool + memsize - sizeof(Chunk));
-    ich->behind = ch;
-    ich->state = CS_NULL;
-    ich->size = 0;
-    m_root = ich;
-    push(ch);
+    ch->next = pool->root;
+    ch->prev = null;
+    pool->root->prev = ch;
+    pool->root = ch;
 }
 
-MemMan_Pool::~MemMan_Pool(void)
+static SEGAN_INLINE void memory_pool_pop(struct memory_pool* pool, struct memory_chunk* ch)
 {
-    mem_free(m_pool);
+    if (ch->prev)           ch->prev->next = ch->next;
+    if (ch->next)           ch->next->prev = ch->prev;
+    if (ch == pool->root)   pool->root = ch->next;
 }
 
-void* MemMan_Pool::alloc(const uint sizeInByte)
+static SEGAN_INLINE uint memory_pool_size(const void* p)
 {
-    Chunk* ch = m_root;
+    if (!p) return 0;
+    struct memory_chunk* ch = (struct memory_chunk*)((byte*)(p) - sizeof(struct memory_chunk));
+    return ch->size;
+}
+
+static SEGAN_INLINE void* memory_pool_alloc( struct sx_memory_manager* manager, const uint sizeinbyte )
+{
+    struct memory_pool* pool = (struct memory_pool*)((byte*)manager + sizeof(struct sx_memory_manager));
+    struct memory_chunk* ch = pool->root;
     while (ch->state == CS_EMPTY)
     {
-        if (ch->size >= sizeInByte)
+        if (ch->size >= sizeinbyte)
         {
             //  free chunk founded
-            pop(ch);
-            if ((ch->size - sizeInByte) > sizeof(Chunk))
+            memory_pool_pop(pool, ch);
+            if ((ch->size - sizeinbyte) > sizeof(struct memory_chunk))
             {
                 //  create new empty chunk by remaining size
-                Chunk* ech = PChunk(pbyte(ch) + sizeof(Chunk) + sizeInByte);
+                struct memory_chunk* ech = (struct memory_chunk*)((byte*)ch + sizeof(struct memory_chunk) + sizeinbyte);
                 ech->behind = ch;
-                ech->size = ch->size - (sizeof(Chunk) + sizeInByte);
+                ech->size = ch->size - (sizeof(struct memory_chunk) + sizeinbyte);
                 ech->state = CS_EMPTY;
-                push(ech);
-                PChunk(pbyte(ech) + sizeof(Chunk) + ech->size)->behind = ech;
-                ch->size = sizeInByte;
+                memory_pool_push(pool, ech);
+                ((struct memory_chunk*)((byte*)ech + sizeof(struct memory_chunk) + ech->size))->behind = ech;
+                ch->size = sizeinbyte;
             }
             ch->state = CS_FULL;
-            return (pbyte(ch) + sizeof(Chunk));
+            return ((byte*)ch + sizeof(struct memory_chunk));
         }
         ch = ch->next;
     }
-    sx_assert("MemMan_Pool::alloc(...) failed due to there is no free chunk exist whit specified size!" < 0);
+    sx_assert("memory_pool_alloc(...) failed due to there is no free chunk exist whit specified size!" == null);
     return null;
 }
 
-SEGAN_INLINE void* MemMan_Pool::realloc(const void* p, const uint sizeInByte)
-{
-    if (!p)
-    {
-        return alloc(sizeInByte);
-    }
-    else
-    {
-        sx_assert(pbyte(p) > m_pool && pbyte(p) < (m_pool + mem_size(m_pool)));
-        void* tmp = alloc(sizeInByte);
-        mem_copy(tmp, p, mem_min_size(size(p), sizeInByte));
-        free(p);
-        return tmp;
-    }
-}
-
-SEGAN_INLINE void* MemMan_Pool::free(const void* p)
+static SEGAN_INLINE void* memory_pool_free( struct sx_memory_manager* manager, const void* p )
 {
     if (!p) return null;
-    sx_assert(pbyte(p) > m_pool && pbyte(p) < (m_pool + mem_size(m_pool)));
+    struct memory_pool* pool = (struct memory_pool*)((byte*)manager + sizeof(struct sx_memory_manager));
+    sx_assert((byte*)p > pool->data && (byte*)p < (pool->data + pool->size));
 
-    Chunk* ch = PChunk(pbyte(p) - sizeof(Chunk));
+    struct memory_chunk* ch = (struct memory_chunk*)((byte*)p - sizeof(struct memory_chunk));
     sx_assert(ch->state == CS_FULL);	//	avoid to free a chunk more that once
 
-#ifdef _DEBUG
+#ifndef NDEBUG
     mem_set((void*)p, 0, ch->size);
 #endif
 
     //  look at neighbor chunk in right side
-    Chunk* rch = PChunk(pbyte(p) + ch->size);
+    struct memory_chunk* rch = (struct memory_chunk*)((byte*)p + ch->size);
     if (rch->state == CS_EMPTY)
     {
-        PChunk(pbyte(rch) + sizeof(Chunk) + rch->size)->behind = ch;
-        ch->size += sizeof(Chunk) + rch->size;
-        pop(rch);
+        ((struct memory_chunk*)((byte*)rch + sizeof(struct memory_chunk) + rch->size))->behind = ch;
+        ch->size += sizeof(struct memory_chunk) + rch->size;
+        memory_pool_pop(pool, rch);
 
-#ifdef _DEBUG
-        mem_set(rch, 0, sizeof(Chunk));
+#ifndef NDEBUG
+        mem_set(rch, 0, sizeof(struct memory_chunk));
 #endif
     }
 
@@ -224,10 +203,10 @@ SEGAN_INLINE void* MemMan_Pool::free(const void* p)
     {
         if (ch->behind->state == CS_EMPTY)
         {
-            PChunk(pbyte(ch) + sizeof(Chunk) + ch->size)->behind = ch->behind;
-            ch->behind->size += sizeof(Chunk) + ch->size;
-#ifdef _DEBUG
-            mem_set(ch, 0, sizeof(Chunk));
+            ((struct memory_chunk*)((byte*)(ch) + sizeof(struct memory_chunk) + ch->size))->behind = ch->behind;
+            ch->behind->size += sizeof(struct memory_chunk) + ch->size;
+#ifndef NDEBUG
+            mem_set(ch, 0, sizeof(struct memory_chunk));
 #endif
             return null;	//	this one is already exist in list
         }
@@ -235,32 +214,67 @@ SEGAN_INLINE void* MemMan_Pool::free(const void* p)
 
     //	push to free list
     ch->state = CS_EMPTY;
-    push(ch);
+    memory_pool_push(pool, ch);
     return null;
 }
 
-SEGAN_INLINE uint MemMan_Pool::size(const void* p)
+static SEGAN_INLINE void* memory_pool_realloc(struct sx_memory_manager* manager, const void* p, const uint sizeinbyte)
 {
-    if (!p) return 0;
-    sx_assert(pbyte(p) > m_pool && pbyte(p) < (m_pool + mem_size(m_pool)));
-    Chunk* ch = PChunk(pbyte(p) - sizeof(Chunk));
-    return ch->size;
+#define mem_min_size(a,b) (((a)<(b))?(a):(b))
+
+    if (!p)
+    {
+        return memory_pool_alloc(manager, sizeinbyte);
+    }
+    else
+    {
+        struct memory_pool* pool = (struct memory_pool*)((byte*)manager + sizeof(struct sx_memory_manager));
+        sx_assert((byte*)p > pool->data && (byte*)p < (pool->data + pool->size));
+        void* tmp = memory_pool_alloc(manager, sizeinbyte);
+        uint cursize = memory_pool_size(p);
+        mem_copy(tmp, p, mem_min_size(cursize, sizeinbyte));
+        memory_pool_free(manager, p);
+        return tmp;
+    }
 }
 
-
-SEGAN_INLINE void MemMan_Pool::push(Chunk* ch)
+SEGAN_LIB_API struct sx_memory_manager * sx_mem_pool_create(uint sizeinbyte)
 {
-    ch->next = m_root;
-    ch->prev = null;
-    m_root->prev = ch;
-    m_root = ch;
-}
-
-SEGAN_INLINE void MemMan_Pool::pop(Chunk* ch)
-{
-    if (ch->prev)	ch->prev->next = ch->next;
-    if (ch->next)	ch->next->prev = ch->prev;
-    if (ch == m_root)	m_root = ch->next;
-}
-
+    uint memsize = sizeof(struct sx_memory_manager) + sizeof(struct memory_pool) + sizeinbyte + 0x0fff * sizeof(struct memory_chunk);
+    byte* mem = (byte*)mem_alloc(memsize);
+    sx_assert(mem);
+#ifndef NDEBUG
+    mem_set(mem, 0, memsize);
 #endif
+
+    struct memory_pool* pool = (struct memory_pool*)(mem + sizeof(struct sx_memory_manager));
+    pool->data = mem + sizeof(struct sx_memory_manager) + sizeof(struct memory_pool);
+    pool->size = memsize;
+
+    //  set first empty chunk
+    struct memory_chunk* ch = (struct memory_chunk*)(pool->data);
+    ch->state = CS_EMPTY;
+    ch->size = memsize - 2 * sizeof(struct memory_chunk);
+
+    //  create last inactive chuck
+    struct memory_chunk* ich = (struct memory_chunk*)(mem + memsize - sizeof(struct memory_chunk));
+    ich->behind = ch;
+    ich->state = CS_NULL;
+    ich->size = 0;
+    pool->root = ich;
+    memory_pool_push(pool, ch);
+
+    //  prepare the instance of memory manager
+    struct sx_memory_manager* res = (struct sx_memory_manager*)mem;
+    res->alloc = memory_pool_alloc;
+    res->realloc = memory_pool_realloc;
+    res->free = memory_pool_free;
+    return res;
+}
+
+SEGAN_LIB_API int sx_mem_pool_destroy(struct sx_memory_manager * mempool)
+{
+    mem_free(mempool);
+    return 0;
+}
+
