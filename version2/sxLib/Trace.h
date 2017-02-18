@@ -12,16 +12,23 @@
 
 #include "Def.h"
 
-#if ( defined(_DEBUG) || SEGAN_ASSERT )
-#define sx_assert(expression)	((!!(expression)) || lib_assert(#expression, __FILE__, __LINE__))
+#if SEGANX_TRACE_ASSERT
+
+#define sx_assert(expression)	((expression) ? (void) (0) : trace_assert(#expression, __FILE__, __LINE__))
+
+#if __cplusplus
+extern "C" {
+#endif // __cplusplus
 
 //! assertion function will stop application and report call stack
-SEGAN_LIB_API int lib_assert(const char* expression, const char* file, const int line);
+SEGAN_LIB_API void trace_assert(const char* expression, const char* file, const int line);
+
+#if __cplusplus
+}
+#endif // __cplusplus
 
 #else
-
 #define sx_assert(expression)
-
 #endif
 
 

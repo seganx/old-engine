@@ -93,18 +93,13 @@ typedef unsigned char bool;
 	#define SEGAN_ALIGN_16
 #endif
 
-#define SEGAN_MEMLEAK						0		//	use first version of memory leak detector
-
-#define SEGAN_ASSERT						0		//	check and log some special events on containers
-
-#define SEGAN_CRASHRPT						0		//	allow the crash reporter system to install it's handlers
-
-#define SEGAN_CRASHRPT_CALLSTACK			0		//	enable call stack system to log stack of function
 
 #define SEGAN_LIB_MULTI_THREADED			0		//	enable core library multi-threaded safe 
 
 #define SX_LIB_SINGLETON                    0
 
+
+#define SEGANX_TRACE_ASSERT					1		//	check and log some special events on containers
 
 #define SEGANX_TRACE_MEMORY					1		//	use second version of memory leak detector
 
