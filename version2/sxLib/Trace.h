@@ -86,26 +86,25 @@ SEGAN_LIB_API void trace_pop(void);
 
 #if SEGANX_TRACE_MEMORY
 
-#define sx_mem_alloc( size_in_byte )            mem_alloc_dbg( size_in_byte, __FILE__, __LINE__ )
-#define sx_mem_realloc( p, new_size_in_byte )   mem_realloc_dbg( p, new_size_in_byte, __FILE__, __LINE__ )
-#define sx_mem_free( p )                        mem_free_dbg( p )
-#define sx_mem_free_and_null( p )               { mem_free_dbg( p ); p = null; }
+#define sx_mem_alloc( size_in_byte )            trace_mem_alloc( size_in_byte, __FILE__, __LINE__ )
+#define sx_mem_realloc( p, new_size_in_byte )   trace_mem_realloc( p, new_size_in_byte, __FILE__, __LINE__ )
+#define sx_mem_free( p )                        trace_mem_free( p )
+#define sx_mem_free_and_null( p )               { trace_mem_free( p ); p = null; }
 
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
 
-SEGAN_LIB_API void* mem_alloc_dbg(const uint size_in_byte, const char* file, const int line);
-SEGAN_LIB_API void* mem_realloc_dbg(void* p, const uint new_size_in_byte, const char* file, const int line);
-SEGAN_LIB_API void* mem_free_dbg(const void* p);
-SEGAN_LIB_API void  mem_clear_debug(void);
+SEGAN_LIB_API void* trace_mem_alloc(const uint size_in_byte, const char* file, const int line);
+SEGAN_LIB_API void* trace_mem_realloc(void* p, const uint new_size_in_byte, const char* file, const int line);
+SEGAN_LIB_API void* trace_mem_free(const void* p);
 
 #ifdef __cplusplus
 }
 #define sx_new      new( __FILE__, __LINE__ )
-SEGAN_INLINE void*  operator new (uint size, const char* file, int line) { return mem_alloc_dbg(size, file, line); }
-SEGAN_INLINE void   operator delete(void *p, const char* file, int line) { mem_free_dbg(p); }
-SEGAN_INLINE void   operator delete(void *p) { mem_free_dbg(p); }
+SEGAN_INLINE void*  operator new (uint size, const char* file, int line) { return trace_mem_alloc(size, file, line); }
+SEGAN_INLINE void   operator delete(void *p, const char* file, int line) { trace_mem_free(p); }
+SEGAN_INLINE void   operator delete(void *p) { trace_mem_free(p); }
 #endif // __cplusplus
 
 #else

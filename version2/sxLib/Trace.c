@@ -110,7 +110,7 @@ static SEGAN_INLINE const char* trace_get_filename(const char* filename)
 
 #if SEGANX_TRACE_MEMORY
 
-static SEGAN_INLINE void mem_check_protection(memory_block* mb)
+static SEGAN_INLINE void trace_mem_check(memory_block* mb)
 {
     byte* p = (byte*)mb + sizeof(memory_block);
 
@@ -127,7 +127,7 @@ static SEGAN_INLINE void mem_check_protection(memory_block* mb)
     }
 }
 
-static SEGAN_INLINE memory_code_result mem_code_protection(void* p, const uint realsizeinbyte)
+static SEGAN_INLINE memory_code_result trace_mem_code(void* p, const uint realsizeinbyte)
 {
     memory_code_result res;
     if (!p)
@@ -157,7 +157,7 @@ static SEGAN_INLINE memory_code_result mem_code_protection(void* p, const uint r
     return res;
 }
 
-static SEGAN_INLINE memory_code_result mem_decode_protection(const void* p)
+static SEGAN_INLINE memory_code_result trace_mem_decode(const void* p)
 {
     memory_code_result res;
     if (!p)
@@ -176,12 +176,12 @@ static SEGAN_INLINE memory_code_result mem_decode_protection(const void* p)
             res.p = null;
             res.mb = null;
         }
-        else mem_check_protection(res.mb);
+        else trace_mem_check(res.mb);
     }
     return res;
 }
 
-static SEGAN_INLINE void mem_debug_push(memory_block* mb)
+static SEGAN_INLINE void trace_mem_push(memory_block* mb)
 {
     if (!s_current_object->mem_tracker->root)
     {
@@ -198,7 +198,7 @@ static SEGAN_INLINE void mem_debug_push(memory_block* mb)
     }
 }
 
-static SEGAN_INLINE void mem_debug_pop(memory_block* mb)
+static SEGAN_INLINE void trace_mem_pop(memory_block* mb)
 {
     if (s_current_object->mem_tracker->root)
     {
@@ -218,7 +218,7 @@ static SEGAN_INLINE void mem_debug_pop(memory_block* mb)
     }
 }
 
-static uint mem_report_compute_num(bool only_corrupted)
+static uint trace_mem_report_compute_num(bool only_corrupted)
 {
     if (!s_current_object->mem_tracker->root) return 0;
 
@@ -226,7 +226,7 @@ static uint mem_report_compute_num(bool only_corrupted)
     memory_block* leaf = s_current_object->mem_tracker->root;
     while (leaf)
     {
-        mem_check_protection(leaf);
+        trace_mem_check(leaf);
         if (only_corrupted)
         {
             if (leaf->corrupted)
@@ -239,29 +239,35 @@ static uint mem_report_compute_num(bool only_corrupted)
     return result;
 }
 
-static void mem_dbg_report(FILE* f, bool only_corrupted)
+static void trace_mem_report(FILE* f, bool only_corrupted)
 {
-    if (!s_current_object->mem_tracker->root || mem_report_compute_num(only_corrupted) < 1) return;
+    if (!s_current_object->mem_tracker->root || trace_mem_report_compute_num(only_corrupted) < 1) return;
     fputs("\nseganx memory debug report:\n", f);
     struct memory_block* leaf = s_current_object->mem_tracker->root;
     while (leaf)
     {
-        mem_check_protection(leaf);
+        trace_mem_check(leaf);
         if (only_corrupted && !leaf->corrupted)
         {
             leaf = leaf->next;
             continue;
         }
-
+#ifndef NDEBUG
+        if (leaf->corrupted)
+            fprintf(f, "%s(%d): error! memory corrupted - size = %d\n", leaf->file, leaf->line, leaf->size);
+        else
+            fprintf(f, "%s(%d): warning! memory leak - size = %d\n", leaf->file, leaf->line, leaf->size);
+#else
         if (leaf->corrupted)
             fprintf(f, "%s(%d): error! memory corrupted - size = %d\n", trace_get_filename(leaf->file), leaf->line, leaf->size);
         else
             fprintf(f, "%s(%d): warning! memory leak - size = %d\n", trace_get_filename(leaf->file), leaf->line, leaf->size);
+#endif
         leaf = leaf->next;
     }
 }
 
-SEGAN_INLINE void* mem_alloc_dbg(const uint size_in_byte, const char* file, const int line)
+SEGAN_INLINE void* trace_mem_alloc(const uint size_in_byte, const char* file, const int line)
 {
     void* res = null;
 
@@ -272,7 +278,7 @@ SEGAN_INLINE void* mem_alloc_dbg(const uint size_in_byte, const char* file, cons
         sx_assert(res);
 
         //	sign memory to check memory corruption
-        memory_code_result memreport = mem_code_protection(res, size_in_byte);
+        memory_code_result memreport = trace_mem_code(res, size_in_byte);
 
         //	store memory block to link list
         if (memreport.mb)
@@ -282,7 +288,7 @@ SEGAN_INLINE void* mem_alloc_dbg(const uint size_in_byte, const char* file, cons
             memreport.mb->size = size_in_byte;
 
             // push the block
-            mem_debug_push(memreport.mb);
+            trace_mem_push(memreport.mb);
         }
 
         //	set user memory as result
@@ -293,12 +299,12 @@ SEGAN_INLINE void* mem_alloc_dbg(const uint size_in_byte, const char* file, cons
     return res;
 }
 
-SEGAN_INLINE void* mem_realloc_dbg(void* p, const uint new_size_in_byte, const char* file, const int line)
+SEGAN_INLINE void* trace_mem_realloc(void* p, const uint new_size_in_byte, const char* file, const int line)
 {
     if (!new_size_in_byte)
-        return mem_free_dbg(p);
+        return trace_mem_free(p);
 
-    memory_code_result memreport = mem_decode_protection(p);
+    memory_code_result memreport = trace_mem_decode(p);
 
     if (memreport.mb)
     {
@@ -306,7 +312,7 @@ SEGAN_INLINE void* mem_realloc_dbg(void* p, const uint new_size_in_byte, const c
         if (memreport.mb->corrupted)
         {
             //	report memory allocations to file
-            mem_dbg_report(stderr, true);
+            trace_mem_report(stderr, true);
 
 #if ( defined(_DEBUG) || SEGAN_ASSERT )
             //	report call stack
@@ -316,14 +322,14 @@ SEGAN_INLINE void* mem_realloc_dbg(void* p, const uint new_size_in_byte, const c
         else
         {
             //	pop memory block from the list
-            mem_debug_pop(memreport.mb);
+            trace_mem_pop(memreport.mb);
         }
 
         //	realloc the memory block
         void* tmp = mem_realloc(memreport.mb, sizeof(memory_block) + MEM_PROTECTION_SIZE + new_size_in_byte + MEM_PROTECTION_SIZE);
 
         //	sign memory to check protection
-        memreport = mem_code_protection(tmp, new_size_in_byte);
+        memreport = trace_mem_code(tmp, new_size_in_byte);
 
         if (memreport.mb)
         {
@@ -332,7 +338,7 @@ SEGAN_INLINE void* mem_realloc_dbg(void* p, const uint new_size_in_byte, const c
             memreport.mb->size = new_size_in_byte;
 
             //	push new block
-            mem_debug_push(memreport.mb);
+            trace_mem_push(memreport.mb);
         }
 
         //	set as result
@@ -346,7 +352,7 @@ SEGAN_INLINE void* mem_realloc_dbg(void* p, const uint new_size_in_byte, const c
             p = mem_realloc(p, sizeof(memory_block) + MEM_PROTECTION_SIZE + new_size_in_byte + MEM_PROTECTION_SIZE);
 
             //	sign memory to check protection
-            memreport = mem_code_protection(p, new_size_in_byte);
+            memreport = trace_mem_code(p, new_size_in_byte);
 
             if (memreport.mb)
             {
@@ -355,7 +361,7 @@ SEGAN_INLINE void* mem_realloc_dbg(void* p, const uint new_size_in_byte, const c
                 memreport.mb->size = new_size_in_byte;
 
                 //	push the block
-                mem_debug_push(memreport.mb);
+                trace_mem_push(memreport.mb);
             }
 
             //	set as result
@@ -366,11 +372,11 @@ SEGAN_INLINE void* mem_realloc_dbg(void* p, const uint new_size_in_byte, const c
     return mem_realloc(p, new_size_in_byte);
 }
 
-SEGAN_INLINE void* mem_free_dbg(const void* p)
+SEGAN_INLINE void* trace_mem_free(const void* p)
 {
     if (!p) return null;
 
-    memory_code_result memreport = mem_decode_protection(p);
+    memory_code_result memreport = trace_mem_decode(p);
 
     if (memreport.mb)
     {
@@ -378,7 +384,7 @@ SEGAN_INLINE void* mem_free_dbg(const void* p)
         if (memreport.mb->corrupted)
         {
             //	report memory allocations to file
-            mem_dbg_report(stderr, true);
+            trace_mem_report(stderr, true);
 
 #if ( defined(_DEBUG) || SEGAN_ASSERT )
             //	report call stack
@@ -388,7 +394,7 @@ SEGAN_INLINE void* mem_free_dbg(const void* p)
         else
         {
             //	pop memory block from the list
-            mem_debug_pop(memreport.mb);
+            trace_mem_pop(memreport.mb);
             mem_free(memreport.mb);
         }
     }
@@ -420,7 +426,7 @@ static SEGAN_INLINE long trace_get_current_tick()
 #endif // SEGANX_TRACE_PROFILER
 
 
-#if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER || SEGANX_TRACE_CRASHRPT|| SEGANX_TRACE_MEMORY)
+#if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER || SEGANX_TRACE_CRASHRPT || SEGANX_TRACE_MEMORY)
 SEGAN_LIB_API void trace_attach(uint stack_size, const char* filename)
 {
     if (s_current_object != null) return;
@@ -447,12 +453,12 @@ SEGAN_LIB_API void trace_detach(void)
     if (s_current_object)
     {
 #if SEGANX_TRACE_MEMORY
-        mem_dbg_report(stderr, false);
-        if (s_current_object->filename && mem_report_compute_num(false) > 0)
+        trace_mem_report(stderr, false);
+        if (s_current_object->filename && trace_mem_report_compute_num(false) > 0)
         {
             FILE* fstr = fopen(s_current_object->filename, "a+, ccs=UTF-8");
             if (fstr) {
-                mem_dbg_report(fstr, false);
+                trace_mem_report(fstr, false);
                 fclose(fstr);
             }
         }
@@ -479,11 +485,7 @@ static SEGAN_INLINE struct trace_info* trace_object_pop()
 SEGAN_LIB_API void trace_push( const char * file, const int line, const char * function )
 {
     struct trace_info* tinfo = trace_object_pop(s_current_object);
-#if DEBUG
     tinfo->file = file;
-#else
-    tinfo->file = trace_get_filename(file);
-#endif
     tinfo->line = line;
     tinfo->func = function;
 #if SEGANX_TRACE_CALLSTACK
@@ -497,11 +499,7 @@ SEGAN_LIB_API void trace_push( const char * file, const int line, const char * f
 SEGAN_LIB_API void trace_push_param( const char * file, const int line, const char * function, ... )
 {
     struct trace_info* tinfo = trace_object_pop(s_current_object);
-#if DEBUG
     tinfo->file = file;
-#else
-    tinfo->file = trace_get_filename(file);
-#endif
     tinfo->line = line;
 
 #if SEGANX_TRACE_CALLSTACK
@@ -520,11 +518,11 @@ SEGAN_LIB_API void trace_push_param( const char * file, const int line, const ch
     else tinfo->param[0] = 0;
 #else
     tinfo->func = function;
-#endif
+#endif // SEGANX_TRACE_CALLSTACK
 
 #if SEGANX_TRACE_PROFILER
     tinfo->time = trace_get_current_tick();
-#endif
+#endif // SEGANX_TRACE_PROFILER
 }
 
 SEGAN_LIB_API void trace_pop( void )
@@ -545,11 +543,15 @@ SEGAN_LIB_API void trace_pop( void )
 #if SEGANX_TRACE_CALLSTACK
 static void trace_callstack_report(FILE* f) 
 {
-    fprintf(f, "User defined callstack:\n");
+    fprintf(f, "\nUser defined callstack:\n");
     for (int i = 0; i < s_current_object->callstack_index; ++i)
     {
         for (int j = 0; j < i; ++j) fprintf(f, "  ");
+#ifndef NDEBUG
         fprintf(f, "%s(%d): %s\n", s_current_object->callstack_array[i].file, s_current_object->callstack_array[i].line, s_current_object->callstack_array[i].func);
+#else
+        fprintf(f, "%s(%d): %s\n", trace_get_filename(s_current_object->callstack_array[i].file), s_current_object->callstack_array[i].line, s_current_object->callstack_array[i].func);
+#endif
     }
 }
 #endif // SEGANX_TRACE_CALLSTACK
@@ -636,7 +638,7 @@ static void trace_signal_handler(int sig, siginfo_t* sinfo, void *ucontext)
         fstr = stderr;
 
     // TODO: Add time alog the string below..
-    fprintf(fstr, "Program received %s (%u)", strsignal(sig), sig);
+    fprintf(fstr, "\n\nseganx crash report:\nProgram received %s (%u)", strsignal(sig), sig);
     if (sinfo->si_code == SI_USER)
         fprintf(fstr, " sent by user %u from process %u", sinfo->si_uid, sinfo->si_pid);
     else if (sinfo->si_code == SI_TKILL)
@@ -730,6 +732,10 @@ static void trace_signal_handler(int sig, siginfo_t* sinfo, void *ucontext)
     trace_callstack_report(fstr);
 #endif // SEGANX_TRACE_CALLSTACK
 
+#if SEGANX_TRACE_MEMORY
+    trace_mem_report(fstr, true);
+#endif // SEGANX_TRACE_MEMORY
+
     exit(EXIT_FAILURE);
 }
 
@@ -778,19 +784,24 @@ static void trace_set_crash_handler(void)
 
 SEGAN_LIB_API void trace_assert(const char* expression, const char* file, const int line)
 {
-#if SEGANX_TRACE_CALLSTACK
     trace_push(file, line, expression);
     FILE* fstr = fopen(s_current_object->filename, "a+, ccs=UTF-8");
     if (fstr == null) fstr = stderr;
-    fprintf(fstr, "%s(%d): Assertion violation on expression (%s)\n", trace_get_filename(file), line, expression);
-    trace_callstack_report(fstr);
-#endif
+    fprintf(fstr, "\n\nseganx assertion report:\n%s(%d): Assertion violation on expression (%s)\n", trace_get_filename(file), line, expression);
 
+#if SEGANX_TRACE_CALLSTACK
+    trace_callstack_report(fstr);
+#endif // SEGANX_TRACE_CALLSTACK
+
+#if SEGANX_TRACE_MEMORY
+    trace_mem_report(fstr, true);
+#endif // SEGANX_TRACE_MEMORY
+    
 #ifndef NDEBUG 
     int* a = 0;
     *a = 0; //	just move your eyes down and look at the call stack list in IDE to find out what happened !
 #endif
 }
 
-#endif // ( defined(_DEBUG) || SEGANX_TRACE_ASSERT )
+#endif // SEGANX_TRACE_ASSERT
 

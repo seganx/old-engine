@@ -93,12 +93,6 @@ typedef unsigned char bool;
 	#define SEGAN_ALIGN_16
 #endif
 
-
-#define SEGAN_LIB_MULTI_THREADED			0		//	enable core library multi-threaded safe 
-
-#define SX_LIB_SINGLETON                    0
-
-
 #define SEGANX_TRACE_ASSERT					1		//	check and log some special events on containers
 
 #define SEGANX_TRACE_MEMORY					1		//	use second version of memory leak detector
@@ -108,6 +102,12 @@ typedef unsigned char bool;
 #define SEGANX_TRACE_CALLSTACK              1
 
 #define SEGANX_TRACE_PROFILER               1
+
+
+#define SEGAN_LIB_MULTI_THREADED			0		//	enable core library multi-threaded safe 
+
+#define SX_LIB_SINGLETON                    0
+
 
 
 //////////////////////////////////////////////////////////////////////////

@@ -637,12 +637,12 @@ SEGAN_LIB_API uint sx_threadpool_num_busy_threads(struct sx_threadpool * threadp
 }
 
 
-SEGAN_LIB_API void sx_sleep(const uint seconds)
+SEGAN_LIB_API void sx_sleep(const uint miliseconds)
 {
 #if defined(_WIN32)
-    Sleep(seconds);
+    Sleep(miliseconds);
 #else
-    usleep(seconds * 1000);
+    usleep(miliseconds * 1000);
 #endif	
 }
 
