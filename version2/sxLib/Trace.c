@@ -85,7 +85,7 @@ typedef struct trace_object
     struct trace_info*     callstack_array;
 #endif
 #if SEGANX_TRACE_MEMORY
-    struct memory_tracker *     mem_tracker;
+    struct memory_tracker* mem_tracker;
 #endif
 }
 trace_object;
