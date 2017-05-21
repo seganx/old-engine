@@ -185,7 +185,7 @@ static SEGAN_INLINE void* memory_pool_free( struct sx_memory_manager* manager, c
     mem_set((void*)p, 0, ch->size);
 #endif
 
-    //  look at neighbor chunk in right side
+    //  look at neighbor chunk at right side
     struct memory_chunk* rch = (struct memory_chunk*)((byte*)p + ch->size);
     if (rch->state == CS_EMPTY)
     {
@@ -198,7 +198,7 @@ static SEGAN_INLINE void* memory_pool_free( struct sx_memory_manager* manager, c
 #endif
     }
 
-    //  look at neighbor chunk in left side
+    //  look at neighbor chunk at left side
     if (ch->behind)
     {
         if (ch->behind->state == CS_EMPTY)

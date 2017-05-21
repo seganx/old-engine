@@ -578,7 +578,7 @@ SEGAN_LIB_API int sx_threadpool_destroy(sx_threadpool * threadpool)
 
     volatile uint num_threads = threadpool->num_threads_ready;
 
-    //  wait for working thread to be finish their jobs
+    //  wait for working threads to be finished
     while (threadpool->num_threads_working)
         sx_sleep(1);
 

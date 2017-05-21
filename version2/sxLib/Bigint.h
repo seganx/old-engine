@@ -5,12 +5,12 @@
 	email:		sajad.b@gmail.com
 	Site:		www.SeganX.com
 	Desc:		This file contain a class to store a big integer number
-	and perform basic mathematic operation on it.
+				and perform basic mathematic operation on it.
 
-	The class uses an array of bytes as digits to store big
-	number. so every byte in that array can be 0..9 and other
-	values are not valid. In this regard the array terminates
-	with a invalid value of 10
+				The class uses an array of bytes as digits to store big
+				number. so every byte in that array can be 0..9 and other
+				values are not valid. In this regard the array terminates
+				with a invalid value of 10
 
 	*********************************************************************/
 #ifndef DEFINED_Bigint
