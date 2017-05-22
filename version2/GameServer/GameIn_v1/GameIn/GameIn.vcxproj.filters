@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\sxLib\Memory.c">
+      <Filter>sxlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sxLib\Platform.c">
+      <Filter>sxlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sxLib\Trace.c">
+      <Filter>sxlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GameIn.c" />
+    <ClCompile Include="..\..\..\sxLib\Time.c">
+      <Filter>sxlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sxLib\Math.c">
+      <Filter>sxlib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\sxLib\Def.h">
+      <Filter>sxlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Memory.h">
+      <Filter>sxlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Partition.h">
+      <Filter>sxlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Platform.h">
+      <Filter>sxlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Trace.h">
+      <Filter>sxlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Time.h">
+      <Filter>sxlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GameIn.h" />
+    <ClInclude Include="..\..\..\sxLib\Math.h">
+      <Filter>sxlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Bigint.h">
+      <Filter>sxlib</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="sxlib">
+      <UniqueIdentifier>{fdd069f5-7e94-43ca-a684-55a3dbd9af26}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
