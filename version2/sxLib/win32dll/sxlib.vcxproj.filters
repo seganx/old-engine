@@ -54,9 +54,6 @@
     <ClInclude Include="..\Crash.h">
       <Filter>lib</Filter>
     </ClInclude>
-    <ClInclude Include="..\Mutex.h">
-      <Filter>lib</Filter>
-    </ClInclude>
     <ClInclude Include="..\Protocol.h">
       <Filter>utils</Filter>
     </ClInclude>
@@ -76,6 +73,9 @@
       <Filter>lib</Filter>
     </ClInclude>
     <ClInclude Include="..\Base64.h">
+      <Filter>lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Thread.h">
       <Filter>lib</Filter>
     </ClInclude>
   </ItemGroup>
@@ -108,9 +108,6 @@
     <ClCompile Include="..\Crash.cpp">
       <Filter>lib</Filter>
     </ClCompile>
-    <ClCompile Include="..\Mutex.cpp">
-      <Filter>lib</Filter>
-    </ClCompile>
     <ClCompile Include="..\Protocol.cpp">
       <Filter>utils</Filter>
     </ClCompile>
@@ -121,6 +118,9 @@
       <Filter>lib</Filter>
     </ClCompile>
     <ClCompile Include="..\Base64.cpp">
+      <Filter>lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Thread.cpp">
       <Filter>lib</Filter>
     </ClCompile>
   </ItemGroup>

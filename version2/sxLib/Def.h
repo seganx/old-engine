@@ -6,8 +6,8 @@
 	Site:		www.seganx.com
 	Desc:		Perprocess defines will be here
 *********************************************************************/
-#ifndef HEADER_DEFINED_def
-#define HEADER_DEFINED_def
+#ifndef DEFINED_def
+#define DEFINED_def
 
 //////////////////////////////////////////////////////////////////////////
 //  basic type definitions
@@ -17,10 +17,8 @@ typedef unsigned char		    u8,			byte;
 typedef unsigned short		    u16,		word;
 typedef unsigned int		    u32,		uint,	dword;
 typedef int					    i32,		sint;
-typedef long				    i64,		int64;
-typedef unsigned long		    u64,		uint64;
-typedef long long			    i128,       int128;
-typedef unsigned long long	    u128,       uint128;
+typedef long long			    i64,		int64;
+typedef unsigned long long		u64,		uint64;
 typedef void*                   handle;
 typedef int					    hresult;
 
@@ -85,7 +83,7 @@ typedef unsigned char bool;
 #define SEGAN_LIB_INLINE					inline
 #endif
 
-#define SEGAN_INLINE						inline
+#define SEGAN_INLINE						//inline
 
 #if defined(_WIN32)
 	#define SEGAN_ALIGN_16					__declspec(align(16))
@@ -101,7 +99,7 @@ typedef unsigned char bool;
 
 #define SEGANX_TRACE_CALLSTACK              1
 
-#define SEGANX_TRACE_PROFILER               1
+#define SEGANX_TRACE_PROFILER               0
 
 
 #define SEGAN_LIB_MULTI_THREADED			0		//	enable core library multi-threaded safe 
@@ -174,4 +172,4 @@ typedef unsigned char bool;
 #include <math.h>
 
 
-#endif	//	HEADER_DEFINED_def
+#endif	//	DEFINED_def

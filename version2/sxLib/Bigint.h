@@ -18,6 +18,10 @@
 
 #include "Def.h"
 
+
+
+
+
 //! use this class to store a big number and operate on it
 template<uint max_digits>
 class Bigint

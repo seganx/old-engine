@@ -44,15 +44,6 @@ SEGAN_INLINE void* mem_realloc(void* p, const uint new_size_in_byte)
     {
         res = p;
         printf("WARNING: Can't reallocate memory!\n");
-
-#ifdef _WIN32
-        if (p) { //  if reallocate function failed then try to allocate new one and copy last data to new pool
-            newptr = malloc(new_size_in_byte);
-            memcpy(newptr, p, mem_min_size(_msize(p), new_size_in_byte));
-            free(p);
-        }
-        else newptr = malloc(new_size_in_byte);
-#endif
     }
 
     return res;

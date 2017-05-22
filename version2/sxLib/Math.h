@@ -9,8 +9,8 @@
 	NOTE:		some algorithms used here came from Doom 3 GPL Source Code. 
 				Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
 *********************************************************************/
-#ifndef GUARD_Math_lib_HEADER_FILE
-#define GUARD_Math_lib_HEADER_FILE
+#ifndef Math_HEADER_FILE
+#define Math_HEADER_FILE
 
 #include "Def.h"
 
@@ -59,6 +59,10 @@
 #define sx_cos( x )				( cosf( x ) )
 #define sx_tan( x )				( tanf( x ) )
 #define sx_atan( x )			( atanf( x ) )
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
 SEGAN_LIB_INLINE float sx_snap_to_int( const float x )
 {
@@ -395,7 +399,22 @@ SEGAN_LIB_API void sx_dh_public_key( char* dest, const char* secret_key, const i
 //! generate Diffie-Hellman final key based on secret key and received public key
 SEGAN_LIB_API void sx_dh_final_key( char* dest, const char* secret_key, const char* public_key, const int& buff_size, const uint& p );
 
-//! 
+//! generate a random number from the seed and advance seed to next step
+SEGAN_LIB_INLINE sint sx_random_advance( uint *seed )
+{
+    *seed = ((*seed * 214013L + 2531011L) >> 16);
+    return sint(*seed & 0x7fff) % RAND_MAX;
+}
+
+//! generate a random number from the seed between range and advance seed to next step
+SEGAN_LIB_INLINE sint sx_random_advance( uint *seed, const sint minRange, const sint maxRange )
+{
+    *seed = ((*seed * 214013L + 2531011L) >> 16);
+    return sint(*seed & 0x7fff) % RAND_MAX;
+
+    // TODO: complete here
+}
+
 
 //! a simple class to generate random numbers
 class SEGAN_LIB_API Randomer
@@ -444,6 +463,9 @@ public:
 };
 
 
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
-#endif	//	GUARD_Math_lib_HEADER_FILE
+#endif	//	Math_HEADER_FILE
 

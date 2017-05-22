@@ -24,6 +24,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -72,37 +73,16 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\system\win32\File.cpp" />
-    <ClCompile Include="..\system\Gameup.cpp" />
-    <ClCompile Include="..\system\win32\Lock.cpp" />
-    <ClCompile Include="..\system\win32\OS.cpp" />
-    <ClCompile Include="..\system\Zip.cpp" />
-    <ClCompile Include="..\Lib.cpp" />
+    <ClInclude Include="..\Def.h" />
+    <ClInclude Include="..\Memory.h" />
+    <ClInclude Include="..\Partition.h" />
+    <ClInclude Include="..\Platform.h" />
+    <ClInclude Include="..\Trace.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\system\File.h" />
-    <ClInclude Include="..\system\Gameup.h" />
-    <ClInclude Include="..\system\Lock.h" />
-    <ClInclude Include="..\system\OS.h" />
-    <ClInclude Include="..\system\System.h" />
-    <ClInclude Include="..\system\System_def.h" />
-    <ClInclude Include="..\system\win32\Win6.h" />
-    <ClInclude Include="..\system\zLib\zconf.h" />
-    <ClInclude Include="..\system\Zip.h" />
-    <ClInclude Include="..\system\zLib\zlib.h" />
-    <ClInclude Include="..\Array.h" />
-    <ClInclude Include="..\Assert.h" />
-    <ClInclude Include="..\Callstack.h" />
-    <ClInclude Include="..\Def.h" />
-    <ClInclude Include="..\Encryption.h" />
-    <ClInclude Include="..\Lib.h" />
-    <ClInclude Include="..\Map.h" />
-    <ClInclude Include="..\Math.h" />
-    <ClInclude Include="..\Memory.h" />
-    <ClInclude Include="..\Queue.h" />
-    <ClInclude Include="..\Stack.h" />
-    <ClInclude Include="..\Stream.h" />
-    <ClInclude Include="..\String.h" />
+    <ClCompile Include="..\Memory.c" />
+    <ClCompile Include="..\Platform.c" />
+    <ClCompile Include="..\Trace.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

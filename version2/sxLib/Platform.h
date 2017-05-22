@@ -4,7 +4,7 @@ filename: 	Platform.h
 Author:		Sajad Beigjani
 eMail:		sajad.b@gmail.com
 Site:		www.seganx.com
-Desc:		This file contains some basic wraper functions that are
+Desc:		This file contains some basic wrapper functions that are
             depend on operating system
 *********************************************************************/
 #ifndef HEADER_PLATFORM
@@ -48,8 +48,6 @@ typedef void (*sx_thread_func)(void *);
 #define sx_vsprintf_len(fmt, args)				(vsnprintf(0, 0, fmt, args) + 1)
 #define sx_vsprintf(dest, len, fmt, args)		vsnprintf(dest, len, fmt, args)
 
-#define sx_localtime(dest, time)				localtime_s(dest, time)
-
 #define RED   
 #define GRN   
 #define YEL   
@@ -66,8 +64,6 @@ typedef void (*sx_thread_func)(void *);
 
 #define sx_vsprintf_len(fmt, args)				(vsnprintf(0, 0, fmt, args) + 1)
 #define sx_vsprintf(dest, len, fmt, args)		vsnprintf(dest, len, fmt, args)
-
-#define sx_localtime(dest, time)				localtime_r(time, dest)
 
 #define RED   "\x1B[31m"
 #define GRN   "\x1B[32m"

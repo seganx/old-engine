@@ -316,7 +316,7 @@ SEGAN_INLINE void* trace_mem_realloc(void* p, const uint new_size_in_byte, const
 
 #if ( defined(_DEBUG) || SEGAN_ASSERT )
             //	report call stack
-            lib_assert("memory block has been corrupted !", memreport.mb->file, memreport.mb->line);
+            trace_assert("memory block has been corrupted !", memreport.mb->file, memreport.mb->line);
 #endif
         }
         else
@@ -388,7 +388,7 @@ SEGAN_INLINE void* trace_mem_free(const void* p)
 
 #if ( defined(_DEBUG) || SEGAN_ASSERT )
             //	report call stack
-            lib_assert("memory block has been corrupted !", memreport.mb->file, memreport.mb->line);
+            trace_assert("memory block has been corrupted !", memreport.mb->file, memreport.mb->line);
 #endif
         }
         else
@@ -482,7 +482,7 @@ static SEGAN_INLINE struct trace_info* trace_object_pop()
     return &s_current_object->callstack_array[s_current_object->callstack_index++];
 }
 
-SEGAN_LIB_API void trace_push( const char * file, const int line, const char * function )
+SEGAN_LIB_API void trace_push(const char * file, const int line, const char * function)
 {
     struct trace_info* tinfo = trace_object_pop(s_current_object);
     tinfo->file = file;
@@ -496,7 +496,7 @@ SEGAN_LIB_API void trace_push( const char * file, const int line, const char * f
 #endif
 }
 
-SEGAN_LIB_API void trace_push_param( const char * file, const int line, const char * function, ... )
+SEGAN_LIB_API void trace_push_param(const char * file, const int line, const char * function, ...)
 {
     struct trace_info* tinfo = trace_object_pop(s_current_object);
     tinfo->file = file;
@@ -511,7 +511,7 @@ SEGAN_LIB_API void trace_push_param( const char * file, const int line, const ch
         sint len = vsnprintf(0, 0, function, args) + 1;
         if (len < 128)
             vsnprintf(tinfo->param, 128, function, args);
-        else 
+        else
             tinfo->func = function;
         va_end(args);
     }
@@ -525,7 +525,7 @@ SEGAN_LIB_API void trace_push_param( const char * file, const int line, const ch
 #endif // SEGANX_TRACE_PROFILER
 }
 
-SEGAN_LIB_API void trace_pop( void )
+SEGAN_LIB_API void trace_pop(void)
 {
 #if SEGANX_TRACE_PROFILER
     struct trace_info* tinfo = &s_current_object->callstack_array[--s_current_object->callstack_index];
@@ -541,7 +541,7 @@ SEGAN_LIB_API void trace_pop( void )
 #if SEGANX_TRACE_CRASHRPT
 
 #if SEGANX_TRACE_CALLSTACK
-static void trace_callstack_report(FILE* f) 
+static void trace_callstack_report(FILE* f)
 {
     fprintf(f, "\nUser defined callstack:\n");
     for (int i = 0; i < s_current_object->callstack_index; ++i)
@@ -586,19 +586,43 @@ static void trace_callstack_report(FILE* f)
 
 static void trace_app_crashed(const char* reason, dword code)
 {
-    printf("code: %d - %s", code, reason);
+    FILE* fstr = null;
+    if (fopen_s(&fstr, s_current_object->filename, "a+"))
+        fstr = stderr;
+
+    //  print time to the file
+    {
+        struct tm timeInfo;
+        char tmp[64] = {0};        
+        time_t timeval = time(null);
+        localtime_s(&timeInfo, &timeval);
+        strftime(tmp, 64, "%Y-%m-%d %H:%M:%S", &timeInfo);
+        fprintf(fstr, "\n\nseganx crash report: %s\n", tmp);
+    }
+
+    fprintf(fstr, "Program received %s (%u)\n", reason, code);
+
+#if SEGANX_TRACE_CALLSTACK
+    trace_callstack_report(fstr);
+#endif // SEGANX_TRACE_CALLSTACK
+
+#if SEGANX_TRACE_MEMORY
+    trace_mem_report(fstr, true);
+#endif // SEGANX_TRACE_MEMORY
+
+    exit(EXIT_FAILURE);
 }
 
 static void trace_crash_signal_handler(int sig)
 {
     switch (sig)
     {
-    case SIGTERM:	trace_app_crashed(CRASHED_APPLICATION_TERMINATED, 0); break;
-    case SIGSEGV:	trace_app_crashed(CRASHED_ACCESS_VIOLATION, 0); break;
-    case SIGINT:	trace_app_crashed(CRASHED_EXTERNAL_INTERRUPT, 0); break;
-    case SIGILL:	trace_app_crashed(CRASHED_INVALID_IMAGE, 0); break;
-    case SIGABRT:	trace_app_crashed(CRASHED_ABNORMAL_TERMINATION, 0); break;
-    case SIGFPE:	trace_app_crashed(CRASHED_ARITHMETIC_OPERATION, 0); break;
+        case SIGTERM:	trace_app_crashed(CRASHED_APPLICATION_TERMINATED, 0); break;
+        case SIGSEGV:	trace_app_crashed(CRASHED_ACCESS_VIOLATION, 0); break;
+        case SIGINT:	trace_app_crashed(CRASHED_EXTERNAL_INTERRUPT, 0); break;
+        case SIGILL:	trace_app_crashed(CRASHED_INVALID_IMAGE, 0); break;
+        case SIGABRT:	trace_app_crashed(CRASHED_ABNORMAL_TERMINATION, 0); break;
+        case SIGFPE:	trace_app_crashed(CRASHED_ARITHMETIC_OPERATION, 0); break;
     }
 }
 
@@ -607,24 +631,24 @@ LONG WINAPI crash_seh_handler(__in PEXCEPTION_POINTERS pExceptionPtrs)
     dword ecode = pExceptionPtrs->ExceptionRecord->ExceptionCode;
     switch (ecode)
     {
-    case EXCEPTION_ACCESS_VIOLATION:		crash_call_callback(ECR_ACCESS_VIOLATION, ecode); break;
-    case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:	crash_call_callback(ECR_ARRAY_BOUNDS, ecode); break;
-    case EXCEPTION_DATATYPE_MISALIGNMENT:	crash_call_callback(ECR_DATATYPE_MISALIGNMENT, ecode); break;
-    case EXCEPTION_FLT_DENORMAL_OPERAND:	crash_call_callback(ECR_FLT_DENORMAL, ecode); break;
-    case EXCEPTION_FLT_DIVIDE_BY_ZERO:		crash_call_callback(ECR_FLT_DIVIDE_BY_ZERO, ecode); break;
-    case EXCEPTION_FLT_INEXACT_RESULT:		crash_call_callback(ECR_FLT_INEXACT, ecode); break;
-    case EXCEPTION_FLT_INVALID_OPERATION:	crash_call_callback(ECR_FLT_INVALID, ecode); break;
-    case EXCEPTION_FLT_OVERFLOW:			crash_call_callback(ECR_FLT_OVERFLOW, ecode); break;
-    case EXCEPTION_FLT_STACK_CHECK:			crash_call_callback(ECR_FLT_STACK_CHECK, ecode); break;
-    case EXCEPTION_FLT_UNDERFLOW:			crash_call_callback(ECR_FLT_UNDERFLOW, ecode); break;
-    case EXCEPTION_ILLEGAL_INSTRUCTION:		crash_call_callback(ECR_ILLEGAL_INSTRUCTION, ecode); break;
-    case EXCEPTION_INT_DIVIDE_BY_ZERO:		crash_call_callback(ECR_INT_DIVIDE_BY_ZERO, ecode); break;
-    case EXCEPTION_INT_OVERFLOW:			crash_call_callback(ECR_INT_OVERFLOW, ecode); break;
-    case EXCEPTION_PRIV_INSTRUCTION:		crash_call_callback(ECR_PRIV_INSTRUCTION, ecode); break;
-    case EXCEPTION_SINGLE_STEP:				crash_call_callback(ECR_SINGLE_STEP, ecode); break;
-    case EXCEPTION_STACK_OVERFLOW:			crash_call_callback(ECR_STACK_OVERFLOW, ecode); break;
+        case EXCEPTION_ACCESS_VIOLATION:		trace_app_crashed(CRASHED_ACCESS_VIOLATION, ecode); break;
+        case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:	trace_app_crashed(CRASHED_ARRAY_BOUNDS, ecode); break;
+        case EXCEPTION_DATATYPE_MISALIGNMENT:	trace_app_crashed(CRASHED_DATATYPE_MISALIGNMENT, ecode); break;
+        case EXCEPTION_FLT_DENORMAL_OPERAND:	trace_app_crashed(CRASHED_FLT_DENORMAL, ecode); break;
+        case EXCEPTION_FLT_DIVIDE_BY_ZERO:		trace_app_crashed(CRASHED_FLT_DIVIDE_BY_ZERO, ecode); break;
+        case EXCEPTION_FLT_INEXACT_RESULT:		trace_app_crashed(CRASHED_FLT_INEXACT, ecode); break;
+        case EXCEPTION_FLT_INVALID_OPERATION:	trace_app_crashed(CRASHED_FLT_INVALID, ecode); break;
+        case EXCEPTION_FLT_OVERFLOW:			trace_app_crashed(CRASHED_FLT_OVERFLOW, ecode); break;
+        case EXCEPTION_FLT_STACK_CHECK:			trace_app_crashed(CRASHED_FLT_STACK_CHECK, ecode); break;
+        case EXCEPTION_FLT_UNDERFLOW:			trace_app_crashed(CRASHED_FLT_UNDERFLOW, ecode); break;
+        case EXCEPTION_ILLEGAL_INSTRUCTION:		trace_app_crashed(CRASHED_ILLEGAL_INSTRUCTION, ecode); break;
+        case EXCEPTION_INT_DIVIDE_BY_ZERO:		trace_app_crashed(CRASHED_INT_DIVIDE_BY_ZERO, ecode); break;
+        case EXCEPTION_INT_OVERFLOW:			trace_app_crashed(CRASHED_INT_OVERFLOW, ecode); break;
+        case EXCEPTION_PRIV_INSTRUCTION:		trace_app_crashed(CRASHED_PRIV_INSTRUCTION, ecode); break;
+        case EXCEPTION_SINGLE_STEP:				trace_app_crashed(CRASHED_SINGLE_STEP, ecode); break;
+        case EXCEPTION_STACK_OVERFLOW:			trace_app_crashed(CRASHED_STACK_OVERFLOW, ecode); break;
 
-    default: crash_call_callback(ECR_UNKNOWN, ecode);
+        default: trace_app_crashed(CRASHED_UNKNOWN, ecode);
     }
     return 0;
 }
@@ -637,8 +661,17 @@ static void trace_signal_handler(int sig, siginfo_t* sinfo, void *ucontext)
     if (fstr == null)
         fstr = stderr;
 
-    // TODO: Add time alog the string below..
-    fprintf(fstr, "\n\nseganx crash report:\nProgram received %s (%u)", strsignal(sig), sig);
+    //  print time to the file
+    {
+        struct tm timeInfo;
+        char tmp[64] = {0};        
+        time_t timeval = time(null);
+        localtime_s(&timeInfo, &timeval);
+        strftime(tmp, 64, "%Y-%m-%d %H:%M:%S", &timeInfo);
+        fprintf(fstr, "\n\nseganx crash report: %s\n", tmp);
+    }
+
+    fprintf(fstr, "Program received %s (%u)", strsignal(sig), sig);
     if (sinfo->si_code == SI_USER)
         fprintf(fstr, " sent by user %u from process %u", sinfo->si_uid, sinfo->si_pid);
     else if (sinfo->si_code == SI_TKILL)
@@ -651,78 +684,78 @@ static void trace_signal_handler(int sig, siginfo_t* sinfo, void *ucontext)
         const char* reason = null;
         switch (sig) 
         {
-        case SIGILL: 
-        {
-            switch (sinfo->si_code) 
+            case SIGILL: 
             {
-            case ILL_ILLOPC: reason = "illegal opcode"; break;
-            case ILL_ILLOPN: reason = "illegal operand"; break;
-            case ILL_ILLADR: reason = "illegal addressing mode"; break;
-            case ILL_ILLTRP: reason = "illegal trap"; break;
-            case ILL_PRVOPC: reason = "privileged opcode"; break;
-            case ILL_PRVREG: reason = "privileged register"; break;
-            case ILL_COPROC: reason = "co-processor error"; break;
-            case ILL_BADSTK: reason = "internal stack error"; break;
-            default: reason = "unknown"; break;
+                switch (sinfo->si_code) 
+                {
+                    case ILL_ILLOPC: reason = "illegal opcode"; break;
+                    case ILL_ILLOPN: reason = "illegal operand"; break;
+                    case ILL_ILLADR: reason = "illegal addressing mode"; break;
+                    case ILL_ILLTRP: reason = "illegal trap"; break;
+                    case ILL_PRVOPC: reason = "privileged opcode"; break;
+                    case ILL_PRVREG: reason = "privileged register"; break;
+                    case ILL_COPROC: reason = "co-processor error"; break;
+                    case ILL_BADSTK: reason = "internal stack error"; break;
+                    default: reason = "unknown"; break;
+                }
             }
-        }
-        break;
-        case SIGFPE: 
-        {
-            switch (sinfo->si_code) 
+                break;
+            case SIGFPE: 
             {
-            case FPE_INTDIV: reason = "integer divide by zero"; break;
-            case FPE_INTOVF: reason = "integer overflow"; break;
-            case FPE_FLTDIV: reason = "floating point divide by zero"; break;
-            case FPE_FLTOVF: reason = "floating point overflow"; break;
-            case FPE_FLTUND: reason = "floating point underflow"; break;
-            case FPE_FLTRES: reason = "floating point inexact result"; break;
-            case FPE_FLTINV: reason = "floating point invalid operation"; break;
-            case FPE_FLTSUB: reason = "subscript out of range"; break;
-            default: reason = "unknown"; break;
+                switch (sinfo->si_code) 
+                {
+                    case FPE_INTDIV: reason = "integer divide by zero"; break;
+                    case FPE_INTOVF: reason = "integer overflow"; break;
+                    case FPE_FLTDIV: reason = "floating point divide by zero"; break;
+                    case FPE_FLTOVF: reason = "floating point overflow"; break;
+                    case FPE_FLTUND: reason = "floating point underflow"; break;
+                    case FPE_FLTRES: reason = "floating point inexact result"; break;
+                    case FPE_FLTINV: reason = "floating point invalid operation"; break;
+                    case FPE_FLTSUB: reason = "subscript out of range"; break;
+                    default: reason = "unknown"; break;
+                }
             }
-        }
-        break;
-        case SIGSEGV: 
-        {
-            switch (sinfo->si_code) 
+                break;
+            case SIGSEGV: 
             {
-            case SEGV_MAPERR: reason = "address not mapped to object"; break;
-            case SEGV_ACCERR: reason = "invalid permissions for mapped object"; break;
-            default: reason = "unknown"; break;
+                switch (sinfo->si_code) 
+                {
+                    case SEGV_MAPERR: reason = "address not mapped to object"; break;
+                    case SEGV_ACCERR: reason = "invalid permissions for mapped object"; break;
+                    default: reason = "unknown"; break;
+                }
             }
-        }
-        break;
-        case SIGBUS: 
-        {
-            switch (sinfo->si_code) 
+                break;
+            case SIGBUS: 
             {
-            case BUS_ADRALN: reason = "invalid address alignment"; break;
-            case BUS_ADRERR: reason = "non-existent physical address"; break;
-            case BUS_OBJERR: reason = "object-specific hardware error"; break;
-            default: reason = "unknown"; break;
+                switch (sinfo->si_code) 
+                {
+                    case BUS_ADRALN: reason = "invalid address alignment"; break;
+                    case BUS_ADRERR: reason = "non-existent physical address"; break;
+                    case BUS_OBJERR: reason = "object-specific hardware error"; break;
+                    default: reason = "unknown"; break;
+                }
             }
-        }
-        break;
-        case SIGPOLL:
-        {
-            switch (sinfo->si_code)
+                break;
+            case SIGPOLL:
             {
-            case POLL_IN: reason = "data input available"; break;
-            case POLL_OUT: reason = "output buffers available"; break;
-            case POLL_MSG: reason = "input message available"; break;
-            case POLL_ERR: reason = "I/O error"; break;
-            case POLL_PRI: reason = "high priority input available"; break;
-            case POLL_HUP: reason = "device disconnected"; break;
-            default: reason = "unknown"; break;
+                switch (sinfo->si_code)
+                {
+                    case POLL_IN: reason = "data input available"; break;
+                    case POLL_OUT: reason = "output buffers available"; break;
+                    case POLL_MSG: reason = "input message available"; break;
+                    case POLL_ERR: reason = "I/O error"; break;
+                    case POLL_PRI: reason = "high priority input available"; break;
+                    case POLL_HUP: reason = "device disconnected"; break;
+                    default: reason = "unknown"; break;
+                }
             }
-        }
-        break;
+                break;
 
-        case SIGABRT: reason = "abnormal termination condition"; break;
-        case SIGINT: reason = "application has requested the Runtime to terminate it in an unusual way. Usually initiated by the user Ctrl + C"; break;        
-        case SIGTERM: reason = "application was terminated"; break;
-        default: reason = "unknown"; break;
+            case SIGABRT: reason = "abnormal termination condition"; break;
+            case SIGINT: reason = "application has requested the Runtime to terminate it in an unusual way. Usually initiated by the user Ctrl + C"; break;        
+            case SIGTERM: reason = "application was terminated"; break;
+            default: reason = "unknown"; break;
         }
 
         fprintf(fstr, "\nFault at memory location 0x%x due to %s (%x).\n", sinfo->si_addr, reason, sinfo->si_code);
@@ -796,7 +829,7 @@ SEGAN_LIB_API void trace_assert(const char* expression, const char* file, const 
 #if SEGANX_TRACE_MEMORY
     trace_mem_report(fstr, true);
 #endif // SEGANX_TRACE_MEMORY
-    
+
 #ifndef NDEBUG 
     int* a = 0;
     *a = 0; //	just move your eyes down and look at the call stack list in IDE to find out what happened !
