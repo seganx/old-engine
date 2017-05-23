@@ -544,9 +544,9 @@ SEGAN_LIB_API void trace_pop(void)
 static void trace_callstack_report(FILE* f)
 {
     fprintf(f, "\nUser defined callstack:\n");
-    for (int i = 0; i < s_current_object->callstack_index; ++i)
+    for (uint i = 0; i < s_current_object->callstack_index; ++i)
     {
-        for (int j = 0; j < i; ++j) fprintf(f, "  ");
+        for (uint j = 0; j < i; ++j) fprintf(f, "  ");
 #ifndef NDEBUG
         fprintf(f, "%s(%d): %s\n", s_current_object->callstack_array[i].file, s_current_object->callstack_array[i].line, s_current_object->callstack_array[i].func);
 #else

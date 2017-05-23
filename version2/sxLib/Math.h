@@ -372,14 +372,34 @@ SEGAN_LIB_API float sx_random_advance_f( uint *seed, const float rmin, const flo
 
 
 //////////////////////////////////////////////////////////////////////////
+//	big number functions
+//////////////////////////////////////////////////////////////////////////
+
+// ! set a big number to the dest buffer
+SEGAN_LIB_API byte* sx_big_number_set(byte* dest, uint64 value);
+
+//! return the length of the big number
+SEGAN_LIB_API uint sx_big_number_len(const byte* number);
+
+//! print the big number to the screen
+SEGAN_LIB_API uint sx_big_number_print(const byte* number);
+
+//! compute divide remaining of the big number by a number
+SEGAN_LIB_API uint sx_big_number_remained(const byte* number, const uint value);
+
+//! compute n power of i to dest buffer as big number
+SEGAN_LIB_API byte* sx_big_number_power(byte* dest, const uint64 i, const uint64 n);
+
+
+//////////////////////////////////////////////////////////////////////////
 //	crc32 algorithm
 //////////////////////////////////////////////////////////////////////////
 
 //! generate unique id from given string
-SEGAN_LIB_API uint sx_crc32_a( const char* str );
+SEGAN_LIB_API uint sx_crc32_a(const char* str);
 
 //! generate unique id from given string
-SEGAN_LIB_API uint sx_crc32_w( const wchar* str );
+SEGAN_LIB_API uint sx_crc32_w(const wchar* str);
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -387,13 +407,13 @@ SEGAN_LIB_API uint sx_crc32_w( const wchar* str );
 //////////////////////////////////////////////////////////////////////////
 
 //! generate Diffie-Hellman secret key
-SEGAN_LIB_API void sx_dh_secret_Key( char* dest, const int dest_size );
+SEGAN_LIB_API void sx_dh_secret_Key(char* dest, const int dest_size);
 
 //! generate Diffie-Hellman public key based on secret key to share with the other
-SEGAN_LIB_API void sx_dh_public_key( char* dest, const char* secret_key, const int buff_size, const uint g, const uint p );
+SEGAN_LIB_API void sx_dh_public_key(char* dest, const char* secret_key, const int buff_size, const uint g, const uint p);
 
 //! generate Diffie-Hellman final key based on secret key and received public key
-SEGAN_LIB_API void sx_dh_final_key( char* dest, const char* secret_key, const char* public_key, const int buff_size, const uint p );
+SEGAN_LIB_API void sx_dh_final_key(char* dest, const char* secret_key, const char* public_key, const int buff_size, const uint p);
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -401,31 +421,15 @@ SEGAN_LIB_API void sx_dh_final_key( char* dest, const char* secret_key, const ch
 //////////////////////////////////////////////////////////////////////////
 
 //! create a hash number from given data
-SEGAN_LIB_API uint sx_checksum(const void* data, const uint size, const uint key);
+SEGAN_LIB_API uint sx_checksum(const void* data, const uint size);
 
 //! encrypt src data to the dest using key value
-SEGAN_LIB_API void sx_encrypt(void* dest, const void* src, const uint size, const uint key);
+SEGAN_LIB_API void sx_encrypt(void* dest, const void* src, const uint srcsize, const char* key, const uint keysize);
 
 //! decrypt src data to the dest using key value
-SEGAN_LIB_API void sx_decrypt(void* dest, const void* src, const uint size, const uint key);
+SEGAN_LIB_API void sx_decrypt(void* dest, const void* src, const uint srcsize, const char* key, const uint keysize);
 
 
-//////////////////////////////////////////////////////////////////////////
-//	big number functions
-//////////////////////////////////////////////////////////////////////////
-
-//! 128 digits as big number structure
-typedef struct sx_big_number
-{
-    byte digits[128];
-}
-sx_big_number;
-
-SEGAN_LIB_API byte* sx_big_number_set(byte* dest, uint64 value);
-SEGAN_LIB_API uint sx_big_number_len(const byte* dest);
-SEGAN_LIB_API uint sx_big_number_print(const byte* dest);
-SEGAN_LIB_API uint sx_big_number_remained(const byte* dest, const uint value);
-SEGAN_LIB_API byte* sx_big_number_power(byte* dest, const uint64 i, const uint64 n);
 
 #ifdef __cplusplus
 }

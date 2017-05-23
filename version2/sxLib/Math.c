@@ -92,133 +92,6 @@ SEGAN_LIB_API float sx_random_advance_f(uint *seed, const float rmin, const floa
 
 
 //////////////////////////////////////////////////////////////////////////
-//	crc32 algorithm
-//////////////////////////////////////////////////////////////////////////
-unsigned long crc32_table[256];
-
-unsigned long crc32_reflect(unsigned long ref, char ch)
-{
-    unsigned long value = 0;
-    for (sint i = 1; i < (ch + 1); ++i)
-    {
-        if (ref & 1)
-            value |= 1 << (ch - i);
-        ref >>= 1;
-    }
-    return value;
-}
-
-uint crc32_init_table(void)
-{
-    unsigned long ulPolynomial = 0x04c11db7;
-    for (sint i = 0; i <= 0xFF; ++i)
-    {
-        crc32_table[i] = crc32_reflect(i, 8) << 24;
-        for (sint j = 0; j < 8; ++j)
-            crc32_table[i] = (crc32_table[i] << 1) ^ (crc32_table[i] & (1 << 31) ? ulPolynomial : 0);
-        crc32_table[i] = crc32_reflect(crc32_table[i], 32);
-    }
-    return 0;
-}
-
-SEGAN_LIB_INLINE uint sx_crc32_a(const char* str)
-{
-    if (!s_math_initialized) sx_math_init();
-
-    sint len = (sint)strlen(str);
-    if (len < 1) return 0;
-
-    unsigned char* buffer = (unsigned char*)str;
-
-    unsigned long ulCRC = 0xffffffff;
-    while (len--)
-        ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ *buffer++];
-
-    return ulCRC ^ 0xffffffff;
-}
-
-SEGAN_LIB_INLINE uint sx_crc32_w(const wchar* str)
-{
-    if (!s_math_initialized) sx_math_init();
-
-    sint len = (sint)wcslen(str);
-    if (len < 1) return 0;
-
-    wchar* buffer = (wchar*)str;
-    unsigned long ulCRC = 0xffffffff;
-    while (len--)
-    {
-        char* c = (char*)(buffer++);
-        ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ c[0]];
-        if (c[1])
-            ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ c[1]];
-    }
-
-    return ulCRC ^ 0xffffffff;
-}
-
-
-
-//////////////////////////////////////////////////////////////////////////
-//	checksum and encryption functions
-//////////////////////////////////////////////////////////////////////////
-SEGAN_LIB_INLINE uint sx_checksum(const void* data, const uint size, const uint key /*= 1363*/)
-{
-    if (!data || !size) return 0;
-    uint r = 0;
-    //const char* d = (char*)data;
-    //CSRandom randomer(key);
-    //for (uint i = 0; i < size; ++i)
-    //	r += d[i] * 0xabcdef12 + randomer.generate() + d[i] + key;
-    return r;
-}
-
-SEGAN_LIB_INLINE void sx_encrypt(void* dest, const void* src, const uint size, const uint key /*= 1363*/)
-{
-    //CSRandom randomer(key);
-    //byte* d = (byte*)dest;
-    //byte* s = (byte*)src;
-    //for (uint i = 0; i < size; ++i)
-    //	d[i] = s[i] + randomer.generate();
-}
-
-SEGAN_LIB_INLINE void sx_decrypt(void* dest, const void* src, const uint size, const uint key /*= 1363*/)
-{
-    //CSRandom randomer(key);
-    //byte* d = (byte*)dest;
-    //byte* s = (byte*)src;
-    //for (uint i = 0; i < size; ++i)
-    //	d[i] = s[i] - randomer.generate();
-}
-
-SEGAN_LIB_INLINE void sx_dh_secret_Key(char* dest, const int dest_size)
-{
-    for (int i = 0; i < dest_size; ++i)
-        dest[i] = (char)sx_random_i(65, 90);
-}
-
-SEGAN_LIB_INLINE void sx_dh_public_key(char* dest, const char* secret_key, const int buff_size, const uint g, const uint p)
-{
-    byte bignum[128] = { 10 };
-    for (int i = 0; i < buff_size; ++i)
-    {
-        uint64 md = sx_big_number_remained(sx_big_number_power(bignum, g, secret_key[i] - 65), p);
-        dest[i] = 65 + (char)md;
-    }
-}
-
-SEGAN_LIB_INLINE void sx_dh_final_key(char* dest, const char* secret_key, const char* public_key, const int buff_size, const uint p)
-{
-    byte bignum[128] = { 10 };
-    for (int i = 0; i < buff_size; ++i)
-    {
-        uint64 md = sx_big_number_remained(sx_big_number_power(bignum, public_key[i] - 65, secret_key[i] - 65), p);
-        dest[i] = 65 + (char)md;
-    }
-}
-
-
-//////////////////////////////////////////////////////////////////////////
 //	big number functions
 //////////////////////////////////////////////////////////////////////////
 SEGAN_LIB_API byte* sx_big_number_set(byte* dest, uint64 value)
@@ -284,6 +157,134 @@ SEGAN_LIB_API byte* sx_big_number_power(byte* dest, const uint64 i, const uint64
 
     return dest;
 }
+
+//////////////////////////////////////////////////////////////////////////
+//	crc32 algorithm
+//////////////////////////////////////////////////////////////////////////
+static unsigned long crc32_table[256];
+
+static unsigned long crc32_reflect(unsigned long ref, char ch)
+{
+    unsigned long value = 0;
+    for (sint i = 1; i < (ch + 1); ++i)
+    {
+        if (ref & 1)
+            value |= 1 << (ch - i);
+        ref >>= 1;
+    }
+    return value;
+}
+
+static uint crc32_init_table(void)
+{
+    unsigned long ulPolynomial = 0x04c11db7;
+    for (sint i = 0; i <= 0xFF; ++i)
+    {
+        crc32_table[i] = crc32_reflect(i, 8) << 24;
+        for (sint j = 0; j < 8; ++j)
+            crc32_table[i] = (crc32_table[i] << 1) ^ (crc32_table[i] & (1 << 31) ? ulPolynomial : 0);
+        crc32_table[i] = crc32_reflect(crc32_table[i], 32);
+    }
+    return 0;
+}
+
+SEGAN_LIB_API uint sx_crc32_a(const char* str)
+{
+    if (!s_math_initialized) sx_math_init();
+
+    sint len = (sint)strlen(str);
+    if (len < 1) return 0;
+
+    unsigned char* buffer = (unsigned char*)str;
+
+    unsigned long ulCRC = 0xffffffff;
+    while (len--)
+        ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ *buffer++];
+
+    return ulCRC ^ 0xffffffff;
+}
+
+SEGAN_LIB_API uint sx_crc32_w(const wchar* str)
+{
+    if (!s_math_initialized) sx_math_init();
+
+    sint len = (sint)wcslen(str);
+    if (len < 1) return 0;
+
+    wchar* buffer = (wchar*)str;
+    unsigned long ulCRC = 0xffffffff;
+    while (len--)
+    {
+        char* c = (char*)(buffer++);
+        ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ c[0]];
+        if (c[1])
+            ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ c[1]];
+    }
+
+    return ulCRC ^ 0xffffffff;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//	checksum and encryption functions
+//////////////////////////////////////////////////////////////////////////
+SEGAN_LIB_API uint sx_checksum(const void* data, const uint size)
+{
+    if (!data || !size) return 0;
+    uint res = 0;
+    uint randomer = 1363;
+    const byte* d = (byte*)data;
+    for (uint i = 0; i < size; ++i)
+    	res += d[i] + sx_random_advance(&randomer) + 0x17bcfa72;
+    return res;
+}
+
+SEGAN_LIB_API void sx_encrypt(void* dest, const void* src, const uint srcsize, const char* key, const uint keysize)
+{
+    uint randomer = sx_checksum(key, keysize);
+    byte* d = (byte*)dest;
+    byte* s = (byte*)src;
+    for (uint i = 0; i < srcsize; ++i)
+    	d[i] = s[i] + key[i % keysize] + sx_random_advance(&randomer);
+}
+
+SEGAN_LIB_API void sx_decrypt(void* dest, const void* src, const uint srcsize, const char* key, const uint keysize)
+{
+    uint randomer = sx_checksum(key, keysize);
+    byte* d = (byte*)dest;
+    byte* s = (byte*)src;
+    for (uint i = 0; i < srcsize; ++i)
+        d[i] = s[i] - key[i % keysize] - sx_random_advance(&randomer);
+}
+
+SEGAN_LIB_API void sx_dh_secret_Key(char* dest, const int dest_size)
+{
+    for (int i = 0; i < dest_size; ++i)
+        dest[i] = (char)sx_random_i(65, 90);
+}
+
+SEGAN_LIB_API void sx_dh_public_key(char* dest, const char* secret_key, const int buff_size, const uint g, const uint p)
+{
+    byte bignum[128] = { 10 };
+    for (int i = 0; i < buff_size; ++i)
+    {
+        uint64 md = sx_big_number_remained(sx_big_number_power(bignum, g, secret_key[i] - 65), p);
+        dest[i] = 65 + (char)md;
+    }
+}
+
+SEGAN_LIB_API void sx_dh_final_key(char* dest, const char* secret_key, const char* public_key, const int buff_size, const uint p)
+{
+    byte bignum[128] = { 10 };
+    for (int i = 0; i < buff_size; ++i)
+    {
+        uint64 md = sx_big_number_remained(sx_big_number_power(bignum, public_key[i] - 65, secret_key[i] - 65), p);
+        dest[i] = 65 + (char)md;
+    }
+}
+
+
 
 
 //////////////////////////////////////////////////////////////////////////
