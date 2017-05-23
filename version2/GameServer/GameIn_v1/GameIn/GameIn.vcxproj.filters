@@ -17,15 +17,16 @@
     <ClCompile Include="..\..\..\sxLib\Math.c">
       <Filter>sxlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\CryptoService.c" />
+    <ClCompile Include="..\..\..\sxLib\String.c">
+      <Filter>sxlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\sxLib\Def.h">
       <Filter>sxlib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\sxLib\Memory.h">
-      <Filter>sxlib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\sxLib\Partition.h">
       <Filter>sxlib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\sxLib\Platform.h">
@@ -41,7 +42,8 @@
     <ClInclude Include="..\..\..\sxLib\Math.h">
       <Filter>sxlib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\sxLib\Bigint.h">
+    <ClInclude Include="..\CryptoService.h" />
+    <ClInclude Include="..\..\..\sxLib\String.h">
       <Filter>sxlib</Filter>
     </ClInclude>
   </ItemGroup>
