@@ -430,6 +430,31 @@ SEGAN_LIB_API void sx_encrypt(void* dest, const void* src, const uint srcsize, c
 SEGAN_LIB_API void sx_decrypt(void* dest, const void* src, const uint srcsize, const char* key, const uint keysize);
 
 
+//////////////////////////////////////////////////////////////////////////
+//	base 64 functions
+//////////////////////////////////////////////////////////////////////////
+
+//! return new length of encoded data
+SEGAN_LIB_API uint sx_base64_encode_len(const uint len);
+
+//! encode source and return number of bytes encoded
+SEGAN_LIB_API uint sx_base64_encode(char* dest, const uint dest_size_in_byte, const void* src, const int src_size_in_byte);
+
+//! return new length of decoded data
+SEGAN_LIB_API uint sx_base64_decode_len(const char* src);
+
+//! decode source and return number of bytes decoded
+SEGAN_LIB_API uint sx_base64_decode(void* dest, const uint dest_size_in_byte, const char* src);
+
+
+//////////////////////////////////////////////////////////////////////////
+//	MD5 functions
+//////////////////////////////////////////////////////////////////////////
+
+/*! MD5 hash given strings. Buffer 'desc' must be 33 bytes long
+args is a NULL terminated list of ASCIIz strings like sx_md5(desc, "a", "b", null) */
+SEGAN_LIB_API char* sx_md5(char desc[33], ...);
+
 
 #ifdef __cplusplus
 }
