@@ -9,8 +9,8 @@
 	NOTE:		some algorithms used here came from Doom 3 GPL Source Code. 
 				Copyright (C) 1999-2011 id Software LLC, a ZeniMax Media company. 
 *********************************************************************/
-#ifndef Math_HEADER_FILE
-#define Math_HEADER_FILE
+#ifndef DEFINED_Math
+#define DEFINED_Math
 
 #include "Def.h"
 
@@ -59,6 +59,7 @@
 #define sx_cos( x )				( cosf( x ) )
 #define sx_tan( x )				( tanf( x ) )
 #define sx_atan( x )			( atanf( x ) )
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -304,17 +305,20 @@ SEGAN_LIB_INLINE float sx_angle_normalize_180( const float angle )
 }
 
 //! compute sine and cosine of the angle x in same time
-SEGAN_LIB_INLINE void sx_sin_cos( const float IN x, float& OUT s, float& OUT c)
+SEGAN_LIB_INLINE void sx_sin_cos( const float x, float* s, float* c )
 {
+    float rs, rc;
 #if defined(_WIN32)
 	_asm {
 		fld		x
 		fsincos
-		mov		ecx, c
-		mov		edx, s
+		mov		ecx, rc
+		mov		edx, rs
 		fstp	dword ptr [ecx]
 		fstp	dword ptr [edx]
 	}
+    *s = rs;
+    *c = rc;
 #else
 	s = sinf( x );
 	c = cosf( x );
@@ -344,36 +348,32 @@ SEGAN_LIB_API float sx_sin_fast( const float x );
 SEGAN_LIB_API float sx_cos_fast( const float x );
 
 //! compute sine and cosine of the angle x in same time. maximum absolute error is 0.001f
-SEGAN_LIB_API void sx_sin_cos_fast( const float IN x, float& OUT s, float& OUT c);
+SEGAN_LIB_API void sx_sin_cos_fast( const float x, float* s, float* c);
+
+
+//////////////////////////////////////////////////////////////////////////
+//	randomize numbers
+//////////////////////////////////////////////////////////////////////////
 
 //! randomize internal random by time as seed
-SEGAN_LIB_API void sx_randomize( const uint& seed );
-
-//! return float random number
-SEGAN_LIB_API float sx_random_f( const float range );
-
-//! return integer random number
-SEGAN_LIB_API sint sx_random_i( const sint range );
-
-//! return float random number between min and max
-SEGAN_LIB_INLINE float sx_random_f_limit( const float minRange, const float maxRange )
-{
-	float len = maxRange - minRange;
-	return sx_random_f( len ) + minRange;
-}
+SEGAN_LIB_API void sx_randomize( const uint seed );
 
 //! return integer random number between min and max
-SEGAN_LIB_INLINE sint sx_random_i_limit( const sint minRange, const sint maxRange )
-{
-	sint len = maxRange - minRange;
-	return sx_random_i( len ) + minRange;
-}
+SEGAN_LIB_API sint sx_random_i( const sint rmin, const sint rmax );
 
-//! set new counter for the id generator
-SEGAN_LIB_API void sx_id_set_counter( const uint id );
+//! return float random number between min and max
+SEGAN_LIB_API float sx_random_f( const float rmin, const float rmax );
 
-//! return unique id and increase the internal id counter
-SEGAN_LIB_API uint sx_id_generate( void );
+//! generate a random number from the seed between range and advance seed to next step
+SEGAN_LIB_API sint sx_random_advance_i( uint *seed, const sint rmin, const sint rmax );
+
+//! generate a random number from the seed between range and advance seed to next step
+SEGAN_LIB_API float sx_random_advance_f( uint *seed, const float rmin, const float rmax );
+
+
+//////////////////////////////////////////////////////////////////////////
+//	crc32 algorithm
+//////////////////////////////////////////////////////////////////////////
 
 //! generate unique id from given string
 SEGAN_LIB_API uint sx_crc32_a( const char* str );
@@ -381,91 +381,55 @@ SEGAN_LIB_API uint sx_crc32_a( const char* str );
 //! generate unique id from given string
 SEGAN_LIB_API uint sx_crc32_w( const wchar* str );
 
-//! create a hash number from given data
-SEGAN_LIB_API uint sx_checksum( const void* data, const uint size, const uint key = 1363 );
 
-//! encrypt src data to the dest using key value
-SEGAN_LIB_API void sx_encrypt( void* dest, const void* src, const uint size, const uint key = 1363 );
-
-//! decrypt src data to the dest using key value
-SEGAN_LIB_API void sx_decrypt( void* dest, const void* src, const uint size, const uint key = 1363 );
+//////////////////////////////////////////////////////////////////////////
+//  diffie-hellman algorithm
+//////////////////////////////////////////////////////////////////////////
 
 //! generate Diffie-Hellman secret key
-SEGAN_LIB_API void sx_dh_secret_Key( char* dest, const int& dest_size );
+SEGAN_LIB_API void sx_dh_secret_Key( char* dest, const int dest_size );
 
 //! generate Diffie-Hellman public key based on secret key to share with the other
-SEGAN_LIB_API void sx_dh_public_key( char* dest, const char* secret_key, const int& buff_size, const uint& g, const uint& p );
+SEGAN_LIB_API void sx_dh_public_key( char* dest, const char* secret_key, const int buff_size, const uint g, const uint p );
 
 //! generate Diffie-Hellman final key based on secret key and received public key
-SEGAN_LIB_API void sx_dh_final_key( char* dest, const char* secret_key, const char* public_key, const int& buff_size, const uint& p );
+SEGAN_LIB_API void sx_dh_final_key( char* dest, const char* secret_key, const char* public_key, const int buff_size, const uint p );
 
-//! generate a random number from the seed and advance seed to next step
-SEGAN_LIB_INLINE sint sx_random_advance( uint *seed )
+
+//////////////////////////////////////////////////////////////////////////
+//	checksum and encryption functions
+//////////////////////////////////////////////////////////////////////////
+
+//! create a hash number from given data
+SEGAN_LIB_API uint sx_checksum(const void* data, const uint size, const uint key);
+
+//! encrypt src data to the dest using key value
+SEGAN_LIB_API void sx_encrypt(void* dest, const void* src, const uint size, const uint key);
+
+//! decrypt src data to the dest using key value
+SEGAN_LIB_API void sx_decrypt(void* dest, const void* src, const uint size, const uint key);
+
+
+//////////////////////////////////////////////////////////////////////////
+//	big number functions
+//////////////////////////////////////////////////////////////////////////
+
+//! 128 digits as big number structure
+typedef struct sx_big_number
 {
-    *seed = ((*seed * 214013L + 2531011L) >> 16);
-    return sint(*seed & 0x7fff) % RAND_MAX;
+    byte digits[128];
 }
+sx_big_number;
 
-//! generate a random number from the seed between range and advance seed to next step
-SEGAN_LIB_INLINE sint sx_random_advance( uint *seed, const sint minRange, const sint maxRange )
-{
-    *seed = ((*seed * 214013L + 2531011L) >> 16);
-    return sint(*seed & 0x7fff) % RAND_MAX;
-
-    // TODO: complete here
-}
-
-
-//! a simple class to generate random numbers
-class SEGAN_LIB_API Randomer
-{
-public:
-	Randomer( void ): m_number(1363) {}
-	Randomer( const uint seed ): m_number(seed) {}
-
-	//! generate a random number
-	sint generate( void )
-	{
-		m_number = ( ( m_number * 214013L + 2531011L ) >> 16 );
-		return sint( m_number & 0x7fff );
-	}
-
-	//! return float random number
-	float get_f( const float range )
-	{
-		float r = (float)generate() / (float)RAND_MAX;
-		return  ( range * r );
-	}
-
-	//! return integer random number
-	sint get_i( const sint range )
-	{
-		float r = (float)generate() / (float)RAND_MAX;
-		return sx_round( r * (float)range );
-	}
-
-	//! return float random number between min and max
-	float get_f_limit( const float minRange, const float maxRange )
-	{
-		float len = maxRange - minRange;
-		return get_f( len ) + minRange;
-	}
-
-	//! return integer random number between min and max
-	sint get_i_limit( const sint minRange, const sint maxRange )
-	{
-		sint len = maxRange - minRange + 1;
-		return get_i( len ) + minRange;
-	}
-
-public:
-	uint	m_number;
-};
-
+SEGAN_LIB_API byte* sx_big_number_set(byte* dest, uint64 value);
+SEGAN_LIB_API uint sx_big_number_len(const byte* dest);
+SEGAN_LIB_API uint sx_big_number_print(const byte* dest);
+SEGAN_LIB_API uint sx_big_number_remained(const byte* dest, const uint value);
+SEGAN_LIB_API byte* sx_big_number_power(byte* dest, const uint64 i, const uint64 n);
 
 #ifdef __cplusplus
 }
 #endif // __cplusplus
 
-#endif	//	Math_HEADER_FILE
+#endif	//	DEFINED_Math
 

@@ -96,7 +96,7 @@ __declspec(thread) struct trace_object * s_current_object = null;
 static __thread struct trace_object * s_current_object = null;
 #endif
 
-static SEGAN_INLINE const char* trace_get_filename(const char* filename)
+static const char* trace_get_filename(const char* filename)
 {
     const char* res = filename;
     for (const char* c = filename; *c != 0; ++c)
@@ -110,7 +110,7 @@ static SEGAN_INLINE const char* trace_get_filename(const char* filename)
 
 #if SEGANX_TRACE_MEMORY
 
-static SEGAN_INLINE void trace_mem_check(memory_block* mb)
+static SEGAN_LIB_INLINE void trace_mem_check(memory_block* mb)
 {
     byte* p = (byte*)mb + sizeof(memory_block);
 
@@ -127,7 +127,7 @@ static SEGAN_INLINE void trace_mem_check(memory_block* mb)
     }
 }
 
-static SEGAN_INLINE memory_code_result trace_mem_code(void* p, const uint realsizeinbyte)
+static SEGAN_LIB_INLINE memory_code_result trace_mem_code(void* p, const uint realsizeinbyte)
 {
     memory_code_result res;
     if (!p)
@@ -157,7 +157,7 @@ static SEGAN_INLINE memory_code_result trace_mem_code(void* p, const uint realsi
     return res;
 }
 
-static SEGAN_INLINE memory_code_result trace_mem_decode(const void* p)
+static SEGAN_LIB_INLINE memory_code_result trace_mem_decode(const void* p)
 {
     memory_code_result res;
     if (!p)
@@ -181,7 +181,7 @@ static SEGAN_INLINE memory_code_result trace_mem_decode(const void* p)
     return res;
 }
 
-static SEGAN_INLINE void trace_mem_push(memory_block* mb)
+static SEGAN_LIB_INLINE void trace_mem_push(memory_block* mb)
 {
     if (!s_current_object->mem_tracker->root)
     {
@@ -198,7 +198,7 @@ static SEGAN_INLINE void trace_mem_push(memory_block* mb)
     }
 }
 
-static SEGAN_INLINE void trace_mem_pop(memory_block* mb)
+static SEGAN_LIB_INLINE void trace_mem_pop(memory_block* mb)
 {
     if (s_current_object->mem_tracker->root)
     {
@@ -267,7 +267,7 @@ static void trace_mem_report(FILE* f, bool only_corrupted)
     }
 }
 
-SEGAN_INLINE void* trace_mem_alloc(const uint size_in_byte, const char* file, const int line)
+SEGAN_LIB_INLINE void* trace_mem_alloc(const uint size_in_byte, const char* file, const int line)
 {
     void* res = null;
 
@@ -299,7 +299,7 @@ SEGAN_INLINE void* trace_mem_alloc(const uint size_in_byte, const char* file, co
     return res;
 }
 
-SEGAN_INLINE void* trace_mem_realloc(void* p, const uint new_size_in_byte, const char* file, const int line)
+SEGAN_LIB_INLINE void* trace_mem_realloc(void* p, const uint new_size_in_byte, const char* file, const int line)
 {
     if (!new_size_in_byte)
         return trace_mem_free(p);
@@ -372,7 +372,7 @@ SEGAN_INLINE void* trace_mem_realloc(void* p, const uint new_size_in_byte, const
     return mem_realloc(p, new_size_in_byte);
 }
 
-SEGAN_INLINE void* trace_mem_free(const void* p)
+SEGAN_LIB_INLINE void* trace_mem_free(const void* p)
 {
     if (!p) return null;
 
@@ -477,7 +477,7 @@ SEGAN_LIB_API void trace_detach(void)
 
 
 #if (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER)
-static SEGAN_INLINE struct trace_info* trace_object_pop()
+static SEGAN_LIB_INLINE struct trace_info* trace_object_pop()
 {
     return &s_current_object->callstack_array[s_current_object->callstack_index++];
 }

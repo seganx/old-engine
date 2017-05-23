@@ -1,96 +1,95 @@
-#include <time.h>
-#include <string>
-#include "Bigint.h"
 #include "Math.h"
-
+#include <time.h>
+#include <string.h>
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-
+static bool s_math_initialized = false;
+void sx_math_init(void);
 
 //////////////////////////////////////////////////////////////////////////
 //	fast sine/cosine lookup table.
 //	code from : http://codepaste.ru/2483/
 
-#define angle2int( angle )			( sint( (angle) * _ANGLE2INT ) )
-#define int2angle( val )			( (val) * _INT2ANGLE )
+#define _SINCOS_NUM_BITS            12
+#define _SINCOS_TABLE_SIZE          (1 << _SINCOS_NUM_BITS)
+#define _SINCOS_TABLE_SHIFT         (16 - _SINCOS_NUM_BITS)
+#define _SINCOS_TABLE_MASK          (_SINCOS_TABLE_SIZE - 1)
+#define _SINCOS_PI                  32768
+#define _SINCOS_2PI                 (2 * _SINCOS_PI)
+#define _SINCOS_PI_DIV_2            (_SINCOS_PI / 2)
+#define _ANGLE2INT                  (_SINCOS_PI / PI)
+#define _INT2ANGLE                  (PI / _SINCOS_PI)
 
-const sint	_SINCOS_NUM_BITS = 12;
-const sint	_SINCOS_TABLE_SIZE = 1 << _SINCOS_NUM_BITS;
-const sint	SINCOS_TABLE_SHIFT = 16 - _SINCOS_NUM_BITS;
-const sint	_SINCOS_TABLE_MASK = _SINCOS_TABLE_SIZE - 1;
-const sint	_SINCOS_PI = 32768;
-const sint	_SINCOS_2PI = 2 * _SINCOS_PI;
-const sint	_SINCOS_PI_DIV_2 = _SINCOS_PI / 2;
-const float _ANGLE2INT = float(_SINCOS_PI / PI);
-const float _INT2ANGLE = float(PI / _SINCOS_PI);
+#define angle2int( angle )			(int)( (angle) * _ANGLE2INT )
+#define int2angle( val )			( (val) * _INT2ANGLE )
 
 __declspec (align(16))  float sin_table[_SINCOS_TABLE_SIZE];
 
-SEGAN_INLINE float sx_sin_fast(const float x)
+SEGAN_LIB_INLINE float sx_sin_fast(const float x)
 {
-	sint a = angle2int(x);
-	return sin_table[(a >> SINCOS_TABLE_SHIFT) & _SINCOS_TABLE_MASK];
+    if (!s_math_initialized) sx_math_init();
+    sint a = angle2int(x);
+    return sin_table[(a >> _SINCOS_TABLE_SHIFT) & _SINCOS_TABLE_MASK];
 }
 
-SEGAN_INLINE float sx_cos_fast(const float x)
+SEGAN_LIB_INLINE float sx_cos_fast(const float x)
 {
-	sint a = angle2int(x) + _SINCOS_PI_DIV_2;
-	return sin_table[(a >> SINCOS_TABLE_SHIFT) & _SINCOS_TABLE_MASK];
+    if (!s_math_initialized) sx_math_init();
+    sint a = angle2int(x) + _SINCOS_PI_DIV_2;
+    return sin_table[(a >> _SINCOS_TABLE_SHIFT) & _SINCOS_TABLE_MASK];
 }
 
-SEGAN_INLINE void sx_sin_cos_fast(const float IN x, float& OUT s, float& OUT c)
+SEGAN_LIB_INLINE void sx_sin_cos_fast(const float x, float *s, float *c)
 {
-	sint a = angle2int(x);
-	s = sin_table[(a >> SINCOS_TABLE_SHIFT) & _SINCOS_TABLE_MASK];
-	a += _SINCOS_PI_DIV_2;
-	c = sin_table[(a >> SINCOS_TABLE_SHIFT) & _SINCOS_TABLE_MASK];
+    if (!s_math_initialized) sx_math_init();
+    sint a = angle2int(x);
+    *s = sin_table[(a >> _SINCOS_TABLE_SHIFT) & _SINCOS_TABLE_MASK];
+    a += _SINCOS_PI_DIV_2;
+    *c = sin_table[(a >> _SINCOS_TABLE_SHIFT) & _SINCOS_TABLE_MASK];
 }
-
 
 
 //////////////////////////////////////////////////////////////////////////
 //	randomize numbers
 //////////////////////////////////////////////////////////////////////////
-SEGAN_LIB_API void sx_randomize(const uint& seed)
+SEGAN_LIB_API void sx_randomize(const uint seed)
 {
-	srand(seed);
+    srand(seed);
 }
 
-SEGAN_INLINE float sx_random_f(const float range)
+SEGAN_LIB_API float sx_random_f(const float rmin, const float rmax)
 {
-	float r = (float)rand() / (float)RAND_MAX;
-	return  (range * r);
+    float r = (float)rand() / (float)RAND_MAX;
+    return rmin + r * (rmax - rmin);
 }
 
-SEGAN_INLINE sint sx_random_i(const sint range)
+SEGAN_LIB_API sint sx_random_i(const sint rmin, const sint rmax)
 {
-	float r = (float)rand() / (float)RAND_MAX;
-	return sx_round(range * r);
+    return rmin + rand() % (rmax - rmin);
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//	id generator
-//////////////////////////////////////////////////////////////////////////
-uint id_counter = 0;
-
-SEGAN_INLINE void sx_id_set_counter(const uint id)
+//! generate a random number from the seed and advance seed to next step
+static sint sx_random_advance(uint *seed)
 {
-	id_counter = id;
+    *seed = ((*seed * 214013L + 2531011L) >> 16);
+    return (sint)(*seed & 0x7fff);
 }
 
-SEGAN_INLINE uint sx_id_generate(void)
+//! generate a random number from the seed between range and advance seed to next step
+SEGAN_LIB_API sint sx_random_advance_i(uint *seed, const sint rmin, const sint rmax)
 {
-#if ( SEGAN_CRITICAL_SECTION == 1 )
-	sx_enter_cs();
-	uint id = id_counter++;
-	sx_leave_cs();
-	return id;
-#else
-	return id_counter++;
-#endif
+    return rmin + sx_random_advance(seed) % (rmax - rmin);
 }
+
+//! generate a random number from the seed between range and advance seed to next step
+SEGAN_LIB_API float sx_random_advance_f(uint *seed, const float rmin, const float rmax)
+{
+    const int val = sx_random_advance(seed) % RAND_MAX;
+    float res = (float)val / (float)RAND_MAX;
+    return rmin + res * (rmax - rmin);
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //	crc32 algorithm
@@ -99,66 +98,63 @@ unsigned long crc32_table[256];
 
 unsigned long crc32_reflect(unsigned long ref, char ch)
 {
-	unsigned long value = 0;
-	for (sint i = 1; i < (ch + 1); ++i)
-	{
-		if (ref & 1)
-			value |= 1 << (ch - i);
-		ref >>= 1;
-	}
-	return value;
+    unsigned long value = 0;
+    for (sint i = 1; i < (ch + 1); ++i)
+    {
+        if (ref & 1)
+            value |= 1 << (ch - i);
+        ref >>= 1;
+    }
+    return value;
 }
 
 uint crc32_init_table(void)
 {
-	unsigned long ulPolynomial = 0x04c11db7;
-	for (sint i = 0; i <= 0xFF; ++i)
-	{
-		crc32_table[i] = crc32_reflect(i, 8) << 24;
-		for (sint j = 0; j < 8; ++j)
-			crc32_table[i] = (crc32_table[i] << 1) ^ (crc32_table[i] & (1 << 31) ? ulPolynomial : 0);
-		crc32_table[i] = crc32_reflect(crc32_table[i], 32);
-	}
-	return 0;
+    unsigned long ulPolynomial = 0x04c11db7;
+    for (sint i = 0; i <= 0xFF; ++i)
+    {
+        crc32_table[i] = crc32_reflect(i, 8) << 24;
+        for (sint j = 0; j < 8; ++j)
+            crc32_table[i] = (crc32_table[i] << 1) ^ (crc32_table[i] & (1 << 31) ? ulPolynomial : 0);
+        crc32_table[i] = crc32_reflect(crc32_table[i], 32);
+    }
+    return 0;
 }
 
-SEGAN_INLINE uint sx_crc32_a(const char* str)
+SEGAN_LIB_INLINE uint sx_crc32_a(const char* str)
 {
-	sint len = (sint)strlen(str);
-	if (len < 1) return 0;
+    if (!s_math_initialized) sx_math_init();
 
-	unsigned char* buffer = (unsigned char*)str;
+    sint len = (sint)strlen(str);
+    if (len < 1) return 0;
 
-	unsigned long ulCRC(0xffffffff);
-	while (len--)
-		ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ *buffer++];
+    unsigned char* buffer = (unsigned char*)str;
 
-	return ulCRC ^ 0xffffffff;
+    unsigned long ulCRC = 0xffffffff;
+    while (len--)
+        ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ *buffer++];
+
+    return ulCRC ^ 0xffffffff;
 }
 
-SEGAN_INLINE uint sx_crc32_w(const wchar* str)
+SEGAN_LIB_INLINE uint sx_crc32_w(const wchar* str)
 {
-	sint len = (sint)wcslen(str);
-	if (len < 1) return 0;
+    if (!s_math_initialized) sx_math_init();
 
-	wchar* buffer = (wchar*)str;
-	unsigned long ulCRC(0xffffffff);
-	while (len--)
-	{
-		union hchar {
-			struct {
-				char c1;
-				char c2;
-			};
-			wchar c;
-		} hc = *(hchar*)(buffer++);
-		ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ hc.c1];
-		if (hc.c2)
-			ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ hc.c2];
+    sint len = (sint)wcslen(str);
+    if (len < 1) return 0;
 
-	}
+    wchar* buffer = (wchar*)str;
+    unsigned long ulCRC = 0xffffffff;
+    while (len--)
+    {
+        char* c = (char*)(buffer++);
+        ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ c[0]];
+        if (c[1])
+            ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ c[1]];
+    }
 
-	return ulCRC ^ 0xffffffff;
+    return ulCRC ^ 0xffffffff;
 }
 
 
@@ -166,102 +162,144 @@ SEGAN_INLINE uint sx_crc32_w(const wchar* str)
 //////////////////////////////////////////////////////////////////////////
 //	checksum and encryption functions
 //////////////////////////////////////////////////////////////////////////
+SEGAN_LIB_INLINE uint sx_checksum(const void* data, const uint size, const uint key /*= 1363*/)
+{
+    if (!data || !size) return 0;
+    uint r = 0;
+    //const char* d = (char*)data;
+    //CSRandom randomer(key);
+    //for (uint i = 0; i < size; ++i)
+    //	r += d[i] * 0xabcdef12 + randomer.generate() + d[i] + key;
+    return r;
+}
+
+SEGAN_LIB_INLINE void sx_encrypt(void* dest, const void* src, const uint size, const uint key /*= 1363*/)
+{
+    //CSRandom randomer(key);
+    //byte* d = (byte*)dest;
+    //byte* s = (byte*)src;
+    //for (uint i = 0; i < size; ++i)
+    //	d[i] = s[i] + randomer.generate();
+}
+
+SEGAN_LIB_INLINE void sx_decrypt(void* dest, const void* src, const uint size, const uint key /*= 1363*/)
+{
+    //CSRandom randomer(key);
+    //byte* d = (byte*)dest;
+    //byte* s = (byte*)src;
+    //for (uint i = 0; i < size; ++i)
+    //	d[i] = s[i] - randomer.generate();
+}
+
+SEGAN_LIB_INLINE void sx_dh_secret_Key(char* dest, const int dest_size)
+{
+    for (int i = 0; i < dest_size; ++i)
+        dest[i] = (char)sx_random_i(65, 90);
+}
+
+SEGAN_LIB_INLINE void sx_dh_public_key(char* dest, const char* secret_key, const int buff_size, const uint g, const uint p)
+{
+    byte bignum[128] = { 10 };
+    for (int i = 0; i < buff_size; ++i)
+    {
+        uint64 md = sx_big_number_remained(sx_big_number_power(bignum, g, secret_key[i] - 65), p);
+        dest[i] = 65 + (char)md;
+    }
+}
+
+SEGAN_LIB_INLINE void sx_dh_final_key(char* dest, const char* secret_key, const char* public_key, const int buff_size, const uint p)
+{
+    byte bignum[128] = { 10 };
+    for (int i = 0; i < buff_size; ++i)
+    {
+        uint64 md = sx_big_number_remained(sx_big_number_power(bignum, public_key[i] - 65, secret_key[i] - 65), p);
+        dest[i] = 65 + (char)md;
+    }
+}
+
 
 //////////////////////////////////////////////////////////////////////////
-//	use protocol random class to handle multi threaded calls
-class CSRandom
-{
-public:
-	CSRandom(const uint seed = 1363) : m_seed(seed), m_curr(63) {}
-
-	byte generate(void)
-	{
-		m_curr += ((m_curr * m_seed * 28454642) + (m_seed * 38745674));
-		return m_curr ? m_curr : ++m_curr;
-	}
-
-public:
-	uint	m_seed;
-	byte	m_curr;
-};
-
-
+//	big number functions
 //////////////////////////////////////////////////////////////////////////
-//	encryption functions
-//////////////////////////////////////////////////////////////////////////
-SEGAN_INLINE uint sx_checksum(const void* data, const uint size, const uint key /*= 1363*/)
+SEGAN_LIB_API byte* sx_big_number_set(byte* dest, uint64 value)
 {
-	if (!data || !size) return 0;
-	uint r = 0;
-	const char* d = (char*)data;
-	CSRandom randomer(key);
-	for (uint i = 0; i < size; ++i)
-		r += d[i] * 0xabcdef12 + randomer.generate() + d[i] + key;
-	return r;
+    uint i = 0;
+    while (value > 0)
+    {
+        dest[i++] = value % 10;
+        value /= 10;
+    }
+    dest[i] = 10;
+    return dest;
 }
 
-SEGAN_INLINE void sx_encrypt(void* dest, const void* src, const uint size, const uint key /*= 1363*/)
+SEGAN_LIB_API uint sx_big_number_len(const byte* number)
 {
-	CSRandom randomer(key);
-	byte* d = (byte*)dest;
-	byte* s = (byte*)src;
-	for (uint i = 0; i < size; ++i)
-		d[i] = s[i] + randomer.generate();
+    uint res = 0;
+    while (number[res] < 10) ++res;
+    return res;
 }
 
-SEGAN_INLINE void sx_decrypt(void* dest, const void* src, const uint size, const uint key /*= 1363*/)
+SEGAN_LIB_API uint sx_big_number_print(const byte* number)
 {
-	CSRandom randomer(key);
-	byte* d = (byte*)dest;
-	byte* s = (byte*)src;
-	for (uint i = 0; i < size; ++i)
-		d[i] = s[i] - randomer.generate();
+    uint len = sx_big_number_len(number);
+    for (int i = len - 1; i >= 0; --i)
+        printf("%u", number[i]);
+    return len;
 }
 
-SEGAN_INLINE void sx_dh_secret_Key(char* dest, const int& dest_size)
+SEGAN_LIB_API uint sx_big_number_remained(const byte* number, const uint value)
 {
-	for (int i = 0; i < dest_size; ++i)
-		dest[i] = (char)sx_random_i_limit(65, 90);
+    uint res = 0;
+    uint len = sx_big_number_len(number);
+    for (int i = len - 1; i >= 0; --i)
+        res = (number[i] + res * 10) % value;
+    return res;
 }
 
-SEGAN_INLINE void sx_dh_public_key(char* dest, const char* secret_key, const int& buff_size, const uint& g, const uint& p)
-{
-	for (int i = 0; i < buff_size; ++i)
-	{
-		uint64 md = sx_power(g, secret_key[i] - 65) % p;
-		dest[i] = 65 + (char)md;
-	}
-}
+SEGAN_LIB_API byte* sx_big_number_power(byte* dest, const uint64 i, const uint64 n)
+{    // original code from: https://discuss.codechef.com/questions/7349/computing-factorials-of-a-huge-number-in-cc-a-tutorial
 
-SEGAN_INLINE void sx_dh_final_key(char* dest, const char* secret_key, const char* public_key, const int& buff_size, const uint& p)
-{
-	for (int i = 0; i < buff_size; ++i)
-	{
-		uint64 md = sx_power(public_key[i] - 65, secret_key[i] - 65) % p;
-		dest[i] = 65 + (char)md;
-	}
+    dest[0] = 1;	    // initializes array with only 1 digit, the digit 1.
+    int	m = 1;			// initializes digit counter
+    int k = 1;			// k is a counter that goes from 1 to n.
+    uint64 temp = 0;	// initializes carry variable to 0.
+    while (k <= n)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            uint64 x = dest[j] * i + temp;	// x contains the digit by digit product
+            dest[j] = x % 10;				// contains the digit to store in position j
+            temp = x / 10;				    // contains the carry value that will be stored on later indexes
+        }
+        while (temp > 0)	// while loop that will store the carry value on array.
+        {
+            dest[m] = temp % 10;
+            temp = temp / 10;
+            m++; // increments digit counter
+        }
+        k++;
+    }
+    dest[m] = 10;
+
+    return dest;
 }
 
 
 //////////////////////////////////////////////////////////////////////////
 // initialize internal library
 //////////////////////////////////////////////////////////////////////////
-bool sx_lib_init_math(void)
+static void sx_math_init(void)
 {
-	//  fill sine/cosine table
-	for (sint i = 0; i < _SINCOS_TABLE_SIZE; i++)
-	{
-		const float angle = int2angle(i << SINCOS_TABLE_SHIFT);
-		sin_table[i] = sinf(angle);
-	}
+    //  fill sine/cosine table
+    for (sint i = 0; i < _SINCOS_TABLE_SIZE; i++)
+    {
+        const float angle = int2angle(i << _SINCOS_TABLE_SHIFT);
+        sin_table[i] = sinf(angle);
+    }
 
-	//  initialize random seed
-	sx_randomize((uint)time(null));
+    //	initialize crc32 table
+    crc32_init_table();
 
-	//	initialize crc32 table
-	crc32_init_table();
-
-	return true;
+    s_math_initialized = true;
 }
-
-bool s_math_initialized = sx_lib_init_math();

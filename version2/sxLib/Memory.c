@@ -16,22 +16,22 @@ __declspec(thread) struct sx_memory_manager* s_manager = null;
 static __thread struct sx_memory_manager* s_manager = null;
 #endif
 
-SEGAN_INLINE void mem_set_manager(struct sx_memory_manager* manager)
+SEGAN_LIB_INLINE void mem_set_manager(struct sx_memory_manager* manager)
 {
     s_manager = manager;
 }
 
-SEGAN_INLINE struct sx_memory_manager* mem_get_manager(void)
+SEGAN_LIB_INLINE struct sx_memory_manager* mem_get_manager(void)
 {
     return s_manager;
 }
 
-SEGAN_INLINE void* mem_alloc(const uint size_in_byte)
+SEGAN_LIB_INLINE void* mem_alloc(const uint size_in_byte)
 {
     return s_manager ? s_manager->alloc(s_manager, size_in_byte) : malloc(size_in_byte);
 }
 
-SEGAN_INLINE void* mem_realloc(void* p, const uint new_size_in_byte)
+SEGAN_LIB_INLINE void* mem_realloc(void* p, const uint new_size_in_byte)
 {
     if (s_manager)
         return s_manager->realloc(s_manager, p, new_size_in_byte);
@@ -49,7 +49,7 @@ SEGAN_INLINE void* mem_realloc(void* p, const uint new_size_in_byte)
     return res;
 }
 
-SEGAN_INLINE void* mem_free(const void* p)
+SEGAN_LIB_INLINE void* mem_free(const void* p)
 {
     if (s_manager)
         return s_manager->free(s_manager, p);
@@ -58,17 +58,17 @@ SEGAN_INLINE void* mem_free(const void* p)
     return null;
 }
 
-SEGAN_INLINE void mem_copy(void* dest, const void* src, const uint size)
+SEGAN_LIB_INLINE void mem_copy(void* dest, const void* src, const uint size)
 {
     memcpy(dest, src, size);
 }
 
-SEGAN_LIB_API sint mem_cmp(const void* src1, const void* src2, const uint size)
+SEGAN_LIB_INLINE sint mem_cmp(const void* src1, const void* src2, const uint size)
 {
     return memcmp(src1, src2, size);
 }
 
-SEGAN_INLINE void mem_set(void* dest, const sint val, const uint size)
+SEGAN_LIB_INLINE void mem_set(void* dest, const sint val, const uint size)
 {
     memset(dest, val, size);
 }
@@ -111,7 +111,7 @@ typedef struct memory_pool
 memory_pool;
 
 
-static SEGAN_INLINE void memory_pool_push(struct memory_pool* pool, struct memory_chunk* ch)
+static SEGAN_LIB_INLINE void memory_pool_push(struct memory_pool* pool, struct memory_chunk* ch)
 {
     ch->next = pool->root;
     ch->prev = null;
@@ -119,21 +119,21 @@ static SEGAN_INLINE void memory_pool_push(struct memory_pool* pool, struct memor
     pool->root = ch;
 }
 
-static SEGAN_INLINE void memory_pool_pop(struct memory_pool* pool, struct memory_chunk* ch)
+static SEGAN_LIB_INLINE void memory_pool_pop(struct memory_pool* pool, struct memory_chunk* ch)
 {
     if (ch->prev)           ch->prev->next = ch->next;
     if (ch->next)           ch->next->prev = ch->prev;
     if (ch == pool->root)   pool->root = ch->next;
 }
 
-static SEGAN_INLINE uint memory_pool_size(const void* p)
+static SEGAN_LIB_INLINE uint memory_pool_size(const void* p)
 {
     if (!p) return 0;
     struct memory_chunk* ch = (struct memory_chunk*)((byte*)(p) - sizeof(struct memory_chunk));
     return ch->size;
 }
 
-static SEGAN_INLINE void* memory_pool_alloc( struct sx_memory_manager* manager, const uint sizeinbyte )
+static SEGAN_LIB_INLINE void* memory_pool_alloc( struct sx_memory_manager* manager, const uint sizeinbyte )
 {
     struct memory_pool* pool = (struct memory_pool*)((byte*)manager + sizeof(struct sx_memory_manager));
     struct memory_chunk* ch = pool->root;
@@ -163,7 +163,7 @@ static SEGAN_INLINE void* memory_pool_alloc( struct sx_memory_manager* manager, 
     return null;
 }
 
-static SEGAN_INLINE void* memory_pool_free( struct sx_memory_manager* manager, const void* p )
+static SEGAN_LIB_INLINE void* memory_pool_free( struct sx_memory_manager* manager, const void* p )
 {
     if (!p) return null;
     struct memory_pool* pool = (struct memory_pool*)((byte*)manager + sizeof(struct sx_memory_manager));
@@ -209,7 +209,7 @@ static SEGAN_INLINE void* memory_pool_free( struct sx_memory_manager* manager, c
     return null;
 }
 
-static SEGAN_INLINE void* memory_pool_realloc(struct sx_memory_manager* manager, const void* p, const uint sizeinbyte)
+static SEGAN_LIB_INLINE void* memory_pool_realloc(struct sx_memory_manager* manager, const void* p, const uint sizeinbyte)
 {
 #define mem_min_size(a,b) (((a)<(b))?(a):(b))
 

@@ -14,7 +14,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 typedef unsigned char		    u8,			byte;
-typedef unsigned short		    u16,		word;
+typedef unsigned short		    u16,		word,   wchar;
 typedef unsigned int		    u32,		uint,	dword;
 typedef int					    i32,		sint;
 typedef long long			    i64,		int64;
@@ -83,7 +83,7 @@ typedef unsigned char bool;
 #define SEGAN_LIB_INLINE					inline
 #endif
 
-#define SEGAN_INLINE						//inline
+#define SEGAN_INLINE						inline
 
 #if defined(_WIN32)
 	#define SEGAN_ALIGN_16					__declspec(align(16))
