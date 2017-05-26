@@ -1,87 +1,92 @@
 #include "CryptoService.h"
+#include <malloc.h>
 
-#if 0
-int crypto_get_authen_code( char* dest_public_key, char* dest_auth_code, const char* received_key )
+#define diffie_hellman_g	7
+#define diffie_hellman_p	23
+
+#define crypto_token_key        "1qa!z2@ws#x$3%edc4r^fv5&tgb*6yh(n7ujm)8ik9ol0p"
+#define crypto_token_keysize    45
+#define crypto_token_checksize  8
+
+uint crypto_token_generate(char* dest, const uint destsize, const void* data, const uint size)
+{
+    uint base64size = sx_base64_encode_len(size);
+    uint res = base64size + crypto_token_checksize;
+    if (!dest || !destsize) return res;
+    if (destsize < res) return 0;
+    
+    char* tmp = alloca(size);
+    sx_encrypt(tmp, data, size, crypto_token_key, crypto_token_keysize);
+    char* chsum = dest + sx_base64_encode(dest, destsize, tmp, size) + 1;
+    u32 chsumvalue = sx_checksum(dest, base64size);
+    sx_base64_encode(chsum, crypto_token_checksize, &chsumvalue, 4);
+
+    return res;
+}
+
+uint crypto_token_validate(const void* data, const uint size)
+{
+    const byte* obj = (const byte*)data;
+    char buf[crypto_token_checksize] = init;
+    uint objectsize = size - crypto_token_checksize;
+    u32 chsumvalue = sx_checksum(data, objectsize);
+    sx_base64_encode(buf, crypto_token_checksize, &chsumvalue, 4);
+    if ( sx_mem_cmp(buf, obj + objectsize, crypto_token_checksize) == 0 )
+        return sx_base64_decode_len(objectsize);
+    return 0;
+}
+
+uint crypto_token_decode(void* dest, const uint destsize, const char* data, const uint size)
+{
+    uint tokensize = size - crypto_token_checksize;
+    uint objectsize = sx_base64_decode_len(tokensize);
+    if (destsize < objectsize) return 0;
+
+    char* tmp = alloca(objectsize);
+    sx_base64_decode(tmp, objectsize, data, tokensize);
+    sx_decrypt(dest, tmp, objectsize, crypto_token_key, crypto_token_keysize);
+    
+    return objectsize;
+}
+
+int crypto_compute_keys(char* dest_local_key, char* dest_public_key, const char* received_key)
 {
     // validate received key
     {
         const int hirange = 65 + diffie_hellman_p;
-        for (int i = 0; i < diffie_hellman_l; ++i)
-            if (sx_between_i(rcvdkey[i], 65, hirange) == false)
+        for (int i = 0; i < crypto_key_len; ++i)
+            if (sx_between_i(received_key[i], 65, hirange) == false)
                 return 1;
     }
 
-    //////////////////////////////////////////////////////////////////////////
-    // setup Diffie-Hellman keys to start communication
-    //////////////////////////////////////////////////////////////////////////
-    sx_randomize((uint)sx_time_counter());
-
     // generate secret key
-    char secret_key[diffie_hellman_l] = { 0 };
-    sx_dh_secret_Key(secret_key, diffie_hellman_l);
+    char secret_key[crypto_key_len] = init;
+    sx_dh_secret_Key(secret_key, crypto_key_len);
 
-    // generate public key based on secret key
-    char public_key[diffie_hellman_l] = { 0 };
-    sx_dh_public_key(public_key, secret_key, diffie_hellman_l, diffie_hellman_g, diffie_hellman_p);
+    // generate public key based on secret key for send to the client
+    sx_dh_public_key(dest_public_key, secret_key, crypto_key_len, diffie_hellman_g, diffie_hellman_p);
 
-    char final_key[diffie_hellman_l] = { 0 };
-    sx_dh_final_key(final_key, secret_key, rcvdkey, diffie_hellman_l, diffie_hellman_p);
-
-    // create a session for the request
-    AuthenSession as;
-    as.access_key = sx_checksum(final_key, diffie_hellman_l);
-    as.birth_time = sx_time_seconds();
-    as.time_out = s_config.time_out;
-
-    // encrypt the session
-    byte enas[session_size] = { 0 };
-    sx_encrypt(enas, &as, session_size, session_cryptokey);
-
-    // create session token as string
-    char stoken[session_size * 2] = { 0 };
-    sx_base64_encode(stoken, sizeof(stoken), enas, session_size);
-
-    // create signature for token
-    char signature[33] = { 0 };
-    sx_md5(signature, stoken, session_secret, null);
-
-    //	send token to the client
-    char msg[128] = { 0 };
-    int len = sprintf_s(msg, 128, "{\"user_data\":%u,\"token\":\"%s.%s\",\"key\":\"%.*s\"}", user_data, stoken, signature, diffie_hellman_l, public_key);
-    request_send(req, msg, len);
-
-    return 1;
-}
-
-int authen_handle_access(Request* req)
-{
-    //	basic verification of the request
-    int req_len = sx_str_len(&req->uri[1]);
-    if (!sx_between_i(req_len, 33 + session_size, 33 + session_size * 2)) return 0;
-
-    //	extract data
-    char token[session_size * 2] = { 0 };
-    const char* signature = sx_str_get_token(token, sizeof(token), &req->uri[1], '.');
-    if (signature == null || *signature == 0) return 0;
-    else signature++;
-
-    //	check signature of the request
-    char curr_signature[33] = { 0 };
-    sx_md5(curr_signature, token, session_secret, null);
-    if (sx_str_cmp(curr_signature, signature)) return 0;
-
-    //	decode session data
-    char stoken[session_size * 2] = { 0 };
-    if (sx_base64_decode(stoken, session_size, token) == 0) return 0;
-
-    //	decrypt session to structure
-    AuthenSession as;
-    sx_decrypt(&as, stoken, session_size, session_cryptokey);
-    if (as.time_out > s_config.time_out) return 0;
-
-    printf("Key: %12u Birth: %u Time: %u\n", as.access_key, as.birth_time, as.time_out);
+    // generate local key based on secret and received key for encryption/decryption
+    sx_dh_final_key(dest_local_key, secret_key, received_key, crypto_key_len, diffie_hellman_p);
 
     return 0;
 }
 
-#endif
+void crypto_encrypt(void* dest, const void* src, const uint srcsize, const char* key, const uint keysize)
+{
+    byte* d = (byte*)dest;
+    byte* s = (byte*)src;
+    for (uint i = 0; i < srcsize; ++i)
+        d[i] = s[i] + key[i % keysize];
+}
+
+void crypto_decrypt(void* dest, const void* src, const uint srcsize, const char* key, const uint keysize)
+{
+    byte* d = (byte*)dest;
+    byte* s = (byte*)src;
+    for (uint i = 0; i < srcsize; ++i)
+        d[i] = s[i] - key[i % keysize];
+}
+
+
+

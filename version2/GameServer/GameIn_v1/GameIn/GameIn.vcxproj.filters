@@ -21,6 +21,12 @@
     <ClCompile Include="..\..\..\sxLib\String.c">
       <Filter>sxlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\mongoose.c">
+      <Filter>mongoose</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sxLib\Json.c">
+      <Filter>sxlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\sxLib\Def.h">
@@ -46,10 +52,19 @@
     <ClInclude Include="..\..\..\sxLib\String.h">
       <Filter>sxlib</Filter>
     </ClInclude>
+    <ClInclude Include="..\mongoose.h">
+      <Filter>mongoose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sxLib\Json.h">
+      <Filter>sxlib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="sxlib">
       <UniqueIdentifier>{fdd069f5-7e94-43ca-a684-55a3dbd9af26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mongoose">
+      <UniqueIdentifier>{3aadd8bb-11f1-4e86-a065-b6c3c4dd2d86}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

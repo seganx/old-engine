@@ -3006,7 +3006,7 @@ struct mg_iface {
 };
 
 struct mg_iface_vtable {
-  void (*init)(struct mg_iface *iface);
+  void (*mginit)(struct mg_iface *iface);
   void (*free)(struct mg_iface *iface);
   void (*add_conn)(struct mg_connection *nc);
   void (*remove_conn)(struct mg_connection *nc);

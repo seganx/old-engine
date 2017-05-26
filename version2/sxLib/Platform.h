@@ -43,7 +43,7 @@ typedef void (*sx_thread_func)(void *);
 
 #if defined(_WIN32)
 #define sx_fprintf(file, fmt, ...)				fprintf(file, fmt, ##__VA_ARGS__)
-#define sx_sprintf(dest, len, fmt, ...)			snprintf(dest, len, fmt, ##__VA_ARGS__)
+#define sx_sprintf(dest, len, fmt, ...)			_snprintf_s(dest, len, _TRUNCATE, fmt, ##__VA_ARGS__)
 
 #define sx_vsprintf_len(fmt, args)				(vsnprintf(0, 0, fmt, args) + 1)
 #define sx_vsprintf(dest, len, fmt, args)		vsnprintf(dest, len, fmt, args)

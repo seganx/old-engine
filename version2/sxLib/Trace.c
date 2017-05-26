@@ -456,8 +456,13 @@ SEGAN_LIB_API void trace_detach(void)
         trace_mem_report(stderr, false);
         if (s_current_object->filename && trace_mem_report_compute_num(false) > 0)
         {
+#if defined(_WIN32)
+            FILE* fstr = null;
+            if (fopen_s(&fstr, s_current_object->filename, "a+") == 0) {
+#else
             FILE* fstr = fopen(s_current_object->filename, "a+, ccs=UTF-8");
             if (fstr) {
+#endif            
                 trace_mem_report(fstr, false);
                 fclose(fstr);
             }
@@ -508,9 +513,17 @@ SEGAN_LIB_API void trace_push_param(const char * file, const int line, const cha
     {
         va_list args;
         va_start(args, function);
+#if defined(_WIN32)
+        sint len = vsnprintf_s(0, 0, _TRUNCATE, function, args) + 1;
+#else
         sint len = vsnprintf(0, 0, function, args) + 1;
+#endif
         if (len < 128)
+#if defined(_WIN32)
+            vsnprintf_s(tinfo->param, 128, _TRUNCATE, function, args);
+#else
             vsnprintf(tinfo->param, 128, function, args);
+#endif
         else
             tinfo->func = function;
         va_end(args);
@@ -586,14 +599,19 @@ static void trace_callstack_report(FILE* f)
 
 static void trace_app_crashed(const char* reason, dword code)
 {
+#ifdef _WIN32
     FILE* fstr = null;
     if (fopen_s(&fstr, s_current_object->filename, "a+"))
         fstr = stderr;
-
+#else
+    FILE* fstr = fopen(s_current_object->filename, "a+, ccs=UTF-8");
+    if (fstr == null)
+        fstr = stderr;
+#endif
     //  print time to the file
     {
         struct tm timeInfo;
-        char tmp[64] = {0};        
+        char tmp[64] = { 0 };
         time_t timeval = time(null);
         localtime_s(&timeInfo, &timeval);
         strftime(tmp, 64, "%Y-%m-%d %H:%M:%S", &timeInfo);
@@ -818,8 +836,14 @@ static void trace_set_crash_handler(void)
 SEGAN_LIB_API void trace_assert(const char* expression, const char* file, const int line)
 {
     trace_push(file, line, expression);
+#ifdef _WIN32
+    FILE* fstr = null;
+    if (fopen_s(&fstr, s_current_object->filename, "a+"))
+        fstr = stderr;
+#else
     FILE* fstr = fopen(s_current_object->filename, "a+, ccs=UTF-8");
     if (fstr == null) fstr = stderr;
+#endif
     fprintf(fstr, "\n\nseganx assertion report:\n%s(%d): Assertion violation on expression (%s)\n", trace_get_filename(file), line, expression);
 
 #if SEGANX_TRACE_CALLSTACK

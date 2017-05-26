@@ -438,13 +438,13 @@ SEGAN_LIB_API void sx_decrypt(void* dest, const void* src, const uint srcsize, c
 SEGAN_LIB_API uint sx_base64_encode_len(const uint len);
 
 //! encode source and return number of bytes encoded
-SEGAN_LIB_API uint sx_base64_encode(char* dest, const uint dest_size_in_byte, const void* src, const int src_size_in_byte);
+SEGAN_LIB_API uint sx_base64_encode(char* dest, const uint dest_size_in_byte, const void* src, const uint src_size_in_byte);
 
 //! return new length of decoded data
-SEGAN_LIB_API uint sx_base64_decode_len(const char* src);
+SEGAN_LIB_API uint sx_base64_decode_len(const uint len);
 
 //! decode source and return number of bytes decoded
-SEGAN_LIB_API uint sx_base64_decode(void* dest, const uint dest_size_in_byte, const char* src);
+SEGAN_LIB_API uint sx_base64_decode(void* dest, const uint dest_size_in_byte, const char* src, const uint src_size_in_byte);
 
 
 //////////////////////////////////////////////////////////////////////////

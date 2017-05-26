@@ -1,84 +1,100 @@
 /********************************************************************
-	created:	2016/4/23
-	filename: 	Json.h
-	author:		Sajad Beigjani
-	email:		sajad.b@gmail.com
-	Site:		www.SeganX.com
-	Desc:		This file contains a class for parse JSON scripts.
-				
-				Concept and code base from http://zserge.com/jsmn.html
-				Copyright (c) 2010 Serge A. Zaitsev
-*********************************************************************/
+    created:	2016/4/23
+    filename: 	Json.h
+    author:		Sajad Beigjani
+    email:		sajad.b@gmail.com
+    Site:		www.SeganX.com
+    Desc:		This file contains structures and function for parse JSON scripts.
+
+    Concept and code base from http://zserge.com/jsmn.html
+    Copyright (c) 2010 Serge A. Zaitsev
+    *********************************************************************/
 #ifndef DEFINED_Json
 #define DEFINED_Json
 
 #include "Def.h"
 
-//! use this class to parse JSON
-class SEGAN_LIB_API Json
+typedef enum json_type
 {
-public:
-	enum Type
-	{
-		UNDEFINED = 0,
-		OBJECT = 1,
-		ARRAY = 2,
-		STRING = 3,
-		PRIMITIVE = 4		//! Other primitive: number, boolean (true/false) or null
-	};
+    UNDEFINED = 0,
+    OBJECT = 1,
+    ARRAY = 2,
+    STRING = 3,
+    PRIMITIVE = 4		//! Other primitive: number, boolean (true/false) or null
+}
+json_type;
 
-	enum Error
-	{
-		ERROR_NOMEM = -1,	//! Not enough tokens were provided
-		ERROR_INVAL = -2,	//! Invalid character inside JSON string
-		ERROR_PART = -3		//! The string is not a full JSON packet, more bytes expected
-	};
+typedef enum json_error
+{
+    ERROR_NOMEM = -1,	//! Not enough tokens were provided
+    ERROR_INVAL = -2,	//! Invalid character inside JSON string
+    ERROR_PART = -3		//! The string is not a full JSON packet, more bytes expected
+}
+json_error;
 
-	struct Node
-	{
-		Type	type;		//! (object, array, string etc.)
-		int		start;		//! start position in JSON data string
-		int		end;		//! end position in JSON data string
-		int		childs;		//! number of children the node has
-		int		parent;		//! index of the parent in node array
-		Node*	right;		//! pointer to the right node
-		Node*	down;		//! pointer to the down node (child)
-	};
+typedef struct sx_json_node
+{
+    json_type	            type;		//! (object, array, string etc.)
+    int		                start;		//! start position in JSON data string
+    int		                end;		//! end position in JSON data string
+    int		                childs;		//! number of children the node has
+    int		                parent;		//! index of the parent in node array
+    struct sx_json_node*	right;		//! pointer to the right node
+    struct sx_json_node*	down;		//! pointer to the down node (child)
+} 
+sx_json_node;
 
-public:
-	Json();
-	~Json();
+//! use this object to hold JSON data
+typedef struct sx_json
+{
+    const char*             text;           //! JSON string
+    uint                    pos;            //! offset in the JSON string
+    uint                    toknext;        //! next token to allocate
+    uint                    toksuper;       //! superior token node, e.g parent object or array
+    int                     nodescount;     //! number of nodes
+    struct sx_json_node*    nodes;          //! array of node
+    struct sx_json_node     tmp;            //! temp node
+}
+sx_json;
 
-	//! parses a JSON data string and return the root node
-	Node* parse(const char* jsondata);
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
-	//! find and return a node by name. return zero node if can't find specified node
-	Node* find(const char* name);
 
-	//! fill out dest buffer with string value of the node
-	int read_string(char* dest, const int dest_size, Node* node);
+//! compute number of nodes needed to parse data
+SEGAN_LIB_API uint sx_json_node_count(sx_json* obj, const char* jsondata, const int jsonlen);
 
-	//! return node's value as integer
-	int read_int(Node* node, const int& default_value);
+/*! 
+parses a JSON data string and return number of nodes
+NOTE: use sx_json_node_count to find out number of nodes needed
+*/
+SEGAN_LIB_API sx_json_node* sx_json_parse(sx_json* obj, const char* jsondata, const int jsonlen);
 
-	//! return node's value as float
-	float read_float(Node* node, const float& default_value);
+//! find and return a node by name. return zero node if can't find specified node
+SEGAN_LIB_API sx_json_node* sx_json_find(sx_json* obj, const char* name);
 
-	//! return node's value as boolean
-	bool read_bool(Node* node, const bool& default_value);
+//! fill out dest buffer with string value of the node and return the length of string
+SEGAN_LIB_API int sx_json_node_read_string(sx_json* obj, char* dest, const int dest_size, sx_json_node* node);
 
-	//! print the parsed JSON in a tree structure
-	void print(void);
+//! fill out dest buffer with string value of the node and return the length of string
+SEGAN_LIB_API int sx_json_read_string(sx_json* obj, char* dest, const int dest_size, const char* name);
 
-public:
-	const char*	m_string;		//! JSON string
-	uint		m_pos;			//! offset in the JSON string
-	uint		m_toknext;		//! next token to allocate
-	uint		m_toksuper;		//! superior token node, e.g parent object or array
-	Node*		m_nodes;		//! array of node
-	Node		m_tmp;			//! temp node
-};
+//! return node's value as integer
+SEGAN_LIB_API int sx_json_read_int(sx_json* obj, sx_json_node* node, const int default_value);
 
+//! return node's value as float
+SEGAN_LIB_API float sx_json_read_float(sx_json* obj, sx_json_node* node, const float default_value);
+
+//! return node's value as boolean
+SEGAN_LIB_API bool sx_json_read_bool(sx_json* obj, sx_json_node* node, const bool default_value);
+
+//! print the parsed JSON in a tree structure
+SEGAN_LIB_API void sx_json_print(sx_json* obj);
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // DEFINED_Json
 

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Test : MonoBehaviour
 {
@@ -7,17 +8,22 @@ public class Test : MonoBehaviour
 
     [Header("Authenticator")]
     public string authenUri = "/authen";
+    public string accessUri = "/access";
 
-    [Header("CryptoService")]
-    public string text;
+    [Header("Authentication params:")]
+    public string username;
+    public string password;
+    public string openId;
+    public string deviceId;
 
     [System.Serializable]
     public class JsonAuthenRec
     {
         public string user_data;
-        public string token;
-        public string key;
+        public string public_key;
+        public string auth_code;
     }
+
 
     IEnumerator AuthenSendRequest()
     {
@@ -29,22 +35,27 @@ public class Test : MonoBehaviour
 
             Debug.Log("sending: " + msg);
             WWW ws = new WWW(serverAddress + authenUri, System.Text.Encoding.ASCII.GetBytes(msg));
-            yield return ws;
 
+            yield return ws;
             Debug.Log("received: " + ws.text);
 
             JsonAuthenRec jsk = JsonUtility.FromJson<JsonAuthenRec>(ws.text);
             if (jsk.user_data == "63")
             {
-                byte[] rcvd_key = System.Text.Encoding.ASCII.GetBytes(jsk.key);
+                byte[] rcvd_key = System.Text.Encoding.ASCII.GetBytes(jsk.public_key);
                 byte[] final_key = AuthenService.FinalKey(secretKey, rcvd_key, 23);
+                Debug.Log("Key: " + System.Text.ASCIIEncoding.ASCII.GetString(final_key));
 
-                uint key = CryptoService.Checksum(final_key);
-                Debug.Log("Key: " + key);
-
-                WWW d = new WWW(serverAddress + "/" + jsk.token);
-                yield return d;
-                Debug.Log(d.text);
+                msg = "{\"user\":" + username + ",\"pass\":" + password + ",\"openid\":" + openId + ",\"deviceid\":" + deviceId + "}";
+                Debug.Log("sending: " + msg);
+                byte[] authencode = System.Text.Encoding.ASCII.GetBytes(jsk.auth_code);
+                byte[] endata = AuthenService.Encrypt(System.Text.Encoding.ASCII.GetBytes(msg), final_key);
+                byte[] finalmsg = new byte[authencode.Length + endata.Length];
+                System.Buffer.BlockCopy(authencode, 0, finalmsg, 0, authencode.Length);
+                System.Buffer.BlockCopy(endata, 0, finalmsg, authencode.Length, endata.Length);
+                ws = new WWW(serverAddress + accessUri, finalmsg);
+                yield return ws;
+                Debug.Log("received: " + ws.text);
             }
         }
     }
@@ -54,32 +65,5 @@ public class Test : MonoBehaviour
         int y = 10, w = 120;
         if (GUI.Button(new Rect(10, y, w, 30), "send request"))
             StartCoroutine(AuthenSendRequest());
-
-#if CR
-                 WWWForm wf = new WWWForm();
-            wf.AddField("user_data", "63");
-            wf.AddBinaryData("public_key", publicKey);
-
-        if (GUI.Button(new Rect(10, y += 35, w, 30), "crypto service"))
-        {
-            byte[] src = System.Text.Encoding.ASCII.GetBytes(text);
-            uint chksum = checksum(src, key);
-            Debug.Log("ch: " + chksum);
-
-            byte[] dest = encrypt(src, key);
-
-            string s = "";
-            foreach (var b in dest)
-                s += b.ToString() + " ";
-            Debug.Log(s);
-
-            dest = decrypt(dest, key);
-
-            s = "";
-            foreach (var b in dest)
-                s += b.ToString() + " ";
-            Debug.Log(s);
-        }
-#endif
     }
 }

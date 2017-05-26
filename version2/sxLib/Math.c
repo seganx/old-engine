@@ -236,7 +236,7 @@ SEGAN_LIB_API uint sx_checksum(const void* data, const uint size)
     uint randomer = 1363;
     const byte* d = (byte*)data;
     for (uint i = 0; i < size; ++i)
-    	res += d[i] + sx_random_advance(&randomer) + 0x17bcfa72;
+    	res += d[i] * sx_random_advance(&randomer) * 0x17bcfa72;
     return res;
 }
 
@@ -321,27 +321,20 @@ static const unsigned char base64_pr2six[256] =
 static const char base64_basis_64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 
-SEGAN_LIB_API uint sx_base64_decode_len(const char *bufcoded)
+SEGAN_LIB_API uint sx_base64_decode_len(const uint len)
 {
-    register const unsigned char* bufin = (const unsigned char *)bufcoded;
-    while (base64_pr2six[*(bufin++)] <= 63);
-
-    register int nprbytes = (bufin - (const unsigned char *)bufcoded) - 1;
-    int nbytesdecoded = ((nprbytes + 3) / 4) * 3;
-
-    return nbytesdecoded + 1;
+    return ((len + 3) / 4) * 3 /*+ 1*/;
 }
 
-SEGAN_LIB_API uint sx_base64_decode(void* dest, const uint dest_size_in_byte, const char* src)
+SEGAN_LIB_API uint sx_base64_decode(void* dest, const uint dest_size_in_byte, const char* src, const uint src_size_in_byte)
 {
-    register const unsigned char *bufin = (const unsigned char *)src;
-    while (base64_pr2six[*(bufin++)] <= 63);
-    register int nprbytes = (bufin - (const unsigned char *)src) - 1;
-    int nbytesdecoded = ((nprbytes + 3) / 4) * 3;
+    register int nprbytes = src_size_in_byte;
+    uint nbytesdecoded = ((nprbytes + 3) / 4) * 3;
 
     //	verify the length of destination
-    if (dest_size_in_byte < (uint)nbytesdecoded - 1) return 0;
+    if (dest_size_in_byte < nbytesdecoded) return 0;
 
+    register const unsigned char *bufin = (const unsigned char *)src;
     register unsigned char* bufout = (unsigned char *)dest;
     bufin = (const unsigned char *)src;
 
@@ -364,7 +357,7 @@ SEGAN_LIB_API uint sx_base64_decode(void* dest, const uint dest_size_in_byte, co
     if (nprbytes > 3)
         *(bufout++) = (unsigned char)(base64_pr2six[bufin[2]] << 6 | base64_pr2six[bufin[3]]);
 
-    *(bufout++) = '\0';
+    //*(bufout++) = '\0';
 
     nbytesdecoded -= (4 - nprbytes) & 3;
     return nbytesdecoded;
@@ -372,10 +365,10 @@ SEGAN_LIB_API uint sx_base64_decode(void* dest, const uint dest_size_in_byte, co
 
 SEGAN_LIB_API uint sx_base64_encode_len(const uint len)
 {
-    return ((len + 2) / 3 * 4) + 1;
+    return ((len + 2) / 3 * 4) /*+ 1*/;
 }
 
-SEGAN_LIB_API uint sx_base64_encode(char* dest, const uint dest_size_in_byte, const void* src, const int src_size_in_byte)
+SEGAN_LIB_API uint sx_base64_encode(char* dest, const uint dest_size_in_byte, const void* src, const uint src_size_in_byte)
 {
     //	verify the length
     if (dest_size_in_byte < sx_base64_encode_len(src_size_in_byte)) return 0;
@@ -383,7 +376,7 @@ SEGAN_LIB_API uint sx_base64_encode(char* dest, const uint dest_size_in_byte, co
     char* p = dest;
     const char* string = (const char*)src;
 
-    int i;
+    uint i;
     for (i = 0; i < src_size_in_byte - 2; i += 3)
     {
         *p++ = base64_basis_64[(string[i] >> 2) & 0x3F];
@@ -409,8 +402,8 @@ SEGAN_LIB_API uint sx_base64_encode(char* dest, const uint dest_size_in_byte, co
         *p++ = '=';
     }
 
-    *p++ = '\0';
-    return p - dest;
+    //*p++ = '\0';
+    return p - dest - 1;
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -41,4 +41,19 @@ public static class AuthenService
         return res;
     }
 
+    public static byte[] Encrypt(byte[] data, byte[] key)
+    {
+        var res = new byte[data.Length];
+        for (int i = 0; i < data.Length; ++i)
+            res[i] = (byte)(data[i] + key[i % key.Length]);
+        return res;
+    }
+
+    public static byte[] Decrypt(byte[] data, byte[] key)
+    {
+        var res = new byte[data.Length];
+        for (int i = 0; i < data.Length; ++i)
+            res[i] = (byte)(data[i] - key[i % key.Length]);
+        return res;
+    }
 }

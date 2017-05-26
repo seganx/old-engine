@@ -32,6 +32,16 @@ SEGAN_LIB_INLINE uint64 sx_str_to_uint64(const char* str, const uint64 defaul_va
     return res;
 }
 
+SEGAN_LIB_INLINE const char* sx_str_get_filename(const char* filename)
+{
+    const char* res = filename;
+    for (const char* c = filename; *c != 0; ++c)
+        if (*c == '/' || *c == '\\')
+            res = c + 1;
+    return res;
+}
+
+
 SEGAN_LIB_INLINE uint sx_wchar_to_utf8(char* dest, const uint destsize, const uint ch)
 {//	code from : http://www.opensource.apple.com/source/OpenLDAP/OpenLDAP-186/OpenLDAP/libraries/libldap/utf-8-conv.c
     uint len = 0;
@@ -231,15 +241,6 @@ SEGAN_LIB_INLINE uint sx_utf8_to_str(wchar* dest, const uint destwords, const ch
 }
 
 
-SEGAN_LIB_INLINE const char* sx_str_get_filename(const char* filename)
-{
-    const char* res = filename;
-    for (const char* c = filename; *c != 0; ++c)
-        if (*c == '/' || *c == '\\')
-            res = c + 1;
-    return res;
-}
-
 
 //////////////////////////////////////////////////////////////////////////
 //	string object stores strings of characters
@@ -247,7 +248,10 @@ SEGAN_LIB_INLINE const char* sx_str_get_filename(const char* filename)
 SEGAN_LIB_INLINE char* sx_string_clear(struct sx_string* obj, bool freemem)
 {
     if (freemem)
+    {
         free(obj->text);
+        obj->text = null;
+    }
     else if (obj->text)
         obj->text[0] = 0;
     obj->len = 0;
@@ -295,7 +299,7 @@ SEGAN_LIB_INLINE char* sx_string_append(struct sx_string* obj, const char* str)
     return obj->text;
 }
 
-SEGAN_LIB_INLINE char* sx_string_insert(struct sx_string* obj, const char* str, sint _where /*= 0*/)
+SEGAN_LIB_INLINE char* sx_string_insert(struct sx_string* obj, const char* str, sint _where)
 {
     //	trusted . safe and optimized function
     if (!str) return obj->text;
@@ -309,7 +313,7 @@ SEGAN_LIB_INLINE char* sx_string_insert(struct sx_string* obj, const char* str, 
     return obj->text;
 }
 
-SEGAN_LIB_INLINE char* sx_string_remove(struct sx_string* obj, sint index, sint count /*= 1*/)
+SEGAN_LIB_INLINE char* sx_string_remove(struct sx_string* obj, sint index, sint count)
 {
     //	trusted . safe and optimized function
     if (!obj->text || count < 1) return obj->text;
@@ -436,20 +440,16 @@ SEGAN_LIB_INLINE char* sx_string_trim(struct sx_string* obj)
 SEGAN_LIB_INLINE char* sx_string_make_upper(struct sx_string* obj)
 {
     if (!obj->text) return null;
-    for (char* cp = obj->text; *cp; ++cp) {
-        if ('a' <= *cp && *cp <= 'z')
-            *cp += 'A' - 'a';
-    }
+    for (char* cp = obj->text; *cp; ++cp)
+        *cp = sx_str_upper(*cp);
     return obj->text;
 }
 
 SEGAN_LIB_INLINE char* sx_string_make_lower(struct sx_string* obj)
 {
     if (!obj->text) return null;
-    for (char* cp = obj->text; *cp; ++cp) {
-        if ('A' <= *cp && *cp <= 'Z')
-            *cp += 'a' - 'A';
-    }
+    for (char* cp = obj->text; *cp; ++cp)
+        *cp = sx_str_lower(*cp);
     return obj->text;
 }
 

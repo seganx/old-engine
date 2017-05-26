@@ -1,58 +1,167 @@
 #include "GameIn.h"
+#include "CryptoService.h"
+#include <malloc.h>
 
-#define diffie_hellman_l	32
-#define diffie_hellman_g	7
-#define diffie_hellman_p	23
+
+static const char *s_http_port = "8000";
+static uint s_request_count = 0;
+
+static void send_to_client(struct mg_connection *nc, const void* data, const int lenght)
+{
+    mg_send_head(nc, 200, lenght, "Content-Type: application/octet-stream");
+    mg_send(nc, data, lenght);
+}
+
+static void api_authen_authcode(struct mg_connection *nc, struct http_message *hm)
+{
+    if (hm->body.len < 32) return;
+
+    sx_json json = init;
+    json.nodescount = sx_json_node_count(&json, hm->body.p, hm->body.len);
+    if (json.nodescount == 5)
+    {
+        sx_json_node nodes[5] = init;
+        json.nodes = nodes;
+        sx_json_parse(&json, hm->body.p, hm->body.len);
+
+        char userdata[32] = init;
+        sx_json_read_string(&json, userdata, 32, "user_data");
+
+        char reckey[33] = init;
+        sx_json_read_string(&json, reckey, 33, "public_key");
+
+        crypto_authen_code authcode = {1, 0};
+
+        char publckey[33] = init;
+        if (crypto_compute_keys(authcode.local_key, publckey, reckey)) return;
+        
+        //printf("%.*s\n", 32, authcode.local_key);
+
+        char token[64] = init;
+        crypto_token_generate(token, 64, &authcode, sizeof(authcode));
+
+        char tmp[256] = init;
+        int len = sx_sprintf(tmp, 256, "{\"user_data\":\"%s\",\"public_key\":\"%s\",\"auth_code\":\"%s\"}", userdata, publckey, token);
+
+        send_to_client(nc, tmp, len);
+    }
+}
+
+static void api_authen_accesscode(struct mg_connection *nc, struct http_message *hm)
+{
+    if (hm->body.len < crypto_authen_code_len) return;
+    if ( crypto_token_validate(hm->body.p, crypto_authen_code_len) < 1 ) return;
+
+    //  extract authentication code
+    crypto_authen_code authcode = init;
+    crypto_token_decode(&authcode, sizeof(authcode), hm->body.p, crypto_authen_code_len);
+    if (authcode.version != 1) return;
+
+    //  read encrypted data
+    char data[256] = init;
+    uint size = hm->body.len - crypto_authen_code_len;
+    sx_mem_copy(data, hm->body.p + crypto_authen_code_len, size);
+    
+    //  decrypt data from client
+    crypto_decrypt(data, data, size, authcode.local_key, crypto_key_len);
+
+    //  read data
+    sx_json json = init;
+    json.nodescount = sx_json_node_count(&json, data, size);
+    if (json.nodescount == 9)
+    {
+        sx_json_node nodes[9] = init;
+        json.nodes = nodes;
+        sx_json_parse(&json, data, size);
+
+        char user[32] = init;
+        sx_json_read_string(&json, user, 32, "user");
+
+        char pass[33] = init;
+        sx_json_read_string(&json, pass, 33, "pass");
+
+        char openid[64] = init;
+        sx_json_read_string(&json, openid, 64, "openid");
+
+        char deviceid[64] = init;
+        sx_json_read_string(&json, deviceid, 64, "deviceid");
+
+        // TODO: send these data to a thread to request profileID from database
+    }
+}
+
+static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
+{
+    switch (ev)
+    {
+        case MG_EV_HTTP_REQUEST:
+        {
+            struct http_message *hm = (struct http_message *) ev_data;
+            if (mg_vcmp(&hm->uri, "/authen/authencode") == 0)
+            {
+                s_request_count++;
+                api_authen_authcode(nc, hm);
+                nc->flags |= MG_F_SEND_AND_CLOSE;
+            }
+            if (mg_vcmp(&hm->uri, "/authen/accesscode") == 0)
+            {
+                s_request_count++;
+                api_authen_accesscode(nc, hm);
+                nc->flags |= MG_F_SEND_AND_CLOSE;
+            }
+            else
+            {
+                /* Send headers */
+                mg_printf(nc, "%s", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n");
+                mg_printf_http_chunk(nc, "{}");
+                /* Send empty chunk, the end of response */
+                mg_send_http_chunk(nc, "", 0);
+            }
+        } break;
+    }
+}
+
 
 int main(int argc, char* argv[])
 {
-	sx_trace_attach(10, "crash report.txt");
-	sx_trace();
+    sx_trace_attach(10, "gamein crash report.txt");
+    sx_trace();
 
-	char t[64] = {0};
-    sx_time_print(t, 64, sx_time_now());
-    sx_print(t);
+    struct mg_mgr mgr;
+    struct mg_connection *nc;
+    struct mg_bind_opts bind_opts;
+    const char *err_str;
 
-    byte bignum[64] = {0};
-    sx_big_number_power(bignum, 7, 48);
-    printf("power(7, 48) = ");
-    int len = sx_big_number_print(bignum);
-    printf("\nnumber lenght: %u\n", len);
+    mg_mgr_init(&mgr, NULL);
 
-    char seckey[diffie_hellman_l + 1] = {0};
-    char pubkey[diffie_hellman_l + 1] = {0};
-    char finkey[diffie_hellman_l + 1] = {0};
+    /* Set HTTP server options */
+    memset(&bind_opts, 0, sizeof(bind_opts));
+    bind_opts.error_string = &err_str;
+    nc = mg_bind_opt(&mgr, s_http_port, ev_handler, bind_opts);
+    if (nc == NULL)
+    {
+        fprintf(stderr, "Error starting server on port %s: %s\n", s_http_port, *bind_opts.error_string);
+        getchar();
+        exit(1);
+    }
 
-    sx_dh_secret_Key(seckey, diffie_hellman_l);
-    sx_dh_public_key(pubkey, seckey, diffie_hellman_l, diffie_hellman_g, diffie_hellman_p );
-    sx_dh_final_key(finkey, seckey, pubkey, diffie_hellman_l, diffie_hellman_p);
+    mg_set_protocol_http_websocket(nc);
 
-    printf("sec: %s\n", seckey);
-    printf("pub: %s\n", pubkey);
-    printf("fin: %s\n", finkey);
+    printf("Starting server on port %s\n", s_http_port);
+    sx_time t = sx_time_now();
+    for (;;) {
+        if (sx_time_diff(sx_time_now(), t) > 1)
+        {
+            t = sx_time_now();
+            printf("\rRPS: %u                     ", s_request_count);
+            s_request_count = 0;
+        }
+        mg_mgr_poll(&mgr, 100);
+    }
 
-    char* txt = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
-    int txt_len = sx_str_len(txt);
-    char enctxt[128] = { 0 };
-    char dectxt[128] = { 0 };
-
-    sx_encrypt(enctxt, txt, txt_len, finkey, diffie_hellman_l);
-    sx_decrypt(dectxt, enctxt, txt_len, finkey, diffie_hellman_l);
-
-    printf("basetx: %s\n", txt);
-    printf("encode: %s\n", enctxt);
-    printf("decode: %s\n", dectxt);
-
-    char base64[128] = {0};
-    sx_base64_encode(base64, 128, enctxt, txt_len);
-    printf("base64 encode: %s\n", base64);
-
-    char md5[33] = {0};
-    sx_md5(md5, dectxt, "hello", null);
-    printf("md5: %s\n", md5);
-
+    mg_mgr_free(&mgr);
 
     getchar();
-	return 0;
+    sx_return(0);
 }
 

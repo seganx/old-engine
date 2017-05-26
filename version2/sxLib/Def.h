@@ -62,7 +62,12 @@ typedef unsigned char bool;
 #ifdef null
 #undef null
 #endif
-#define null	NULL
+#define null    NULL
+
+#ifdef init
+#undef init
+#endif
+#define init    {0}
 
 //////////////////////////////////////////////////////////////////////////
 //!!!    CHANGE THESE PREPROCESSORS TO CHANGE COMPILER BEHAVIOR      !!!//
