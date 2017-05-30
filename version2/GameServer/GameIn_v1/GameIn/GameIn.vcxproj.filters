@@ -27,6 +27,7 @@
     <ClCompile Include="..\..\..\sxLib\Json.c">
       <Filter>sxlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\database.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\sxLib\Def.h">
@@ -58,6 +59,7 @@
     <ClInclude Include="..\..\..\sxLib\Json.h">
       <Filter>sxlib</Filter>
     </ClInclude>
+    <ClInclude Include="..\database.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="sxlib">

@@ -5,6 +5,7 @@
 
 static const char *s_http_port = "8000";
 static uint s_request_count = 0;
+static struct sx_threadpool * s_threadpool = null;
 
 static void send_to_client(struct mg_connection *nc, const void* data, const int lenght)
 {
@@ -47,6 +48,45 @@ static void api_authen_authcode(struct mg_connection *nc, struct http_message *h
     }
 }
 
+typedef struct therad_task_authen
+{
+    bool done;
+    struct sx_string request;
+    struct sx_string result;
+}
+therad_task_authen;
+
+static void api_authen_accesscode_thread(void* p)
+{
+    struct therad_task_authen* data = (struct therad_task_authen*)p;
+
+    //  read data
+    sx_json json = init;
+    json.nodescount = sx_json_node_count(&json, data->request.text, data->request.len);
+    if (json.nodescount == 9)
+    {
+        sx_json_node nodes[9] = init;
+        json.nodes = nodes;
+
+        sx_json_parse(&json, data->request.text, data->request.len);
+
+        char user[32] = init;
+        sx_json_read_string(&json, user, 32, "user");
+
+        char pass[33] = init;
+        sx_json_read_string(&json, pass, 33, "pass");
+
+        char openid[64] = init;
+        sx_json_read_string(&json, openid, 64, "openid");
+
+        char deviceid[64] = init;
+        sx_json_read_string(&json, deviceid, 64, "deviceid");
+
+        sx_string_set(&data->result, user);
+        data->done = true;
+    }
+}
+
 static void api_authen_accesscode(struct mg_connection *nc, struct http_message *hm)
 {
     if (hm->body.len < crypto_authen_code_len) return;
@@ -70,23 +110,15 @@ static void api_authen_accesscode(struct mg_connection *nc, struct http_message 
     json.nodescount = sx_json_node_count(&json, data, size);
     if (json.nodescount == 9)
     {
-        sx_json_node nodes[9] = init;
-        json.nodes = nodes;
-        sx_json_parse(&json, data, size);
+        //  allocate thread object to read data from database
+        therad_task_authen* thobject = (therad_task_authen*)sx_mem_calloc(sizeof(therad_task_authen));
+        sx_string_set(&thobject->request, data);
 
-        char user[32] = init;
-        sx_json_read_string(&json, user, 32, "user");
-
-        char pass[33] = init;
-        sx_json_read_string(&json, pass, 33, "pass");
-
-        char openid[64] = init;
-        sx_json_read_string(&json, openid, 64, "openid");
-
-        char deviceid[64] = init;
-        sx_json_read_string(&json, deviceid, 64, "deviceid");
+        //  assign thread object to connection
+        nc->user_data = thobject;
 
         // TODO: send these data to a thread to request profileID from database
+        sx_threadpool_add_job( s_threadpool, api_authen_accesscode_thread, thobject );
     }
 }
 
@@ -107,7 +139,6 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
             {
                 s_request_count++;
                 api_authen_accesscode(nc, hm);
-                nc->flags |= MG_F_SEND_AND_CLOSE;
             }
             else
             {
@@ -118,6 +149,19 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
                 mg_send_http_chunk(nc, "", 0);
             }
         } break;
+
+        case MG_EV_POLL:
+            if (nc->user_data)
+            {
+                therad_task_authen* thobject = (therad_task_authen*)nc->user_data;
+                if (thobject->done)
+                {
+                    send_to_client(nc, thobject->result.text, thobject->result.len);
+                    sx_mem_free_and_null(nc->user_data);
+                    nc->flags |= MG_F_SEND_AND_CLOSE;
+                }
+            }
+            break;
     }
 }
 
@@ -144,20 +188,24 @@ int main(int argc, char* argv[])
         getchar();
         exit(1);
     }
-
     mg_set_protocol_http_websocket(nc);
 
     printf("Starting server on port %s\n", s_http_port);
+
+    s_threadpool = sx_threadpool_create(100);
+
     sx_time t = sx_time_now();
     for (;;) {
         if (sx_time_diff(sx_time_now(), t) > 1)
         {
             t = sx_time_now();
-            printf("\rRPS: %u                     ", s_request_count);
+            printf("\rRPS: %4u  TJC: %4u", s_request_count, sx_threadpool_num_jobs(s_threadpool));
             s_request_count = 0;
         }
         mg_mgr_poll(&mgr, 100);
     }
+
+    sx_threadpool_destroy( s_threadpool );
 
     mg_mgr_free(&mgr);
 

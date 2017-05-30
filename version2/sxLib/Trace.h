@@ -87,6 +87,7 @@ SEGAN_LIB_API void trace_pop(void);
 #if SEGANX_TRACE_MEMORY
 
 #define sx_mem_alloc( size_in_byte )            trace_mem_alloc( size_in_byte, __FILE__, __LINE__ )
+#define sx_mem_calloc( size_in_byte )           trace_mem_calloc( size_in_byte, __FILE__, __LINE__ )
 #define sx_mem_realloc( p, new_size_in_byte )   trace_mem_realloc( p, new_size_in_byte, __FILE__, __LINE__ )
 #define sx_mem_free( p )                        trace_mem_free( p )
 #define sx_mem_free_and_null( p )               { trace_mem_free( p ); p = null; }
@@ -96,6 +97,7 @@ extern "C" {
 #endif // __cplusplus
 
 SEGAN_LIB_API void* trace_mem_alloc(const uint size_in_byte, const char* file, const int line);
+SEGAN_LIB_API void* trace_mem_calloc(const uint size_in_byte, const char* file, const int line);
 SEGAN_LIB_API void* trace_mem_realloc(void* p, const uint new_size_in_byte, const char* file, const int line);
 SEGAN_LIB_API void* trace_mem_free(const void* p);
 
