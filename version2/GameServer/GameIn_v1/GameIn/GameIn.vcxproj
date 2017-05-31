@@ -68,8 +68,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Projects\Sajad\mysql-connector-c-6.1.10-win32\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Projects\Sajad\mysql-connector-c-6.1.10-win32\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\mysql\connector\include;$(IncludePath)</IncludePath>
+    <LibraryPath>../mysql/connector/lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

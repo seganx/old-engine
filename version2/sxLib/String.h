@@ -59,8 +59,8 @@ SEGAN_LIB_API uint sx_utf8_to_str( wchar* dest, const uint destwords, const char
 //! string structure stores strings of characters 
 typedef struct sx_string
 {
-    sint    len;        //  length of string
 	char*   text;       //	main text
+    sint    len;        //  length of string
 }
 sx_string;
 

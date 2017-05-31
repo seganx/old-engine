@@ -1,9 +1,8 @@
 #include <my_global.h>
 #include <mysql.h>
+#pragma comment (lib, "libmysql.lib")
 
 #include "database.h"
-
-#pragma comment (lib, "libmysql.lib")
 
 bool sx_database_initalize(struct sx_database * database, const struct sx_database_config * config)
 {

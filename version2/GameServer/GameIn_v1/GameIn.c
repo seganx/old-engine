@@ -50,13 +50,14 @@ static void api_authen_authcode(struct mg_connection *nc, struct http_message *h
 
 typedef struct therad_task_authen
 {
-    bool done;
-    struct sx_string request;
-    struct sx_string result;
+    bool                done;
+    char                key[crypto_key_len];
+    struct sx_string    request;
+    struct sx_string    result;
 }
 therad_task_authen;
 
-static void api_authen_accesscode_thread(void* p)
+static void authen_accesscode_thread(void* p)
 {
     struct therad_task_authen* data = (struct therad_task_authen*)p;
 
@@ -82,12 +83,16 @@ static void api_authen_accesscode_thread(void* p)
         char deviceid[64] = init;
         sx_json_read_string(&json, deviceid, 64, "deviceid");
 
+        //  request profile id from database
+
+
         sx_string_set(&data->result, user);
+        sx_encrypt(data->result.text, data->result.text, data->result.len, data->key, crypto_key_len);
         data->done = true;
     }
 }
 
-static void api_authen_accesscode(struct mg_connection *nc, struct http_message *hm)
+static void authen_accesscode(struct mg_connection *nc, struct http_message *hm)
 {
     if (hm->body.len < crypto_authen_code_len) return;
     if ( crypto_token_validate(hm->body.p, crypto_authen_code_len) < 1 ) return;
@@ -112,13 +117,14 @@ static void api_authen_accesscode(struct mg_connection *nc, struct http_message 
     {
         //  allocate thread object to read data from database
         therad_task_authen* thobject = (therad_task_authen*)sx_mem_calloc(sizeof(therad_task_authen));
+        sx_mem_copy(thobject->key, authcode.local_key, crypto_key_len);
         sx_string_set(&thobject->request, data);
 
         //  assign thread object to connection
         nc->user_data = thobject;
 
         // TODO: send these data to a thread to request profileID from database
-        sx_threadpool_add_job( s_threadpool, api_authen_accesscode_thread, thobject );
+        sx_threadpool_add_job( s_threadpool, authen_accesscode_thread, thobject );
     }
 }
 
@@ -138,16 +144,9 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
             if (mg_vcmp(&hm->uri, "/authen/accesscode") == 0)
             {
                 s_request_count++;
-                api_authen_accesscode(nc, hm);
+                authen_accesscode(nc, hm);
             }
-            else
-            {
-                /* Send headers */
-                mg_printf(nc, "%s", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n");
-                mg_printf_http_chunk(nc, "{}");
-                /* Send empty chunk, the end of response */
-                mg_send_http_chunk(nc, "", 0);
-            }
+            else send_to_client(nc, "{seganx@gmail.com}", 18);
         } break;
 
         case MG_EV_POLL:
