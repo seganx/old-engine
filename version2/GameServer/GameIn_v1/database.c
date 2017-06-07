@@ -7,14 +7,14 @@
 bool sx_database_initalize(struct sx_database * database, const struct sx_database_config * config)
 {
     sx_trace();
-
+    
 	//	check to see if library is compiled as thread-safe
-#if _DEBUG
+#if 0 && _DEBUG
 	if (mysql_thread_safe() == 0)
 	{
 		sx_print("ERROR: MySQL library is NOT compiled as thread-safe!");
 		sx_assert(false);
-		return false;
+		sx_return(false);
 	}
 #endif
 
@@ -25,9 +25,10 @@ bool sx_database_initalize(struct sx_database * database, const struct sx_databa
 		mysql_close(database->mysql);
 		mysql_thread_end();
 		database->mysql = null;
-		return false;
+		sx_return(false);
 	}
-	return true;
+
+	sx_return(true);
 }
 
 void sx_database_finalize(struct sx_database * database)
@@ -40,9 +41,11 @@ void sx_database_finalize(struct sx_database * database)
 		mysql_thread_end();
 	}
 	database->mysql = null;
+
+    sx_return();
 }
 
-uint sx_database_command(struct sx_database * database, struct sx_string * query, struct sx_string * result)
+uint sx_database_query(struct sx_database * database, struct sx_string * query, struct sx_string * result)
 {
     sx_trace();
 
@@ -51,10 +54,11 @@ uint sx_database_command(struct sx_database * database, struct sx_string * query
 	if (mysql_query(database->mysql, query->text))
 	{
 		sx_print("Error: %s", mysql_error(database->mysql));
-		return 0;
+		sx_return(0);
 	}
 
 	//	process each statement result
+    uint res = 0;
 	do
 	{
 		MYSQL_RES *myres = mysql_store_result(database->mysql);
@@ -68,8 +72,11 @@ uint sx_database_command(struct sx_database * database, struct sx_string * query
 			{
 				for (uint i = 0; i < fieldc; ++i)
                 {
+                    if (res > 0)
+                        sx_string_append(result, database_sepchar);
+
+                    res++;
                     sx_string_append(result, row[i]);
-                    sx_string_append(result, database_sepchar);
 				}
 			}
 			else break;
@@ -78,5 +85,10 @@ uint sx_database_command(struct sx_database * database, struct sx_string * query
 
 	} while (mysql_next_result(database->mysql) == 0);
 
-	return result->len;
+	sx_return(res);
+}
+
+bool sx_database_verify_data(const char* data)
+{
+    return sx_str_str(data, "<") == null && sx_str_str(data, ">") == null && sx_str_str(data, ";") == null;
 }

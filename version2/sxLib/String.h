@@ -27,6 +27,7 @@ extern "C" {
 
 SEGAN_LIB_API uint sx_str_len( const char* str );
 SEGAN_LIB_API sint sx_str_cmp( const char* str1, const char* str2 );
+SEGAN_LIB_API const char* sx_str_str( const char* str, const char* what );
 
 //! copy the src string to the destination string and return number of characters which have copied contain null character
 SEGAN_LIB_API sint sx_str_copy( char* dest, const sint dest_size_in_byte, const char* src );
@@ -64,7 +65,7 @@ typedef struct sx_string
 }
 sx_string;
 
-SEGAN_LIB_API char* sx_string_clear(struct sx_string* obj, bool freemem);
+SEGAN_LIB_API char* sx_string_clear(struct sx_string* obj);
 SEGAN_LIB_API char* sx_string_set(struct sx_string* obj, const char* text);
 SEGAN_LIB_API char* sx_string_format(struct sx_string* obj, const char* format, ...);
 SEGAN_LIB_API char* sx_string_append(struct sx_string* obj, const char* str);

@@ -1,6 +1,4 @@
 #include "Json.h"
-//#include <stdio.h>
-//#include <string.h>
 
 //////////////////////////////////////////////////////////////////////////
 //	JSMN functions
@@ -321,6 +319,7 @@ SEGAN_LIB_API sx_json_node* sx_json_parse(sx_json* obj, const char* jsondata, co
 	for (int i = 0; i < obj->nodescount; ++i)
 	{
 		sx_json_node* node = &obj->nodes[i];
+        node->text = obj->text;
 		if (node->parent >= 0)
 		{
 			sx_json_node* parent = &obj->nodes[node->parent];
@@ -334,7 +333,7 @@ SEGAN_LIB_API sx_json_node* sx_json_parse(sx_json* obj, const char* jsondata, co
 		}
 	}
 
-	return &obj->nodes[0];
+	return obj->nodes;
 }
 
 SEGAN_LIB_API sx_json_node* sx_json_find(sx_json* obj, const char* name)
@@ -343,33 +342,38 @@ SEGAN_LIB_API sx_json_node* sx_json_find(sx_json* obj, const char* name)
 	return res ? res : &obj->tmp;
 }
 
-SEGAN_LIB_API int sx_json_node_read_string(sx_json* obj, char* dest, const int dest_size, sx_json_node* node)
+SEGAN_LIB_API int sx_json_read_value(sx_json_node* node, char* dest, const int dest_size)
 {
-	return _snprintf_s(dest, dest_size, _TRUNCATE, "%.*s", (node->down->end - node->down->start), (obj->text + node->down->start));
+	return _snprintf_s(dest, dest_size, _TRUNCATE, "%.*s", (node->down->end - node->down->start), (node->text + node->down->start));
 }
 
-SEGAN_LIB_API int sx_json_read_string(sx_json* obj, char* dest, const int dest_size, const char* name)
+SEGAN_LIB_API int sx_json_read_string(sx_json_node* node, const char* name, char* dest, const int dest_size)
 {
-    sx_json_node* node = jsmn_find(obj->nodes, obj->text, name);
-    return node ? sx_json_node_read_string(obj, dest, dest_size, node) : 0;
+    sx_json_node* found = jsmn_find(node, node->text, name);
+    return found ? sx_json_read_value(found, dest, dest_size) : 0;
 }
 
-SEGAN_LIB_API int sx_json_read_int(sx_json* obj, sx_json_node* node, const int default_value)
+SEGAN_LIB_API int sx_json_read_int(sx_json_node* node, const char* name, const int default_value)
+{
+    char tmp[16] = init;
+    sx_json_read_string(node, name, tmp, 16);
+   
+    int res = default_value;
+    sscanf_s(tmp, "%d", &res, sizeof(res));
+    return res;
+}
+
+SEGAN_LIB_API float sx_json_read_float(sx_json_node* node, const char* name, const float default_value)
 {
 	return 0;
 }
 
-SEGAN_LIB_API float sx_json_read_float(sx_json* obj, sx_json_node* node, const float default_value)
-{
-	return 0;
-}
-
-SEGAN_LIB_API bool sx_json_read_bool(sx_json* obj, sx_json_node* node, const bool default_value)
+SEGAN_LIB_API bool sx_json_read_bool(sx_json_node* node, const char* name, const bool default_value)
 {
 	return false;
 }
 
-SEGAN_LIB_API void sx_json_print(sx_json* obj)
+SEGAN_LIB_API void sx_json_print(sx_json_node* node)
 {
-	jsmn_print(obj->text, obj->nodes, 0, true, true);
+	jsmn_print(node->text, node, 0, true, true);
 }

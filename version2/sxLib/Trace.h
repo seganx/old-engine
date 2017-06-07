@@ -61,7 +61,7 @@ SEGAN_LIB_API void trace_detach( void );
 
 #define sx_trace()                          { trace_push( __FILE__, __LINE__, __FUNCTION__ ); }
 #define sx_trace_param(function,...)        { trace_push_param( __FILE__, __LINE__, #function, __VA_ARGS__ ); }
-#define sx_return(expression)               { trace_pop(); return expression; }
+#define sx_return(...)                      { trace_pop(); return __VA_ARGS__; }
 
 #if __cplusplus
 extern "C" {

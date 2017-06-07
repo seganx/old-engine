@@ -1,3 +1,6 @@
+#ifndef HEADER_GAMEIN
+#define HEADER_GAMEIN
+
 #include "../../sxLib/Def.h"
 #include "../../sxLib/Memory.h"
 #include "../../sxLib/Trace.h"
@@ -21,4 +24,14 @@
 
 #include "mongoose.h"
 
+typedef enum gamein_error
+{
+    GIE_NO_ERROR = 0,
+    GIE_INVALID_DATA = 1,
+    GIE_INVALID_USERPASS = 2
+}
+gamein_error;
+
 void send_to_client(struct mg_connection *nc, const void* data, const int lenght);
+
+#endif // HEADER_GAMEIN

@@ -107,13 +107,15 @@ SEGAN_LIB_API struct sx_thread * sx_thread_create(const uint id, sx_thread_func 
 SEGAN_LIB_API int sx_thread_destroy(struct sx_thread * thread);
 SEGAN_LIB_API uint sx_thread_id(struct sx_thread * thread);
 
-SEGAN_LIB_API struct sx_threadpool* sx_threadpool_create(const uint thread_count);
+SEGAN_LIB_API struct sx_threadpool* sx_threadpool_create(const uint thread_count, const char* trace_filename);
 SEGAN_LIB_API int sx_threadpool_destroy(struct sx_threadpool * threadpool);
 SEGAN_LIB_API int sx_threadpool_add_job(struct sx_threadpool * threadpool, sx_thread_func func, void * param);
 SEGAN_LIB_API uint sx_threadpool_num_jobs(struct sx_threadpool * threadpool);
 SEGAN_LIB_API uint sx_threadpool_num_busy_threads(struct sx_threadpool * threadpool);
 
 SEGAN_LIB_API void sx_sleep(const uint miliseconds);
+SEGAN_LIB_API char sx_getch();
+
 
 #ifdef __cplusplus
 }

@@ -13,8 +13,8 @@ crypto_authen_code;
 typedef struct crypto_access_code
 {
     byte    version;                    //  version of the object
-    char    local_key[crypto_key_len];  //  local key
     uint    profile_id;                 //  unique id of the player used to access from database
+    char    local_key[crypto_key_len];  //  local key
 }
 crypto_access_code;
 

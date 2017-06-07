@@ -4,6 +4,8 @@
 
 SEGAN_LIB_INLINE uint sx_str_len(const char* str) { return str ? strlen(str) : 0; }
 SEGAN_LIB_INLINE sint sx_str_cmp(const char* str1, const char* str2) { return str1 && str2 ? strcmp(str1, str2) : (str1 ? 1 : (str2 ? -1 : 0)); }
+SEGAN_LIB_INLINE const char* sx_str_str(const char* str, const char* what) { return str && what ? strstr(str, what) : null; }
+
 SEGAN_LIB_INLINE sint sx_str_copy(char* dest, const sint dest_size_in_byte, const char* src) { return strcpy_s(dest, dest_size_in_byte, src); }
 SEGAN_LIB_INLINE char sx_str_upper(char c) { return toupper(c); }
 SEGAN_LIB_INLINE char sx_str_lower(char c) { return tolower(c); }
@@ -245,15 +247,10 @@ SEGAN_LIB_INLINE uint sx_utf8_to_str(wchar* dest, const uint destwords, const ch
 //////////////////////////////////////////////////////////////////////////
 //	string object stores strings of characters
 //////////////////////////////////////////////////////////////////////////
-SEGAN_LIB_INLINE char* sx_string_clear(struct sx_string* obj, bool freemem)
+SEGAN_LIB_INLINE char* sx_string_clear(struct sx_string* obj)
 {
-    if (freemem)
-    {
-        free(obj->text);
-        obj->text = null;
-    }
-    else if (obj->text)
-        obj->text[0] = 0;
+    free(obj->text);
+    obj->text = null;
     obj->len = 0;
     return null;
 }
@@ -269,7 +266,7 @@ SEGAN_LIB_INLINE char* sx_string_set(struct sx_string* obj, const char* text)
             memcpy(obj->text, text, obj->len);
             obj->text[obj->len] = 0;
         }
-        else sx_string_clear(obj, true);
+        else sx_string_clear(obj);
     }
     return obj->text;
 }
@@ -282,7 +279,7 @@ SEGAN_LIB_INLINE char* sx_string_format(struct sx_string* obj, const char* forma
     va_start(argList, format);
     obj->len = _vscprintf(format, argList);
     obj->text = realloc(obj->text, obj->len + 1);
-    vsprintf_s(obj->text, obj->len, format, argList);
+    vsnprintf_s(obj->text, obj->len, _TRUNCATE, format, argList);
     va_end(argList);
     return obj->text;
 }

@@ -34,6 +34,7 @@ json_error;
 
 typedef struct sx_json_node
 {
+    const char*             text;       //! JSON string
     json_type	            type;		//! (object, array, string etc.)
     int		                start;		//! start position in JSON data string
     int		                end;		//! end position in JSON data string
@@ -53,9 +54,10 @@ typedef struct sx_json
     uint                    toksuper;       //! superior token node, e.g parent object or array
     int                     nodescount;     //! number of nodes
     struct sx_json_node*    nodes;          //! array of node
-    struct sx_json_node     tmp;            //! temp node
+    struct sx_json_node     tmp;            //! temp node used in return values
 }
 sx_json;
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,7 +68,7 @@ extern "C" {
 SEGAN_LIB_API uint sx_json_node_count(sx_json* obj, const char* jsondata, const int jsonlen);
 
 /*! 
-parses a JSON data string and return number of nodes
+parses a JSON data string and return a pointer to the root
 NOTE: use sx_json_node_count to find out number of nodes needed
 */
 SEGAN_LIB_API sx_json_node* sx_json_parse(sx_json* obj, const char* jsondata, const int jsonlen);
@@ -75,22 +77,22 @@ SEGAN_LIB_API sx_json_node* sx_json_parse(sx_json* obj, const char* jsondata, co
 SEGAN_LIB_API sx_json_node* sx_json_find(sx_json* obj, const char* name);
 
 //! fill out dest buffer with string value of the node and return the length of string
-SEGAN_LIB_API int sx_json_node_read_string(sx_json* obj, char* dest, const int dest_size, sx_json_node* node);
+SEGAN_LIB_API int sx_json_read_value(sx_json_node* node, char* dest, const int dest_size);
 
 //! fill out dest buffer with string value of the node and return the length of string
-SEGAN_LIB_API int sx_json_read_string(sx_json* obj, char* dest, const int dest_size, const char* name);
+SEGAN_LIB_API int sx_json_read_string(sx_json_node* node, const char* name, char* dest, const int dest_size);
 
 //! return node's value as integer
-SEGAN_LIB_API int sx_json_read_int(sx_json* obj, sx_json_node* node, const int default_value);
+SEGAN_LIB_API int sx_json_read_int(sx_json_node* node, const char* name, const int default_value);
 
 //! return node's value as float
-SEGAN_LIB_API float sx_json_read_float(sx_json* obj, sx_json_node* node, const float default_value);
+SEGAN_LIB_API float sx_json_read_float(sx_json_node* node, const char* name, const float default_value);
 
 //! return node's value as boolean
-SEGAN_LIB_API bool sx_json_read_bool(sx_json* obj, sx_json_node* node, const bool default_value);
+SEGAN_LIB_API bool sx_json_read_bool(sx_json_node* node, const char* name, const bool default_value);
 
 //! print the parsed JSON in a tree structure
-SEGAN_LIB_API void sx_json_print(sx_json* obj);
+SEGAN_LIB_API void sx_json_print(sx_json_node* node);
 
 #ifdef __cplusplus
 }

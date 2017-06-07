@@ -43,8 +43,11 @@ bool sx_database_initalize( struct sx_database * database, const struct sx_datab
 //	finalize the SQL connection
 void sx_database_finalize( struct sx_database * database );
 
-//  send query command to mySql server and return received data size in byte
-uint sx_database_command( struct sx_database * database, struct sx_string * query, struct sx_string * result );
+//  send query command to mySql server and return number of received fields
+uint sx_database_query( struct sx_database * database, struct sx_string * query, struct sx_string * result );
+
+//  verify that user content is clear from injection strings
+bool sx_database_verify_data( const char* data );
 
 #if __cplusplus
 }

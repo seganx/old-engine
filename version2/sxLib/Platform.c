@@ -1,3 +1,4 @@
+#include "Trace.h"
 #include "Platform.h"
 
 #if defined(_WIN32)
@@ -7,6 +8,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #endif
+#include <conio.h>
 
 //! mutex object
 typedef struct sx_mutex
@@ -81,6 +83,7 @@ threadpool_jobqueue;
 //! threadpool object
 typedef struct sx_threadpool
 {
+    const char*         trace_file;             //  filename for trace
     sx_thread*          threads;                //  array of thread objecs
     sx_semaphore        semaphore;              //  semaphore used to signal threads in pool
     threadpool_jobqueue jobqueue;               //  multi-threaded safe queue of jobs
@@ -465,6 +468,7 @@ static int jobqueue_destroy(struct threadpool_jobqueue* jobqueue)
 static void threadpool_worker(void* p)
 {
     struct sx_threadpool* threadpool = (struct sx_threadpool*)p;
+    sx_trace_attach(10, threadpool->trace_file);
 
     // count number of threads which are ready
     sx_mutex_lock(&threadpool->mutex);
@@ -484,8 +488,8 @@ static void threadpool_worker(void* p)
         threadpool->num_threads_working++;
         sx_mutex_unlock(&threadpool->mutex);
 
-        // dequeue job from jobsqueue
-        struct threadpool_job* job = NULL;
+        // dequeue job from jobs queue
+        struct threadpool_job* job = null;
         sx_mutex_lock(&threadpool->jobqueue.mutex);
         job = jobqueue_dequeue(&threadpool->jobqueue);
         sx_mutex_unlock(&threadpool->jobqueue.mutex);
@@ -515,7 +519,7 @@ static void threadpool_worker(void* p)
 }
 
 
-SEGAN_LIB_API struct sx_threadpool* sx_threadpool_create(const uint num_threads)
+SEGAN_LIB_API struct sx_threadpool* sx_threadpool_create(const uint num_threads, const char* trace_filename)
 {
     if (num_threads <= 0)
         return NULL;
@@ -526,6 +530,7 @@ SEGAN_LIB_API struct sx_threadpool* sx_threadpool_create(const uint num_threads)
         sx_print("Error: Can't allocate memory for thread pool!\n");
         return NULL;
     }
+    res->trace_file = trace_filename;
 
     res->threads = (struct sx_thread*)calloc(num_threads, sizeof(struct sx_thread));
     if (res->threads == NULL)
@@ -615,6 +620,7 @@ SEGAN_LIB_API int sx_threadpool_add_job(struct sx_threadpool* threadpool, sx_thr
         return -1;
     }
 
+    job->prev = null;
     job->func = func;
     job->param = param;
 
@@ -644,5 +650,13 @@ SEGAN_LIB_API void sx_sleep(const uint miliseconds)
 #else
     usleep(miliseconds * 1000);
 #endif	
+}
+
+SEGAN_LIB_API char sx_getch()
+{
+    char r = 0;
+    if (_kbhit())
+        r = _getch();
+    return r;
 }
 

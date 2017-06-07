@@ -11,10 +11,13 @@ public class Test : MonoBehaviour
     public string accessUri = "/access";
 
     [Header("Authentication params:")]
+    public string deviceId;
+    public string google;
+    public string facebook;
+    public string type;
     public string username;
     public string password;
-    public string openId;
-    public string deviceId;
+    
 
     [System.Serializable]
     public class JsonAuthenRec
@@ -46,7 +49,14 @@ public class Test : MonoBehaviour
                 byte[] final_key = AuthenService.FinalKey(secretKey, rcvd_key, 23);
                 Debug.Log("Key: " + System.Text.ASCIIEncoding.ASCII.GetString(final_key));
 
-                msg = "{\"user\":" + username + ",\"pass\":" + password + ",\"openid\":" + openId + ",\"deviceid\":" + deviceId + "}";
+                msg = "{\"user_data\":63"+
+                    ",\"device\":" + deviceId +
+                    ",\"google\":" + google +
+                    ",\"facebook\":" + facebook +
+                    ",\"type\":" + type +
+                    ",\"user\":" + username + 
+                    ",\"pass\":" + password + 
+                    "}";
                 Debug.Log("sending: " + msg);
                 byte[] authencode = System.Text.Encoding.ASCII.GetBytes(jsk.auth_code);
                 byte[] endata = AuthenService.Encrypt(System.Text.Encoding.ASCII.GetBytes(msg), final_key);
