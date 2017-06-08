@@ -1,8 +1,8 @@
-#include "CryptoService.h"
+#include "crypto.h"
 #include <malloc.h>
 
-#define diffie_hellman_g	7
-#define diffie_hellman_p	23
+#define diffie_hellman_g	    7
+#define diffie_hellman_p	    23
 
 #define crypto_token_key        "1qa!z2@ws#x$3%edc4r^fv5&tgb*6yh(n7ujm)8ik9ol0p"
 #define crypto_token_keysize    45

@@ -25,6 +25,9 @@
 extern "C" {
 #endif // __cplusplus
 
+SEGAN_LIB_API char sx_str_upper( char c );
+SEGAN_LIB_API char sx_str_lower( char c );
+
 SEGAN_LIB_API uint sx_str_len( const char* str );
 SEGAN_LIB_API sint sx_str_cmp( const char* str1, const char* str2 );
 SEGAN_LIB_API const char* sx_str_str( const char* str, const char* what );
@@ -32,8 +35,11 @@ SEGAN_LIB_API const char* sx_str_str( const char* str, const char* what );
 //! copy the src string to the destination string and return number of characters which have copied contain null character
 SEGAN_LIB_API sint sx_str_copy( char* dest, const sint dest_size_in_byte, const char* src );
 
-SEGAN_LIB_API char sx_str_upper( char c );
-SEGAN_LIB_API char sx_str_lower( char c );
+//! return number of items in splittable string
+SEGAN_LIB_API sint sx_str_split_count( const char* str, const char* split );
+
+//! split string and copy substring to the destination buffer. return number of characters copied to destination
+SEGAN_LIB_API sint sx_str_split( char* dest, const uint destsize, const char* str, const char* split, const uint index );
 
 SEGAN_LIB_API sint sx_str_to_int( const char* str, const sint defaul_val);
 

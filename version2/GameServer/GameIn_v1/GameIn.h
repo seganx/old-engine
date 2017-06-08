@@ -32,6 +32,27 @@ typedef enum gamein_error
 }
 gamein_error;
 
-void send_to_client(struct mg_connection *nc, const void* data, const int lenght);
+
+typedef struct gamein
+{
+    char                         trace_file[32];
+    char                         http_port[8];
+    uint                         threads_count;
+    uint                         request_count;
+    struct sx_threadpool *       threadpool;
+    struct sx_database_config *  database_config;
+}
+gamein;
+
+extern struct gamein g_gamein;
+
+//! send data to the client and close the connection
+void send_and_close(struct mg_connection *nc, const void* data, const int lenght);
+
+//! implement this function in your own application to handle requests
+void gamein_handle_request(struct mg_connection *nc, struct http_message *hm);
+
+//! implement this function in your own application to handle pool
+void gamein_handle_pool(struct mg_connection *nc);
 
 #endif // HEADER_GAMEIN

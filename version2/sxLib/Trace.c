@@ -557,21 +557,15 @@ SEGAN_LIB_API void trace_push_param(const char * file, const int line, const cha
 
 SEGAN_LIB_API void trace_pop(void)
 {
-#if _DEBUG
-    sx_assert(s_current_object->callstack_index > 0);
-#endif
-
 #if SEGANX_TRACE_PROFILER
     struct trace_info* tinfo = &s_current_object->callstack_array[--s_current_object->callstack_index];
     tinfo->time = trace_get_current_tick() - tinfo->time;
 #else
+#if _DEBUG
+    if (s_current_object->callstack_index > 0)
+#endif
     --s_current_object->callstack_index;
 #endif
-
-#if SEGANX_TRACE_CRASHRPT
-    if (s_current_object->callstack_index == 0 && trace_mem_report_compute_num(false) > 0)
-        trace_app_crashed("Memory leak detected!", 0);
-#endif // SEGANX_TRACE_CRASHRPT
 }
 
 #endif // (SEGANX_TRACE_CALLSTACK || SEGANX_TRACE_PROFILER)

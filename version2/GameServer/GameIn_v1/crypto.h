@@ -1,7 +1,6 @@
 #include "GameIn.h"
 
 #define crypto_key_len	        32
-#define crypto_authen_code_len  52
 
 typedef struct crypto_authen_code
 {

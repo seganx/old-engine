@@ -18,7 +18,8 @@
     <ClCompile Include="..\..\..\sxLib\String.c" />
     <ClCompile Include="..\..\..\sxLib\Time.c" />
     <ClCompile Include="..\..\..\sxLib\Trace.c" />
-    <ClCompile Include="..\CryptoService.c" />
+    <ClCompile Include="..\authenticator.c" />
+    <ClCompile Include="..\crypto.c" />
     <ClCompile Include="..\database.c" />
     <ClCompile Include="..\GameIn.c" />
     <ClCompile Include="..\mongoose.c" />
@@ -32,7 +33,8 @@
     <ClInclude Include="..\..\..\sxLib\String.h" />
     <ClInclude Include="..\..\..\sxLib\Time.h" />
     <ClInclude Include="..\..\..\sxLib\Trace.h" />
-    <ClInclude Include="..\CryptoService.h" />
+    <ClInclude Include="..\authenticator.h" />
+    <ClInclude Include="..\crypto.h" />
     <ClInclude Include="..\database.h" />
     <ClInclude Include="..\GameIn.h" />
     <ClInclude Include="..\mongoose.h" />

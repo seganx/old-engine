@@ -516,6 +516,8 @@ static void threadpool_worker(void* p)
     sx_mutex_lock(&threadpool->mutex);
     threadpool->num_threads_ready--;
     sx_mutex_unlock(&threadpool->mutex);
+
+    sx_trace_detach();
 }
 
 

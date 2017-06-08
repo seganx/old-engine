@@ -344,7 +344,8 @@ SEGAN_LIB_API sx_json_node* sx_json_find(sx_json* obj, const char* name)
 
 SEGAN_LIB_API int sx_json_read_value(sx_json_node* node, char* dest, const int dest_size)
 {
-	return _snprintf_s(dest, dest_size, _TRUNCATE, "%.*s", (node->down->end - node->down->start), (node->text + node->down->start));
+    int res = _snprintf_s(dest, dest_size, _TRUNCATE, "%.*s", (node->down->end - node->down->start), (node->text + node->down->start));
+    return res < 0 ? dest_size - 1 : res;
 }
 
 SEGAN_LIB_API int sx_json_read_string(sx_json_node* node, const char* name, char* dest, const int dest_size)

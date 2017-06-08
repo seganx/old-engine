@@ -2,13 +2,46 @@
 #include <ctype.h>
 #include <string.h>
 
+SEGAN_LIB_INLINE char sx_str_upper(char c) { return toupper(c); }
+SEGAN_LIB_INLINE char sx_str_lower(char c) { return tolower(c); }
+
 SEGAN_LIB_INLINE uint sx_str_len(const char* str) { return str ? strlen(str) : 0; }
 SEGAN_LIB_INLINE sint sx_str_cmp(const char* str1, const char* str2) { return str1 && str2 ? strcmp(str1, str2) : (str1 ? 1 : (str2 ? -1 : 0)); }
 SEGAN_LIB_INLINE const char* sx_str_str(const char* str, const char* what) { return str && what ? strstr(str, what) : null; }
-
 SEGAN_LIB_INLINE sint sx_str_copy(char* dest, const sint dest_size_in_byte, const char* src) { return strcpy_s(dest, dest_size_in_byte, src); }
-SEGAN_LIB_INLINE char sx_str_upper(char c) { return toupper(c); }
-SEGAN_LIB_INLINE char sx_str_lower(char c) { return tolower(c); }
+
+SEGAN_LIB_INLINE sint sx_str_split_count(const char* str, const char* split)
+{
+    if (!str || !split) return 0;
+    sint res = 1;
+    for (const char* f = strstr(str, split); f != null; f = strstr(++f, split))
+        res++;
+    return res;
+}
+
+SEGAN_LIB_INLINE sint sx_str_split(char* dest, const uint destsize, const char* str, const char* split, const uint index)
+{
+    if (!str || !split) return 0;
+
+    uint splitlen = strlen(split);
+    const char *start = str, *end = strstr(str, split);
+    for (uint i = 0; i < index && end != null; ++i)
+    {
+        start = end + splitlen;
+        end = strstr(++end, split);
+    }
+
+    if (end == null)
+        end = str + strlen(str);
+
+    if (start)
+    {
+        int res = _snprintf_s(dest, destsize, _TRUNCATE, "%.*s", (end - start), start);
+        return res < 0 ? destsize - 1 : res;
+    }
+    else return 0;
+}
+
 
 SEGAN_LIB_INLINE sint sx_str_to_int(const char* str, const sint defaul_val /*= 0 */)
 {
@@ -473,4 +506,5 @@ SEGAN_LIB_INLINE char* sx_string_make_path_style(struct sx_string* obj)
     }
     return obj->text;
 }
+
 

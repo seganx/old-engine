@@ -11,9 +11,11 @@
 
 #include "GameIn.h"
 
-//! every fields in result will be separated by this char
-#define database_sepchar    ">"
 
+//! every fields in result will be separated by this char
+#define sx_database_sepchar     ">"
+
+typedef void(*sx_database_func)(void * userdata, const int index, const char* data);
 
 //! database configuration
 typedef struct sx_database_config
@@ -44,7 +46,16 @@ bool sx_database_initalize( struct sx_database * database, const struct sx_datab
 void sx_database_finalize( struct sx_database * database );
 
 //  send query command to mySql server and return number of received fields
-uint sx_database_query( struct sx_database * database, struct sx_string * query, struct sx_string * result );
+uint sx_database_query_cb( struct sx_database * database, sx_database_func callback, void* userdata, const char* query );
+
+//  send query command to mySql server and return number of received fields
+uint sx_database_query_cb_fmt( struct sx_database * database, sx_database_func callback, void* userdata, const char* strformat, ... );
+
+//  send query command to mySql server and return number of received fields
+uint sx_database_query_str( struct sx_database * database, struct sx_string * result, const char* strformat, ... );
+
+//  send query command to mySql server and return number of received fields
+uint sx_database_query( struct sx_database * database, char* dest, const uint destsize, const char* strformat, ... );
 
 //  verify that user content is clear from injection strings
 bool sx_database_verify_data( const char* data );

@@ -17,7 +17,6 @@
     <ClCompile Include="..\..\..\sxLib\Math.c">
       <Filter>sxlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\CryptoService.c" />
     <ClCompile Include="..\..\..\sxLib\String.c">
       <Filter>sxlib</Filter>
     </ClCompile>
@@ -28,6 +27,8 @@
       <Filter>sxlib</Filter>
     </ClCompile>
     <ClCompile Include="..\database.c" />
+    <ClCompile Include="..\crypto.c" />
+    <ClCompile Include="..\authenticator.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\sxLib\Def.h">
@@ -49,7 +50,6 @@
     <ClInclude Include="..\..\..\sxLib\Math.h">
       <Filter>sxlib</Filter>
     </ClInclude>
-    <ClInclude Include="..\CryptoService.h" />
     <ClInclude Include="..\..\..\sxLib\String.h">
       <Filter>sxlib</Filter>
     </ClInclude>
@@ -60,6 +60,8 @@
       <Filter>sxlib</Filter>
     </ClInclude>
     <ClInclude Include="..\database.h" />
+    <ClInclude Include="..\crypto.h" />
+    <ClInclude Include="..\authenticator.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="sxlib">
