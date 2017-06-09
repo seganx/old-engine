@@ -4,6 +4,8 @@
 #include <malloc.h>
 
 
+#define authen_md5_salt     "seganx"
+
 typedef struct authen_task
 {
     bool                done;
@@ -12,6 +14,19 @@ typedef struct authen_task
     struct sx_string    result;
 }
 authen_task;
+
+typedef struct authen_user
+{
+    uint    ver;
+    char    userdata[33];
+    char    device[33];
+    char    type[16];
+    char    user[33];
+    char    pass[33];
+    char    google[33];
+    char    facebook[33];
+}
+authen_user;
 
 static void authen_authcode(struct mg_connection *nc, struct http_message *hm)
 {
@@ -55,7 +70,7 @@ static void authen_accesscode_send_result(struct authen_task* data, const char* 
 {
     sx_trace();
 
-    if (error == NO_ERROR)
+    if (error == NO_ERROR && *profile_id != '0')
     {
         //  create access code version 1
         crypto_access_code access_code = { 1, 0, 0 };
@@ -76,44 +91,52 @@ static void authen_accesscode_send_result(struct authen_task* data, const char* 
     sx_return();
 }
 
-static void authen_accesscode_userpass(struct authen_task* data, const char* userdata, const char* device, const char* type, const char* user, const char* pass)
+static void authen_accesscode_userpass(struct authen_task* task, struct authen_user* data)
 {
     sx_trace();
 
     sx_database dbase = init;
     if (sx_database_initalize(&dbase, g_gamein.database_config))
     {
-        if (sx_str_cmp(type, "login") == 0)
+        if (sx_str_cmp(data->type, "login") == 0)
         {
-            char profileid[16] = init;
-            if (sx_database_query(&dbase, profileid, 16, "SELECT profile_id FROM authen WHERE (username='%s' AND password='%s');", user, pass))
-            {
-                sx_database_query_cb_fmt(&dbase, null, null, "UPDATE authen SET device='%s' WHERE (profile_id='%s');", device, profileid);
-                authen_accesscode_send_result(data, userdata, profileid, GIE_NO_ERROR);
-            }
-            else authen_accesscode_send_result(data, userdata, "0", GIE_INVALID_USERPASS);
+            char tmp[34] = init;
+
+            //  verify that user has valid account
+            if (sx_database_query(&dbase, tmp, 34, "SELECT profile_id FROM authen WHERE (username='%s' AND password='%s');", data->user, data->pass))
+                authen_accesscode_send_result(task, data->userdata, tmp, GIE_NO_ERROR);
+            else
+                authen_accesscode_send_result(task, data->userdata, "0", GIE_INVALID_USERPASS);
         }
-        else if (sx_str_cmp(type, "register") == 0)
+        else if (sx_str_cmp(data->type, "register") == 0)
         {
-            // verify that player had an account on current device
-            char profileid[16] = init;
-            if (sx_database_query(&dbase, profileid, 16, "SELECT profile_id FROM authen WHERE (device='%s');", device))
-            {
+            char tmp[64] = init;
 
-            }
-
-            if (sx_database_query_cb_fmt(&dbase, null, null, "SELECT profile_id FROM authen WHERE (username='%s');", user) < 1)
+            //  verify username is not exist in database
+            if (sx_database_query(&dbase, tmp, 64, "SELECT profile_id FROM authen WHERE (username='%s');", data->user))
             {
-                sx_database_query(&dbase, "REPLACE INTO authen (username,password,device) VALUES('%s','%s','%s');", user, pass, device);
-                char profileid[16] = init;
-                if (sx_database_query(&dbase, profileid, 16, "SELECT profile_id FROM authen WHERE (username='%s' AND password='%s');", user, pass))
-                    authen_accesscode_send_result(data, userdata, profileid, GIE_NO_ERROR);
-                else 
-                    authen_accesscode_send_result(data, userdata, "0", GIE_INVALID_USERPASS);
+                //  since there is someone registered before we can not register it again
+                authen_accesscode_send_result(task, data->userdata, "0", GIE_INVALID_USERPASS);
             }
-            else authen_accesscode_send_result(data, userdata, "0", GIE_INVALID_USERPASS);
+            else
+            {
+                // verify that player had an account on current device
+                if (sx_database_query(&dbase, tmp, 64, "SELECT profile_id FROM authen WHERE (device='%s' || google='%s' || facebook='%s');", data->device, data->google, data->facebook))
+                {
+                    //  just update username and password for this profile id
+                    sx_database_query_cb_fmt(&dbase, null, null, "UPDATE authen SET username='%s', password='%s', device=NULL WHERE (profile_id='%s');", data->user, data->pass, tmp);
+                    authen_accesscode_send_result(task, data->userdata, tmp, GIE_NO_ERROR);
+                }
+                else  // there is no account with this device
+                {
+                    //  create a new account
+                    sx_database_query(&dbase, tmp, 64,
+                        "INSERT INTO authen (username, password) VALUES ('%s' ,'%s');"
+                        "SELECT profile_id FROM authen WHERE (username='%s');", data->user, data->pass, data->user);
+                    authen_accesscode_send_result(task, data->userdata, tmp, GIE_NO_ERROR);
+                }
+            }
         }
-        else authen_accesscode_send_result(data, userdata, "0", GIE_INVALID_DATA);
 
         sx_database_finalize(&dbase);
     }
@@ -121,31 +144,26 @@ static void authen_accesscode_userpass(struct authen_task* data, const char* use
     sx_return();
 }
 
-static void authen_accesscode_openid(struct authen_task* data, const char* userdata, const char* device, const char* provider, const char* openid)
-{
-    sx_trace();
-
-    sx_return();
-}
-
-static void authen_accesscode_device(struct authen_task* data, const char* userdata, const char* device)
+static void authen_accesscode_device(struct authen_task* task, struct authen_user * data)
 {
     sx_trace();
 
     sx_database dbase = init;
     if (sx_database_initalize(&dbase, g_gamein.database_config))
     {
-        char profileid[16] = init;
-        if (sx_database_query(&dbase, profileid, 16, "SELECT profile_id FROM authen WHERE (device='%s');", device) < 1)
+        char tmp[64] = init;
+
+        //  verify that there is nothing here
+        if (sx_database_query(&dbase, tmp, 64, "SELECT profile_id FROM authen WHERE (device='%s');", data->device) < 1)
         {
-            sx_database_query_cb_fmt(&dbase, null, null, "INSERT INTO authen (device) VALUES('%s');", device);
-            sx_database_query(&dbase, profileid, 16, "SELECT profile_id FROM authen WHERE (device='%s');", device);
-        }        
-        authen_accesscode_send_result(data, userdata, profileid, GIE_NO_ERROR);
+            sx_database_query(&dbase, tmp, 64, "INSERT INTO authen (device) VALUES('%s'); SELECT profile_id FROM authen WHERE (device='%s');", data->device, data->device);
+            authen_accesscode_send_result(task, data->userdata, tmp, GIE_NO_ERROR);
+        }
+        else authen_accesscode_send_result(task, data->userdata, tmp, GIE_NO_ERROR);
 
         sx_database_finalize(&dbase);
     }
-    else authen_accesscode_send_result(data, "", "0", GIE_INVALID_DATA);
+    else authen_accesscode_send_result(task, "", "0", GIE_INVALID_DATA);
 
     sx_return();
 }
@@ -154,62 +172,48 @@ static void authen_accesscode_thread(void* p)
 {
     sx_trace();
 
-    struct authen_task* data = (struct authen_task*)p;
+    struct authen_task* task = (struct authen_task*)p;
 
     //  read data
     sx_json json = init;
-    json.nodescount = sx_json_node_count(&json, data->request.text, data->request.len);
-    if (json.nodescount == 15)
+    json.nodescount = sx_json_node_count(&json, task->request.text, task->request.len);
+    json.nodes = alloca(json.nodescount * sizeof(sx_json_node));
+    sx_mem_set(json.nodes, 0, json.nodescount * sizeof(sx_json_node));
+    sx_json_node* jsroot = sx_json_parse(&json, task->request.text, task->request.len);
+
+    authen_user data = init;
+    data.ver = sx_json_read_int(jsroot, "ver", 0);
+    if (data.ver == 1)
     {
-        sx_json_node nodes[15] = init;
-        json.nodes = nodes;
-        
-        sx_json_node* jsroot = sx_json_parse(&json, data->request.text, data->request.len);
+        sx_json_read_string(jsroot, "user_data", data.userdata, 33);
+        sx_json_read_string(jsroot, "device", data.device, 33);
+        sx_json_read_string(jsroot, "type", data.type, 16);
+        sx_json_read_string(jsroot, "user", data.user, 33);
+        sx_json_read_string(jsroot, "pass", data.pass, 33);
 
-        char userdata[33] = init;
-        sx_json_read_string(jsroot, "user_data", userdata, 33);
-
-        char device[33] = init;
-        if (sx_json_read_string(jsroot, "device", device, 33) < 10 || !sx_database_verify_data(device))
+        if (sx_str_len(data.device) < 10 || sx_database_invalid_data(data.device) || sx_database_invalid_data(data.user))
         {
-            authen_accesscode_send_result(data, userdata, "0", GIE_INVALID_DATA);
+            authen_accesscode_send_result(task, data.userdata, "0", GIE_INVALID_DATA);
             sx_return();
         }
 
-        char type[16] = init;
-        if (sx_json_read_string(jsroot, "type", type, 16) > 2)
+        if (sx_str_len(data.type) > 2)
         {
-            char user[33] = init;
-            if (sx_json_read_string(jsroot, "user", user, 33) > 5 && sx_database_verify_data(user))
+            if (sx_str_len(data.user) > 2 && sx_str_len(data.pass) > 5)
             {
-                char pass[33] = init;
-                if (sx_json_read_string(jsroot, "pass", pass, 33) > 5 && sx_database_verify_data(pass))
-                {
-                    char tmp[33] = init;
-                    authen_accesscode_userpass(data, userdata, device, type, user, sx_md5(pass, "seganx", null));
-                    sx_return();
-                }
+                sx_md5(data.pass, data.pass, authen_md5_salt, null);
+                authen_accesscode_userpass(task, &data);
+                sx_return();
             }
-        }
 
-        char google[33] = init;
-        if (sx_json_read_string(jsroot, "google", google, 33) > 10 && sx_database_verify_data(google))
-        {
-            authen_accesscode_openid(data, userdata, device, "google", google);
-            sx_return();
-        }
-
-        char facebook[33] = init;
-        if (sx_json_read_string(jsroot, "facebook", facebook, 33) > 10 && sx_database_verify_data(facebook))
-        {
-            authen_accesscode_openid(data, userdata, device, "facebook", facebook);
+            //  type has value but username or password is invalid
+            authen_accesscode_send_result(task, data.userdata, "0", GIE_INVALID_USERPASS);
             sx_return();
         }
 
         //  just login with device
-        authen_accesscode_device(data, userdata, device);
+        authen_accesscode_device(task, &data);
     }
-    else authen_accesscode_send_result(data, "", "0", GIE_INVALID_DATA);
 
     sx_return();
 }
@@ -238,7 +242,7 @@ static void authen_accesscode(struct mg_connection *nc, struct http_message *hm)
     //  read data
     sx_json json = init;
     json.nodescount = sx_json_node_count(&json, data, size);
-    if (json.nodescount == 15)
+    if (json.nodescount > 2)
     {
         //  allocate thread object to read data from database
         authen_task* thobject = (authen_task*)sx_mem_calloc(sizeof(authen_task));
@@ -251,6 +255,7 @@ static void authen_accesscode(struct mg_connection *nc, struct http_message *hm)
         // TODO: send these data to a thread to request profileID from database
         sx_threadpool_add_job(g_gamein.threadpool, authen_accesscode_thread, thobject);
     }
+    else send_and_close(nc, "{\"user_data\":\"\",\"error\":\"1\",\"access_code\":\"\"}", 47);
 
     sx_return();
 }

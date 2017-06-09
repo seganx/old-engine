@@ -91,12 +91,12 @@ uint sx_database_query_cb_fmt(struct sx_database * database, sx_database_func ca
     sx_trace();
 
     //  init query string
-    va_list argList;
-    va_start(argList, strformat);
-    int len = _vscprintf(strformat, argList);
+    va_list args;
+    va_start(args, strformat);
+    int len = sx_vsprintf_len(strformat, args);
     char* query = (char*)alloca(len);
-    vsnprintf_s(query, len, _TRUNCATE, strformat, argList);
-    va_end(argList);
+    sx_vsprintf(query, len, strformat, args);
+    va_end(args);
 
     int res = sx_database_query_cb(database, callback, userdata, query);
 
@@ -117,12 +117,12 @@ uint sx_database_query_str(struct sx_database * database, struct sx_string * res
     sx_trace();
 
     //  init query string
-    va_list argList;
-    va_start(argList, strformat);
-    int len = _vscprintf(strformat, argList);
+    va_list args;
+    va_start(args, strformat);
+    int len = sx_vsprintf_len(strformat, args);
     char* query = (char*)alloca(len);
-    vsnprintf_s(query, len, _TRUNCATE, strformat, argList);
-    va_end(argList);
+    sx_vsprintf(query, len, strformat, args);
+    va_end(args);
 
     int res = sx_database_query_cb(database, sx_db_cb_str, result, query);
 
@@ -149,6 +149,7 @@ static void sx_db_cb_ud(void * userdata, const int index, const char* data)
         ud->des[ud->ptr++] = *spchar;
 
     sx_mem_copy(ud->des + ud->ptr, data, datalen);
+    ud->ptr += datalen;
 }
 
 uint sx_database_query(struct sx_database * database, char* dest, const uint destsize, const char* strformat, ...)
@@ -157,20 +158,20 @@ uint sx_database_query(struct sx_database * database, char* dest, const uint des
     sx_trace();
 
     //  init query string
-    va_list argList;
-    va_start(argList, strformat);
-    int len = _vscprintf(strformat, argList);
+    va_list args;
+    va_start(args, strformat);
+    int len = sx_vsprintf_len(strformat, args);
     char* query = (char*)alloca(len);
-    vsnprintf_s(query, len, _TRUNCATE, strformat, argList);
-    va_end(argList);
+    sx_vsprintf(query, len, strformat, args);
+    va_end(args);
 
     sx_db_ud ud = {0, destsize, dest};
-    int res = sx_database_query_cb(database, sx_db_cb_str, &ud, query);
+    int res = sx_database_query_cb(database, sx_db_cb_ud, &ud, query);
 
     sx_return(res);
 }
 
-bool sx_database_verify_data(const char* data)
+bool sx_database_invalid_data(const char* data)
 {
-    return sx_str_str(data, "<") == null && sx_str_str(data, ">") == null && sx_str_str(data, ";") == null;
+    return sx_str_str(data, "<") || sx_str_str(data, ">") || sx_str_str(data, ";");
 }

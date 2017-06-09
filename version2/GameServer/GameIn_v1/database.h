@@ -58,7 +58,7 @@ uint sx_database_query_str( struct sx_database * database, struct sx_string * re
 uint sx_database_query( struct sx_database * database, char* dest, const uint destsize, const char* strformat, ... );
 
 //  verify that user content is clear from injection strings
-bool sx_database_verify_data( const char* data );
+bool sx_database_invalid_data( const char* data );
 
 #if __cplusplus
 }

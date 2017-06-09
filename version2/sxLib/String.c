@@ -310,9 +310,17 @@ SEGAN_LIB_INLINE char* sx_string_format(struct sx_string* obj, const char* forma
     if (!format) return obj->text;
     va_list argList;
     va_start(argList, format);
-    obj->len = _vscprintf(format, argList);
+#ifdef _WIN32
+    obj->len = _vscprintf(format, argList) + 1;
+#else
+    obj->len = vsnprintf(0, 0, format, argList) + 1;
+#endif
     obj->text = realloc(obj->text, obj->len + 1);
-    vsnprintf_s(obj->text, obj->len, _TRUNCATE, format, argList);
+#ifdef _WIN32
+    _vsnprintf_s(obj->text, obj->len, _TRUNCATE, format, argList);
+#else
+    vsnprintf(obj->text, obj->len, format, argList);
+#endif
     va_end(argList);
     return obj->text;
 }

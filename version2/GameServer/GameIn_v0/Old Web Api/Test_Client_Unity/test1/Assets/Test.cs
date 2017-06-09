@@ -12,8 +12,6 @@ public class Test : MonoBehaviour
 
     [Header("Authentication params:")]
     public string deviceId;
-    public string google;
-    public string facebook;
     public string type;
     public string username;
     public string password;
@@ -30,7 +28,7 @@ public class Test : MonoBehaviour
 
     IEnumerator AuthenSendRequest()
     {
-        while (true)
+        //while (true)
         {
             byte[] secretKey = AuthenService.SecretKey(32);
             byte[] publicKey = AuthenService.PublicKey(secretKey, 7, 23);
@@ -49,10 +47,10 @@ public class Test : MonoBehaviour
                 byte[] final_key = AuthenService.FinalKey(secretKey, rcvd_key, 23);
                 Debug.Log("Key: " + System.Text.ASCIIEncoding.ASCII.GetString(final_key));
 
-                msg = "{\"user_data\":63"+
+                msg = "{"+
+					"\"ver\":1"+
+					",\"user_data\":63"+
                     ",\"device\":" + deviceId +
-                    ",\"google\":" + google +
-                    ",\"facebook\":" + facebook +
                     ",\"type\":" + type +
                     ",\"user\":" + username + 
                     ",\"pass\":" + password + 
