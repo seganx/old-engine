@@ -47,7 +47,7 @@ gamein;
 extern struct gamein g_gamein;
 
 //! send data to the client and close the connection
-void send_and_close(struct mg_connection *nc, const void* data, const int lenght);
+int send_and_close(struct mg_connection *nc, const void* data, const int lenght);
 
 //! implement this function in your own application to handle requests
 void gamein_handle_request(struct mg_connection *nc, struct http_message *hm);

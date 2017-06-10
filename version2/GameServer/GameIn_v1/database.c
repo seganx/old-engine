@@ -175,3 +175,8 @@ bool sx_database_invalid_data(const char* data)
 {
     return sx_str_str(data, "<") || sx_str_str(data, ">") || sx_str_str(data, ";");
 }
+
+bool sx_database_valid_data(const char* data)
+{
+    return !sx_database_invalid_data(data);
+}

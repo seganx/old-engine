@@ -6,13 +6,13 @@
 
 struct gamein g_gamein = init;
 
-void send_and_close(struct mg_connection *nc, const void* data, const int lenght)
+int send_and_close(struct mg_connection *nc, const void* data, const int lenght)
 {
     sx_trace();
     mg_send_head(nc, 200, lenght, "Content-Type: application/octet-stream");
     mg_send(nc, data, lenght);
     nc->flags |= MG_F_SEND_AND_CLOSE;
-    sx_return();
+    sx_return(0);
 }
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
