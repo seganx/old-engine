@@ -1,5 +1,4 @@
--- 
-DROP TABLE IF EXISTS authen;
+-- DROP TABLE IF EXISTS authen;
 
 CREATE TABLE IF NOT EXISTS authen
 (

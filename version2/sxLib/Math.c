@@ -323,13 +323,13 @@ static const char base64_basis_64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno
 
 SEGAN_LIB_API uint sx_base64_decode_len(const uint len)
 {
-    return ((len + 3) / 4) * 3 /*+ 1*/;
+    return ((len + 3) / 4) * 3;
 }
 
 SEGAN_LIB_API uint sx_base64_decode(void* dest, const uint dest_size_in_byte, const char* src, const uint src_size_in_byte)
 {
     register int nprbytes = src_size_in_byte;
-    uint nbytesdecoded = ((nprbytes + 3) / 4) * 3;
+    uint nbytesdecoded = sx_base64_decode_len(nprbytes);
 
     //	verify the length of destination
     if (dest_size_in_byte < nbytesdecoded) return 0;
@@ -365,7 +365,7 @@ SEGAN_LIB_API uint sx_base64_decode(void* dest, const uint dest_size_in_byte, co
 
 SEGAN_LIB_API uint sx_base64_encode_len(const uint len)
 {
-    return ((len + 2) / 3 * 4) /*+ 1*/;
+    return ((len + 2) / 3 * 4);
 }
 
 SEGAN_LIB_API uint sx_base64_encode(char* dest, const uint dest_size_in_byte, const void* src, const uint src_size_in_byte)

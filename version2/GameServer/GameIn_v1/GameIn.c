@@ -6,14 +6,55 @@
 
 struct gamein g_gamein = init;
 
-int send_and_close(struct mg_connection *nc, const void* data, const int lenght)
+static int gamein_read_header(char* dest, const uint destsize, struct http_message *hm, const char* name)
+{
+    struct mg_str* tmp = mg_get_http_header(hm, name);
+    if (tmp && tmp->len < destsize)
+    {
+        sx_mem_copy(dest, tmp->p, tmp->len);
+        return tmp->len;
+    }
+    return 0;
+}
+
+uint gamein_header_read(struct gamein_header* dest, struct http_message *hm)
+{
+    gamein_read_header(dest->user_data, 63, hm, "gamein_userdata");
+    return gamein_read_header(dest->access_code, 95, hm, "gamein_access");
+}
+
+struct gamein_access_token * gamein_access_token_read(struct gamein_access_token *dest, const char* data, const uint size)
+{
+    if (crypto_token_validate(data, size))
+    {
+        char tmp[sizeof(gamein_access_token) + 3] = init;
+        if (crypto_token_decode(tmp, sizeof(gamein_access_token) + 3, data, size))
+            sx_mem_copy(dest, tmp, sizeof(gamein_access_token));
+    }
+    return dest;    
+}
+
+int gamein_send_and_close(struct mg_connection *nc, const gamein_header *header, const void *data, const int lenght)
 {
     sx_trace();
-    mg_send_head(nc, 200, lenght, "Content-Type: application/octet-stream");
+
+    char hdr[256] = init;
+    sx_sprintf(hdr, 256, 
+        "Content-Type: application/octet-stream\n"
+        "gamein_userdata: %s\n"
+        "gamein_error: %u\n"
+        "gamein_access: %s",
+        header->user_data, 
+        header->error,
+        header->access_code);
+
+    mg_send_head(nc, 200, lenght, hdr);
     mg_send(nc, data, lenght);
     nc->flags |= MG_F_SEND_AND_CLOSE;
+
     sx_return(0);
 }
+
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
 {
@@ -31,6 +72,20 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
 
 int main(int argc, char* argv[])
 {
+#if 0
+    {
+        for (int i = 1; i < 256; ++i)
+        {
+            int blen = sx_base64_encode_len(i);
+            int slen = sx_base64_decode_len(blen);
+            if (slen != i)
+                printf("%3u", i);
+        }
+        getchar();
+        return 0;
+    }
+#endif
+
     struct sx_database_config database_config = init;
     g_gamein.database_config = &database_config;
 

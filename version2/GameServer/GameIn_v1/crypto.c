@@ -26,6 +26,7 @@ uint crypto_token_generate(char* dest, const uint destsize, const void* data, co
 
 uint crypto_token_validate(const void* data, const uint size)
 {
+    if (!data || size <= crypto_token_checksize) return 0;
     const byte* obj = (const byte*)data;
     char buf[crypto_token_checksize] = init;
     uint objectsize = size - crypto_token_checksize;
@@ -49,27 +50,27 @@ uint crypto_token_decode(void* dest, const uint destsize, const char* data, cons
     return objectsize;
 }
 
-int crypto_compute_keys(char* dest_local_key, char* dest_public_key, const char* received_key)
+int crypto_compute_keys(char* dest_local_key, char* dest_public_key, const char* received_key, const uint key_size)
 {
     // validate received key
     {
         const int hirange = 65 + diffie_hellman_p;
-        for (int i = 0; i < crypto_key_len; ++i)
+        for (uint i = 0; i < key_size; ++i)
             if (sx_between_i(received_key[i], 65, hirange) == false)
-                return 1;
+                return 0;
     }
 
     // generate secret key
-    char secret_key[crypto_key_len] = init;
-    sx_dh_secret_Key(secret_key, crypto_key_len);
+    char* secret_key = alloca(key_size);
+    sx_dh_secret_Key(secret_key, key_size);
 
     // generate public key based on secret key for send to the client
-    sx_dh_public_key(dest_public_key, secret_key, crypto_key_len, diffie_hellman_g, diffie_hellman_p);
+    sx_dh_public_key(dest_public_key, secret_key, key_size, diffie_hellman_g, diffie_hellman_p);
 
     // generate local key based on secret and received key for encryption/decryption
-    sx_dh_final_key(dest_local_key, secret_key, received_key, crypto_key_len, diffie_hellman_p);
+    sx_dh_final_key(dest_local_key, secret_key, received_key, key_size, diffie_hellman_p);
 
-    return 0;
+    return 1;
 }
 
 void crypto_encrypt(void* dest, const void* src, const uint srcsize, const char* key, const uint keysize)
