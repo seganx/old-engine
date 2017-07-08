@@ -144,7 +144,10 @@ public class Test : MonoBehaviour
         return new WWW(uri, data, headers);
     }
 
-
+    public string CacheFileName
+    {
+        get { return "HashtKhan/" + "test" + ".ContentBytes"; }
+    }
 
     IEnumerator DownloadTexture()
     {
@@ -152,13 +155,13 @@ public class Test : MonoBehaviour
         log += "Downloading -> ";
         yield return ws;
         log += "Downloaded: " + ws.size + "\n";
-        SaveData("test", ws.bytes);
+        SaveData(CacheFileName, ws.bytes);
     }
 
     IEnumerator DisplayTexture()
     {
         var tex = new Texture2D(256, 256, TextureFormat.DXT1, false);
-        tex.LoadRawTextureData(LoadData("test"));
+        tex.LoadRawTextureData(LoadData(CacheFileName));
         tex.Apply();
         cube.GetComponent<Renderer>().material.mainTexture = tex;        
         yield break;
@@ -167,26 +170,28 @@ public class Test : MonoBehaviour
 
     void OnGUI()
     {
-        GUI.Box(new Rect(0, 0, Screen.width, 100), log);
+        float dpi = Screen.dpi / 100;
 
-        int y = 80, w = 180, h = 20, ha = 30;
+        GUI.Box(new Rect(0, 0, Screen.width, 100 * dpi), log);
 
-        if (GUI.Button(new Rect(10, y += ha, w, h), "Download Texture"))
+        float x = 10 * dpi, y = 80 * dpi, w = 180 * dpi, h = 20 * dpi, ha = 30 * dpi;
+
+        if (GUI.Button(new Rect(x, y += ha, w, h), "Download Texture"))
             StartCoroutine(DownloadTexture());
 
-        if (GUI.Button(new Rect(10, y += ha, w, h), "Display Texture"))
+        if (GUI.Button(new Rect(x, y += ha, w, h), "Display Texture"))
             StartCoroutine(DisplayTexture());
 
-        if (GUI.Button(new Rect(10, y += ha, w, h), "Request Code"))
+        if (GUI.Button(new Rect(x, y += ha, w, h), "Request Code"))
             StartCoroutine(RequestAuthenCode());
 
-        if (GUI.Button(new Rect(10, y += ha, w, h), "Login Device"))
+        if (GUI.Button(new Rect(x, y += ha, w, h), "Login Device"))
             StartCoroutine(LoginWithDevice());
 
-        if (GUI.Button(new Rect(10, y += ha, w, h), "Register UserPass"))
+        if (GUI.Button(new Rect(x, y += ha, w, h), "Register UserPass"))
             StartCoroutine(RegisterUserPass());
 
-        if (GUI.Button(new Rect(10, y += ha, w, h), "Login UserPass"))
+        if (GUI.Button(new Rect(x, y += ha, w, h), "Login UserPass"))
             StartCoroutine(LoginWithUserPass());
     }
 
@@ -194,7 +199,7 @@ public class Test : MonoBehaviour
     public static void SaveData(string path, byte[] data)
     {
         path = Application.temporaryCachePath + "/" + path;
-        log += "Saving to " + path + "\n";
+        log += "Saving file to " + path + "\n";
         var dir = Path.GetDirectoryName(path);
         if (Directory.Exists(dir) == false)
             Directory.CreateDirectory(dir);
@@ -203,7 +208,10 @@ public class Test : MonoBehaviour
             File.WriteAllBytes(path, data);
             log += "Saved!\n";
         }
-        catch { }
+        catch (System.Exception e)
+        {
+            log += "Can't save the file: " + e.Message;
+        }
     }
 
     public static byte[] LoadData(string path)

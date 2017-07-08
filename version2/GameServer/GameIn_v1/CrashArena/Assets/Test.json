@@ -1,0 +1,12 @@
+{
+	"name": "Titan",
+	"body": {
+		"mass": "5",
+		"sprite": "Body_0"
+	},
+	"wheel": {
+		"mass": "1",
+		"sprite": "Wheel_0",
+		"pos": {1, -1, 0}
+	}
+}
