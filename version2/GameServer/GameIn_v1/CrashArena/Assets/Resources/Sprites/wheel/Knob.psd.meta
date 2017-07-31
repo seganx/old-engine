@@ -1,0 +1,165 @@
+fileFormatVersion: 2
+guid: dfa7e9eab35990045b68a0aef55e1a5a
+timeCreated: 1501233757
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Knob_0
+    21300002: Knob_1
+    21300004: Knob_2
+    21300006: Knob_3
+    21300008: Knob_4
+    21300010: Knob_5
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: 29
+  maxTextureSize: 256
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 100
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 5
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: Knob_0
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 59
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -24, y: 25}
+        - {x: -25, y: 24}
+        - {x: -25, y: -25}
+        - {x: 23, y: -25}
+        - {x: 25, y: -21}
+        - {x: 25, y: 25}
+    - name: Knob_1
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 59
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -24, y: 25}
+        - {x: -25, y: 24}
+        - {x: -25, y: -25}
+        - {x: 23, y: -25}
+        - {x: 25, y: -21}
+        - {x: 25, y: 25}
+    - name: Knob_2
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 59
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -24, y: 25}
+        - {x: -25, y: 24}
+        - {x: -25, y: -25}
+        - {x: 23, y: -25}
+        - {x: 25, y: -21}
+        - {x: 25, y: 25}
+    - name: Knob_3
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 4
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -24, y: 25}
+        - {x: -25, y: 24}
+        - {x: -25, y: -25}
+        - {x: 23, y: -25}
+        - {x: 25, y: -21}
+        - {x: 25, y: 25}
+    - name: Knob_4
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 4
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -24, y: 25}
+        - {x: -25, y: 24}
+        - {x: -25, y: -25}
+        - {x: 23, y: -25}
+        - {x: 25, y: -21}
+        - {x: 25, y: 25}
+    - name: Knob_5
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 4
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -24, y: 25}
+        - {x: -25, y: 24}
+        - {x: -25, y: -25}
+        - {x: 23, y: -25}
+        - {x: 25, y: -21}
+        - {x: 25, y: 25}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

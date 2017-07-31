@@ -1,0 +1,183 @@
+fileFormatVersion: 2
+guid: 77d06f669a86a934cafd9bb26bb447ca
+timeCreated: 1501233773
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Scooter_0
+    21300002: Scooter_1
+    21300004: Scooter_2
+    21300006: Scooter_3
+    21300008: Scooter_4
+    21300010: Scooter_5
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: 29
+  maxTextureSize: 256
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 100
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 5
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: Scooter_0
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 74
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -20, y: 30}
+        - {x: -30, y: 21}
+        - {x: -30, y: -16}
+        - {x: -21, y: -27}
+        - {x: -18, y: -30}
+        - {x: 24, y: -30}
+        - {x: 30, y: -17}
+        - {x: 30, y: 20}
+        - {x: 21, y: 30}
+    - name: Scooter_1
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 74
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -20, y: 30}
+        - {x: -30, y: 21}
+        - {x: -30, y: -16}
+        - {x: -21, y: -27}
+        - {x: -18, y: -30}
+        - {x: 24, y: -30}
+        - {x: 30, y: -17}
+        - {x: 30, y: 20}
+        - {x: 21, y: 30}
+    - name: Scooter_2
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 74
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -20, y: 30}
+        - {x: -30, y: 21}
+        - {x: -30, y: -16}
+        - {x: -21, y: -27}
+        - {x: -18, y: -30}
+        - {x: 24, y: -30}
+        - {x: 30, y: -17}
+        - {x: 30, y: 20}
+        - {x: 21, y: 30}
+    - name: Scooter_3
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 7
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -16, y: 30}
+        - {x: -23, y: 28}
+        - {x: -30, y: 16}
+        - {x: -30, y: -20}
+        - {x: -20, y: -30}
+        - {x: 26, y: -30}
+        - {x: 30, y: -19}
+        - {x: 30, y: 24}
+        - {x: 23, y: 30}
+    - name: Scooter_4
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 7
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -16, y: 30}
+        - {x: -23, y: 28}
+        - {x: -30, y: 16}
+        - {x: -30, y: -20}
+        - {x: -20, y: -30}
+        - {x: 26, y: -30}
+        - {x: 30, y: -19}
+        - {x: 30, y: 24}
+        - {x: 23, y: 30}
+    - name: Scooter_5
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 7
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -16, y: 30}
+        - {x: -23, y: 28}
+        - {x: -30, y: 16}
+        - {x: -30, y: -20}
+        - {x: -20, y: -30}
+        - {x: 26, y: -30}
+        - {x: 30, y: -19}
+        - {x: 30, y: 24}
+        - {x: 23, y: 30}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
