@@ -27,6 +27,18 @@ public static class GameObjectEx
         return res.GetComponent<T>();
     }
 
+    public static T Clone<T>(this Object self) where T : Component
+    {
+        return (self as GameObject).Clone<T>();
+    }
+
+    public static T Clone<T>(this Object self, Transform parent, bool worldPositionStays = false) where T : Component
+    {
+        T res = (self as GameObject).Clone<T>();
+        res.transform.SetParent(parent, worldPositionStays);
+        return res;
+    }
+
     public static GameObject Clone(this GameObject self, Transform similarTo)
     {
         GameObject res = GameObject.Instantiate(self);
@@ -43,5 +55,12 @@ public static class GameObjectEx
         res.transform.SetParent(parent);
         res.transform.CopyValuesFrom(similarTo);
         return res;
+    }
+
+    public static void DestroyNow(this GameObject self)
+    {
+        self.transform.SetParent(null);
+        self.SetActive(false);
+        GameObject.Destroy(self);
     }
 }

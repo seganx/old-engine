@@ -83,6 +83,19 @@ public static class MonoEx
         else return defaultValue;
     }
 
+    public static T ToEnum<T>(this string self, T defaultValue)
+    {
+        if (string.IsNullOrEmpty(self))
+            return defaultValue;
+        try
+        {
+            T res = (T)System.Enum.Parse(typeof(T), self, true);
+            return System.Enum.IsDefined(typeof(T), res) ? res : defaultValue;
+        }
+        catch { }
+        return defaultValue;
+    }
+
     public static int FindDigit(this string self, int startIndex = 0)
     {
         if (self.HasContent())

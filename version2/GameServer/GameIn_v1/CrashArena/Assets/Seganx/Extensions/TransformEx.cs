@@ -39,29 +39,36 @@ public static class TransformEx
         return res;
     }
 
+    public static Transform DestroyNow(this Transform self)
+    {
+        self.SetParent(null);
+        self.gameObject.SetActive(false);
+        GameObject.Destroy(self.gameObject);
+        return self;
+    }
+
     public static Transform RemoveChildren(this Transform self, int startIndex = 0, int count = -1)
     {
         if (count == 0) return self;
 
         if (count > 0)
-        {
-            int endIndex = Mathf.Min(count + startIndex, self.childCount);
-            for (int i = startIndex; i < endIndex; i++)
-                GameObject.Destroy(self.GetChild(i).gameObject);
-        }
+            count = Mathf.Min(count + startIndex, self.childCount);
         else
-        {
-            for (int i = startIndex; i < self.childCount; i++)
-                GameObject.Destroy(self.GetChild(i).gameObject);
-        }
+            count = self.childCount - startIndex;
+
+        while (count-- > 0)
+            self.GetChild(startIndex).DestroyNow();
+
         return self;
     }
 
     public static Transform RemoveChildrenBut(this Transform self, int except)
     {
-        for (int i = 0; i < self.childCount; i++)
-            if (except != i)
-                GameObject.Destroy(self.GetChild(i).gameObject);
+        int count = except;
+        while (count-- > 0)
+            self.GetChild(0).DestroyNow();
+        while (self.childCount > 1)
+            self.GetChild(1).DestroyNow();
         return self;
     }
 

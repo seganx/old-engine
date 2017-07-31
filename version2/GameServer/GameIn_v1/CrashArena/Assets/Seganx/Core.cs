@@ -29,7 +29,6 @@ public class Core : MonoBehaviour
     // Use this for initialization
     IEnumerator Start()
     {
-        var startTime = System.DateTime.Now;
         CryptoKey = System.Text.Encoding.ASCII.GetBytes(cryptokey);
 
         BaseDeviceId = PlayerPrefs.GetString("Core.BaseDeviceId", "");
@@ -52,6 +51,7 @@ public class Core : MonoBehaviour
 
         //  wait for response of the request
 #if !UNITY_EDITOR
+        var startTime = System.DateTime.Now;
         while (BaseDeviceId.Length < 1 && (System.DateTime.Now - startTime).TotalSeconds < 5)
             yield return new WaitForEndOfFrame();
 #endif
