@@ -2,10 +2,11 @@
 
 CREATE TABLE IF NOT EXISTS shop
 (
-    id                      INT UNSIGNED DEFAULT 0,     -- id of the package in the market
-    platform                TINYINT UNSIGNED DEFAULT 0, -- googleplay, cafebazaar, mayket, etc
-    group                   TINYINT UNSIGNED DEFAULT 0, -- treasure, decorations, etc
-    style                   TINYINT UNSIGNED DEFAULT 0, -- ordinary, special, popup, etc
+    id                      INT UNSIGNED AUTO_INCREMENT UNIQUE PRIMARY KEY,     -- id of the package in the market
+	market_id               INT UNSIGNED DEFAULT 0,     						-- id of the package in the market
+    platform                TINYINT UNSIGNED DEFAULT 0, 						-- googleplay, cafebazaar, mayket, etc
+    group                   TINYINT UNSIGNED DEFAULT 0, 						-- treasure, decorations, etc
+    style                   TINYINT UNSIGNED DEFAULT 0, 						-- ordinary, special, popup, etc
     active                  BOOLEAN DEFAULT FALSE,
 
     price_main              INT UNSIGNED DEFAULT 0,
