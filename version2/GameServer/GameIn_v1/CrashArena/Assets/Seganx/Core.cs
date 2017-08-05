@@ -20,7 +20,6 @@ public class Core : MonoBehaviour
     }
 #endif
 
-    public Object startScene = null;
     public string cryptokey = "";
     public string salt = "";
     public Text screenlog = null;
@@ -101,8 +100,7 @@ public class Core : MonoBehaviour
             PlayerPrefs.SetString("Core.DeviceId", DeviceId);
         }
 
-        if (startScene)
-            SceneManager.LoadScene(startScene.name, LoadSceneMode.Single);
+        SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 
     public static string ComputeMD5(string str, string salt)
