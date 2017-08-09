@@ -7,6 +7,7 @@ public class Core : MonoBehaviour
 {
     public static string BaseDeviceId { private set; get; }
     public static string DeviceId { private set; get; }
+    public static string Salt { private set; get; }
     public static bool IsFakeDeviceId { private set; get; }
     public static byte[] CryptoKey { private set; get; }
 
@@ -28,6 +29,7 @@ public class Core : MonoBehaviour
     // Use this for initialization
     IEnumerator Start()
     {
+        Salt = salt;
         CryptoKey = System.Text.Encoding.ASCII.GetBytes(cryptokey);
 
         BaseDeviceId = PlayerPrefs.GetString("Core.BaseDeviceId", "");

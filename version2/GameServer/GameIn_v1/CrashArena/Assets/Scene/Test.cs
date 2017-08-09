@@ -4,22 +4,30 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
-public class Test : MonoBehaviour
+public class Test : Base
 {
     public TextAsset jsonFile = null;
 
     // Use this for initialization
-    IEnumerator Start()
+    void Start()
     {
-        yield return new WaitForSeconds(0.5f);
-
-        while (true)
+        Download("http://locator.8khan.ir/Tests/Assets/Asset.xml", w =>
         {
-            var root = JSON.Parse(jsonFile.text);
-            Debug.Log(root.ToString());
-            HandleJsonObject(root);
-            yield return new WaitForSeconds(20);
-        }
+            print("Downloaded: " + w.text);
+        });
+
+        LoadFromCacheOrDownload("http://locator.8khan.ir/Tests/Assets/Asset.xml", 1, w =>
+        {
+            print(w.text);
+        });
+
+        //while (false)
+        //{
+        //    var root = JSON.Parse(jsonFile.text);
+        //    Debug.Log(root.ToString());
+        //    HandleJsonObject(root);
+        //    yield return new WaitForSeconds(20);
+        //}
     }
 
     void HandleJsonObject(JSONNode root)
