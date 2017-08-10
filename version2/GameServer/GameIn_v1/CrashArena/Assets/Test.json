@@ -7,7 +7,7 @@
 		"level": "1",
 		"value": "5",
 		"mass": "5",
-		"health": "50",
+		"health": "200",
 		"power": "10",
 		"slots": [{
 			"type": "wheel",
@@ -40,7 +40,7 @@
 		"level": "1",
 		"value": "2",
 		"mass": "30",
-		"health": "10",
+		"health": "50",
 		"power": "0",
 		"slot": "0",
 		"speed": "1000"
@@ -51,7 +51,7 @@
 		"level": "1",
 		"value": "2",
 		"mass": "1",
-		"health": "10",
+		"health": "100",
 		"power": "0",
 		"slot": "1",
 		"speed": "1000"
@@ -63,22 +63,10 @@
 		"level": "1",
 		"value": "2",
 		"mass": "0",
-		"health": "10",
+		"health": "50",
 		"power": "4",
 		"damage": "5",
 		"speed": "-10",
 		"slot": "0"
-	}, {
-		"type": "Blade",
-		"grade": "2",
-		"rarity": "0",
-		"level": "1",
-		"value": "2",
-		"mass": "0",
-		"health": "10",
-		"power": "4",
-		"damage": "5",
-		"speed": "-10",
-		"slot": "1"
 	}]
 }

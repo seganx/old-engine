@@ -4,6 +4,9 @@ using System.Collections;
 
 public class Console_Info : MonoBehaviour
 {
+    public delegate string OnDisplayInfoEvent(string info);
+    public static OnDisplayInfoEvent OnDisplayInfo = null;
+
     public Text label = null;
 
     public string DisplayDeviceID
@@ -27,7 +30,9 @@ public class Console_Info : MonoBehaviour
         if (gameObject.activeInHierarchy == false) return;
         Invoke("OnEnable", 0.5f);
 
-        string str = "Ver: " + Application.version + " - Id: " + DisplayDeviceID;
+        string str = "Version: " + Application.version + " - DeviceId: " + DisplayDeviceID;
+        if (OnDisplayInfo != null)
+            str = OnDisplayInfo(str);
         //str += "\n" + System.DateTime.Now + " - Server: " + Network.Instance.ServerType + " - Nickname: " + Game.Instance.player.NickName;
 
         label.text = str;

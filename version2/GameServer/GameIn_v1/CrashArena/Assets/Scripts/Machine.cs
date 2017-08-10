@@ -6,6 +6,9 @@ public enum Side { Null, Player, Opponent }
 
 public class Machine : MonoBehaviour
 {
+    public float totalHealth = 0;
+    public float totalDamage = 0;
+
     public Side side = Side.Null;
     public Body body = null;
     public List<Wheel> wheels = new List<Wheel>();

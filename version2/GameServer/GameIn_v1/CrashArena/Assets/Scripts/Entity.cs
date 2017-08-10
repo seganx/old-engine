@@ -17,8 +17,6 @@ public class Entity : MonoBehaviour
 
     public Entity UpdateData(JSONNode root)
     {
-        machine = GetComponentInParent<Machine>();
-
         for (int i = 0; i < root.Count; i++)
         {
             var node = root[i];
@@ -37,6 +35,10 @@ public class Entity : MonoBehaviour
             }
         }
 
+        machine = GetComponentInParent<Machine>();
+        machine.totalHealth += health;
+        machine.totalDamage += damage;
+
         return this;
     }
 
@@ -45,11 +47,11 @@ public class Entity : MonoBehaviour
         var com = other.GetComponentInParent<Entity>();
         if (com != null)
         {
-            health -= com.damage;
-            if (health <= 0)
+            machine.totalHealth -= com.damage;
+            if (machine.totalHealth <= 0)
             {
                 Debug.Log(name + ": Destroyed!");
-                Destroy(gameObject);
+                Destroy(machine.gameObject);
             }
         }
     }

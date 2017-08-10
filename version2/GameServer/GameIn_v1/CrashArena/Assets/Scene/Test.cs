@@ -6,6 +6,7 @@ using System.IO;
 
 public class Test : Base
 {
+
     public TextAsset jsonFile = null;
 
     // Use this for initialization
@@ -20,18 +21,23 @@ public class Test : Base
         {
             print(w.text);
         });
-
-        //while (false)
-        //{
-        //    var root = JSON.Parse(jsonFile.text);
-        //    Debug.Log(root.ToString());
-        //    HandleJsonObject(root);
-        //    yield return new WaitForSeconds(20);
-        //}
     }
 
-    void HandleJsonObject(JSONNode root)
+    // Update is called once per frame
+    void Update()
     {
+
+    }
+
+    private static Test instance = null;
+    public static Test Instance { get { return instance == null ? instance = FindObjectOfType<Test>() : instance; } }
+
+    [Console("game")]
+    public static void Clone()
+    {
+        var root = JSON.Parse(Instance.jsonFile.text);
+        Debug.Log(root.ToString());
+
         var obj = Resources.Load("Machines/Machine");
 
         var machine = obj.Clone<Machine>();
@@ -43,23 +49,5 @@ public class Test : Base
         machine.transform.localPosition = Vector3.right * 2;
 
         //UnityEditor.EditorApplication.isPaused = true;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    [Console("game")]
-    public static void MyTest(int x, float y, string s)
-    {
-        Debug.Log("my test: " + x + " " + y + " " + s);
-    }
-
-    [Console("game")]
-    public static void JustTest()
-    {
-        Debug.Log("just test");
     }
 }
