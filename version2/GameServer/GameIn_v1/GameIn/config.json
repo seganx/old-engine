@@ -1,0 +1,15 @@
+{
+	trace:"gamein crash report.txt",
+	
+	port:8000,
+	threads:7,
+	
+	database: 
+	{
+		host:"localhost",
+		port:3306,
+		name:"test",
+		user:"test",
+		pass:"1qaz2wsx3edc4rfv"
+	}
+}

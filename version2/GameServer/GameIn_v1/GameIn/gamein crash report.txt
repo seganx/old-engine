@@ -1,0 +1,25 @@
+
+
+
+seganx crash report: 2017-06-07 21:44:25
+Program received Memory leak detected! (0)
+
+User defined callstack:
+
+
+seganx crash report: 2017-06-09 15:26:38
+Program received Abnormal termination condition, as is e.g. initiated by std::abort()! (0)
+
+User defined callstack:
+d:\projects\sajad\seganx\version2\gameserver\gamein_v1\authenticator.c(170): authen_accesscode_thread
+  d:\projects\sajad\seganx\version2\gameserver\gamein_v1\authenticator.c(150): authen_accesscode_device
+    d:\projects\sajad\seganx\version2\gameserver\gamein_v1\database.c(157): sx_database_query
+
+
+seganx crash report: 2017-06-09 15:31:19
+Program received Abnormal termination condition, as is e.g. initiated by std::abort()! (0)
+
+User defined callstack:
+d:\projects\sajad\seganx\version2\gameserver\gamein_v1\authenticator.c(170): authen_accesscode_thread
+  d:\projects\sajad\seganx\version2\gameserver\gamein_v1\authenticator.c(150): authen_accesscode_device
+    d:\projects\sajad\seganx\version2\gameserver\gamein_v1\database.c(157): sx_database_query
