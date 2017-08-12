@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SeganX;
 
 public class Wheel : Entity
 {
-    public Wheel Setup(JSONNode root)
+    public Wheel Setup(Json.Node root)
     {
         UpdateData(root);
         CheckSprite(Params.Wheel);

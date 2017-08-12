@@ -3,16 +3,18 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
 
-
-[AttributeUsage(AttributeTargets.Method)]
-public class ConsoleAttribute : Attribute
+namespace SeganX
 {
-    public string cmdSpace;
-    public string cmdName;
-
-    public ConsoleAttribute(string space, string altName = "")
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ConsoleAttribute : Attribute
     {
-        cmdSpace = space.ToLower();
-        cmdName = altName.ToLower();
+        public string cmdSpace;
+        public string cmdName;
+
+        public ConsoleAttribute(string space, string altName = "")
+        {
+            cmdSpace = space.ToLower();
+            cmdName = altName.ToLower();
+        }
     }
 }

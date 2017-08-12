@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using SeganX;
 
 public class Test : Base
 {
@@ -32,10 +33,10 @@ public class Test : Base
     private static Test instance = null;
     public static Test Instance { get { return instance == null ? instance = FindObjectOfType<Test>() : instance; } }
 
-    [Console("game")]
+    [SeganX.Console("game")]
     public static void Clone()
     {
-        var root = JSON.Parse(Instance.jsonFile.text);
+        var root = Json.Parse(Instance.jsonFile.text);
         Debug.Log(root.ToString());
 
         var obj = Resources.Load("Machines/Machine");

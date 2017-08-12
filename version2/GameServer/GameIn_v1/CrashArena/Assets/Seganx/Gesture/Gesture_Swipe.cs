@@ -1,81 +1,84 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Gesture_Swipe : Gesture_Base 
+namespace SeganX
 {
-    [Tooltip("Swipe will be started if user moves his finger over this threshold.")]
-    public float startThreshold = 20;
-
-    [Tooltip("Swipe vector will has relative values instead of absolute values.")]
-    public bool relative = false;
-
-    private bool started = false;
-    private bool firstTouch = false;
-    private Vector3 firstPos;
-
-    //  gestures will be sorted by priorities
-    public override GestureType Type
+    public class Gesture_Swipe : Gesture_Base
     {
-        get { return GestureType.Swipe; }
-    }
+        [Tooltip("Swipe will be started if user moves his finger over this threshold.")]
+        public float startThreshold = 20;
 
-    //  this is called per frame to let the recognizer understand what's happening and return true on success
-    public override bool Recognize()
-    {
-        if (touchCount != 1) return CancelSwipe();
+        [Tooltip("Swipe vector will has relative values instead of absolute values.")]
+        public bool relative = false;
 
-        if (TouchDown())
+        private bool started = false;
+        private bool firstTouch = false;
+        private Vector3 firstPos;
+
+        //  gestures will be sorted by priorities
+        public override GestureManager.Type Type
         {
-            firstTouch = true;
-            firstPos = TouchPosition();
-            return false;
+            get { return GestureManager.Type.Swipe; }
         }
-        else if (firstTouch)
+
+        //  this is called per frame to let the recognizer understand what's happening and return true on success
+        public override bool Recognize()
         {
-            if (TouchHold())
+            if (touchCount != 1) return CancelSwipe();
+
+            if (TouchDown())
             {
-                if (started)
+                firstTouch = true;
+                firstPos = TouchPosition();
+                return false;
+            }
+            else if (firstTouch)
+            {
+                if (TouchHold())
                 {
-                    state = GestureState.Activated;
-                    return true;
+                    if (started)
+                    {
+                        state = GestureManager.State.Activated;
+                        return true;
+                    }
+                    else if (Vector3.Distance(firstPos, TouchPosition()) > startThreshold * dpiFactor)
+                    {
+                        started = true;
+                        return true;
+                    }
+                    else return false;
                 }
-                else if (Vector3.Distance(firstPos, TouchPosition()) > startThreshold * dpiFactor)
+                else if (TouchReleased())
                 {
-                    started = true;
-                    return true;
+                    return CancelSwipe();
                 }
                 else return false;
             }
-            else if (TouchReleased())
-            {
-                return CancelSwipe();
-            }
-            else return false;
+            else return CancelSwipe();
         }
-        else return CancelSwipe();
-    }
 
-    public override void DoUpdate(Gesture_Base hooker)
-    {
-        if (started)
+        public override void DoUpdate(Gesture_Base hooker)
         {
-            if (hooker == this)
+            if (started)
             {
-                manager.swipeVector = ( TouchPosition() - firstPos ) * dpiFactor;
+                if (hooker == this)
+                {
+                    manager.swipeVector = (TouchPosition() - firstPos) * dpiFactor;
 
-                if (relative)
-                    firstPos = TouchPosition();
+                    if (relative)
+                        firstPos = TouchPosition();
+                }
+                else CancelSwipe();
             }
-            else CancelSwipe();
         }
-    }
 
-    bool CancelSwipe()
-    {
-        started = false;
-        firstTouch = false;
-        firstPos.Set(Mathf.Infinity, Mathf.Infinity, 0);
-        manager.swipeVector = Vector3.zero;
-        return false;
+        bool CancelSwipe()
+        {
+            started = false;
+            firstTouch = false;
+            firstPos.Set(Mathf.Infinity, Mathf.Infinity, 0);
+            manager.swipeVector = Vector3.zero;
+            return false;
+        }
     }
 }

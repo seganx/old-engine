@@ -1,73 +1,76 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Gesture_Tap : Gesture_Base
+namespace SeganX
 {
-    [Tooltip("Tap will be ignored if user holds his finger over this time.")]
-    public float cancelTime = 20;
-
-    [Tooltip("Tap will be ignored if user moves his finger over this threshold.")]
-    public float cancelThreshold = 20;
-
-    private bool firstTouch = false;
-    private float touchTime = 3;
-    private Vector3 firstPos;
-
-    //  gestures will be sorted by priorities
-    public override GestureType Type
+    public class Gesture_Tap : Gesture_Base
     {
-        get { return GestureType.Tap; }
-    }
+        [Tooltip("Tap will be ignored if user holds his finger over this time.")]
+        public float cancelTime = 20;
 
-    //  this is called per frame to let the recognizer understand what's happening and return true on success
-    public override bool Recognize()
-    {
-        if (touchCount != 1) return CancelTap();
+        [Tooltip("Tap will be ignored if user moves his finger over this threshold.")]
+        public float cancelThreshold = 20;
 
-        if (TouchDown(0))
+        private bool firstTouch = false;
+        private float touchTime = 3;
+        private Vector3 firstPos;
+
+        //  gestures will be sorted by priorities
+        public override GestureManager.Type Type
         {
-            firstTouch = true;
-            touchTime = cancelTime;
-            firstPos = TouchPosition();
+            get { return GestureManager.Type.Tap; }
         }
-        else if (firstTouch)
+
+        //  this is called per frame to let the recognizer understand what's happening and return true on success
+        public override bool Recognize()
         {
-            if (TouchHold(0))
+            if (touchCount != 1) return CancelTap();
+
+            if (TouchDown(0))
             {
-                touchTime -= Time.deltaTime;
-                if (touchTime < 0)
+                firstTouch = true;
+                touchTime = cancelTime;
+                firstPos = TouchPosition();
+            }
+            else if (firstTouch)
+            {
+                if (TouchHold(0))
                 {
-                    return CancelTap();
+                    touchTime -= Time.deltaTime;
+                    if (touchTime < 0)
+                    {
+                        return CancelTap();
+                    }
+                    else if (Vector3.Distance(firstPos, TouchPosition()) > cancelThreshold * dpiFactor)
+                    {
+                        return CancelTap();
+                    }
                 }
-                else if (Vector3.Distance(firstPos, TouchPosition()) > cancelThreshold * dpiFactor)
+                else if (TouchReleased(0))
                 {
-                    return CancelTap();
+                    state = GestureManager.State.Activated;
+                    return true;
                 }
             }
-            else if (TouchReleased(0))
-            {
-                state = GestureState.Activated;
-                return true;
-            }
-        }
-       
-        return false;
-    }
 
-    public override void DoUpdate(Gesture_Base hooker)
-    {
-        if (hooker == this)
+            return false;
+        }
+
+        public override void DoUpdate(Gesture_Base hooker)
         {
-            //Debug.Log("Tap on : " + manager.currPosition);
+            if (hooker == this)
+            {
+                //Debug.Log("Tap on : " + manager.currPosition);
+            }
+            else CancelTap();
         }
-        else CancelTap();
-    }
 
-    bool CancelTap()
-    {
-        firstTouch = false;
-        touchTime = 0;
-        firstPos.Set(Mathf.Infinity, Mathf.Infinity, 0);
-        return false;
+        bool CancelTap()
+        {
+            firstTouch = false;
+            touchTime = 0;
+            firstPos.Set(Mathf.Infinity, Mathf.Infinity, 0);
+            return false;
+        }
     }
 }

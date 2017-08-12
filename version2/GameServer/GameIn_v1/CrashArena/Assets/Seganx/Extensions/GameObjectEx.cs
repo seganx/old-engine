@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
 public static class GameObjectEx
 {
     public static RectTransform GetRectTransform(this GameObject self)

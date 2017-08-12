@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Seganx/Albedo/Simple" 
 {
 	Properties 
@@ -48,7 +50,7 @@ Shader "Seganx/Albedo/Simple"
 				VertexOutput vert (VertexInput v)
 				{
 					VertexOutput o;
-					o.pos = mul( UNITY_MATRIX_MVP, v.pos );
+					o.pos = UnityObjectToClipPos( v.pos );
 					o.uv0 = TRANSFORM_TEX( v.uv0, _MainTex );
 					return o;
 				}

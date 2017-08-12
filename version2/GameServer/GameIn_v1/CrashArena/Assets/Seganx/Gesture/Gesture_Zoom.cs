@@ -1,13 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Gesture_Zoom : Gesture_Base
+namespace SeganX
 {
-    //  gestures will be sorted by priorities
-    public override GestureType Type
+    public class Gesture_Zoom : Gesture_Base
     {
-        get { return GestureType.Zoom; }
+        //  gestures will be sorted by priorities
+        public override GestureManager.Type Type
+        {
+            get { return GestureManager.Type.Zoom; }
+        }
+
+
     }
-
-
 }

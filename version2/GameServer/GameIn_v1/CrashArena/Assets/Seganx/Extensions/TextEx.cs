@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+
 public static class TextEx
 {
     static string WrapLine(this TextGenerator self, string line, TextGenerationSettings settings)

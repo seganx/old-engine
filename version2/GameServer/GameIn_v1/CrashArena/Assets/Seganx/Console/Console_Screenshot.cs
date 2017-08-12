@@ -2,32 +2,34 @@
 using System.Collections;
 using System.IO;
 
-public class Console_Screenshot : MonoBehaviour
+namespace SeganX.Console
 {
-    public void CaptureAndShare()
+    public class Console_Screenshot : MonoBehaviour
     {
-        StopCoroutine(DoCaptureAndShare());
-        StartCoroutine(DoCaptureAndShare());
-    }
+        public void CaptureAndShare()
+        {
+            StopCoroutine(DoCaptureAndShare());
+            StartCoroutine(DoCaptureAndShare());
+        }
 
-    IEnumerator DoCaptureAndShare()
-    {
-        var filename = Application.temporaryCachePath + "/ConsoleScreenshot.png";
-        try { if (File.Exists(filename)) File.Delete(filename); }
-        catch { }
+        IEnumerator DoCaptureAndShare()
+        {
+            var filename = Application.temporaryCachePath + "/ConsoleScreenshot.png";
+            try { if (File.Exists(filename)) File.Delete(filename); }
+            catch { }
 
-        yield return new WaitForEndOfFrame();
-        Application.CaptureScreenshot(filename);
-
-        while (File.Exists(filename) == false)
             yield return new WaitForEndOfFrame();
-        Share(filename);
-    }
+            ScreenCapture.CaptureScreenshot(filename);
 
-    private void Share(string filename)
-    {
+            while (File.Exists(filename) == false)
+                yield return new WaitForEndOfFrame();
+            Share(filename);
+        }
+
+        private void Share(string filename)
+        {
 #if UNITY_EDITOR
-        Application.OpenURL(filename);
+            Application.OpenURL(filename);
 
 #endif
 
@@ -67,5 +69,6 @@ public class Console_Screenshot : MonoBehaviour
         catch { }
 #elif UNITY_IOS && !UNITY_EDITOR
 #endif
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using SeganX;
 
 public class Body : Entity
 {
@@ -8,7 +9,7 @@ public class Body : Entity
     public List<Slot> staffs = new List<Slot>();
     public List<Slot> weapons = new List<Slot>();
 
-    public Body Setup(JSONNode root)
+    public Body Setup(Json.Node root)
     {
         UpdateData(root);
         CheckSprite(Params.Body);

@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SeganX;
 
 public class Staff : Entity
 {
 
-    public Staff Setup(JSONNode root)
+    public Staff Setup(Json.Node root)
     {
         UpdateData(root);
 

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using SeganX;
 
 
 public class Slot : MonoBehaviour
@@ -8,7 +9,7 @@ public class Slot : MonoBehaviour
     public string type = "";
     public float frequency = 10;
 
-    public Slot Setup(Body body, JSONNode root)
+    public Slot Setup(Body body, Json.Node root)
     {
         Vector2 pos = Vector2.zero;
         for (int i = 0; i < root.Count; i++)

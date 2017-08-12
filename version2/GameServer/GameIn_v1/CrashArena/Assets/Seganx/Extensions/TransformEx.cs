@@ -197,7 +197,7 @@ public static class TransformEx
 
     public static Transform FindChildRecursive(this Transform self, string childName, bool justActivates = false)
     {
-        Transform child = self.FindChild(childName);
+        Transform child = self.Find(childName);
         if (child != null)
         {
             if (justActivates)

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using SeganX;
 
 public class Entity : MonoBehaviour
 {
@@ -15,7 +15,7 @@ public class Entity : MonoBehaviour
     public float speed = 0;
     public Machine machine = null;
 
-    public Entity UpdateData(JSONNode root)
+    public Entity UpdateData(Json.Node root)
     {
         for (int i = 0; i < root.Count; i++)
         {

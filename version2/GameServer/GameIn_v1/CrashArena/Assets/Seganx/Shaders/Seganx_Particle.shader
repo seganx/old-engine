@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Seganx/Particle" 
 {
 	Properties 
@@ -56,7 +58,7 @@ Shader "Seganx/Particle"
 				VertexOutput vert (VertexInput v)
 				{
 					VertexOutput o;
-					o.pos = mul( UNITY_MATRIX_MVP, v.pos );
+					o.pos = UnityObjectToClipPos( v.pos );
 					o.uv0 = TRANSFORM_TEX( v.uv0, _MainTex );
 					o.col = _Color * _TintColor * v.col;
 					return o;

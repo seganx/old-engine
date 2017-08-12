@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Seganx/UI/Albedo/Add Color" {
 	Properties {
 		_MainTex ("Sprite", 2D) = "white" {}
@@ -70,7 +72,7 @@ Shader "Seganx/UI/Albedo/Add Color" {
 			vs_out vert (vs_in v)
 			{
 				vs_out o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.pos);
+				o.pos = UnityObjectToClipPos(v.pos);
 				o.col = v.col;
 				o.uv0 = TRANSFORM_TEX(v.uv0, _MainTex);
 

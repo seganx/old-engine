@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SeganX;
 
 public class Base : MonoBehaviour
 {

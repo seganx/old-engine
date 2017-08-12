@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SeganX;
 
 public class Weapon : Entity
 {
-    public Weapon Setup(JSONNode root)
+    public Weapon Setup(Json.Node root)
     {
         UpdateData(root);
         

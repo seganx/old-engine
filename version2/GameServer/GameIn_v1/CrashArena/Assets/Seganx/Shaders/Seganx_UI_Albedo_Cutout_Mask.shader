@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "UI/Albedo/CutoutMask" 
 {
 	Properties 
@@ -80,7 +82,7 @@ Shader "UI/Albedo/CutoutMask"
 			vs_out vert (vs_in v)
 			{
 				vs_out o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.pos);
+				o.pos = UnityObjectToClipPos(v.pos);
 				o.uv0 = TRANSFORM_TEX(v.uv0, _MainTex);
 				o.uv1 = mul(UNITY_MATRIX_MV, float4(v.pos.xyz, 0));
 				o.uv1 = TRANSFORM_TEX(o.uv1, _MaskTex);

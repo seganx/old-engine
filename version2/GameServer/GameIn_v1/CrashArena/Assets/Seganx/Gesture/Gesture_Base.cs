@@ -25,102 +25,105 @@ using UnityEngine;
 using System;
 using System.Collections;
 
-public abstract class Gesture_Base : MonoBehaviour, IComparable<Gesture_Base>
+namespace SeganX
 {
-    //  state will show the current state of the touch
-    public GestureState state = GestureState.Sleep;
-
-    //  the owner of this gesture
-    protected GestureManager manager = null;
-
-    //  Use this before initialization
-    void Awake()
+    public abstract class Gesture_Base : MonoBehaviour, IComparable<Gesture_Base>
     {
-        manager = GestureManager.Instance;
-        manager.gestureList.Add(this);
-    }
+        //  state will show the current state of the touch
+        public GestureManager.State state = GestureManager.State.Sleep;
 
-    //  will be true if the state is ACTIVATED
-    public bool IsActivated
-    {
-        get { return state == GestureState.Activated; }
-    }
+        //  the owner of this gesture
+        protected GestureManager manager = null;
 
-    #region virtual functions
-    //  gestures will be sorted by priorities
-    public virtual GestureType Type
-    {
-        get { throw new Exception("Please override Type property for class " + this.GetType() + "."); }
-    }
-    
-    //  this is called per frame to let the recognizer understand what's happening and return ture on success
-    public virtual bool Recognize()
-    {
-        //  just place the codes to understand if the gesture is recognized or not
-        //  if this one recognize the gesture it should change the status to ACTIVATED
-        throw new Exception("Function Recognize() in " + this.GetType() + " is not exist! Please override this function.");
-    }
+        //  Use this before initialization
+        void Awake()
+        {
+            manager = GestureManager.Instance;
+            manager.gestureList.Add(this);
+        }
 
-    //  will be called if this gesture recognized the touch
-    public virtual void DoUpdate(Gesture_Base hooker)
-    {
-        //  this will be called when the stats is ACTIVATED even if the other
-        //  recognizer with higher priorities has been activated. The hooker is
-        //  the first recognizer with higher priority which is activated. So this
-        //  one is responsible to stop updating or update data in manager simultaneously.
-        //  Note that the hooker could be this one ;)
-    }
-    #endregion
+        //  will be true if the state is ACTIVATED
+        public bool IsActivated
+        {
+            get { return state == GestureManager.State.Activated; }
+        }
 
-    #region helper functions
-    //  return number of touches on the screen
-    protected int touchCount
-    {
-        get { return manager.touchCount; }
-    }
-    //  return true if the specified touch has been down
-    protected bool TouchDown(int index = 0)
-    {
-        return manager.TouchDown(index);
-    }
+        #region virtual functions
+        //  gestures will be sorted by priorities
+        public virtual GestureManager.Type Type
+        {
+            get { throw new Exception("Please override Type property for class " + this.GetType() + "."); }
+        }
 
-    //  return true if the specified touch is being hold
-    protected bool TouchHold(int index = 0)
-    {
-        return manager.TouchHold(index);
-    }
+        //  this is called per frame to let the recognizer understand what's happening and return ture on success
+        public virtual bool Recognize()
+        {
+            //  just place the codes to understand if the gesture is recognized or not
+            //  if this one recognize the gesture it should change the status to ACTIVATED
+            throw new Exception("Function Recognize() in " + this.GetType() + " is not exist! Please override this function.");
+        }
 
-    //  return true if the specified touch has been released
-    protected bool TouchReleased(int index = 0)
-    {
-        return manager.TouchReleased(index);
-    }
+        //  will be called if this gesture recognized the touch
+        public virtual void DoUpdate(Gesture_Base hooker)
+        {
+            //  this will be called when the stats is ACTIVATED even if the other
+            //  recognizer with higher priorities has been activated. The hooker is
+            //  the first recognizer with higher priority which is activated. So this
+            //  one is responsible to stop updating or update data in manager simultaneously.
+            //  Note that the hooker could be this one ;)
+        }
+        #endregion
 
-    //  return the position of a touch specified by index
-    protected Vector3 TouchPosition(int index = 0)
-    {
-        return manager.TouchPosition(index);
-    }
+        #region helper functions
+        //  return number of touches on the screen
+        protected int touchCount
+        {
+            get { return manager.touchCount; }
+        }
+        //  return true if the specified touch has been down
+        protected bool TouchDown(int index = 0)
+        {
+            return manager.TouchDown(index);
+        }
 
-    // dpi factor can be multiplied to some values which is related to the scale of the screen to correct errors on varies screen sizes
-    protected float dpiFactor
-    {
-        get { return GestureManager.DpiFactor; }
-    }
-    #endregion
+        //  return true if the specified touch is being hold
+        protected bool TouchHold(int index = 0)
+        {
+            return manager.TouchHold(index);
+        }
 
-    #region interface functions
-    public int CompareTo(Gesture_Base other)
-    {
-        int i = (int)this.Type;
-        int o = (int)other.Type;
-        return i.CompareTo(o);
-    }
+        //  return true if the specified touch has been released
+        protected bool TouchReleased(int index = 0)
+        {
+            return manager.TouchReleased(index);
+        }
 
-    public override string ToString()
-    {
-        return string.Format("[{0}] state: {1}", this.GetType(), state);
-    }
-    #endregion
+        //  return the position of a touch specified by index
+        protected Vector3 TouchPosition(int index = 0)
+        {
+            return manager.TouchPosition(index);
+        }
 
+        // dpi factor can be multiplied to some values which is related to the scale of the screen to correct errors on varies screen sizes
+        protected float dpiFactor
+        {
+            get { return GestureManager.DpiFactor; }
+        }
+        #endregion
+
+        #region interface functions
+        public int CompareTo(Gesture_Base other)
+        {
+            int i = (int)this.Type;
+            int o = (int)other.Type;
+            return i.CompareTo(o);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[{0}] state: {1}", this.GetType(), state);
+        }
+        #endregion
+
+    }
 }

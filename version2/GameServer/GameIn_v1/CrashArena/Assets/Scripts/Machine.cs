@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using SeganX;
 
 public enum Side { Null, Player, Opponent }
 
@@ -15,7 +16,7 @@ public class Machine : MonoBehaviour
     public List<Staff> staffs = new List<Staff>();
     public List<Weapon> weapons = new List<Weapon>();
 
-    public Machine Setup(JSONNode root, Side playerSide)
+    public Machine Setup(Json.Node root, Side playerSide)
     {
         side = playerSide;
 
