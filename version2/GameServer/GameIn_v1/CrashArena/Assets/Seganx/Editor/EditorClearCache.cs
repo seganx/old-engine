@@ -7,20 +7,20 @@ namespace SeganX.Editor
 {
     public class EditorCacheItems
     {
-        [MenuItem("Tools/Cache/Clear All")]
+        [MenuItem("SeganX/Cache/Clear All")]
         private static void ClearAll()
         {
             ClearPlayerPrefs();
             ClearFiles();
         }
 
-        [MenuItem("Tools/Cache/Clear PlayerPrefs")]
+        [MenuItem("SeganX/Cache/Clear PlayerPrefs")]
         private static void ClearPlayerPrefs()
         {
             PlayerPrefs.DeleteAll();
         }
 
-        [MenuItem("Tools/Cache/Clear Files")]
+        [MenuItem("SeganX/Cache/Clear Files")]
         private static void ClearFiles()
         {
             Caching.ClearCache();

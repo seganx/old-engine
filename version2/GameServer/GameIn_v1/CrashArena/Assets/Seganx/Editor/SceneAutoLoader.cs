@@ -29,7 +29,7 @@ namespace SeganX.Editor
         }
 
         // Menu items to select the "master" scene and control whether or not to load it.
-        [MenuItem("Tools/Scene Autoload/Select Master Scene...")]
+        [MenuItem("SeganX/Scene Autoload/Select Master Scene...")]
         private static void SelectMasterScene()
         {
             string masterScene = EditorUtility.OpenFilePanel("Select Master Scene", Application.dataPath, "unity");
@@ -40,23 +40,23 @@ namespace SeganX.Editor
             }
         }
 
-        [MenuItem("Tools/Scene Autoload/Load Master On Play", true)]
+        [MenuItem("SeganX/Scene Autoload/Load Master On Play", true)]
         private static bool ShowLoadMasterOnPlay()
         {
             return !LoadMasterOnPlay;
         }
-        [MenuItem("Tools/Scene Autoload/Load Master On Play")]
+        [MenuItem("SeganX/Scene Autoload/Load Master On Play")]
         private static void EnableLoadMasterOnPlay()
         {
             LoadMasterOnPlay = true;
         }
 
-        [MenuItem("Tools/Scene Autoload/Don't Load Master On Play", true)]
+        [MenuItem("SeganX/Scene Autoload/Don't Load Master On Play", true)]
         private static bool ShowDontLoadMasterOnPlay()
         {
             return LoadMasterOnPlay;
         }
-        [MenuItem("Tools/Scene Autoload/Don't Load Master On Play")]
+        [MenuItem("SeganX/Scene Autoload/Don't Load Master On Play")]
         private static void DisableLoadMasterOnPlay()
         {
             LoadMasterOnPlay = false;
