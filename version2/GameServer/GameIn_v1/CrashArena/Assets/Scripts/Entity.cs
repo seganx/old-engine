@@ -5,7 +5,7 @@ using SeganX;
 public class Entity : MonoBehaviour
 {
     public int grade = 0;
-    public int rarity = 0;
+    public int material = 0;
     public int level = 1;
     public int power = 0;
     public float value = 5;
@@ -24,7 +24,7 @@ public class Entity : MonoBehaviour
             {
                 case Params.Type: name = node.Value; break;
                 case Params.Grade: grade = node.AsInt; break;
-                case Params.Rarity: rarity = node.AsInt; break;
+                case Params.Material: material = node.AsInt; break;
                 case Params.Level: level = node.AsInt; break;
                 case Params.Power: power = node.AsInt; break;
                 case Params.Value: value = node.AsFloat; break;
@@ -44,10 +44,24 @@ public class Entity : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        var com = other.GetComponentInParent<Entity>();
-        if (com != null)
+        var com = other.GetComponentInParent<Weapon>();
+        if (com != null && com.damageType == Weapon.DamageType.OnCollisionEnter)
         {
             machine.totalHealth -= com.damage;
+            if (machine.totalHealth <= 0)
+            {
+                Debug.Log(name + ": Destroyed!");
+                Destroy(machine.gameObject);
+            }
+        }
+    }
+
+    void OnTriggerStay2D(Collider2D other)
+    {
+        var com = other.GetComponentInParent<Weapon>();
+        if (com != null && com.damageType == Weapon.DamageType.OnCollisionStay)
+        {
+            machine.totalHealth -= com.damage * com.speed * Time.deltaTime;
             if (machine.totalHealth <= 0)
             {
                 Debug.Log(name + ": Destroyed!");
@@ -61,7 +75,7 @@ public class Entity : MonoBehaviour
         var path = "Sprites/" + param + "/" + name;
         var res = Resources.LoadAll<Sprite>(path);
         if (res.IsNullOrEmpty())
-            res = Resources.LoadAll<Sprite>(path + "_" + grade);
+            res = Resources.LoadAll<Sprite>(path + "_" + material);
         return res;
     }
 
@@ -71,7 +85,7 @@ public class Entity : MonoBehaviour
         if (sprite == null) return null;
 
         var allsprites = LoadSprites(param);
-        var spriteName = name + "_" + grade;
+        var spriteName = name + "_" + material;
         foreach (var item in allsprites)
             if (item.name == spriteName)
                 sprite.sprite = item;

@@ -22,6 +22,8 @@ public class Test : Base
         {
             print(w.text);
         });
+
+        DelayCall(1, Clone);
     }
 
     // Update is called once per frame

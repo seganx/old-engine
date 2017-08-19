@@ -5,8 +5,8 @@ public static class Params
 {
     public const string Null = "null";
     public const string Type = "type";
+    public const string Material = "material";
     public const string Grade = "grade";
-    public const string Rarity = "rarity";
     public const string Level = "level";
     public const string Value = "value";
     public const string Mass = "mass";

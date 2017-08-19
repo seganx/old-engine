@@ -29,6 +29,18 @@ public class Body : Entity
         Flip(gameObject, machine.side);
         CheckRigidbody();
 
+        //  load additional visual
+        var additional = Resources.Load("Machines/Body_" + material);
+        if (additional != null)
+        {
+            var child = additional.Clone<Transform>(transform);
+            child.localPosition = Vector3.zero;
+            if (machine.side == Side.Opponent)
+                child.localScale = new Vector3(-1, 1, 1);
+            else
+                child.localScale = Vector3.one;
+        }
+
         return this;
     }
 

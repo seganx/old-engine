@@ -2,8 +2,8 @@
 	"name": "seganx",
 	"body": {
 		"type": "Titan",
+		"material": "0",
 		"grade": "2",
-		"rarity": "1",
 		"level": "1",
 		"value": "5",
 		"mass": "5",
@@ -35,8 +35,8 @@
 	},
 	"wheels": [{
 		"type": "Knob",
+		"material": "0",
 		"grade": "0",
-		"rarity": "0",
 		"level": "1",
 		"value": "2",
 		"mass": "30",
@@ -46,8 +46,8 @@
 		"speed": "1000"
 	}, {
 		"type": "Roller",
+		"material": "0",
 		"grade": "3",
-		"rarity": "0",
 		"level": "1",
 		"value": "2",
 		"mass": "1",
@@ -58,15 +58,27 @@
 	}],
 	"weapons": [{
 		"type": "Blade",
+		"material": "2",
 		"grade": "2",
-		"rarity": "0",
 		"level": "1",
 		"value": "2",
 		"mass": "0",
 		"health": "50",
 		"power": "4",
 		"damage": "5",
-		"speed": "-10",
+		"speed": "-7",
 		"slot": "0"
+	}, {
+		"type": "Chainsaw",
+		"material": "0",
+		"grade": "2",
+		"level": "1",
+		"value": "2",
+		"mass": "0",
+		"health": "50",
+		"power": "4",
+		"damage": "5",
+		"speed": "5",
+		"slot": "1"
 	}]
 }

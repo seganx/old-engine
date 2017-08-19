@@ -1,16 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿#if UNITY_EDITOR
 using UnityEngine;
+using UnityEditor;
 
-public class AssetBoundleBuilder : MonoBehaviour {
+namespace SeganX.Editor
+{
+    public class AssetBundlesBuilder
+    {
+        [MenuItem("SeganX/AssetBundles/Build")]
+        private static void BuildAllAssetBundles()
+        {
+            BuildPipeline.BuildAssetBundles("AssetBundles", BuildAssetBundleOptions.None, BuildTarget.Android);
+        }
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    }
 }
+#endif
