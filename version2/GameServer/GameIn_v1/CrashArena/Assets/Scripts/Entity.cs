@@ -75,13 +75,15 @@ public class Entity : MonoBehaviour
         var path = "Sprites/" + param + "/" + name;
         var res = Resources.LoadAll<Sprite>(path);
         if (res.IsNullOrEmpty())
-            res = Resources.LoadAll<Sprite>(path + "_" + material);
+            res = Resources.LoadAll<Sprite>(path + "/" + name + "_" + material);
+        if (res.IsNullOrEmpty())
+            res = new Sprite[10];
         return res;
     }
 
-    public SpriteRenderer CheckSprite(string param)
+    public SpriteRenderer CheckSprite(string param, SpriteRenderer sprite = null)
     {
-        var sprite = GetComponent<SpriteRenderer>();
+        if (sprite == null) sprite = GetComponent<SpriteRenderer>();
         if (sprite == null) return null;
 
         var allsprites = LoadSprites(param);

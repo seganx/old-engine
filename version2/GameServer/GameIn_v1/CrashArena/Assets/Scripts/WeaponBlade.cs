@@ -22,7 +22,7 @@ public class WeaponBlade : MonoBehaviour
         Resources.UnloadUnusedAssets();
 
         saw.gameObject.AddComponent<CircleCollider2D>().isTrigger = true;
-        GetComponent<Rotator>().speed = wparent.speed;
+        GetComponent<Rotator>().speed = parent.machine.side == Side.Null ? 0 : wparent.speed;
         return this;
     }
 }

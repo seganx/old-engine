@@ -19,8 +19,19 @@ public class Weapon : Entity
         var basePath = "Machines/Weapon_" + name;
         switch (name)
         {
-            case "Blade": Resources.Load<GameObject>(basePath).Clone<WeaponBlade>(transform).Setup(this); break;
-            case "Chainsaw": Resources.Load<GameObject>(basePath).Clone<WeaponChainsaw>(transform).Setup(this); break;
+            case "Blade": 
+                Resources.Load<GameObject>(basePath).Clone<WeaponBlade>(transform).Setup(this); 
+                break;
+
+            case "Chainsaw":
+            case "Drill":
+            case "Stinger":
+                Resources.Load<GameObject>(basePath).Clone<WeaponSharp>(transform).Setup(this); 
+                break;
+
+            case "Laser":
+                Resources.Load<GameObject>(basePath).Clone<WeaponLaser>(transform).Setup(this); 
+                break;
         }
 
         if (machine.side == Side.Opponent)
