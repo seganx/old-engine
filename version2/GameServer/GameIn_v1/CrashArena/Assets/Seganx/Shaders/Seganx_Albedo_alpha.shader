@@ -69,8 +69,7 @@ Shader "Seganx/Albedo/Alpha/Blend"
 					return o;
 				}
 			
-				float _ColorStrength;
-				
+				float _ColorStrength;				
 				fixed4 frag (VertexOutput i) : SV_Target
 				{
 					fixed4 c = tex2D( _MainTex, i.uv0 ) * i.col;

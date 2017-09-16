@@ -24,7 +24,14 @@ public class BrushPrefabEditor : Editor
                     RaycastHit hit;
                     if (Physics.Raycast(ray, out hit))
                     {
-                        var newone = Instantiate(brushMan.prefab, hit.point, Quaternion.identity, brushMan.transform);
+                        Quaternion initRotarion = Quaternion.identity;
+                        if ((brushMan.options & BrushPrefab.Options.RandomRotationX) != 0)
+                            initRotarion *= Quaternion.Euler(Random.Range(0, 360), 0, 0);
+                        if ((brushMan.options & BrushPrefab.Options.RandomRotationY) != 0)
+                            initRotarion *= Quaternion.Euler(0, Random.Range(0, 360), 0);
+                        if ((brushMan.options & BrushPrefab.Options.RandomRotationZ) != 0)
+                            initRotarion *= Quaternion.Euler(0, 0, Random.Range(0, 360));
+                        var newone = Instantiate(brushMan.prefab, hit.point, initRotarion, brushMan.transform);
                         newone.SendMessage("OnCreatedByBrushPrefab", evt, SendMessageOptions.DontRequireReceiver);
                         BrushPrefab.lastCreated = newone;
                     }

@@ -6,6 +6,7 @@ Shader "Seganx/Albedo/Simple"
 	{
 		_Color("Color", Color) = (1,1,1,1)
 		_MainTex ("Base (RGB)", 2D) = "white" {}
+		_ColorStrength("Color Strength", Float) = 1
 
 		[Enum(ON,1,OFF,0)]				_ZWrite ("Z Write", Int) = 1
 		[Enum(BACK,2,FRONT,1,OFF,0)]	_Cull ("Cull", Int) = 2
@@ -56,10 +57,11 @@ Shader "Seganx/Albedo/Simple"
 
 				sampler2D _MainTex;
 				float4 _Color;
+				float _ColorStrength;
 				fixed4 frag (VertexOutput i) : SV_Target
 				{
 					fixed4 c = tex2D( _MainTex, i.uv0 );
-					return c * _Color;
+					return c * _Color * _ColorStrength;
 				}
 				
 			ENDCG

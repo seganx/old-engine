@@ -6,6 +6,8 @@ Shader "Seganx/VertexLit"
 	{
 		_Color("Color", Color) = (1,1,1,1)
 		_MainTex ("Base (RGB)", 2D) = "white" {}
+		_ColorStrength("Color Strength", Float) = 1
+
 		
 		[Enum(ON,1,OFF,0)]	_ZWrite ("Z Write", Int) = 1
 		[Enum(BACK,2,FRONT,1,OFF,0)]	_Cull ("Cull", Int) = 2
@@ -69,9 +71,10 @@ Shader "Seganx/VertexLit"
 					return o;
 				}
 				
+				float _ColorStrength;
 				fixed4 frag (VertexOutput v) : SV_Target
 				{
-					fixed4 c = tex2D( _MainTex, v.uv0 ) * _Color;
+					fixed4 c = tex2D( _MainTex, v.uv0 ) * _Color * _ColorStrength;
 					c.rgb *= v.shd;
 					return c;
 				}
