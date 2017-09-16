@@ -43,10 +43,8 @@ Shader "Seganx/Albedo/Simple"
 					float2 uv0 : TEXCOORD0;
 				};
 
-				float4 _Color;
-				sampler2D _MainTex;
-				float4 _MainTex_ST;
 			
+				float4 _MainTex_ST;
 				VertexOutput vert (VertexInput v)
 				{
 					VertexOutput o;
@@ -55,6 +53,9 @@ Shader "Seganx/Albedo/Simple"
 					return o;
 				}
 			
+
+				sampler2D _MainTex;
+				float4 _Color;
 				fixed4 frag (VertexOutput i) : SV_Target
 				{
 					fixed4 c = tex2D( _MainTex, i.uv0 );
