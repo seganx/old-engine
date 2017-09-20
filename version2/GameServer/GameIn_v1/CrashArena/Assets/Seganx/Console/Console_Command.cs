@@ -43,6 +43,22 @@ namespace SeganX.Console
         public void RunCommand()
         {
             var str = userInput.text;
+
+            //  handle help command
+            if (str.ToLower() == "help")
+            {
+                string helpStr = "List of commands:\n";
+                if (methods.Count > 0)
+                {
+                    foreach (var item in methods)
+                        helpStr += item.space + " " + item.name + "\n";
+                }
+                else helpStr += "No command founded!";
+                Debug.Log(helpStr);
+                return;
+            }
+
+
             Debug.Log("Execute: " + str);
 
             string[] cmd = str.Split(' ');
@@ -100,5 +116,6 @@ namespace SeganX.Console
             }
             method.info.Invoke(null, arglist);
         }
+
     }
 }

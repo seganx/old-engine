@@ -39,5 +39,10 @@ namespace SeganX.Console
 
             label.text = str;
         }
+
+        public static void SetOnDisplayInfo(OnDisplayInfoEvent onDisplayInfo)
+        {
+            OnDisplayInfo = onDisplayInfo;
+        }
     }
 }

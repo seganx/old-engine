@@ -7,6 +7,8 @@ using System.IO;
 
 public static class MonoEx
 {
+    public delegate float ReturnValue<T>(T Obj);
+
     #region basic types
     public static bool IsTypeOf<T>(this object self)
     {
@@ -153,7 +155,7 @@ public static class MonoEx
     }
     #endregion
 
-    #region array
+    #region arrays
     public static bool HasOneItem(this System.Array self)
     {
         return self != null && self.Length == 1;
@@ -176,6 +178,46 @@ public static class MonoEx
             if (item.Equals(i))
                 return true;
         return false;
+    }
+
+    public static T FindMax<T>(this System.Array self, ReturnValue<T> returnValueFunc)
+    {
+        if (self.IsNullOrEmpty() || self.Length < 1) return default(T);
+        object selected = self.GetValue(0);
+        foreach (var item in self)
+            if (returnValueFunc((T)selected) < returnValueFunc((T)item))
+                selected = item;
+        return (T)selected;
+    }
+
+    public static T FindMin<T>(this System.Array self, ReturnValue<T> returnValueFunc)
+    {
+        if (self.IsNullOrEmpty() || self.Length < 1) return default(T);
+        object selected = self.GetValue(0);
+        foreach (var item in self)
+            if (returnValueFunc((T)selected) > returnValueFunc((T)item))
+                selected = item;
+        return (T)selected;
+    }
+
+    public static T FindMax<T>(this List<T> self, ReturnValue<T> returnValueFunc)
+    {
+        if (self == null || self.Count < 1) return default(T);
+        T selected = self[0];
+        foreach (var item in self)
+            if (returnValueFunc(selected) < returnValueFunc(item))
+                selected = item;
+        return selected;
+    }
+
+    public static T FindMin<T>(this List<T> self, ReturnValue<T> returnValueFunc)
+    {
+        if (self == null || self.Count < 1) return default(T);
+        T selected = self[0];
+        foreach (var item in self)
+            if (returnValueFunc(selected) > returnValueFunc(item))
+                selected = item;
+        return selected;
     }
     #endregion
 

@@ -159,5 +159,18 @@ namespace SeganX.Console
             return height;
         }
 
+#if UNITY_EDITOR
+        [Console("Console")]
+        public static void SaveLog()
+        {
+            string str = "";
+            foreach (var item in instance.textList)
+                str += item.visualText + "\n";
+
+            var filename = System.IO.Path.GetTempFileName() + ".txt";
+            System.IO.File.WriteAllText(filename, str.Replace("\n", "\r\n"));
+            Application.OpenURL(filename);
+        }
+#endif
     }
 }
