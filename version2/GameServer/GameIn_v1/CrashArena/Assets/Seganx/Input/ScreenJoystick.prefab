@@ -229,6 +229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d1a3deb9ec28f7448785e04fa11cf36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hand: 0
   MovementRange: 50
   HideOnRelease: 0
   MoveBase: 1
