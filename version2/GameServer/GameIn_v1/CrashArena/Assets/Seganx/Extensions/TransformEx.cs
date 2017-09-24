@@ -195,7 +195,7 @@ public static class TransformEx
         return res == null ? self.GetChild(index).GetComponentInChildren<T>() : res;
     }
 
-    public static Transform FindChildRecursive(this Transform self, string childName, bool justActivates = false)
+    public static Transform FindRecursive(this Transform self, string childName, bool justActivates = false)
     {
         Transform child = self.Find(childName);
         if (child != null)
@@ -209,7 +209,7 @@ public static class TransformEx
         }
 
         for (int idx = 0; idx < self.childCount; ++idx)
-            if ((child = FindChildRecursive(self.GetChild(idx), childName, justActivates)) != null)
+            if ((child = FindRecursive(self.GetChild(idx), childName, justActivates)) != null)
                 return child;
 
         return null;
