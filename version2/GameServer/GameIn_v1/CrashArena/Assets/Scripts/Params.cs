@@ -4,6 +4,7 @@ using System.Collections;
 public static class Params
 {
     public const string Null = "null";
+    public const string Name = "name";
     public const string Type = "type";
     public const string Material = "material";
     public const string Grade = "grade";
@@ -21,6 +22,9 @@ public static class Params
     public const string Wheel = "wheel";
     public const string Staff = "staff";
     public const string Weapon = "weapon";
+    public const string Wheels = "wheels";
+    public const string Staffs = "staffs";
+    public const string Weapons = "weapons";
     public const string X = "x";
     public const string Y = "y";
 }

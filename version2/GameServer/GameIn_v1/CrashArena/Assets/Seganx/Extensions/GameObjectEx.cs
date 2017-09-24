@@ -28,6 +28,11 @@ public static class GameObjectEx
         return res.GetComponent<T>();
     }
 
+    public static T Clone<T>(this Component self) where T : Component
+    {
+        return self.gameObject.Clone<T>();
+    }
+
     public static T Clone<T>(this Object self) where T : Component
     {
         return (self as GameObject).Clone<T>();
