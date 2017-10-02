@@ -6,14 +6,16 @@ namespace SeganX
     [Serializable]
     public class Value
     {
+        //public bool Enable = true;
+
         [SerializeField]
         private float min = 0;
 
         [SerializeField]
-        private float max = 0;
+        private float max = 100;
 
         [SerializeField]
-        private float current = 0;
+        private float current = 100;
 
         public bool IsMax { get { return Mathf.Approximately(current, max); } }
         public bool IsMin { get { return Mathf.Approximately(current, min); } }

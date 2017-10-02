@@ -89,7 +89,7 @@ public static class TransformEx
         return -1;
     }
 
-    public static RectTransform GetRectTransform(this Transform self)
+    public static RectTransform AsRectTransform(this Transform self)
     {
         return self as RectTransform;
     }
@@ -143,6 +143,14 @@ public static class TransformEx
         return self as RectTransform;
     }
 
+    public static Transform Scale(this Transform self, Vector3 factors)
+    {
+        var scl = self.localScale;
+        scl.Scale(factors);
+        self.localScale = scl;
+        return self;
+    }
+
     public static Transform SetParent(this Transform self, Transform parent, bool holdPosition, bool holdScale, bool holdRotation)
     {
         Vector3 lastPos = self.position;
@@ -168,7 +176,7 @@ public static class TransformEx
 
     public static RectTransform AttachToCanvas(this Transform self, string canvasName)
     {
-        RectTransform rectTransform = self.GetRectTransform();
+        RectTransform rectTransform = self.AsRectTransform();
         rectTransform.SetParent(GameObject.Find(canvasName).transform, false);
         return rectTransform;
     }

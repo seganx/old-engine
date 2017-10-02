@@ -43,6 +43,13 @@ namespace SeganX
             public float horizontalValue = 0;
         }
 
+        public class SteeringWheel : Button
+        {
+            public float relativeAngle = 0;
+            public float totalAngle = 0;
+        }
+
+        public static SteeringWheel Steering = new SteeringWheel();
         public static Joystick JoystickLeft = new Joystick();
         public static Joystick JoystickRight = new Joystick();
         public static Button Jump = new Button();

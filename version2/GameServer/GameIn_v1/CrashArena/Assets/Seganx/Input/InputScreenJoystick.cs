@@ -49,9 +49,6 @@ namespace SeganX
 
         [Tooltip("Image of the stick itself")]
         public Image Stick;
-
-        [Tooltip("Touch Zone transform")]
-        public RectTransform TouchZone;
         // ---------------------------------------------------------------------------
 
         private InputManager.Joystick joystick = null;
@@ -76,12 +73,7 @@ namespace SeganX
             initialStickPosition = stickTransform.anchoredPosition;
             intermediateStickPosition = initialStickPosition;
             initialBasePosition = baseTransform.anchoredPosition;
-
-            stickTransform.anchoredPosition = initialStickPosition;
-            baseTransform.anchoredPosition = initialBasePosition;
-
             oneOverMovementRange = 1f / MovementRange;
-
 
             if (HideOnRelease)
             {
