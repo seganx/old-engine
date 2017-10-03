@@ -6,7 +6,8 @@ namespace SeganX
     [Serializable]
     public class Value
     {
-        //public bool Enable = true;
+        public delegate void ChangedCallback(float lastValue, float currentValue);
+        public event ChangedCallback OnValueChanged;
 
         [SerializeField]
         private float min = 0;
@@ -45,7 +46,13 @@ namespace SeganX
 
         public float Current
         {
-            set { current = Mathf.Clamp(value, min, max); }
+            set
+            {
+                var lastValue = current;
+                current = Mathf.Clamp(value, min, max);
+                if (lastValue != current)
+                OnValueChanged(lastValue, current);
+            }
             get { return current; }
         }
 
@@ -56,7 +63,12 @@ namespace SeganX
                 float d = (max - min);
                 return (d > Mathf.Epsilon) ? current * 100 / d : 0;
             }
-            set { current = value * 0.01f * (max - min); }            
+            set { current = value * 0.01f * (max - min); }
+        }
+
+        public void SetOnValueChanged(ChangedCallback callback)
+        {
+            OnValueChanged += callback;
         }
     }
 }
