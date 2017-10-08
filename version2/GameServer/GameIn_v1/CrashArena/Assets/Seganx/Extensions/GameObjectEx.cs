@@ -38,6 +38,13 @@ public static class GameObjectEx
         return (self as GameObject).Clone<T>();
     }
 
+    public static T Clone<T>(this Component self, Transform parent, bool worldPositionStays = false) where T : Component
+    {
+        T res = self.gameObject.Clone<T>();
+        res.transform.SetParent(parent, worldPositionStays);
+        return res;
+    }
+
     public static T Clone<T>(this Object self, Transform parent, bool worldPositionStays = false) where T : Component
     {
         T res = (self as GameObject).Clone<T>();

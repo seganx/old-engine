@@ -143,6 +143,14 @@ public static class TransformEx
         return self as RectTransform;
     }
 
+    public static Transform SetPosition(this Transform self, float x, float y, float z)
+    {
+        var pos = self.position;
+        pos.Set(x, y, z);
+        self.position = pos;
+        return self;
+    }
+
     public static Transform Scale(this Transform self, Vector3 factors)
     {
         var scl = self.localScale;

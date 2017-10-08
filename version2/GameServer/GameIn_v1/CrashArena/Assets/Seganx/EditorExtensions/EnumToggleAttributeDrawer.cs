@@ -1,30 +1,54 @@
 ﻿#if UNITY_EDITOR
-using System;
 using UnityEditor;
 using UnityEngine;
 
 [CustomPropertyDrawer(typeof(EnumToggleAttribute))]
 public class EnumToggleAttributeDrawer : PropertyDrawer
 {
-    public override void OnGUI(Rect _position, SerializedProperty _property, GUIContent _label)
-    {
-        int enumLength = _property.enumNames.Length;
-        float buttonWidth = (_position.width - EditorGUIUtility.labelWidth) / enumLength;
+    public float buttonHeight = 0;
+    public int rowsCount = 1;
 
-        EditorGUI.LabelField(new Rect(_position.x, _position.y, EditorGUIUtility.labelWidth, _position.height), _label);
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        buttonHeight = base.GetPropertyHeight(property, label);
+        return buttonHeight * rowsCount;
+    }
+
+    public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
+    {
+        EditorGUI.LabelField(new Rect(rect.x, rect.y, EditorGUIUtility.labelWidth, rect.height), label);
+
+        int buttonsIntValue = property.enumValueIndex;
 
         EditorGUI.BeginChangeCheck();
 
-        int buttonsIntValue = _property.enumValueIndex;
-        for (int i = 0; i < enumLength; i++)
+        rowsCount = 1;
+        float top = rect.y;
+        float left = rect.x + EditorGUIUtility.labelWidth;
+        for (int i = 0; i < property.enumNames.Length; i++)
         {
-            Rect buttonPos = new Rect(_position.x + EditorGUIUtility.labelWidth + buttonWidth * i, _position.y, buttonWidth, _position.height);
-            if (GUI.Toggle(buttonPos, buttonsIntValue == i, _property.enumNames[i], "Button"))
+            float buttonWidth = ComputeButtonWidth(property.enumNames[i]);
+
+            if (left + buttonWidth > rect.width + rect.x)
+            {
+                left = rect.x + EditorGUIUtility.labelWidth;
+                top += buttonHeight;
+                rowsCount++;
+            }
+
+            Rect buttonPos = new Rect(left, top, buttonWidth, buttonHeight);
+            if (GUI.Toggle(buttonPos, buttonsIntValue == i, property.enumNames[i], "Button"))
                 buttonsIntValue = i;
+            left += buttonWidth;
         }
 
         if (EditorGUI.EndChangeCheck())
-            _property.enumValueIndex = buttonsIntValue;
+            property.enumValueIndex = buttonsIntValue;
+    }
+
+    private float ComputeButtonWidth(string label)
+    {
+        return GUI.skin.label.CalcSize(new GUIContent(label)).x + 10;
     }
 }
 #endif
