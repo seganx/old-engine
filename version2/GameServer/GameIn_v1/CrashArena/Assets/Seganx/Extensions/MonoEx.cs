@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System;
 
 public static class MonoEx
 {
@@ -28,6 +29,16 @@ public static class MonoEx
     public static bool Between(this int x, int x1, int x2)
     {
         return x >= x1 && x <= x2;
+    }
+
+    public static int ToInt(this IConvertible self)
+    {
+        return (int)self;
+    }
+
+    public static bool IsFlagOn(this IConvertible self, IConvertible flag)
+    {
+        return ((int)self & (int)flag) != 0;
     }
     #endregion
 

@@ -28,7 +28,6 @@ public class EnumToggleAttributeDrawer : PropertyDrawer
         for (int i = 0; i < property.enumNames.Length; i++)
         {
             float buttonWidth = ComputeButtonWidth(property.enumNames[i]);
-
             if (left + buttonWidth > rect.width + rect.x)
             {
                 left = rect.x + EditorGUIUtility.labelWidth;
@@ -39,6 +38,7 @@ public class EnumToggleAttributeDrawer : PropertyDrawer
             Rect buttonPos = new Rect(left, top, buttonWidth, buttonHeight);
             if (GUI.Toggle(buttonPos, buttonsIntValue == i, property.enumNames[i], "Button"))
                 buttonsIntValue = i;
+
             left += buttonWidth;
         }
 

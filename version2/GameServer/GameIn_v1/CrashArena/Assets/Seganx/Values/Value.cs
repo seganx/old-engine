@@ -32,5 +32,10 @@ namespace SeganX
             if (OnValueChanged != null && lastValue != current)
                 OnValueChanged(lastValue, current);
         }
+
+        public virtual void CopyFrom(Value src)
+        {
+            current = src.current;
+        }
     }
 }

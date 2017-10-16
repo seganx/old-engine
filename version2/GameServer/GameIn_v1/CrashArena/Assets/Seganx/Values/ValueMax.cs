@@ -36,5 +36,12 @@ namespace SeganX
             }
             get { return max; }
         }
+
+        public override void CopyFrom(Value src)
+        {
+            base.CopyFrom(src);
+            if (src is ValueMax)
+                max = src.As<ValueMax>().max;
+        }
     }
 }

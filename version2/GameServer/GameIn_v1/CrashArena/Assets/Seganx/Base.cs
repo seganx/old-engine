@@ -4,6 +4,9 @@ using SeganX;
 
 public class Base : MonoBehaviour
 {
+    public GameManager gameManager { get { return GameManager.Instance; } }
+    public GUIManager guiManager { get { return GUIManager.Instance; } }
+
     public virtual bool Visible { set { gameObject.SetActive(value); } get { return gameObject.activeSelf; } }
 
     public void DelayCall(float seconds, System.Action callback)

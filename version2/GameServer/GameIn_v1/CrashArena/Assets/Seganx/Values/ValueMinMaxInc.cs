@@ -19,6 +19,13 @@ namespace SeganX
         {
             Current += perSecond * Time.deltaTime;
         }
+
+        public override void CopyFrom(Value src)
+        {
+            base.CopyFrom(src);
+            if (src is ValueMinMaxInc)
+                perSecond = src.As<ValueMinMaxInc>().perSecond;
+        }
     }
 
 }

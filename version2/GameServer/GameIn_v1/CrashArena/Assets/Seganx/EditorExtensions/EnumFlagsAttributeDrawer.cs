@@ -6,38 +6,62 @@ using UnityEngine;
 [CustomPropertyDrawer(typeof(EnumFlagAttribute))]
 public class EnumFlagsAttributeDrawer : PropertyDrawer
 {
-    public override void OnGUI(Rect _position, SerializedProperty _property, GUIContent _label)
+    public float buttonHeight = 0;
+    public int rowsCount = 1;
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        buttonHeight = base.GetPropertyHeight(property, label);
+        return buttonHeight * rowsCount;
+    }
+
+    public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
     {
         int buttonsIntValue = 0;
-        int enumLength = _property.enumNames.Length;
+        int enumLength = property.enumNames.Length;
         bool[] buttonPressed = new bool[enumLength];
-        float buttonWidth = (_position.width - EditorGUIUtility.labelWidth) / enumLength;
 
-        EditorGUI.LabelField(new Rect(_position.x, _position.y, EditorGUIUtility.labelWidth, _position.height), _label);
+        EditorGUI.LabelField(new Rect(rect.x, rect.y, EditorGUIUtility.labelWidth, rect.height), label);
 
         EditorGUI.BeginChangeCheck();
 
+        rowsCount = 1;
+        float top = rect.y;
+        float left = rect.x + EditorGUIUtility.labelWidth;
         for (int i = 0; i < enumLength; i++)
         {
-
             // Check if the button is/was pressed 
-            if ((_property.intValue & (1 << i)) == 1 << i)
+            if ((property.intValue & (1 << i)) == 1 << i)
             {
                 buttonPressed[i] = true;
             }
 
-            Rect buttonPos = new Rect(_position.x + EditorGUIUtility.labelWidth + buttonWidth * i, _position.y, buttonWidth, _position.height);
 
-            buttonPressed[i] = GUI.Toggle(buttonPos, buttonPressed[i], _property.enumNames[i], "Button");
+            float buttonWidth = ComputeButtonWidth(property.enumNames[i]);
+            if (left + buttonWidth > rect.width + rect.x)
+            {
+                left = rect.x + EditorGUIUtility.labelWidth;
+                top += buttonHeight;
+                rowsCount++;
+            }
 
+            Rect buttonPos = new Rect(left, top, buttonWidth, buttonHeight);
+            buttonPressed[i] = GUI.Toggle(buttonPos, buttonPressed[i], property.enumNames[i], "Button");
             if (buttonPressed[i])
-                buttonsIntValue += 1 << i;
+                buttonsIntValue |= 1 << i;
+
+            left += buttonWidth;
         }
 
         if (EditorGUI.EndChangeCheck())
         {
-            _property.intValue = buttonsIntValue;
+            property.intValue = buttonsIntValue;
         }
+    }
+
+    private float ComputeButtonWidth(string label)
+    {
+        return GUI.skin.label.CalcSize(new GUIContent(label)).x + 10;
     }
 }
 #endif
