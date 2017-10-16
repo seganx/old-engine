@@ -13,7 +13,12 @@ public class Entity : MonoBehaviour
     public float health = 10;
     public float damage = 0;
     public float speed = 0;
-    public Machine machine = null;
+
+    public IMachine machine = null;
+
+    protected SpriteRenderer spriteRenderer = null;
+
+    public float Height { get { return spriteRenderer ? spriteRenderer.sprite.rect.height / spriteRenderer.sprite.pixelsPerUnit : 0; } }
 
     public Entity UpdateData(Json.Node root)
     {
@@ -35,9 +40,31 @@ public class Entity : MonoBehaviour
             }
         }
 
-        machine = GetComponentInParent<Machine>();
-        machine.totalHealth += health;
-        machine.totalDamage += damage;
+        machine = GetComponentInParent<IMachine>();
+
+        return this;
+    }
+
+    public Entity AddSpriteRenderer(string param)
+    {
+        spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
+        spriteRenderer.sortingLayerName = machine.SpriteLayerName;
+        spriteRenderer.sortingOrder = machine.SpriteOrder++;
+        spriteRenderer.sprite = LoadSprite(param, name, material);
+        return this;
+    }
+
+    public Entity AddColliderWithRigidBody<T>() where T : Component
+    {
+        if (machine.IsEditMode) return this;
+
+        if (GetComponent<T>() == null)
+            gameObject.AddComponent<T>();
+
+        var rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
+            rb = gameObject.AddComponent<Rigidbody2D>();
+        rb.mass = mass;
 
         return this;
     }
@@ -46,31 +73,21 @@ public class Entity : MonoBehaviour
     {
         var com = other.GetComponentInParent<Weapon>();
         if (com != null && com.damageType == Weapon.DamageType.OnCollisionEnter)
-        {
-            machine.totalHealth -= com.damage;
-            if (machine.totalHealth <= 0)
-            {
-                Debug.Log(name + ": Destroyed!");
-                Destroy(machine.gameObject);
-            }
-        }
+            machine.TakeDamage(com.damage);
     }
 
     void OnTriggerStay2D(Collider2D other)
     {
         var com = other.GetComponentInParent<Weapon>();
         if (com != null && com.damageType == Weapon.DamageType.OnCollisionStay)
-        {
-            machine.totalHealth -= com.damage * com.speed * Time.deltaTime;
-            if (machine.totalHealth <= 0)
-            {
-                Debug.Log(name + ": Destroyed!");
-                Destroy(machine.gameObject);
-            }
-        }
+            machine.TakeDamage(com.damage * com.speed * Time.deltaTime);
     }
 
-    public Sprite[] LoadSprites(string param)
+
+    //////////////////////////////////////////////////////////////
+    //  STATIC MEMBERS
+    //////////////////////////////////////////////////////////////
+    public static Sprite[] LoadSprites(string param, string name, int material)
     {
         var path = "Sprites/" + param + "/" + name;
         var res = Resources.LoadAll<Sprite>(path);
@@ -81,31 +98,24 @@ public class Entity : MonoBehaviour
         return res;
     }
 
-    public SpriteRenderer CheckSprite(string param, SpriteRenderer sprite = null)
+    public static Sprite LoadSprite(string param, string name, int material)
     {
-        if (sprite == null) sprite = GetComponent<SpriteRenderer>();
-        if (sprite == null) return null;
-
-        var allsprites = LoadSprites(param);
+        var allsprites = LoadSprites(param, name, material);
         var spriteName = name + "_" + material;
+
+        Sprite res = null;
         foreach (var item in allsprites)
             if (item.name == spriteName)
-                sprite.sprite = item;
-
+                res = item;
         Resources.UnloadUnusedAssets();
-        return sprite;
+
+        return res;
     }
 
-    public Entity CheckRigidbody()
-    {
-        if (mass > 0 && machine.side != Side.Null)
-            gameObject.AddComponent<Rigidbody2D>().mass = mass;
-        return this;
-    }
 
-    public static GameObject Flip(GameObject obj, Side side)
+    public static GameObject Flip(GameObject obj, MachineParty party)
     {
-        if (side == Side.Opponent)
+        if (party == MachineParty.Opponent)
         {
             var sprite = obj.GetComponent<SpriteRenderer>();
             if (sprite) sprite.flipX = true;
@@ -120,5 +130,21 @@ public class Entity : MonoBehaviour
             }
         }
         return obj;
+    }
+
+    public static GameObject SortSprites(GameObject obj, IMachine machine)
+    {
+        var sprites = obj.GetComponentsInChildren<SpriteRenderer>(true);
+        foreach (var item in sprites)
+            item.sortingOrder = machine.SpriteOrder++;
+        return obj;
+    }
+
+    public static T Create<T>(Transform parent) where T : Entity
+    {
+        var obj = new GameObject();
+        var res = obj.AddComponent<T>();
+        obj.transform.SetParent(parent, false);
+        return res;
     }
 }

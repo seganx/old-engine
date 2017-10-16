@@ -12,25 +12,25 @@
 		"slots": [{
 			"type": "wheel",
 			"x": "0.8",
-			"y": "-1.2",
+			"y": "0",
 			"freq": "5"
 		}, {
 			"type": "wheel",
 			"x": "-0.8",
-			"y": "-1.2",
+			"y": "0",
 			"freq": "7"
 		}, {
 			"type": "weapon",
 			"x": "-0.5",
-			"y": "0"
+			"y": "1.2"
 		}, {
 			"type": "weapon",
 			"x": "0.5",
-			"y": "0"
+			"y": "1.2"
 		}, {
 			"type": "staff",
 			"x": "0.5",
-			"y": "-0.5"
+			"y": "0.5"
 		}]
 	},
 	"wheels": [{
@@ -57,6 +57,18 @@
 		"speed": "1000"
 	}],
 	"weapons": [{
+		"type": "Chainsaw",
+		"material": "0",
+		"grade": "2",
+		"level": "1",
+		"value": "2",
+		"mass": "0",
+		"health": "50",
+		"power": "4",
+		"damage": "20",
+		"speed": "5",
+		"slot": "1"
+	}, {
 		"type": "Blade",
 		"material": "2",
 		"grade": "2",
@@ -68,17 +80,5 @@
 		"damage": "5",
 		"speed": "-7",
 		"slot": "0"
-	}, {
-		"type": "Laser",
-		"material": "0",
-		"grade": "2",
-		"level": "1",
-		"value": "2",
-		"mass": "0",
-		"health": "50",
-		"power": "4",
-		"damage": "20",
-		"speed": "5",
-		"slot": "1"
 	}]
 }

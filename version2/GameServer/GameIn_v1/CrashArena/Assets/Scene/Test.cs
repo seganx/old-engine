@@ -41,15 +41,15 @@ public class Test : Base
         var root = Json.Parse(Instance.jsonFile.text);
         Debug.Log(root.ToString());
 
-        var obj = Resources.Load("Machines/Machine");
+        //var obj = Resources.Load("Machines/Machine");
 
-        var machine = obj.Clone<Machine>();
-        machine.Setup(root, Side.Player);
-        machine.transform.localPosition = Vector3.left * 2;
+        var machine = Machine.Create();
+        machine.Setup(root, MachineParty.Player);
+        machine.transform.localPosition = Vector3.left * 4.5f;
 
-        machine = obj.Clone<Machine>();
-        machine.Setup(root, Side.Opponent);
-        machine.transform.localPosition = Vector3.right * 2;
+        machine = Machine.Create();
+        machine.Setup(root, MachineParty.Opponent);
+        machine.transform.localPosition = Vector3.right * 4.5f;
 
         //UnityEditor.EditorApplication.isPaused = true;
     }

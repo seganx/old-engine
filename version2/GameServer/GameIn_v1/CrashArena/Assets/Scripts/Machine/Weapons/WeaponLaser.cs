@@ -16,7 +16,7 @@ public class WeaponLaser : MonoBehaviour
         parent = wparent;
         parent.damageType = Weapon.DamageType.OnCollisionStay;
 
-        var sprites = wparent.LoadSprites(Params.Weapon);
+        var sprites = Entity.LoadSprites(Params.Weapon, wparent.name, wparent.material);
         body.sprite = sprites[0];
         Resources.UnloadUnusedAssets();
         return this;
@@ -24,7 +24,7 @@ public class WeaponLaser : MonoBehaviour
 
     void Update()
     {
-        if (parent.machine.side == Side.Null) return;
+        if (parent.machine.IsEditMode) return;
 
         fightTime += Time.deltaTime / parent.speed;
         if (fightTime >= 1)

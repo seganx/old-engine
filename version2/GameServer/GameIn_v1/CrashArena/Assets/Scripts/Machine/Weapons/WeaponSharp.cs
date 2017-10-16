@@ -15,7 +15,7 @@ public class WeaponSharp : MonoBehaviour
         parent = wparent;
         parent.damageType = Weapon.DamageType.OnCollisionStay;
 
-        var sprites = wparent.LoadSprites(Params.Weapon);
+        var sprites = Entity.LoadSprites(Params.Weapon, wparent.name, wparent.material);
         body.sprite = sprites[0];
         Resources.UnloadUnusedAssets();
         return this;
@@ -23,7 +23,6 @@ public class WeaponSharp : MonoBehaviour
 
     void Update()
     {
-        if (parent.machine.side != Side.Null)
-            saw.SetActiveChild(imageIndex++ % 3);
+        saw.SetActiveChild(imageIndex++ % 3);
     }
 }

@@ -31,8 +31,6 @@ namespace SeganX
         {
             canvas = GetComponent<Canvas>();
             Resources.UnloadUnusedAssets();
-
-            DelayCall(1, () => OpenPage<Page_MainMenu>());
         }
 
         // Update is called once per frame

@@ -14,7 +14,7 @@ public class WeaponBlade : MonoBehaviour
         parent = wparent;
         parent.damageType = Weapon.DamageType.OnCollisionEnter;
 
-        var sprites = wparent.LoadSprites(Params.Weapon);
+        var sprites = Entity.LoadSprites(Params.Weapon, wparent.name, wparent.material);
         saw.sprite = sprites[0];
         handle.sprite = sprites[1];
         arm.sprite = sprites[2];
@@ -22,7 +22,7 @@ public class WeaponBlade : MonoBehaviour
         Resources.UnloadUnusedAssets();
 
         saw.gameObject.AddComponent<CircleCollider2D>().isTrigger = true;
-        GetComponent<Rotator>().speed = parent.machine.side == Side.Null ? 0 : wparent.speed;
+        GetComponent<Rotator>().speed = wparent.speed;
         return this;
     }
 }

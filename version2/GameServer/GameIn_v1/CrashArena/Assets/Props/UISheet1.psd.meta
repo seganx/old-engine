@@ -1,21 +1,14 @@
 fileFormatVersion: 2
-guid: 84db75faee98cba489049d8fe8764a77
-timeCreated: 1500307444
+guid: 429bc346047951743b8972810ef59a97
+timeCreated: 1508185611
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: B_0_0
-    21300002: W_0_0
-    21300004: AxeHandle
-    21300006: AxeHead
-    21300008: Slot_Wheel
-    21300010: Slot_Weapon
-    21300012: Slot_Stuffs
-    21300014: Slot_Staff
+    21300000: UISheet1_0
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 1
+    enableMipMap: 0
     sRGBTexture: 1
     linearTexture: 0
     fadeOut: 0
@@ -34,16 +27,16 @@ TextureImporter:
   generateCubemap: 6
   cubemapConvolution: 0
   seamlessCubemap: 0
-  textureFormat: -1
+  textureFormat: 1
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
     filterMode: -1
-    aniso: 16
+    aniso: -1
     mipBias: -1
     wrapU: 1
-    wrapV: 1
-    wrapW: 1
+    wrapV: -1
+    wrapW: -1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -64,7 +57,23 @@ TextureImporter:
   textureFormatSet: 0
   platformSettings:
   - buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 512
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Standalone
+    maxTextureSize: 512
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Android
+    maxTextureSize: 512
     textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
@@ -75,47 +84,19 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Slot_Weapon
+      name: UISheet1_0
       rect:
         serializedVersion: 2
         x: 2
-        y: 42
-        width: 27
-        height: 20
+        y: 442
+        width: 67
+        height: 69
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
-      tessellationDetail: -1
-    - serializedVersion: 2
-      name: Slot_Staff
-      rect:
-        serializedVersion: 2
-        x: 38
-        y: 42
-        width: 24
-        height: 19
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-    - serializedVersion: 2
-      name: Slot_Wheel
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 3
-        width: 45
-        height: 29
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
     outline: []
     physicsShape: []
   spritePackingTag: 
