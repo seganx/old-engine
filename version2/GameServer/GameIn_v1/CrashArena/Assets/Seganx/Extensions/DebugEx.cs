@@ -48,7 +48,8 @@ public static class DebugEx
                     if (member.MemberType == MemberTypes.Property)
                     {
                         var prop = member as PropertyInfo;
-                        res += prop.Name + GetStringDebug(prop.GetValue(self, null), levels - 1) + " ";
+                        if (prop.CanRead)
+                            res += prop.Name + GetStringDebug(prop.GetValue(self, null), levels - 1) + " ";
                     }
                 }
                 res = res.Remove(res.Length - 1) + "}";

@@ -25,5 +25,15 @@
             else
                 return target;
         }
+
+        public static bool IsEnemy(this Party self)
+        {
+            return self == Party.Enemy;
+        }
+
+        public static bool IsFriend(this Party self)
+        {
+            return self == Party.Friend;
+        }
     }
 }

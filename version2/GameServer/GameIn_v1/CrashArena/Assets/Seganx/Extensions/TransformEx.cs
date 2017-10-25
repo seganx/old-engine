@@ -159,6 +159,14 @@ public static class TransformEx
         return self;
     }
 
+    public static Transform Scale(this Transform self, float x, float y, float z)
+    {
+        var scl = self.localScale;
+        scl.x *= x; scl.y *= y; scl.z *= z;
+        self.localScale = scl;
+        return self;
+    }
+
     public static Transform SetParent(this Transform self, Transform parent, bool holdPosition, bool holdScale, bool holdRotation)
     {
         Vector3 lastPos = self.position;
