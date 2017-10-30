@@ -6,7 +6,7 @@ namespace SeganX
 {
     public class GameManager : Base
     {
-        public string prefabPath = "";
+        public string prefabPath = "Prefabs/UI/";
         public Canvas canvas = null;
 
         private GameState currentState = null;
@@ -148,4 +148,11 @@ namespace SeganX
         }
 #endif
     }
+
+
+    ////////////////////////////////////////////////////////////
+    /// STATIV MEMBERS
+    ////////////////////////////////////////////////////////////
+    //private static Game instance = null;
+    //public static Game Instance { get { return instance == null ? (instance = FindObjectOfType<Game>()) : instance; } }
 }

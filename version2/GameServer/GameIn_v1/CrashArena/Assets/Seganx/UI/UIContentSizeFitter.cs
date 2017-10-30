@@ -8,9 +8,9 @@ namespace SeganX
         [System.Flags]
         public enum Option : int
         {
-            Automatic = 0x01,
-            ItemPosition = 0x02,
-            ContentSize = 0x04
+            Automatic = 1 << 0,
+            ItemPosition = 1 << 1,
+            ContentSize = 1 << 2
         }
 
         [EnumFlag]

@@ -5,7 +5,8 @@ using SeganX;
 public class Base : MonoBehaviour
 {
     public Game game { get { return Game.Instance; } }
-
+    public RectTransform rectTransform { get { return transform as RectTransform; } }
+    public RectTransform parentRectTransform { get { return transform.parent as RectTransform; } }
     public virtual bool Visible { set { gameObject.SetActive(value); } get { return gameObject.activeSelf; } }
 
     public void DelayCall(float seconds, System.Action callback)
