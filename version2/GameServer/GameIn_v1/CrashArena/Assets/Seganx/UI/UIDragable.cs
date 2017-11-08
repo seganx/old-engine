@@ -10,9 +10,12 @@ namespace SeganX
 
     public class UIDragable : Base, IDragHandler, IPointerDownHandler, IPointerUpHandler
     {
-        public bool isDraging { get; private set; }
-
+        public Rect bound;
+        public Vector2 snapThreshold = Vector2.one;
         private Vector2 offset = Vector2.zero;
+
+        public bool freezed { get; set; }
+        public bool isDragging { get { return current == this; } }
 
         public void OnPointerDown(PointerEventData eventData)
         {
@@ -22,17 +25,48 @@ namespace SeganX
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            isDraging = false;
+            cancelDrag = false;
+            current = null;
         }
 
-        public virtual void OnDrag(PointerEventData eventData)
+        public void OnDrag(PointerEventData eventData)
         {
-            isDraging = true;
+            if (cancelDrag)
+            {
+                eventData.pointerDrag = null;
+                cancelDrag = false;
+                current = null;
+                return;
+            }
+            if (freezed) return;
+            current = this;
 
             Vector2 localPoint;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRectTransform, eventData.position, eventData.enterEventCamera ?? eventData.pressEventCamera, out localPoint);
-            rectTransform.anchoredPosition = localPoint + offset;
+            localPoint += offset;
+            localPoint.x = Mathf.RoundToInt(localPoint.x / snapThreshold.x) * snapThreshold.x;
+            localPoint.y = Mathf.RoundToInt(localPoint.y / snapThreshold.y) * snapThreshold.y;
+
+            if (localPoint.x < bound.x) localPoint.x = bound.x;
+            if (localPoint.y > bound.y) localPoint.y = bound.y;
+            if (localPoint.x > bound.x + bound.width) localPoint.x = bound.x + bound.width;
+            if (localPoint.y < bound.y - bound.height + rectTransform.rect.height) localPoint.y = bound.y - bound.height + rectTransform.rect.height;
+
+            rectTransform.anchoredPosition = localPoint;
         }
+
+
+        ////////////////////////////////////////////////////////////
+        /// STATIV MEMBERS
+        ////////////////////////////////////////////////////////////
+        public static UIDragable current = null;
+        private static bool cancelDrag = false;
+        public static void CancelDrag()
+        {
+            if (current)
+                cancelDrag = true;
+        }
+
     }
 
 }

@@ -37,5 +37,20 @@ namespace SeganX
         {
             current = src.current;
         }
+
+        public static implicit operator float(Value v)
+        {
+            return v.Current;
+        }
+
+        public static implicit operator int(Value v)
+        {
+            return Mathf.RoundToInt(v.Current);
+        }
+
+        public static float operator +(Value v, float f)
+        {
+            return v.Current + f;
+        }
     }
 }

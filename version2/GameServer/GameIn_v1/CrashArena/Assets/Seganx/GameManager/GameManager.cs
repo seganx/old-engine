@@ -96,7 +96,7 @@ namespace SeganX
             return closeAll ? ClosePopup(closeAll) : guiStack.Count;
         }
 
-        public GameManager CloseAll(bool closeDoor = true)
+        public GameManager CloseAll()
         {
             ClosePopup(true);
             BackButton();

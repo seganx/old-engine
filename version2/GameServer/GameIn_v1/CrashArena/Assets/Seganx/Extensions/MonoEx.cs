@@ -33,7 +33,15 @@ public static class MonoEx
 
     public static int ToInt(this IConvertible self)
     {
-        return (int)self;
+        if (self is char)
+        {
+            char c = (char)self;
+            if (System.Char.IsDigit(c))
+                return (int)System.Char.GetNumericValue(c);
+            else
+                return 0;
+        }
+        else return (int)self;
     }
 
     public static bool IsFlagOn(this IConvertible self, IConvertible flag)
@@ -74,6 +82,11 @@ public static class MonoEx
             return self.Replace("/", "\\");
         else
             return self.Replace("\\", "/");
+    }
+
+    public static bool ToBoolean(this string self)
+    {
+        return self.ToLower() == "true";
     }
 
     public static int ToInt(this string self, int defaultValue = 0)

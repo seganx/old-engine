@@ -102,7 +102,9 @@ namespace SeganX.Console
             {
                 var methodParam = methodParams[i];
 
-                if (methodParam.ParameterType == typeof(int))
+                if (methodParam.ParameterType == typeof(bool))
+                    arglist[i] = cmd[i + 2].ToBoolean();
+                else if (methodParam.ParameterType == typeof(int))
                     arglist[i] = cmd[i + 2].ToInt();
                 else if (methodParam.ParameterType == typeof(string))
                     arglist[i] = cmd[i + 2];

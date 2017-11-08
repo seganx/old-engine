@@ -3,18 +3,16 @@ using UnityEngine;
 
 namespace SeganX
 {
-    public interface IProfileAsset { }
-
     [System.Serializable]
     public class ProfileData
     {
         public string nickname;
-        public int score;
-        public int xp;
-        public int level;
+        public Value score;
+        public Value xp;
+        public Value level;
 
-        public List<IProfileAsset> storage = new List<IProfileAsset>();
-        public List<IProfileAsset> assets = new List<IProfileAsset>();
+        public List<object> storage = new List<object>();
+        public List<object> assets = new List<object>();
     }
 
 }
