@@ -26,6 +26,11 @@ namespace SeganX
             if (src is ValueMinMaxInc)
                 perSecond = src.As<ValueMinMaxInc>().perSecond;
         }
+
+        public override string ToString()
+        {
+            return base.ToString() + " PerSecond[" + PerSecond + "]";
+        }
     }
 
 }

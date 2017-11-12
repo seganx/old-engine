@@ -5,14 +5,13 @@ using UnityEngine.UI;
 
 namespace SeganX
 {
-    [ExecuteInEditMode]
     public class UIColorAnimation : MonoBehaviour
     {
         public enum WrapMode { PingPong, Loop, Once }
         public enum CopyMode { All, RGB, A }
 
         public Graphic graphic = null;
-        public Gradient gradient = new Gradient();
+        public Gradient gradient;
         public CopyMode copyMode = CopyMode.All;
         public WrapMode wrapMode = WrapMode.PingPong;
         public float speed = 1;

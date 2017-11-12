@@ -5,6 +5,19 @@ using SeganX;
 
 public class UIBookListItem : Base
 {
+    public GameObject deleteButton = null;
+    public GameObject addButton = null;
+    public GameObject editButton = null;
+
+    public UIBookListItem Setup()
+    {
+        Destroy(addButton);
+        deleteButton.SetActive(true);
+        editButton.SetActive(true);
+
+        return this;
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -19,7 +32,8 @@ public class UIBookListItem : Base
 
     public void OnAddItem()
     {
-        gameObject.Clone();
+        gameObject.Clone<UIBookListItem>().Setup().transform.SetAsFirstSibling();
+       
     }
 
     public void OnDeleteItem()

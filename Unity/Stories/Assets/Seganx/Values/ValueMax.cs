@@ -43,5 +43,10 @@ namespace SeganX
             if (src is ValueMax)
                 max = src.As<ValueMax>().max;
         }
+
+        public override string ToString()
+        {
+            return base.ToString() + " Percent[" + Percent + "] Max[" + Max + "]";
+        }
     }
 }

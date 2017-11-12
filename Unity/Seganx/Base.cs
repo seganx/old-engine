@@ -4,7 +4,7 @@ using SeganX;
 
 public class Base : MonoBehaviour
 {
-    public GameManager gameManager { get { return GameManager.Instance; } }
+    public static Game gameManager { get { return GameManager.Instance as Game; } }
     public RectTransform rectTransform { get { return transform as RectTransform; } }
     public RectTransform parentRectTransform { get { return transform.parent as RectTransform; } }
     public virtual bool Visible { set { gameObject.SetActive(value); } get { return gameObject.activeSelf; } }

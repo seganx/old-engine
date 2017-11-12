@@ -43,5 +43,10 @@ namespace SeganX
             if (src is ValueMinMax)
                 min = src.As<ValueMinMax>().min;
         }
+
+        public override string ToString()
+        {
+            return base.ToString() + " Min[" + Min + "]";
+        }
     }
 }

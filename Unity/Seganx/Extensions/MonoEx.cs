@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Globalization;
 using System.IO;
 using System;
@@ -252,6 +253,17 @@ public static class MonoEx
         try { return string.Format("{0}/{1}/{2} {3}:{4}", pc.GetYear(dateTime), pc.GetMonth(dateTime), pc.GetDayOfMonth(dateTime), pc.GetHour(dateTime), pc.GetMinute(dateTime)); }
         catch { }
         return "";
+    }
+
+    // clone object using serialize/deserialize in memory. USE ONLY for basic classes
+    public static T CloneSerialized<T>(this object self)
+    {
+        MemoryStream stream = new MemoryStream();
+        BinaryFormatter serializer = new BinaryFormatter();
+        serializer.Serialize(stream, self);
+        stream.Position = 0;
+        BinaryFormatter deserializer = new BinaryFormatter();
+        return (T)deserializer.Deserialize(stream);
     }
     #endregion
 

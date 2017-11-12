@@ -38,6 +38,11 @@ namespace SeganX
             current = src.current;
         }
 
+        public override string ToString()
+        {
+            return base.ToString() + " Current[" + Current + "]";
+        }
+
         public static implicit operator float(Value v)
         {
             return v.Current;
