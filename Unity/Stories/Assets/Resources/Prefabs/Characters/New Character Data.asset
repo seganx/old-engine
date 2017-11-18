@@ -11,6 +11,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bb5ae9bbf932c743a5b9a2711df2a02, type: 3}
   m_Name: New Character Data
   m_EditorClassIdentifier: 
-  bodies: []
-  faces: []
-  hairs: []
+  bodies:
+  - Body
+  faces:
+  - Face
+  hairs:
+  - Hair

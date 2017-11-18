@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
+    public CharacterData test = null;
     public Body body = null;
     public Face face = null;
     public Hair hair = null;
@@ -53,26 +54,31 @@ public class Character : MonoBehaviour
     }
 
 
+    private void Start()
+    {
+        Setup(test.bodies[0], test.faces[0], test.hairs[0]);
+    }
+
     //////////////////////////////////////////////////////////////////
     //  STATIC MEMBERS
     //////////////////////////////////////////////////////////////////
     public static Body LoadBody(string name)
     {
-        var go = Resources.Load<Body>("Prefabs/Characters/Bodies/" + name);
+        var go = Resources.Load<Body>("Prefabs/Characters/Bodies/" + name).Clone<Body>();
         go.name = name;
         return go;
     }
 
     public static Face LoadFace(string name)
     {
-        var go = Resources.Load<Face>("Prefabs/Characters/Faces/" + name);
+        var go = Resources.Load<Face>("Prefabs/Characters/Faces/" + name).Clone<Face>();
         go.name = name;
         return go;
     }
 
     public static Hair LoadHair(string name)
     {
-        var go = Resources.Load<Hair>("Prefabs/Characters/Hairs/" + name);
+        var go = Resources.Load<Hair>("Prefabs/Characters/Hairs/" + name).Clone<Hair>();
         go.name = name;
         return go;
     }

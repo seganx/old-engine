@@ -371,6 +371,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7804597b01b62004eac2d0fe2647af49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  test: {fileID: 11400000, guid: f476d0c4ab7fe814698c96cdd67e42fa, type: 2}
   body: {fileID: 0}
   face: {fileID: 0}
   hair: {fileID: 0}
