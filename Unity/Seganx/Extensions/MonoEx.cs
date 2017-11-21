@@ -42,6 +42,16 @@ public static class MonoEx
             else
                 return 0;
         }
+        else if (self is float)
+        {
+            float f = (float)self;
+            return Mathf.RoundToInt(f);
+        }
+        else if (self is double)
+        {
+            double d = (double)self;
+            return Mathf.RoundToInt((float)d);
+        }
         else return (int)self;
     }
 

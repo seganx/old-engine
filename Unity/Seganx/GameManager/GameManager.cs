@@ -6,7 +6,7 @@ namespace SeganX
 {
     public class GameManager : Base
     {
-        public string prefabPath = "Prefabs/UI/";
+        public string uiPathPrefabs = "Prefabs/States/";
         public Canvas canvas = null;
 
         private GameState currentState = null;
@@ -19,7 +19,7 @@ namespace SeganX
 
         public T OpenState<T>() where T : GameState
         {
-            T state = Resources.Load<T>(prefabPath + typeof(T).Name);
+            T state = Resources.Load<T>(uiPathPrefabs + typeof(T).Name);
             if (state == null)
             {
                 Debug.LogError("GameManager could not find " + typeof(T).Name);
@@ -36,7 +36,9 @@ namespace SeganX
             stateStack.Insert(0, typeof(T));
             currentState = Instantiate<GameState>(state);
             currentState.name = state.name;
-            AttachCanvas(currentState);
+
+            if (currentState.transform is RectTransform)
+                AttachCanvas(currentState);
 
             return currentState as T;
         }
@@ -50,7 +52,7 @@ namespace SeganX
             Destroy(currentState.gameObject, delay);
             DelayCall(delay + 0.1f, () => Resources.UnloadUnusedAssets());
 
-            var state = Resources.Load<GameState>(prefabPath + stateStack[0].Name);
+            var state = Resources.Load<GameState>(uiPathPrefabs + stateStack[0].Name);
             currentState = Instantiate(state) as GameState;
             currentState.name = state.name;
             AttachCanvas(currentState);
@@ -70,7 +72,7 @@ namespace SeganX
 
         public T OpenPopup<T>() where T : GameState
         {
-            T popup = Resources.Load<T>(prefabPath + typeof(T).Name);
+            T popup = Resources.Load<T>(uiPathPrefabs + typeof(T).Name);
             if (popup == null)
             {
                 Debug.LogError("GameManager could not find " + typeof(T).Name);
