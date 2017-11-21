@@ -8,21 +8,19 @@ namespace SeganX
     {
         public int version = 1;
 
-        public static AssetData Load(WWW ws)
+        public static AssetData LoadEncrypted(byte[] src)
         {
-            if (ws.assetBundle != null)
+            var data = CryptoService.DecryptWithMac(src, Core.CryptoKey, Core.Salt);
+            var bundle = AssetBundle.LoadFromMemory(data);
+            var path = bundle.GetAllAssetNames();
+            foreach (var item in path)
             {
-                var bundle = ws.assetBundle;
-                var path = bundle.GetAllAssetNames();
-                foreach (var item in path)
+                var asset = bundle.LoadAsset<AssetData>(item);
+                if (asset != null)
                 {
-                    var asset = bundle.LoadAsset<AssetData>(item);
-                    if (asset != null)
-                    {
-                        s_assets.Remove(asset);
-                        s_assets.Add(asset);
-                        return asset;
-                    }
+                    s_assets.Remove(asset);
+                    s_assets.Add(asset);
+                    return asset;
                 }
             }
             return null;

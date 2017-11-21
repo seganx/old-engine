@@ -79,9 +79,9 @@ public class Character : Base
         }
         else
         {
-            LoadFromCacheOrDownload("http://locator.8khan.ir/Tests/Assets/data.data", 1, ws =>
+            LoadFromCacheOrDownload("http://locator.8khan.ir/Tests/Assets/sajad.char.seganx", 1, ws =>
             {
-                test = AssetData.Load(ws) as CharacterData;
+                test = AssetData.LoadEncrypted(ws.bytes) as CharacterData;
                 Setup(test.bodies[0], test.faces[0], test.hairs[0]);
                 Debug.Log(test);
                 //SetupBody(test.bodies[0]);

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.IO;
 using UnityEngine;
 using UnityEditor;
 
@@ -16,12 +15,22 @@ namespace SeganX
             if (GUILayout.Button("Encrypt File"))
             {
                 var path = EditorUtility.OpenFilePanel("Encrypt File And Save", "", "");
-                CryptoService.SaveEncryptFile(path, core.cryptokey.GetBytes(), core.salt);
+                if (path.Length > 3)
+                {
+                    var src = File.ReadAllBytes(path);
+                    var data = CryptoService.EncryptWithMac(src, core.cryptokey.GetBytes(), core.salt);
+                    File.WriteAllBytes(path + ".seganx", data);
+                }
             }
             if (GUILayout.Button("Decrypt File"))
             {
                 var path = EditorUtility.OpenFilePanel("Decrypt File And Save", "", "");
-                CryptoService.SaveDecryptFile(path, core.cryptokey.GetBytes(), core.salt);
+                if (path.Length > 3)
+                {
+                    var src = File.ReadAllBytes(path);
+                    var data = CryptoService.DecryptWithMac(src, core.cryptokey.GetBytes(), core.salt);
+                    File.WriteAllBytes(path.Replace(".seganx", ""), data);
+                }
             }
         }
     }
