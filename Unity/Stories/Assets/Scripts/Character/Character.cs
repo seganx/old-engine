@@ -1,14 +1,31 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using SeganX;
 
-public class Character : MonoBehaviour
+public class Character : Base
 {
+    public static List<AssetBundle> boundles = new List<AssetBundle>();
+
     public CharacterData test = null;
     public Body body = null;
     public Face face = null;
     public Hair hair = null;
 
+    public Character Setup(Body bodyPrefab, Face facePrefab, Hair hairPrefab)
+    {
+        if (body) Destroy(body.gameObject);
+
+        body = bodyPrefab.Clone<Body>();
+        face = facePrefab.Clone<Face>();
+        hair = hairPrefab.Clone<Hair>();
+
+        if (body) body.transform.SetParent(transform, false);
+        if (face && body) face.transform.SetParent(body.faceJoint, false);
+        if (hair && face) hair.transform.SetParent(face.hairJoint, false);
+
+        return this;
+    }
 
     public Character Setup(string bodyName, string faceName, string hairName)
     {
@@ -56,7 +73,20 @@ public class Character : MonoBehaviour
 
     private void Start()
     {
-        Setup(test.bodies[0], test.faces[0], test.hairs[0]);
+        if (test != null)
+        {
+            Setup(test.bodies[0], test.faces[0], test.hairs[0]);
+        }
+        else
+        {
+            LoadFromCacheOrDownload("http://locator.8khan.ir/Tests/Assets/data.data", 1, ws =>
+            {
+                test = AssetData.Load(ws) as CharacterData;
+                Setup(test.bodies[0], test.faces[0], test.hairs[0]);
+                Debug.Log(test);
+                //SetupBody(test.bodies[0]);
+            });
+        }
     }
 
     //////////////////////////////////////////////////////////////////
@@ -64,7 +94,7 @@ public class Character : MonoBehaviour
     //////////////////////////////////////////////////////////////////
     public static Body LoadBody(string name)
     {
-        var go = Resources.Load<Body>("Prefabs/Characters/Bodies/" + name).Clone<Body>();
+        var go = Resources.Load<Body>("Prefabs/Characters/Faces/" + name).Clone<Body>();
         go.name = name;
         return go;
     }

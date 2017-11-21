@@ -7,6 +7,6 @@ public class Game : GameManager
 {
     void Start()
     {
-        OpenState<State_Login>();
+        //OpenState<State_Login>();
     }
 }

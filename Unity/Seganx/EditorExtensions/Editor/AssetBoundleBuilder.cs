@@ -9,7 +9,8 @@ namespace SeganX.Editor
         [MenuItem("SeganX/AssetBundles/Build")]
         private static void BuildAllAssetBundles()
         {
-            BuildPipeline.BuildAssetBundles("AssetBundles", BuildAssetBundleOptions.None, BuildTarget.Android);
+            var path = EditorUtility.SaveFolderPanel("Save Asset Boundle", null, null);
+            BuildPipeline.BuildAssetBundles(path, BuildAssetBundleOptions.None, BuildTarget.Android);
         }
 
     }
