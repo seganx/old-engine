@@ -36,9 +36,10 @@
                 look into Gesture_Base class
 
 *********************************************************************/
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace SeganX
 {
@@ -83,7 +84,7 @@ namespace SeganX
         public Vector3 lastPosition = new Vector3(0, 0, 0);
         public Type activatedType = Type.Null;
 
-        public GUIText debugText = null;
+        public Text debugText = null;
 
         //  list of all gestures has been added
         [HideInInspector]

@@ -7,7 +7,7 @@ public class Character : Base
 {
     public static List<AssetBundle> boundles = new List<AssetBundle>();
 
-    public CharacterData test = null;
+    public AssetCharacter test = null;
     public Body body = null;
     public Face face = null;
     public Hair hair = null;
@@ -70,9 +70,28 @@ public class Character : Base
         return this;
     }
 
-
     private void Start()
     {
+        var book = new Book();
+        for (int i = 0; i < 20; i++)
+        {
+            book.sections.Add(new Book.Section());
+            for (int j = 0; j < 20; j++)
+            {
+                book.sections[i].pages.Add(new Book.Page());
+                for (int k = 0; k < 3; k++)
+                {
+                    book.sections[i].pages[j].questions.Add(new Book.Question());
+                }
+            }
+        }
+        Debug.Log(book.GetStringDebug(10));
+        PlayerPrefsEx.Serialize("TestBook", book);
+
+
+
+        var chData = new CharacterData() { family = "sajad", body = "body_2", face = "face_1", hair = "hair_3", name = "salman" };
+
         if (test != null)
         {
             Setup(test.bodies[0], test.faces[0], test.hairs[0]);
@@ -81,10 +100,8 @@ public class Character : Base
         {
             LoadFromCacheOrDownload("http://locator.8khan.ir/Tests/Assets/sajad.char.seganx", 1, ws =>
             {
-                test = AssetData.LoadEncrypted(ws.bytes) as CharacterData;
-                Setup(test.bodies[0], test.faces[0], test.hairs[0]);
-                Debug.Log(test);
-                //SetupBody(test.bodies[0]);
+                AssetData.LoadEncrypted(ws.bytes);
+                AssetCharacter.Setup(this, chData, true);
             });
         }
     }
