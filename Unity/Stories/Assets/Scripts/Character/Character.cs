@@ -72,23 +72,20 @@ public class Character : Base
 
     private void Start()
     {
-        var book = new Book();
+        var book = new BookData();
         for (int i = 0; i < 20; i++)
         {
-            book.sections.Add(new Book.Section());
+            book.pages.Add(new BookData.Page());
             for (int j = 0; j < 20; j++)
             {
-                book.sections[i].pages.Add(new Book.Page());
+                book.pages[i].dialogs.Add(new BookData.Dialog());
                 for (int k = 0; k < 3; k++)
                 {
-                    book.sections[i].pages[j].questions.Add(new Book.Question());
+                    book.pages[i].dialogs[j].questions.Add(new BookData.Question());
                 }
             }
         }
         Debug.Log(book.GetStringDebug(10));
-        PlayerPrefsEx.Serialize("TestBook", book);
-
-
 
         var chData = new CharacterData() { family = "sajad", body = "body_2", face = "face_1", hair = "hair_3", name = "salman" };
 
