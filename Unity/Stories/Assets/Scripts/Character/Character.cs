@@ -72,21 +72,6 @@ public class Character : Base
 
     private void Start()
     {
-        var book = new BookData();
-        for (int i = 0; i < 20; i++)
-        {
-            book.pages.Add(new BookData.Page());
-            for (int j = 0; j < 20; j++)
-            {
-                book.pages[i].dialogs.Add(new BookData.Dialog());
-                for (int k = 0; k < 3; k++)
-                {
-                    book.pages[i].dialogs[j].questions.Add(new BookData.Question());
-                }
-            }
-        }
-        Debug.Log(book.GetStringDebug(10));
-
         var chData = new CharacterData() { family = "sajad", body = "body_2", face = "face_1", hair = "hair_3", name = "salman" };
 
         if (test != null)

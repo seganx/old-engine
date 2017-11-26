@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<data-set xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<!-- bundles Informations for client 1.1 -->
+	<bundle ver="1", link="http://locator.8khan.ir/tests/sajad/bundles/test1.char.seganx"></bundle>
+	<bundle ver="1", link="http://locator.8khan.ir/tests/sajad/bundles/test2.char.seganx"></bundle>
+	<bundle ver="1", link="http://locator.8khan.ir/tests/sajad/bundles/test1.back.seganx"></bundle>
+	<bundle ver="1", link="http://locator.8khan.ir/tests/sajad/bundles/test1.border.seganx"></bundle>
+	<bundle ver="1", link="http://locator.8khan.ir/tests/sajad/bundles/test1.blob.seganx"></bundle>
+	
+</data-set>

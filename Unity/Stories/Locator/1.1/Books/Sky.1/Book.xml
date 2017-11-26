@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<data-set xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<book id="1" chapter="1">
+		<name>"Sky"</name>
+		<chapter>"Starting"</chapter>
+		<auther>"Sajad Beigjani"</auther>
+		<desc>"This is a simple test book to be displayed in the list"</desc>
+		<release>"Fully Released"</release>
+	
+		<bundle>"test1.char.seganx"</bundle>
+		<bundle>"test2.char.seganx"</bundle>
+		<bundle>"test1.back.seganx"</bundle>
+		<bundle>"test1.border.seganx"</bundle>
+		<bundle>"test1.blob.seganx"</bundle>
+	</book>
+	
+	<book id="1" chapter="2">
+		<name>"Sky"</name>
+		<chapter>"Keep Moving"</chapter>
+		<auther>"Sajad Beigjani"</auther>
+		<desc>"This is a simple keep moving to be displayed in the list"</desc>
+		<release>"Comming Soon"</release>
+		
+		<bundle>"test1.char.seganx"</bundle>
+		<bundle>"test2.char.seganx"</bundle>
+		<bundle>"test1.back.seganx"</bundle>
+		<bundle>"test1.border.seganx"</bundle>
+		<bundle>"test1.blob.seganx"</bundle>
+	</book>
+
+
+</data-set>

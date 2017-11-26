@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<data-set xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<!-- Server addresses -->
+	<ip-port servertype="test" debugmode="true" ip="82.99.216.186" port="1500" />
+
+	<!-- Update Informations -->
+	<update market="bazaar" maintenance="false" silentupdate="true" forceupdate="false" link="bazaar://details?id=com.avid.hashtkhan">
+	"نسخه جدید در دسترس است!_لطفا بروزرسانی نمایید."
+	</update>
+	
+	<!-- Social links -->
+	<social market="bazaar" link="https://goo.gl/knwCWS" facebook="https://goo.gl/UECsAU" instagram="https://goo.gl/xuGVsE" telegram="https://goo.gl/dnm8Qg"/>
+	
+	<!-- Rate Us Links -->
+	<rateus market="bazaar" package="com.farsitel.bazaar" link="bazaar://details?id=com.avid.hashtkhan"/>
+
+	<!-- Feedback Links -->
+	<feedback market="bazaar" email="info@8khan.ir" link="" transactions="https://cafebazaar.ir/account/?l=fa#tabs-transactions"/>
+	
+	<!-- Exception devices -->
+	<device debugmode="true">3514726e930274158aa64ebd9a2e615c</device>
+	
+	<!-- Exception player -->
+	<player debugmode="true">sajad</player>
+
+</data-set>
