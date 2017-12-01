@@ -15,10 +15,11 @@ public class Popup_Loader : GameState
     public bool isDownloading { get { return downloadCount > 0; } }
 
 
-    public void DownloadXML(string url, System.Action<XmlReader> callback)
+    public Popup_Loader DownloadXML(string url, System.Action<XmlReader> callback)
     {
         downloadCount++;
         Download(url, ws => PostDownload(ws, url, callback));
+        return this;
     }
 
     private void PostDownload(WWW ws, string url, System.Action<XmlReader> callback)
@@ -47,7 +48,23 @@ public class Popup_Loader : GameState
 
     public override void Back()
     {
-        
+
     }
 
+    public void ForceBack()
+    {
+        base.Back();
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////
+    //  static members
+    //////////////////////////////////////////////////////////////////////////////////
+
+    public static Popup_Loader XmlDownload(string url, System.Action<XmlReader> callback)
+    {
+        if (gameManager.CurrentPopup is Popup_Loader)
+            return gameManager.CurrentPopup.As<Popup_Loader>().DownloadXML(url, callback);
+        else
+            return gameManager.OpenPopup<Popup_Loader>().DownloadXML(url, callback);
+    }
 }

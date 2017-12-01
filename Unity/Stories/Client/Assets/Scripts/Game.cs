@@ -13,12 +13,11 @@ public class Game : GameManager
 
     IEnumerator Start()
     {
-        var loader = OpenPopup<Popup_Loader>();
-
         //   load config
-        loader.DownloadXML(baseAddress + "Config.xml", reader => { });
+
+        var loader = Popup_Loader.XmlDownload(baseAddress + "Config.xml", reader => { });
         while (loader.isDownloading)
-            yield return null;
+            yield return new WaitForEndOfFrame();
 
         //  load books
         loader.DownloadXML(baseAddress + "Books.xml", xmlReader =>
@@ -28,8 +27,10 @@ public class Game : GameManager
                 loader.DownloadXML(baseAddress + item, reader => BookData.Load(reader));
         });
         while (loader.isDownloading)
-            yield return null;
+            yield return new WaitForEndOfFrame();
 
         Debug.Log(BookData.all.GetStringDebug());
+
+        loader.ForceBack();
     }
 }

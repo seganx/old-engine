@@ -7,7 +7,7 @@ namespace SeganX
     public abstract class GameState : Base
     {
         //  Will be called before destroying this object. return time of closing animation
-        public virtual float OnClose()
+        public virtual float PreClose()
         {
             return 0;
         }

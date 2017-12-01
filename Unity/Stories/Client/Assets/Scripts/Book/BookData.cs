@@ -17,6 +17,9 @@ public class BookData
     public List<string> bundles = new List<string>();
 
 
+    /////////////////////////////////////////////////////////
+    /// STATIC MEMEBR
+    /////////////////////////////////////////////////////////
     public static List<BookData> all = new List<BookData>();
 
     public static bool Load(XmlReader reader)
@@ -50,9 +53,9 @@ public class BookData
                     break;
 
                 case XmlNodeType.EndElement:
-                    elementName = null;
                     if (reader.Name == "book")
                         all.Add(item);
+                    elementName = null;
                     break;
             }
         }

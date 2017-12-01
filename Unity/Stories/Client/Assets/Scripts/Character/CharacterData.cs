@@ -6,7 +6,8 @@
     public string face = "";
     public string hair = "";
 
-    public bool isPlayer { get { return family.IsNullOrEmpty() || name.IsNullOrEmpty(); } }
+    public bool isPlayer { get { return family == "player" || name == "player"; } }
+    public bool isNull { get { return family.IsNullOrEmpty() || name.IsNullOrEmpty(); } }
 
     public CharacterData CopyFrom(CharacterData src)
     {
