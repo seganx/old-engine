@@ -42,22 +42,29 @@ public static class MonoEx
             else
                 return 0;
         }
-        else if (self is float)
-        {
-            float f = (float)self;
-            return Mathf.RoundToInt(f);
-        }
-        else if (self is double)
-        {
-            double d = (double)self;
-            return Mathf.RoundToInt((float)d);
-        }
         else return (int)self;
     }
 
     public static bool IsFlagOn(this IConvertible self, IConvertible flag)
     {
         return ((int)self & (int)flag) != 0;
+    }
+
+    public static IConvertible AddFlag(this IConvertible self, IConvertible flag)
+    {
+        int res = (int)self;
+        res |= (int)flag;
+        return res;
+    }
+
+    public static int GetFlagsCount(this IConvertible self)
+    {
+        var res = 0;
+        var values = Enum.GetValues(self.GetType());
+        foreach (var value in values)
+            if (((int)self & (int)value) != 0)
+                res++;
+        return res;
     }
     #endregion
 

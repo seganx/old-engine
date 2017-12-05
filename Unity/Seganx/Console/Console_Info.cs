@@ -32,7 +32,7 @@ namespace SeganX.Console
             if (gameObject.activeInHierarchy == false) return;
             Invoke("OnEnable", 0.5f);
 
-            string str = "Version: " + Application.version + " - DeviceId: " + DisplayDeviceID;
+            string str = "Ver: " + Application.version + "\nId: " + DisplayDeviceID;
             if (OnDisplayInfo != null)
                 str = OnDisplayInfo(str);
             //str += "\n" + System.DateTime.Now + " - Server: " + Network.Instance.ServerType + " - Nickname: " + Game.Instance.player.NickName;

@@ -167,11 +167,6 @@ public static class TransformEx
         return self;
     }
 
-    public static Vector3 Scale(this Vector3 self, float x, float y, float z)
-    {
-        return new Vector3(self.x * x, self.y * y, self.z * z);
-    }
-
     public static Transform SetParent(this Transform self, Transform parent, bool holdPosition, bool holdScale, bool holdRotation)
     {
         Vector3 lastPos = self.position;

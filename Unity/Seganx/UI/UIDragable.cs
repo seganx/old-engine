@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 namespace SeganX
 {
+    public enum UIDragState { Normal, Dragging, Drop }
 
     public class UIDragable : Base, IDragHandler, IPointerDownHandler, IPointerUpHandler
     {
@@ -18,6 +19,7 @@ namespace SeganX
         public bool isDragging { get { return current == this; } }
 
         public Vector2 position { get; private set; }
+        public Vector2 delta { get; private set; }
 
         public void OnPointerDown(PointerEventData eventData)
         {
@@ -55,6 +57,7 @@ namespace SeganX
             if (localPoint.y < bound.y - bound.height + rectTransform.rect.height) localPoint.y = bound.y - bound.height + rectTransform.rect.height;
 
             position = localPoint;
+            delta = eventData.delta;
         }
 
 

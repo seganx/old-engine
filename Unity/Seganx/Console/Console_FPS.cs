@@ -13,7 +13,6 @@ namespace SeganX.Console
 
         private float accum = 0f;           // FPS accumulated over the interval
         private int frames = 0;             // Frames drawn over the interval
-        private float deltaTime = 0;
 
         void OnEnable() { StartCoroutine(FPS()); }
         void OnDisable() { StopCoroutine(FPS()); }
@@ -30,7 +29,6 @@ namespace SeganX.Console
         {
             accum += Time.timeScale / Time.deltaTime;
             ++frames;
-            deltaTime = Time.deltaTime;
         }
 
         IEnumerator FPS()
@@ -41,8 +39,7 @@ namespace SeganX.Console
                 // Update the FPS
                 float fps = accum / frames;
 
-                string str = "FPS: " + fps.ToString("f" + Mathf.Clamp(nbDecimal, 0, 10)) + "\n";
-                str += "DT: " + deltaTime.ToString("f6");
+                string str = "FPS:\n" + fps.ToString("f" + Mathf.Clamp(nbDecimal, 0, 10)) + "\n";
 
                 fpsLabel.text = str;
 

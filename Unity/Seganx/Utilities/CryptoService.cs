@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 public static class CryptoService
 {
@@ -22,39 +23,56 @@ public static class CryptoService
         return res.ToString();
     }
 
-    private static byte[] Encrypt(byte[] data, byte[] key)
+    public static void CopyBytes(byte[] dest, int destIndex, byte[] src, int srcIndex, int count)
     {
-        var res = new byte[data.Length];
-        for (int i = 0; i < data.Length; ++i)
-            res[i] = (byte)(data[i] + key[i % key.Length]);
+        Buffer.BlockCopy(src, srcIndex, dest, destIndex, count);
+    }
+
+    public static bool CompareBytes(byte[] b1, int b1index, byte[] b2, int b2index, int count = int.MaxValue)
+    {
+        if (b1 == b2) return true;
+        var len = Math.Min(Math.Min(b1.Length - b1index, b2.Length - b2index), count);
+        for (int i = 0; i < len; i++)
+            if (b1[i + b1index] != b2[i + b2index])
+                return false;
+        return true;
+    }
+
+    public static byte[] EncryptBytes(byte[] data, byte[] key, int index = 0, int count = int.MaxValue)
+    {
+        var len = Math.Min(data.Length - index, count);
+        var res = new byte[len];
+        for (int i = 0; i < len; ++i)
+            res[i] = (byte)(data[i + index] + key[i % key.Length]);
         return res;
     }
 
-    private static byte[] Decrypt(byte[] data, byte[] key)
+    public static byte[] DecryptBytes(byte[] data, byte[] key, int index = 0, int count = int.MaxValue)
     {
-        var res = new byte[data.Length];
-        for (int i = 0; i < data.Length; ++i)
-            res[i] = (byte)(data[i] - key[i % key.Length]);
+        var len = Math.Min(data.Length - index, count);
+        var res = new byte[len];
+        for (int i = 0; i < len; ++i)
+            res[i] = (byte)(data[i + index] - key[i % key.Length]);
         return res;
     }
 
-    public static byte[] SaveEncryptFile(string filePath, byte[] key, string salt)
+    public static byte[] EncryptWithMac(byte[] src, byte[] key, string salt)
     {
-        var src = File.ReadAllBytes(filePath);
-        var data = Encrypt(src, key);
-        var md5 = ComputeMD5(src, salt);
-        File.WriteAllBytes(filePath + "." + md5, data);
-        return data;
+        var md5 = ComputeMD5(src, salt).GetBytes();
+        var data = EncryptBytes(src, key);
+        var res = new byte[md5.Length + data.Length];
+        CopyBytes(res, 0, md5, 0, md5.Length);
+        CopyBytes(res, md5.Length, data, 0, data.Length);
+        return res;
     }
 
-    public static byte[] SaveDecryptFile(string filePath, byte[] key, string salt)
+    public static byte[] DecryptWithMac(byte[] src, byte[] key, string salt)
     {
-        var src = File.ReadAllBytes(filePath);
-        var data = Decrypt(src, key);
-        var md5 = ComputeMD5(data, salt);
-        var ext = Path.GetExtension(filePath).Remove(0, 1);
-        if (md5 != ext) return null;
-        File.WriteAllBytes(filePath.Replace("." + ext, ""), data);
-        return data;
+        var res = DecryptBytes(src, key, 32);
+        var md5 = ComputeMD5(res, salt).GetBytes();
+        if (CompareBytes(md5, 0, src, 0, 32))
+            return res;
+        else
+            return null;
     }
 }
