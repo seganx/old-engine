@@ -149,6 +149,19 @@ public static class MonoEx
         return -1;
     }
 
+    public static bool IsRtl(this string self)
+    {
+        return self != null && self.Length > 0 && (int)self[0] > 1000;
+    }
+
+    public static bool HasRtl(this string self)
+    {
+        bool isEnglish = true;
+        for (int i = 0; i < self.Length && isEnglish; i++)
+            isEnglish = (self[i] < 1000);
+        return !isEnglish;
+    }
+
     public static bool ContainsAny(this string self, string[] items)
     {
         if (self.IsNullOrEmpty() || items.IsNullOrEmpty()) return false;
