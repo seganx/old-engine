@@ -7,7 +7,7 @@ using System.Xml;
 
 public class Popup_Loader : GameState
 {
-    public Image image = null;
+    public RectTransform[] loaders;
     public GameObject networkError = null;
     public GameObject serverMaintenance = null;
 
@@ -56,10 +56,17 @@ public class Popup_Loader : GameState
         base.Back();
     }
 
+    private void Update()
+    {
+        for (int i = 0; i < loaders.Length; i++)
+            loaders[i].Rotate(0, 0, Time.deltaTime * (i % 2 == 0 ? 100 : -150));
+    }
+
+
+
     //////////////////////////////////////////////////////////////////////////////////
     //  static members
     //////////////////////////////////////////////////////////////////////////////////
-
     public static Popup_Loader XmlDownload(string url, System.Action<XmlReader> callback)
     {
         if (gameManager.CurrentPopup is Popup_Loader)

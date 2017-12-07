@@ -9,6 +9,9 @@ public class Game : GameManager
     public string version = "1.1";
     public string locatorAddress = "http://locator.8khan.ir/Tests/Sajad/";
 
+    [Header("Test:")]
+    public AssetCharacter testCharacter = null;
+
     public string baseAddress { get { return locatorAddress + version + "/"; } }
 
     IEnumerator Start()

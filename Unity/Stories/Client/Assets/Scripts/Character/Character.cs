@@ -7,10 +7,20 @@ public class Character : Base
 {
     public static List<AssetBundle> boundles = new List<AssetBundle>();
 
-    public AssetCharacter test = null;
     public Body body = null;
     public Face face = null;
     public Hair hair = null;
+
+    public void Clear()
+    {
+        if (body) Destroy(body.gameObject);
+        body = null; face = null; hair = null;
+    }
+
+    public Character Setup(CharacterData data)
+    {
+        return Setup(data.body, data.face, data.hair);
+    }
 
     public Character Setup(Body bodyPrefab, Face facePrefab, Hair hairPrefab)
     {
@@ -72,6 +82,7 @@ public class Character : Base
 
     private void Start()
     {
+#if OFF
         var chData = new CharacterData() { family = "sajad", body = "body_2", face = "face_1", hair = "hair_3", name = "salman" };
 
         if (test != null)
@@ -86,6 +97,7 @@ public class Character : Base
                 AssetCharacter.Setup(this, chData, true);
             });
         }
+#endif
     }
 
     //////////////////////////////////////////////////////////////////
@@ -93,21 +105,24 @@ public class Character : Base
     //////////////////////////////////////////////////////////////////
     public static Body LoadBody(string name)
     {
-        var go = Resources.Load<Body>("Prefabs/Characters/Faces/" + name).Clone<Body>();
+        name = name.ToLower();
+        var go = gameManager.testCharacter.bodies.Find(x => x.name.ToLower() == name).Clone<Body>();
         go.name = name;
         return go;
     }
 
     public static Face LoadFace(string name)
     {
-        var go = Resources.Load<Face>("Prefabs/Characters/Faces/" + name).Clone<Face>();
+        name = name.ToLower();
+        var go = gameManager.testCharacter.faces.Find(x => x.name.ToLower() == name).Clone<Face>();
         go.name = name;
         return go;
     }
 
     public static Hair LoadHair(string name)
     {
-        var go = Resources.Load<Hair>("Prefabs/Characters/Hairs/" + name).Clone<Hair>();
+        name = name.ToLower();
+        var go = gameManager.testCharacter.hairs.Find(x => x.name.ToLower() == name).Clone<Hair>();
         go.name = name;
         return go;
     }

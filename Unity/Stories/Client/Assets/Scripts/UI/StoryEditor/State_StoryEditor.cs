@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SeganX;
+using StoryEditor;
 
 public class State_StoryEditor : GameState
 {
-
-    //////////////////////////////////////////////////////
-    // static memebers
-    //////////////////////////////////////////////////////
-    public static Book current = null;
+    public MainPanel mainPanel = null;
+    public EditorPanel editorPanel = null;
 }

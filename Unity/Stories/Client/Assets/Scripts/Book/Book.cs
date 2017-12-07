@@ -12,16 +12,12 @@ public class Book
 
     public class Dialog
     {
-        public CharacterData character = new CharacterData();
-        public string text = "";
-        public List<Question> questions = new List<Question>();
-    }
-
-    public class Page
-    {
         public string name = "";
         public string background = "";
-        public List<Dialog> dialogs = new List<Dialog>();
+        public CharacterData character = new CharacterData();
+        public string text = "";
+        public string next = "";
+        public List<Question> questions = new List<Question>();
     }
 
     public int Id = 0;
@@ -29,5 +25,5 @@ public class Book
     public string border = "";
     public string dialog = "";
     public CharacterData player = new CharacterData();
-    public List<Page> pages = new List<Page>();
+    public List<Dialog> dialogs = new List<Dialog>();
 }

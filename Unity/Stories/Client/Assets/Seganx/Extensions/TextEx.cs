@@ -33,13 +33,24 @@ public static class TextEx
         return string.Join("\n", lines.ToArray());
     }
 
-    public static Text SetTextAndWrap(this Text self, string text)
+    public static Text SetTextAndWrap(this Text self, string text, bool autoRtl = false)
     {
         if (text.IsNullOrEmpty())
         {
             self.text = text;
             return self;
         }
+
+        if (autoRtl)
+            self.FitAlignment(text.IsRtl());
+
+        if (text.HasRtl() == false)
+        {
+            self.text = text;
+            return self;
+        }
+
+        text = PersianTextShaper.PersianTextShaper.ShapeText(text);
 
         TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
         TextGenerator generator = self.cachedTextGenerator;
@@ -63,5 +74,19 @@ public static class TextEx
         TextGenerationSettings settings = self.GetGenerationSettings(new Vector2(self.rectTransform.rect.width, self.rectTransform.rect.height));
         TextGenerator generator = self.cachedTextGenerator;
         return generator.GetPreferredHeight(text, settings) / settings.scaleFactor;
+    }
+
+    public static Text FitAlignment(this Text self, bool rtl)
+    {
+        switch (self.alignment)
+        {
+            case TextAnchor.UpperLeft: if (rtl) self.alignment = TextAnchor.UpperRight; break;
+            case TextAnchor.UpperRight: if (!rtl) self.alignment = TextAnchor.UpperLeft; break;
+            case TextAnchor.MiddleLeft: if (rtl) self.alignment = TextAnchor.MiddleRight; break;
+            case TextAnchor.MiddleRight: if (!rtl) self.alignment = TextAnchor.MiddleLeft; break;
+            case TextAnchor.LowerLeft: if (rtl) self.alignment = TextAnchor.LowerRight; break;
+            case TextAnchor.LowerRight: if (!rtl) self.alignment = TextAnchor.LowerLeft; break;
+        }
+        return self;
     }
 }

@@ -49,6 +49,23 @@ public static class MonoEx
     {
         return ((int)self & (int)flag) != 0;
     }
+
+    public static IConvertible AddFlag(this IConvertible self, IConvertible flag)
+    {
+        int res = (int)self;
+        res |= (int)flag;
+        return res;
+    }
+
+    public static int GetFlagsCount(this IConvertible self)
+    {
+        var res = 0;
+        var values = Enum.GetValues(self.GetType());
+        foreach (var value in values)
+            if (((int)self & (int)value) != 0)
+                res++;
+        return res;
+    }
     #endregion
 
     #region string
@@ -130,6 +147,19 @@ public static class MonoEx
                 if (char.IsDigit(self[i]))
                     return i;
         return -1;
+    }
+
+    public static bool IsRtl(this string self)
+    {
+        return self != null && self.Length > 0 && (int)self[0] > 1000;
+    }
+
+    public static bool HasRtl(this string self)
+    {
+        bool isEnglish = true;
+        for (int i = 0; i < self.Length && isEnglish; i++)
+            isEnglish = (self[i] < 1000);
+        return !isEnglish;
     }
 
     public static bool ContainsAny(this string self, string[] items)
