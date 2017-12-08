@@ -25,12 +25,22 @@ namespace SeganX.Editor
         {
             Caching.ClearCache();
 
-            var files = Directory.GetFiles(Application.temporaryCachePath);
+            var files = Directory.GetFiles(Application.persistentDataPath);
             foreach (var item in files)
                 try { File.Delete(item); }
                 catch { };
 
-            var dirs = Directory.GetDirectories(Application.temporaryCachePath);
+            var dirs = Directory.GetDirectories(Application.persistentDataPath);
+            foreach (var item in dirs)
+                try { Directory.Delete(item, true); }
+                catch { };
+
+            files = Directory.GetFiles(Application.temporaryCachePath);
+            foreach (var item in files)
+                try { File.Delete(item); }
+                catch { };
+
+            dirs = Directory.GetDirectories(Application.temporaryCachePath);
             foreach (var item in dirs)
                 try { Directory.Delete(item, true); }
                 catch { };

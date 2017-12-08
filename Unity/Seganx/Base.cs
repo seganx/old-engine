@@ -28,7 +28,7 @@ public class Base : MonoBehaviour
     IEnumerator DoLoadFromCacheOrDownload(string url, int version, System.Action<WWW> callback)
     {
         var filename = url.ComputeMD5(Core.Salt + version) + ".seganx";
-        var path = "file:///" + Application.temporaryCachePath + "/" + filename;
+        var path = "file:///" + Application.persistentDataPath + "/" + filename;
 
         var res = new WWW(path);
         yield return res;
