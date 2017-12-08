@@ -2,7 +2,7 @@
 <data-set xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
 	<!-- books Information -->
-	<book link="Books/Sky.1/"/>
-	<book link="Books/Earth/"/>
+	<book link="books/sky.1/book.xml"/>
+	<book link="books/earth/book.xml"/>
 	
 </data-set>

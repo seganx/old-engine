@@ -18,7 +18,7 @@ public class State_Login : GameState
 
     public void OnLogin()
     {
-        gameManager.OpenState<State_BookList>();
+        //gameManager.OpenState<State_BookList>();
 
         if (username.text.Length < 4 || password.text.Length < 4) return;
         button.SetActive(false);

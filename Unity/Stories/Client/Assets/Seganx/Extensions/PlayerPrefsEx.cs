@@ -36,7 +36,7 @@ namespace SeganX
 
         public static void SaveData(string path, byte[] data)
         {
-            path = Application.temporaryCachePath + "/" + path;
+            path = Application.persistentDataPath + "/" + path;
             var dir = Path.GetDirectoryName(path);
             if (Directory.Exists(dir) == false)
                 Directory.CreateDirectory(dir);
@@ -53,7 +53,7 @@ namespace SeganX
         public static byte[] LoadData(string path)
         {
             byte[] res = null;
-            path = Application.temporaryCachePath + "/" + path;
+            path = Application.persistentDataPath + "/" + path;
             if (File.Exists(path))
             {
                 try

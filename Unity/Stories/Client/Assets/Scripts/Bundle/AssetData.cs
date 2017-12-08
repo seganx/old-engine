@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System.Xml;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -30,6 +30,15 @@ namespace SeganX
         {
             var res = s_assets.Find(x => x.name == name);
             return res != null ? res as T : null;
+        }
+
+        public static List<KeyValuePair<int, string>> LoadList(XmlReader reader)
+        {
+            var res = new List<KeyValuePair<int, string>>();
+            while (reader.Read())
+                if (reader.NodeType == XmlNodeType.Element && reader.Name == "bundle")
+                    res.Add(new KeyValuePair<int, string>(reader.GetAttribute("version").ToInt(0), reader.GetAttribute("link")));
+            return res;
         }
 
         public static List<AssetData> s_assets = new List<AssetData>();

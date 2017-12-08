@@ -69,7 +69,7 @@ public class BookData
 
         while (reader.Read())
             if (reader.NodeType == XmlNodeType.Element && reader.Name == "book")
-                res.Add(reader.GetAttribute("link") + "Book.xml");
+                res.Add(reader.GetAttribute("link"));
 
         return res;
     }

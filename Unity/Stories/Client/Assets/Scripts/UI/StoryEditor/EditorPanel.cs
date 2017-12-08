@@ -12,7 +12,8 @@ namespace StoryEditor
         public ScrollRect scroller = null;
         public DialogEditor prefab = null;
 
-        private Vector2Int level = Vector2Int.zero;
+        private Vector2Int positionLevel = Vector2Int.zero;
+        private List<DialogEditor> tempList = new List<DialogEditor>();
 
         public EditorPanel Setup(Book book)
         {
@@ -34,24 +35,43 @@ namespace StoryEditor
                 else for (int i = 0; i < item.data.questions.Count && i < 2; i++)
                         item.links[i] = dialogs.Find(x => x.data.name == item.data.questions[i].onclick_dialog);
 
+            return Referesh();
+        }
 
-            level = Vector2Int.zero;
-            UpdatePosition(dialogs[0], 0);
+        public EditorPanel Referesh()
+        {
+            if (dialogs.Count < 1) return this;
+
+            tempList.Clear();
+            tempList.AddRange(dialogs);
+
+            positionLevel = Vector2Int.zero;
+            UpdateLinkedPosition(dialogs[0], 0);
+
+            while (tempList.Count > 0)
+            {
+                positionLevel.y--;
+                UpdateLinkedPosition(tempList[0], 0);
+            }
+
+            foreach (var item in dialogs)
+                item.UpdateLinksVisuals();
+
             return this;
         }
 
-        private void UpdatePosition(DialogEditor dialog, int index)
+        private void UpdateLinkedPosition(DialogEditor dialog, int index)
         {
             if (dialog == null) return;
-            dialog.rectTransform.anchoredPosition = new Vector2(index * space.x, level.y * space.y);
-            foreach (var item in dialog.links)
-            {
-                if (item != null)
-                {
-                    UpdatePosition(item, index + 1);
-                    level.y--;
-                }
-            }
+            tempList.Remove(dialog);
+            dialog.rectTransform.anchoredPosition = new Vector2(index * space.x, positionLevel.y * space.y);
+            if (scroller.content.sizeDelta.x <= index * space.x + space.x * 2)
+                scroller.content.SetAnchordWidth(index * space.x + space.x * 2);
+            if (scroller.content.sizeDelta.y <= -positionLevel.y * space.y)
+                scroller.content.SetAnchordHeight(-positionLevel.y * space.y);
+            UpdateLinkedPosition(dialog.links[0], index + 1);
+            if (dialog.links[1] != null) positionLevel.y--;
+            UpdateLinkedPosition(dialog.links[1], index + 1);
         }
 
         // Use this for initialization
@@ -94,6 +114,42 @@ namespace StoryEditor
             d.character = new CharacterData() { family = "sajad", body = "body_2", face = "face_1", hair = "hair_2", name = "salman" };
             d.text = "path 2!!!";
             mybook.dialogs.Add(d);
+
+            d = new Book.Dialog();
+            d.name = "_01";
+            d.character = new CharacterData() { family = "sajad", body = "body_2", face = "face_1", hair = "hair_2", name = "salman" };
+            d.text = "unlinked!!";
+            mybook.dialogs.Add(d);
+
+            d = new Book.Dialog();
+            d.name = "_02";
+            d.character = new CharacterData() { family = "sajad", body = "body_1", face = "face_1", hair = "hair_1", name = "saeed" };
+            d.text = "unlinked with question";
+
+            q = new Book.Question();
+            q.text = "question 1";
+            q.onclick_dialog = "_path1";
+            d.questions.Add(q);
+
+            q = new Book.Question();
+            q.text = "question 2";
+            q.onclick_dialog = "_path2";
+            d.questions.Add(q);
+
+            mybook.dialogs.Add(d);
+
+            d = new Book.Dialog();
+            d.name = "_path1";
+            d.character = new CharacterData() { family = "sajad", body = "body_0", face = "face_2", hair = "hair_3", name = "salman" };
+            d.text = "path 1!!!";
+            mybook.dialogs.Add(d);
+
+            d = new Book.Dialog();
+            d.name = "_path2";
+            d.character = new CharacterData() { family = "sajad", body = "body_2", face = "face_1", hair = "hair_2", name = "salman" };
+            d.text = "path 2!!!";
+            mybook.dialogs.Add(d);
+
 
             Setup(mybook);
         }

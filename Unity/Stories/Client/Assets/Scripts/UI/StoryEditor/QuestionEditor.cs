@@ -10,6 +10,7 @@ namespace StoryEditor
         public Button addButton = null;
         public Button removeButton = null;
         public GameObject[] labels = null;
+        public GameObject link = null;
 
         private Book.Dialog data = null;
         public QuestionEditor Setup(Book.Dialog dialogData)
@@ -26,6 +27,7 @@ namespace StoryEditor
         {
             addButton.gameObject.SetActive(false);
             removeButton.gameObject.SetActive(true);
+            link.SetActive(true);
 
             if (data.questions.Count < 2)
             {
@@ -44,10 +46,14 @@ namespace StoryEditor
         {
             addButton.gameObject.SetActive(true);
             removeButton.gameObject.SetActive(false);
+            link.SetActive(false);
             data.questions.Clear();
 
             foreach (var item in labels)
                 item.SetActive(false);
+
+            GetComponentInParent<DialogEditor>().links[1] = null;
+            GetComponentInParent<EditorPanel>().Referesh();
         }
 
         public void OnEditLabel(int index)

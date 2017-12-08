@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.UI.Extensions;
 using UnityEngine;
 
 namespace StoryEditor
@@ -11,6 +12,8 @@ namespace StoryEditor
         public Text dialogText = null;
         public QuestionEditor questionEditor = null;
         public DialogEditor[] links = new DialogEditor[2] { null, null };
+        public UILineRenderer[] lines = new UILineRenderer[2] { null, null };
+
 
         public Book.Dialog data = null;
 
@@ -18,7 +21,7 @@ namespace StoryEditor
         {
             data = dialog;
 
-            if (dialog.character.isNull)
+            if (dialog.character.isEmpty)
                 character.Clear();
             else if (dialog.character.isPlayer)
                 character.Setup(EditorPanel.current.player);
@@ -32,6 +35,28 @@ namespace StoryEditor
             return this;
         }
 
+        public void UpdateLinksVisuals()
+        {
+            Vector3 offset = Vector3.one * 10; offset.y *= -2;
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (links[i] != null)
+                {
+                    var dest = links[i].rectTransform.anchoredPosition3D + offset - (rectTransform.anchoredPosition3D + lines[i].rectTransform.anchoredPosition3D);
+
+                    var points = lines[i].Points;
+                    points[1].x = dest.x;
+                    points[2].y = dest.y;
+                    points[3] = dest;
+                    lines[i].Points = points;
+
+                    lines[i].enabled = true;
+                }
+                else lines[i].enabled = false;
+            }
+        }
+
         public void OnEditText()
         {
             gameManager.OpenPopup<Popup_InputText>().Setup(data.text, "Enter text...", str =>
@@ -40,6 +65,18 @@ namespace StoryEditor
                 {
                     data.text = str;
                     dialogText.SetTextAndWrap(data.text, true);
+                }
+            });
+        }
+
+        public void OnEditCharacter()
+        {
+            gameManager.OpenPopup<Popup_SelectCharacter>().Setup(data.character, cdata =>
+            {
+                if (cdata != null)
+                {
+                    data.character = cdata;
+                    character.Setup(cdata);
                 }
             });
         }

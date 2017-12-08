@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 1e98834675ea2014eb5d36e183c1e53c
-timeCreated: 1512593000
+timeCreated: 1512679469
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
@@ -25,6 +25,8 @@ TextureImporter:
     21300036: GUI_14
     21300038: GUI_15
     21300040: GUI_16
+    21300042: GUI_17
+    21300044: GUI_18
   externalObjects: {}
   serializedVersion: 4
   mipmaps:
@@ -395,6 +397,34 @@ TextureImporter:
         y: 1
         width: 73
         height: 75
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: GUI_17
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 1
+        width: 76
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: GUI_18
+      rect:
+        serializedVersion: 2
+        x: 163
+        y: 1
+        width: 76
+        height: 76
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

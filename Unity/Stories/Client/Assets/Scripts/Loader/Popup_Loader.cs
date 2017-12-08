@@ -14,6 +14,29 @@ public class Popup_Loader : GameState
     public int downloadCount = 0;
     public bool isDownloading { get { return downloadCount > 0; } }
 
+    public Popup_Loader DownloadAndCache(string url, int version, System.Action<WWW> callback)
+    {
+        downloadCount++;
+        LoadFromCacheOrDownload(url, version, ws =>
+        {
+            if (ws.isDone == false || ws.bytesDownloaded < 1)
+            {
+                networkError.SetActive(true);
+                DownloadAndCache(url, version, callback);
+                downloadCount--;
+                return;
+            }
+            else networkError.SetActive(false);
+
+            if (ws.error.IsNullOrEmpty())
+            {
+                callback(ws);
+                downloadCount--;
+            }
+            else serverMaintenance.SetActive(true);
+        });
+        return this;
+    }
 
     public Popup_Loader DownloadXML(string url, System.Action<XmlReader> callback)
     {
@@ -24,7 +47,7 @@ public class Popup_Loader : GameState
 
     private void PostDownload(WWW ws, string url, System.Action<XmlReader> callback)
     {
-        if (ws.isDone == false)
+        if (ws.isDone == false || ws.bytesDownloaded < 1)
         {
             networkError.SetActive(true);
             DownloadXML(url, callback);
@@ -51,7 +74,7 @@ public class Popup_Loader : GameState
 
     }
 
-    public void ForceBack()
+    public void Close()
     {
         base.Back();
     }
@@ -73,5 +96,13 @@ public class Popup_Loader : GameState
             return gameManager.CurrentPopup.As<Popup_Loader>().DownloadXML(url, callback);
         else
             return gameManager.OpenPopup<Popup_Loader>().DownloadXML(url, callback);
+    }
+
+    public static Popup_Loader FileDownloadAndCache(string url, int version, System.Action<WWW> callback)
+    {
+        if (gameManager.CurrentPopup is Popup_Loader)
+            return gameManager.CurrentPopup.As<Popup_Loader>().DownloadAndCache(url, version, callback);
+        else
+            return gameManager.OpenPopup<Popup_Loader>().DownloadAndCache(url, version, callback);
     }
 }

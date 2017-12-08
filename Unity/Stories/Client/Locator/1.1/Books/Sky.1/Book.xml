@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <data-set xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-	<book id="1" chapter="1">
+	<book id="1" chapter="1" link="books/sky.1/chapter1.xml">
 		<name>"Sky"</name>
 		<chapter>"Starting"</chapter>
 		<auther>"Sajad Beigjani"</auther>
@@ -15,7 +15,7 @@
 		<bundle>"test1.blob.seganx"</bundle>
 	</book>
 	
-	<book id="1" chapter="2">
+	<book id="1" chapter="2" link="books/sky.1/chapter2.xml">
 		<name>"Sky"</name>
 		<chapter>"Keep Moving"</chapter>
 		<auther>"Sajad Beigjani"</auther>
