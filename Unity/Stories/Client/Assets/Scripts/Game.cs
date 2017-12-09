@@ -5,13 +5,19 @@ using SeganX;
 
 public class Game : GameManager
 {
+    [System.Serializable]
+    public class CharacterDefaults
+    {
+        public Sprite Null = null;
+        public Sprite Empty = null;
+        public Sprite Player = null;
+    }
+
     [Header("Config:")]
     public string version = "1.1";
     public string locatorAddress = "http://locator.8khan.ir/Tests/Sajad/";
 
-    [Header("Defaults:")]
-    public Sprite defaultEmptySprite = null;
-    public Sprite defaultPlayerSprite = null;
+    public CharacterDefaults characterDefaults;
 
     public string baseAddress { get { return locatorAddress + version + "/"; } }
 

@@ -21,8 +21,8 @@ namespace SelectCharacter
         {
             data = charData;
 
-            if (data.isEmpty) characterBack.sprite = gameManager.defaultEmptySprite;
-            else if (data.isPlayer) characterBack.sprite = gameManager.defaultPlayerSprite;
+            if (data.isEmpty) characterBack.sprite = gameManager.characterDefaults.Empty;
+            else if (data.isPlayer) characterBack.sprite = gameManager.characterDefaults.Player;
             else preview.Setup(data);
 
             nameLabel.SetTextAndWrap(data.name);

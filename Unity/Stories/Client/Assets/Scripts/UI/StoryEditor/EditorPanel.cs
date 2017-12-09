@@ -50,7 +50,7 @@ namespace StoryEditor
 
             while (tempList.Count > 0)
             {
-                positionLevel.y--;
+                positionLevel.x++;
                 UpdateLinkedPosition(tempList[0], 0);
             }
 
@@ -64,14 +64,16 @@ namespace StoryEditor
         {
             if (dialog == null) return;
             tempList.Remove(dialog);
-            dialog.rectTransform.anchoredPosition = new Vector2(index * space.x, positionLevel.y * space.y);
-            if (scroller.content.sizeDelta.x <= index * space.x + space.x * 2)
-                scroller.content.SetAnchordWidth(index * space.x + space.x * 2);
-            if (scroller.content.sizeDelta.y <= -positionLevel.y * space.y)
-                scroller.content.SetAnchordHeight(-positionLevel.y * space.y);
-            UpdateLinkedPosition(dialog.links[0], index + 1);
-            if (dialog.links[1] != null) positionLevel.y--;
-            UpdateLinkedPosition(dialog.links[1], index + 1);
+            dialog.rectTransform.anchoredPosition = new Vector2(positionLevel.x * space.x, index * space.y);
+
+            UpdateLinkedPosition(dialog.links[0], index - 1);
+            if (dialog.links[1] != null) positionLevel.x++;
+            UpdateLinkedPosition(dialog.links[1], index - 1);
+
+            if (scroller.content.sizeDelta.x <= positionLevel.x * space.x + space.x * 2)
+                scroller.content.SetAnchordWidth(positionLevel.x * space.x + space.x * 2);
+            if (scroller.content.sizeDelta.y <= -index * space.y + space.y * 2)
+                scroller.content.SetAnchordHeight(-index * space.y + space.y * 2);
         }
 
         // Use this for initialization
@@ -113,6 +115,7 @@ namespace StoryEditor
             d.name = "path2";
             d.character = new CharacterData() { family = "sajad", body = "body_2", face = "face_1", hair = "hair_2", name = "salman" };
             d.text = "path 2!!!";
+            d.next = "_02";
             mybook.dialogs.Add(d);
 
             d = new Book.Dialog();

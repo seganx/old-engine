@@ -20,6 +20,13 @@ public class AssetCharacter : AssetData
         return s_assets.Find(x => x is AssetCharacter && x.As<AssetCharacter>().family == family).As<AssetCharacter>();
     }
 
+    public static Sprite FindCharacterFace(string family, string faceName, Sprite defaultSprite)
+    {
+        var asset = s_assets.Find(x => x is AssetCharacter && x.As<AssetCharacter>().family == family).As<AssetCharacter>();
+        var face = asset != null ? asset.faces.Find(x => x.name.ToLower() == faceName.ToLower()) : null;
+        return face != null ? face.preview : defaultSprite;
+    }
+
     public static List<AssetCharacter> FindAll()
     {
         var res = new List<AssetCharacter>();
