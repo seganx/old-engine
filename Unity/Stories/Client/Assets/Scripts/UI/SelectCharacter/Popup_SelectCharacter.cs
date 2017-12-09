@@ -59,27 +59,12 @@ public class Popup_SelectCharacter : GameState
             base.Back();
             callbackFunc(selected);
         }
-        else if (recentList.Contains(selected))
-        {
-            base.Back();
-            recentList.Remove(selected);
-            recentList.Insert(0, selected);
-            callbackFunc(selected);
-        }
         else gameManager.OpenPopup<Popup_EditCharacter>().Setup(AssetCharacter.FindCharacter(selected.family), selected, cdata =>
             {
                 if (cdata == null) return;
 
                 // check to see if it's exist in recent list or not
-                foreach (var item in recentList)
-                    if (cdata.IsSameAs(item))
-                    {
-                        recentList.Remove(item);
-                        recentList.Insert(0, item);
-                        callbackFunc(item);
-                        base.Back();
-                        return;
-                    }
+                recentList.RemoveAll(x => x.name == cdata.name);
 
                 //  item is not exist in recent list
                 recentList.Insert(0, cdata);

@@ -9,7 +9,7 @@ namespace EditCharacter
     public class ListItemHair : Base
     {
         public Text nameLabel = null;
-        public RectTransform holder = null;
+        public Image image = null;
 
         public Hair data = null;
 
@@ -20,13 +20,13 @@ namespace EditCharacter
         {
             data = hair;
 
-            hair.Clone<Hair>(holder);
+            image.sprite = hair.preview;
             nameLabel.SetTextAndWrap(data.name);
 
             background = GetComponent<Image>();
             owner = GetComponentInParent<Popup_EditCharacter>();
 
-            if (Popup_EditCharacter.selected.hair == data.name)
+            if (Popup_EditCharacter.currentSelected.hair == data.name)
                 OnSelect();
 
             return this;
@@ -34,7 +34,7 @@ namespace EditCharacter
 
         public void OnSelect()
         {
-            Popup_EditCharacter.selected.hair = data.name;
+            Popup_EditCharacter.currentSelected.hair = data.name;
             owner.UpdatePreview();
 
             if (selected != null)

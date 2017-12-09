@@ -4,6 +4,6 @@ using UnityEngine;
 
 public class Face : MonoBehaviour
 {
-    public Transform hairJoint = null;
-    
+    public Sprite preview = null;
+    public Transform hairJoint = null;    
 }

@@ -76,7 +76,17 @@ namespace StoryEditor
                 if (cdata != null)
                 {
                     data.character = cdata;
-                    character.Setup(cdata);
+                    character.Clear();
+
+                    if (cdata.isPlayer)
+                        character.GetComponentInParent<Image>().sprite = gameManager.defaultPlayerSprite;
+                    else if (cdata.isEmpty)
+                        character.GetComponentInParent<Image>().sprite = gameManager.defaultEmptySprite;
+                    else
+                    {
+                        character.GetComponentInParent<Image>().sprite = null;
+                        character.Setup(cdata);
+                    }
                 }
             });
         }

@@ -5,5 +5,6 @@ using UnityEngine.UI;
 
 public class Body : MonoBehaviour
 {
+    public Sprite preview = null;
     public Transform faceJoint = null;
 }

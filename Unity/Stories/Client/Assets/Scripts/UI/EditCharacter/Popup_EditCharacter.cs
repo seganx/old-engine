@@ -8,6 +8,7 @@ using EditCharacter;
 public class Popup_EditCharacter : GameState
 {
     public Character preview = null;
+    public InputField characterName = null;
 
     public ScrollRect hairScroller = null;
     public ScrollRect faceScroller = null;
@@ -21,9 +22,12 @@ public class Popup_EditCharacter : GameState
 
     public Popup_EditCharacter Setup(AssetCharacter source, CharacterData currentData, System.Action<CharacterData> callback)
     {
-        selected = currentData ?? source.Default;
         callbackFunc = callback;
+
+        currentSelected = currentData != null ? currentData.Clone() : source.Default;
+
         UpdatePreview();
+        characterName.text = currentSelected.name;
 
         foreach (var item in source.hairs)
             hairItemPrefab.Clone<ListItemHair>(hairScroller.content).Setup(item);
@@ -39,15 +43,27 @@ public class Popup_EditCharacter : GameState
 
     public void UpdatePreview()
     {
-        preview.Setup(selected);
+        preview.Setup(currentSelected);
     }
-    
+
     public void OnConfirmed(bool isOk)
     {
-        base.Back();
+        if (isOk == false)
+        {
+            callbackFunc(null);
+            base.Back();
+            return;
+        }
 
-        if (callbackFunc != null)
-            callbackFunc(isOk ? selected : null);
+        if (characterName.text.HasContent(3) == false)
+        {
+            characterName.targetGraphic.color = Color.yellow;
+            return;
+        }
+        else base.Back();
+
+        currentSelected.name = characterName.text;
+        callbackFunc(currentSelected);
     }
 
     public override void Back()
@@ -59,6 +75,6 @@ public class Popup_EditCharacter : GameState
     //////////////////////////////////////////////////////////////////////////////////
     //  static members
     //////////////////////////////////////////////////////////////////////////////////
-    public static CharacterData selected = null;
+    public static CharacterData currentSelected = new CharacterData();
 
 }

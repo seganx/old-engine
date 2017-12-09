@@ -9,7 +9,7 @@ namespace EditCharacter
     public class ListItemBody : Base
     {
         public Text nameLabel = null;
-        public RectTransform holder = null;
+        public Image image = null;
 
         public Body data = null;
 
@@ -20,13 +20,13 @@ namespace EditCharacter
         {
             data = body;
 
-            body.Clone<Body>(holder);
+            image.sprite = body.preview;
             nameLabel.SetTextAndWrap(data.name);
 
             background = GetComponent<Image>();
             owner = GetComponentInParent<Popup_EditCharacter>();
 
-            if (Popup_EditCharacter.selected.body == data.name)
+            if (Popup_EditCharacter.currentSelected.body == data.name)
                 OnSelect();
 
             return this;
@@ -34,7 +34,7 @@ namespace EditCharacter
 
         public void OnSelect()
         {
-            Popup_EditCharacter.selected.body = data.name;
+            Popup_EditCharacter.currentSelected.body = data.name;
             owner.UpdatePreview();
 
             if (selected != null)

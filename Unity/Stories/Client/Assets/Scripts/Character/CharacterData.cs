@@ -26,6 +26,17 @@
         return this;
     }
 
+    public CharacterData Clone()
+    {
+        var res = new CharacterData();
+        res.family = family;
+        res.name = name;
+        res.body = body;
+        res.face = face;
+        res.hair = hair;
+        return res;
+    }
+
     public bool IsSameAs(CharacterData other)
     {
         return family == other.family && name == other.name && body == other.body && face == other.face && hair == other.hair;
