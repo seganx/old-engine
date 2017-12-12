@@ -6,7 +6,8 @@ public class UIPersianInputField : Base
 {
     public bool autoAlignment = true;
     private InputField inputField = null;
-    private Text inputText = null;
+
+    public Text inputText { get; private set; }
 
     void Awake()
     {
