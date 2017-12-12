@@ -52,7 +52,7 @@ namespace StoryEditor
             foreach (var item in labels)
                 item.SetActive(false);
 
-            GetComponentInParent<DialogEditor>().links[1] = null;
+            GetComponentInParent<DialogItem>().links[1] = null;
             GetComponentInParent<EditorPanel>().Referesh();
         }
 

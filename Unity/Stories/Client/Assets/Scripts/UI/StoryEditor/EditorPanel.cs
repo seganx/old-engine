@@ -10,10 +10,10 @@ namespace StoryEditor
     {
         public Vector2 space = Vector2.one;
         public ScrollRect scroller = null;
-        public DialogEditor prefab = null;
+        public DialogItem prefab = null;
 
         private Vector2Int positionLevel = Vector2Int.zero;
-        private List<DialogEditor> tempList = new List<DialogEditor>();
+        private List<DialogItem> tempList = new List<DialogItem>();
 
         public EditorPanel Setup(Book book)
         {
@@ -26,7 +26,7 @@ namespace StoryEditor
 
             //  create dialog boxes
             foreach (var item in book.dialogs)
-                dialogs.Add(prefab.Clone<DialogEditor>(scroller.content).Setup(item));
+                dialogs.Add(prefab.Clone<DialogItem>(scroller.content).Setup(item));
 
             //  link dialog boxes
             foreach (var item in dialogs)
@@ -60,7 +60,7 @@ namespace StoryEditor
             return this;
         }
 
-        private void UpdateLinkedPosition(DialogEditor dialog, int index)
+        private void UpdateLinkedPosition(DialogItem dialog, int index)
         {
             if (dialog == null) return;
             tempList.Remove(dialog);
@@ -168,7 +168,7 @@ namespace StoryEditor
         // static memebers
         //////////////////////////////////////////////////////
         public static Book current = null;
-        public static List<DialogEditor> dialogs = new List<DialogEditor>();
+        public static List<DialogItem> dialogs = new List<DialogItem>();
     }
 }
 

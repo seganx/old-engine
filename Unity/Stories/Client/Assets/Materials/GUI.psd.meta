@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 1e98834675ea2014eb5d36e183c1e53c
-timeCreated: 1512679469
+timeCreated: 1513105104
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
@@ -27,6 +27,8 @@ TextureImporter:
     21300040: GUI_16
     21300042: GUI_17
     21300044: GUI_18
+    21300046: GUI_19
+    21300048: GUI_20
   externalObjects: {}
   serializedVersion: 4
   mipmaps:
@@ -412,7 +414,7 @@ TextureImporter:
         width: 76
         height: 76
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -426,8 +428,36 @@ TextureImporter:
         width: 76
         height: 76
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: GUI_19
+      rect:
+        serializedVersion: 2
+        x: 141
+        y: 301
+        width: 47
+        height: 47
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: GUI_20
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 460
+        width: 103
+        height: 48
+      alignment: 9
+      pivot: {x: 0.6, y: 0.5}
+      border: {x: 52, y: 11, z: 10, w: 12}
       outline: []
       physicsShape: []
       tessellationDetail: 0

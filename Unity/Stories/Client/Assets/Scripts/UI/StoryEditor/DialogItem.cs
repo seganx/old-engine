@@ -6,17 +6,17 @@ using UnityEngine;
 
 namespace StoryEditor
 {
-    public class DialogEditor : Base
+    public class DialogItem : Base
     {
         public Image characterFace = null;
         public Text dialogText = null;
-        public DialogEditor[] links = new DialogEditor[2] { null, null };
+        public DialogItem[] links = new DialogItem[2] { null, null };
         public UILineRenderer[] lines = new UILineRenderer[2] { null, null };
 
 
         public Book.Dialog data = null;
 
-        public DialogEditor Setup(Book.Dialog dialog)
+        public DialogItem Setup(Book.Dialog dialog)
         {
             data = dialog;
             UpdateFace();
@@ -58,13 +58,9 @@ namespace StoryEditor
 
         public void OnEditText()
         {
-            gameManager.OpenPopup<Popup_InputText>().Setup(data.text, "Enter text...", str =>
+            gameManager.OpenPopup<Popup_DialogEditor>().Setup(data, (isOk) =>
             {
-                if (str != null)
-                {
-                    data.text = str;
-                    dialogText.SetTextAndWrap(data.text, true);
-                }
+                if (isOk) Setup(data);
             });
         }
 

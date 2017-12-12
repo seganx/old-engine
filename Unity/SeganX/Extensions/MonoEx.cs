@@ -208,6 +208,11 @@ public static class MonoEx
         var lines = self.Split('\n');
         return lines.Length;
     }
+
+    public static string CleanForPersian(this string self)
+    {
+        return self.Replace('ي', 'ی').Replace("‌", "");
+    }
     #endregion
 
     #region arrays

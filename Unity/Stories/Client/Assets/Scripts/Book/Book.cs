@@ -5,7 +5,6 @@ public class Book
     public class Question
     {
         public string text = "";
-        public string onclick_page = "";
         public string onclick_dialog = "";
         public string onclick_param = "";
     }

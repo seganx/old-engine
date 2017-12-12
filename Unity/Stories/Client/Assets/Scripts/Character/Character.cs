@@ -19,6 +19,8 @@ public class Character : Base
 
     public Character Setup(CharacterData data, bool fullLength = false)
     {
+        Clear();
+
         var src = AssetCharacter.FindCharacter(data.family);
         if (src == null) return this;
 
