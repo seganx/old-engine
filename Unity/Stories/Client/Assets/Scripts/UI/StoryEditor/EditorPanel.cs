@@ -12,6 +12,7 @@ namespace StoryEditor
         public ScrollRect scroller = null;
         public DialogItem prefab = null;
 
+        private Vector2 contentSize = Vector2.zero;
         private Vector2Int positionLevel = Vector2Int.zero;
         private List<DialogItem> tempList = new List<DialogItem>();
 
@@ -30,10 +31,7 @@ namespace StoryEditor
 
             //  link dialog boxes
             foreach (var item in dialogs)
-                if (item.data.next.HasContent())
-                    item.links[0] = dialogs.Find(x => x.data.name == item.data.next);
-                else for (int i = 0; i < item.data.questions.Count && i < 2; i++)
-                        item.links[i] = dialogs.Find(x => x.data.name == item.data.questions[i].onclick_dialog);
+                UpdateLink(item);
 
             return Referesh();
         }
@@ -45,6 +43,7 @@ namespace StoryEditor
             tempList.Clear();
             tempList.AddRange(dialogs);
 
+            contentSize = Vector2.zero;
             positionLevel = Vector2Int.zero;
             UpdateLinkedPosition(dialogs[0], 0);
 
@@ -53,6 +52,7 @@ namespace StoryEditor
                 positionLevel.x++;
                 UpdateLinkedPosition(tempList[0], 0);
             }
+            scroller.content.sizeDelta = contentSize;
 
             foreach (var item in dialogs)
                 item.UpdateLinksVisuals();
@@ -70,10 +70,10 @@ namespace StoryEditor
             if (dialog.links[1] != null) positionLevel.x++;
             UpdateLinkedPosition(dialog.links[1], index - 1);
 
-            if (scroller.content.sizeDelta.x <= positionLevel.x * space.x + space.x * 2)
-                scroller.content.SetAnchordWidth(positionLevel.x * space.x + space.x * 2);
-            if (scroller.content.sizeDelta.y <= -index * space.y + space.y * 2)
-                scroller.content.SetAnchordHeight(-index * space.y + space.y * 2);
+            if (contentSize.x <= positionLevel.x * space.x + space.x * 2)
+                contentSize.x = positionLevel.x * space.x + space.x * 2;
+            if (contentSize.y <= -index * space.y + space.y * 2)
+                contentSize.y = -index * space.y + space.y * 2;
         }
 
         // Use this for initialization
@@ -82,14 +82,14 @@ namespace StoryEditor
             var mybook = new Book();
 
             var d = new Book.Dialog();
-            d.name = "d0";
+            d.name = "z0";
             d.character = new CharacterData() { family = "sajad", body = "body_2", face = "face_1", hair = "hair_3", name = "salman" };
             d.text = "Hello baby!!!";
-            d.next = "d1";
+            d.next = "z1";
             mybook.dialogs.Add(d);
 
             d = new Book.Dialog();
-            d.name = "d1";
+            d.name = "z1";
             d.character = new CharacterData() { family = "sajad", body = "body_1", face = "face_1", hair = "hair_1", name = "saeed" };
             d.text = "Hello dear!!!";
 
@@ -115,23 +115,23 @@ namespace StoryEditor
             d.name = "path2";
             d.character = new CharacterData() { family = "sajad", body = "body_2", face = "face_1", hair = "hair_2", name = "salman" };
             d.text = "path 2!!!";
-            d.next = "_02";
+            d.next = "z02";
             mybook.dialogs.Add(d);
 
             d = new Book.Dialog();
-            d.name = "_01";
+            d.name = "z01";
             d.character = new CharacterData() { family = "sajad", body = "body_2", face = "face_1", hair = "hair_2", name = "salman" };
             d.text = "unlinked!!";
             mybook.dialogs.Add(d);
 
             d = new Book.Dialog();
-            d.name = "_02";
+            d.name = "z02";
             d.character = new CharacterData() { family = "sajad", body = "body_1", face = "face_1", hair = "hair_1", name = "saeed" };
             d.text = "unlinked with question";
 
             q = new Book.Question();
             q.text = "question 1";
-            q.onclick_dialog = "_path1";
+            q.onclick_dialog = "sajad";
             d.questions.Add(q);
 
             q = new Book.Question();
@@ -142,7 +142,7 @@ namespace StoryEditor
             mybook.dialogs.Add(d);
 
             d = new Book.Dialog();
-            d.name = "_path1";
+            d.name = "sajad";
             d.character = new CharacterData() { family = "sajad", body = "body_0", face = "face_2", hair = "hair_3", name = "salman" };
             d.text = "path 1!!!";
             mybook.dialogs.Add(d);
@@ -169,6 +169,15 @@ namespace StoryEditor
         //////////////////////////////////////////////////////
         public static Book current = null;
         public static List<DialogItem> dialogs = new List<DialogItem>();
+
+        public static void UpdateLink(DialogItem item)
+        {
+            item.links[0] = item.links[1] = null;
+            if (item.data.next.HasContent())
+                item.links[0] = dialogs.Find(x => x.data.name == item.data.next);
+            else for (int i = 0; i < item.data.questions.Count && i < 2; i++)
+                    item.links[i] = dialogs.Find(x => x.data.name == item.data.questions[i].onclick_dialog);
+        }
     }
 }
 

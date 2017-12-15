@@ -6,9 +6,10 @@ using SeganX;
 
 namespace StoryEditor
 {
-    public class Popup_DialogEditor : GameState
+    public class Popup_EditDialog : GameState
     {
         public Image background = null;
+        public InputField dialogName = null;
         public Character character = null;
         public InputField dialogText = null;
         public GameObject questionNonePanel = null;
@@ -23,12 +24,14 @@ namespace StoryEditor
         private CharacterData charData = null;
 
 
-        public Popup_DialogEditor Setup(Book.Dialog dialog, System.Action<bool> callback)
+        public Popup_EditDialog Setup(Book.Dialog dialog, System.Action<bool> callback)
         {
             data = dialog;
             callbackFunc = callback;
-            //background.sprite = data.background;
             charData = dialog.character;
+
+            //background.sprite = data.background;
+            dialogName.text = dialog.name;
             UpdateFace();
             dialogText.text = dialog.text;
             defaultLink.text = "Next Page: " + (nextPage = dialog.next);
@@ -93,7 +96,17 @@ namespace StoryEditor
         {
             if (index == -1)
             {
-                defaultLink.text = "Next Page: " + (nextPage = "place code here");
+                gameManager.OpenPopup<Popup_SelectDialog>().Setup(EditorPanel.current, data, nextPage, bdata =>
+                {
+                    defaultLink.text = "Next Page: " + (nextPage = bdata.name == "none" ? "" : bdata.name);
+                });
+            }
+            else
+            {
+                gameManager.OpenPopup<Popup_SelectDialog>().Setup(EditorPanel.current, data, questionLink[index].text, bdata =>
+                {
+                    questionLink[index].text = (nextPage = bdata.name == "none" ? "" : bdata.name);
+                });
             }
         }
 
@@ -101,15 +114,24 @@ namespace StoryEditor
         {
             if (isOk)
             {
+                var newname = dialogName.text.Trim() != "none" ? dialogName.text.Trim().CleanForPersian() : "";
+                if (newname.Length > 1 && EditorPanel.current.dialogs.Find(x => x.name == newname) == null)
+                    data.name = newname;
+
                 data.character = charData;
                 data.text = dialogText.text.CleanForPersian();
-                data.next = nextPage;
                 data.questions.Clear();
 
-                if (questionPanel.activeSelf)
+                if (questionPanel.activeSelf && questionLink[0].text.Length > 0 && questionLink[1].text.Length > 0)
                 {
+                    data.next = "";
                     data.questions.Add(new Book.Question() { text = questionText[0].text.CleanForPersian(), onclick_dialog = questionLink[0].text });
                     data.questions.Add(new Book.Question() { text = questionText[1].text.CleanForPersian(), onclick_dialog = questionLink[1].text });
+                }
+                else
+                {
+                    data.next = nextPage;
+                    data.questions.Clear();
                 }
             }
 

@@ -8,6 +8,7 @@ namespace StoryEditor
 {
     public class DialogItem : Base
     {
+        public Text nameLabel = null;
         public Image characterFace = null;
         public Text dialogText = null;
         public DialogItem[] links = new DialogItem[2] { null, null };
@@ -19,6 +20,7 @@ namespace StoryEditor
         public DialogItem Setup(Book.Dialog dialog)
         {
             data = dialog;
+            nameLabel.SetTextAndWrap(dialog.name);
             UpdateFace();
             dialogText.SetTextAndWrap(dialog.text, true);
             return this;
@@ -36,18 +38,20 @@ namespace StoryEditor
 
         public void UpdateLinksVisuals()
         {
+            var offset = Vector3.down * 20 + Vector3.right * 50;
             for (int i = 0; i < lines.Length; i++)
             {
                 if (links[i] != null)
                 {
-                    var distance = links[i].rectTransform.anchoredPosition - rectTransform.anchoredPosition;
-                    if (Mathf.Abs(distance.x) > 200 || Mathf.Abs(distance.y) > 400)
+                    var distance = links[i].rectTransform.anchoredPosition3D - rectTransform.anchoredPosition3D;
+                    if (Mathf.Abs(distance.x) > 50 || Mathf.Abs(distance.y) > 400)
                     {
-                        var dest = links[i].rectTransform.anchoredPosition3D - (rectTransform.anchoredPosition3D + lines[i].rectTransform.anchoredPosition3D);
+                        var dest = distance - lines[i].rectTransform.anchoredPosition3D;
 
                         var points = lines[i].Points;
-                        points[1] = dest;
+                        points[1] = dest + offset;
                         lines[i].Points = points;
+                        lines[i].SetAllDirty();
                         lines[i].enabled = true;
                     }
                     else lines[i].enabled = false;
@@ -58,9 +62,14 @@ namespace StoryEditor
 
         public void OnEditText()
         {
-            gameManager.OpenPopup<Popup_DialogEditor>().Setup(data, (isOk) =>
+            gameManager.OpenPopup<Popup_EditDialog>().Setup(data, (isOk) =>
             {
-                if (isOk) Setup(data);
+                if (isOk)
+                {
+                    Setup(data);
+                    EditorPanel.UpdateLink(this);
+                    GetComponentInParent<EditorPanel>().Referesh();
+                }
             });
         }
 
