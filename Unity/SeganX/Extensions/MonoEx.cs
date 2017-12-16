@@ -32,17 +32,17 @@ public static class MonoEx
         return x >= x1 && x <= x2;
     }
 
-    public static int ToInt(this IConvertible self)
+    public static int ToInt(this float self)
     {
-        if (self is char)
-        {
-            char c = (char)self;
-            if (System.Char.IsDigit(c))
-                return (int)System.Char.GetNumericValue(c);
-            else
-                return 0;
-        }
-        else return (int)self;
+        return Mathf.RoundToInt(self);
+    }
+
+    public static int ToInt(this char self)
+    {
+        if (System.Char.IsDigit(self))
+            return (int)System.Char.GetNumericValue(self);
+        else
+            return 0;
     }
 
     public static bool IsFlagOn(this IConvertible self, IConvertible flag)

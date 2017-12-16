@@ -14,6 +14,7 @@ namespace SeganX
         public Rect bound;
         public Vector2 snapThreshold = Vector2.one;
         private Vector2 offset = Vector2.zero;
+        private bool stopUpdate = true;
 
         public bool freezed { get; set; }
         public bool isDragging { get { return current == this; } }
@@ -23,12 +24,14 @@ namespace SeganX
 
         public void OnPointerDown(PointerEventData eventData)
         {
+            stopUpdate = false;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRectTransform, eventData.position, eventData.enterEventCamera ?? eventData.pressEventCamera, out offset);
             offset = rectTransform.anchoredPosition - offset;
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            stopUpdate = true;
             cancelDrag = false;
             current = null;
         }
@@ -42,7 +45,7 @@ namespace SeganX
                 current = null;
                 return;
             }
-            if (freezed) return;
+            if (stopUpdate || freezed) return;
             current = this;
 
             Vector2 localPoint;

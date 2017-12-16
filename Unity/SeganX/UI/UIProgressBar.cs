@@ -4,13 +4,19 @@ using UnityEngine;
 
 namespace SeganX
 {
-    public class UIProgressBar : MonoBehaviour
+    public class UIProgressBar : Base
     {
         private float initwidth = 0;
 
-        void Awake()
+        void Start()
+        {
+            Setup();
+        }
+
+        public UIProgressBar Setup()
         {
             initwidth = transform.As<RectTransform>().rect.width;
+            return this;
         }
 
         public void Set(float value, float maxValue)
