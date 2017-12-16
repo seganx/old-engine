@@ -3,24 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using SeganX;
-using SelectDialog;
 
-public class Popup_SelectDialog : GameState
+public class Popup_SelectDialog : GameStateSelectBase
 {
-    public ListItem prefab = null;
-    public ScrollRect scroller = null;
-    private System.Action<Book.Dialog> callbackFunc = null;
+    public ListItemBase nonePrefab = null;
 
-    public Popup_SelectDialog Setup(Book currentBook, Book.Dialog currentDialog, string selected, System.Action<Book.Dialog> callback)
+    public Popup_SelectDialog Setup(Book currentBook, Book.Dialog currentDialog, string selected, System.Action<object> callback)
     {
         callbackFunc = callback;
 
         //  inser null item
-        {
-            var nullItem = prefab.Clone<ListItem>(scroller.content).Setup(new Book.Dialog() { name = "none" });
-            nullItem.characterFace.gameObject.SetActive(false);
-            nullItem.OnSelect();
-        }
+        nonePrefab.Clone<ListItemBase>(scroller.content).Setup(new Book.Dialog() { name = "none" }).OnSelect();
 
         var dialogList = new List<Book.Dialog>(currentBook.dialogs);
         dialogList.Sort((x, y) => string.Compare(x.name, y.name));
@@ -28,28 +21,12 @@ public class Popup_SelectDialog : GameState
         foreach (var item in dialogList)
         {
             if (item == currentDialog) continue;
-            var listItem = prefab.Clone<ListItem>(scroller.content).Setup(item);
-            if (listItem.data.name == selected)
+
+            var listItem = prefab.Clone<ListItemDialog>(scroller.content).Setup(item);
+            if (listItem.data.As<Book.Dialog>().name == selected)
                 listItem.OnSelect();
         }
 
         return this;
     }
-
-    public void OnConfirmed()
-    {
-        base.Back();
-        if (callbackFunc == null) return;
-        callbackFunc(selected);
-    }
-
-    public override void Back()
-    {
-        OnConfirmed();
-    }
-
-    //////////////////////////////////////////////////////////
-    // static members
-    //////////////////////////////////////////////////////////
-    public static Book.Dialog selected = null;
 }

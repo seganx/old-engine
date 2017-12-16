@@ -98,14 +98,16 @@ namespace StoryEditor
             {
                 gameManager.OpenPopup<Popup_SelectDialog>().Setup(EditorPanel.current, data, nextPage, bdata =>
                 {
-                    defaultLink.text = "Next Page: " + (nextPage = bdata.name == "none" ? "" : bdata.name);
+                    if (bdata != null)
+                        defaultLink.text = "Next Page: " + (nextPage = bdata.As<Book.Dialog>().name == "none" ? "" : bdata.As<Book.Dialog>().name);
                 });
             }
             else
             {
                 gameManager.OpenPopup<Popup_SelectDialog>().Setup(EditorPanel.current, data, questionLink[index].text, bdata =>
                 {
-                    questionLink[index].text = (nextPage = bdata.name == "none" ? "" : bdata.name);
+                    if (bdata != null)
+                        questionLink[index].text = (nextPage = bdata.As<Book.Dialog>().name == "none" ? "" : bdata.As<Book.Dialog>().name);
                 });
             }
         }

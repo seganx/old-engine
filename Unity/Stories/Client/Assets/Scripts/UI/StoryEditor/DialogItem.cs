@@ -46,10 +46,14 @@ namespace StoryEditor
                     var distance = links[i].rectTransform.anchoredPosition3D - rectTransform.anchoredPosition3D;
                     if (Mathf.Abs(distance.x) > 50 || Mathf.Abs(distance.y) > 400)
                     {
-                        var dest = distance - lines[i].rectTransform.anchoredPosition3D;
+                        var dest = distance - lines[i].rectTransform.anchoredPosition3D + offset;
 
                         var points = lines[i].Points;
-                        points[1] = dest + offset;
+                        if (i == 0)
+                            points[1].Set(points[0].x, dest.y);
+                        else
+                            points[1].Set(dest.x, points[0].y);
+                        points[2] = dest;
                         lines[i].Points = points;
                         lines[i].SetAllDirty();
                         lines[i].enabled = true;
