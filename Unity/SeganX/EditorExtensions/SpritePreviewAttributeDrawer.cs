@@ -5,6 +5,9 @@ using UnityEngine;
 [CustomPropertyDrawer(typeof(SpritePreviewAttribute))]
 public class SpritePreviewAttributeDrawer : PropertyDrawer
 {
+    private static Texture2D s_currentTexture = null;
+    private static Texture2D s_currentTextureConverted = null;
+
     private float baseHeight;
     private float previewHeight;
 
@@ -34,6 +37,16 @@ public class SpritePreviewAttributeDrawer : PropertyDrawer
             position.height = previewHeight;
 
             var sprite = property.objectReferenceValue.As<Sprite>();
+            if (s_currentTexture != sprite.texture)
+            {
+                s_currentTexture = sprite.texture;
+
+                if (sprite.texture.format == TextureFormat.DXT1 || sprite.texture.format == TextureFormat.DXT5)
+                {
+                    EditorUtility.form
+                }
+            }
+
             var texture = new Texture2D((int)sprite.rect.width, (int)sprite.rect.height, sprite.texture.format, false);
             Graphics.CopyTexture(sprite.texture, 0, 0, (int)sprite.rect.x, (int)sprite.rect.y, texture.width, texture.height, texture, 0, 0, 0, 0);
             EditorGUI.LabelField(position, new GUIContent() { image = texture });
