@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SeganX.Effects
 {
@@ -20,8 +21,7 @@ namespace SeganX.Effects
         public Transform target = null;
         public AnimationCurve speed = new AnimationCurve(new Keyframe[] { new Keyframe(0, 1, 0, 0), new Keyframe(0.5f, 5, 0, 0), new Keyframe(1, 1, 0, 0) });
         public CurvePath curvePath = new CurvePath();
-        public Event OnReachTarget;
-
+        public UnityEvent OnReachTarget;
 
         private float moveTime = 0;
         private float moveTimeMax = 0;
@@ -42,7 +42,11 @@ namespace SeganX.Effects
         {
             var targetTime = Vector3.Distance(transform.position, target.position) / moveTimeMax;
             if (target)
+            {
                 initPosition = Vector3.MoveTowards(initPosition, target.position, Time.deltaTime * speed.Evaluate(1 - targetTime));
+                if (initPosition == target.position)
+                    OnReachTarget.Invoke();
+            }
 
             if (curvePath.activate)
             {

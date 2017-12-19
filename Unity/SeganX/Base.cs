@@ -9,6 +9,16 @@ public class Base : MonoBehaviour
     public RectTransform parentRectTransform { get { return transform.parent as RectTransform; } }
     public virtual bool Visible { set { gameObject.SetActive(value); } get { return gameObject.activeSelf; } }
 
+    public void DestroyGameObject(float delay)
+    {
+        Destroy(gameObject, delay);
+    }
+
+    public void DestroyScript(float delay)
+    {
+        Destroy(this, delay);
+    }
+
     public void DelayCall(float seconds, System.Action callback)
     {
         StartCoroutine(DoDelayCall(seconds, callback));
