@@ -40,15 +40,12 @@ public class SpritePreviewAttributeDrawer : PropertyDrawer
             if (s_currentTexture != sprite.texture)
             {
                 s_currentTexture = sprite.texture;
-
-                if (sprite.texture.format == TextureFormat.DXT1 || sprite.texture.format == TextureFormat.DXT5)
-                {
-                    EditorUtility.form
-                }
+                s_currentTextureConverted = new Texture2D(s_currentTexture.width, s_currentTexture.height, TextureFormat.ARGB32, false);
+                Graphics.ConvertTexture(s_currentTexture, 0, s_currentTextureConverted, 0);
             }
 
-            var texture = new Texture2D((int)sprite.rect.width, (int)sprite.rect.height, sprite.texture.format, false);
-            Graphics.CopyTexture(sprite.texture, 0, 0, (int)sprite.rect.x, (int)sprite.rect.y, texture.width, texture.height, texture, 0, 0, 0, 0);
+            var texture = new Texture2D((int)sprite.rect.width, (int)sprite.rect.height, TextureFormat.ARGB32, false);
+            Graphics.CopyTexture(s_currentTextureConverted, 0, 0, (int)sprite.rect.x, (int)sprite.rect.y, texture.width, texture.height, texture, 0, 0, 0, 0);
             EditorGUI.LabelField(position, new GUIContent() { image = texture });
         }
     }
