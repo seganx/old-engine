@@ -16,6 +16,7 @@ public class Base : MonoBehaviour
 
     IEnumerator DoDelayCall(float seconds, System.Action callback)
     {
+
         yield return new WaitForSeconds(seconds);
         callback();
     }
