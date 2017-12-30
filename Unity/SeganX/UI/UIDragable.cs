@@ -54,10 +54,13 @@ namespace SeganX
             localPoint.x = Mathf.RoundToInt(localPoint.x / snapThreshold.x) * snapThreshold.x;
             localPoint.y = Mathf.RoundToInt(localPoint.y / snapThreshold.y) * snapThreshold.y;
 
-            if (localPoint.x < bound.x) localPoint.x = bound.x;
-            if (localPoint.y > bound.y) localPoint.y = bound.y;
-            if (localPoint.x > bound.x + bound.width - rectTransform.rect.width) localPoint.x = bound.x + bound.width - rectTransform.rect.width;
-            if (localPoint.y < bound.y - bound.height + rectTransform.rect.height) localPoint.y = bound.y - bound.height + rectTransform.rect.height;
+            if (bound.width > 1 || bound.height > 1)
+            {
+                if (localPoint.x < bound.x) localPoint.x = bound.x;
+                if (localPoint.y > bound.y) localPoint.y = bound.y;
+                if (localPoint.x > bound.x + bound.width - rectTransform.rect.width) localPoint.x = bound.x + bound.width - rectTransform.rect.width;
+                if (localPoint.y < bound.y - bound.height + rectTransform.rect.height) localPoint.y = bound.y - bound.height + rectTransform.rect.height;
+            }
 
             position = localPoint;
             delta = eventData.delta;

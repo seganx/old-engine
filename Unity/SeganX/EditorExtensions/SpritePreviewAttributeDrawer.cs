@@ -19,7 +19,7 @@ public class SpritePreviewAttributeDrawer : PropertyDrawer
         {
             //var sprite = property.objectReferenceValue.IsTypeOf<Sprite>() ? property.objectReferenceValue as Sprite : null;
             var sprite = property.objectReferenceValue as Sprite;
-            previewHeight = sprite.rect.height;
+            if (sprite != null) previewHeight = sprite.rect.height;
         }
         return baseHeight + previewHeight;
     }

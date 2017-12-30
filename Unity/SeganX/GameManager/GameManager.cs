@@ -150,7 +150,7 @@ namespace SeganX
 
 
         ////////////////////////////////////////////////////////////
-        /// STATIV MEMBERS
+        /// STATIC MEMBERS
         ////////////////////////////////////////////////////////////
         private static GameManager instance = null;
         public static GameManager Instance { get { return instance == null ? (instance = FindObjectOfType<GameManager>()) : instance; } }

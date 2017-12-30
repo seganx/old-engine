@@ -21,9 +21,10 @@ namespace SeganX
             value.y = current.y = y;
         }
 
-        public void Setup(Vector2 initValue)
+        public BlenderVector2 Setup(Vector2 initValue)
         {
             current = value = initValue;
+            return this;
         }
 
         public bool Update(float deltaTime)
