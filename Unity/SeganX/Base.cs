@@ -41,17 +41,20 @@ public class Base : MonoBehaviour
         var filename = url.ComputeMD5(Core.Salt + version) + ".seganx";
         var path = "file:///" + Application.persistentDataPath + "/" + filename;
 
+        Debug.Log("Try loading from cache " + path);
         var res = new WWW(path);
         yield return res;
 
         if (res.error.HasContent())
         {
+            Debug.Log("Failed to download from cache!\nDownloading from " + url);
             res = new WWW(url);
             yield return res;
-
+            Debug.Log("Received bytes: " + res.bytesDownloaded);
             if (res.error.IsNullOrEmpty() && res.bytes.Length > 0)
                 PlayerPrefsEx.SaveData(filename, res.bytes);
         }
+        else Debug.Log("Loaded " + res.bytesDownloaded + " from cache");
 
         callback(res);
     }
@@ -63,8 +66,10 @@ public class Base : MonoBehaviour
 
     IEnumerator DoDownload(string url, System.Action<WWW> callback)
     {
+        Debug.Log("Downloading from " + url);
         var res = new WWW(url);
         yield return res;
+        Debug.Log("Received bytes: " + res.bytesDownloaded);
         callback(res);
     }
 }
