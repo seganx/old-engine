@@ -11,10 +11,11 @@ public static class DebugEx
         if (self == null) return "[null]";
         System.Type type = self.GetType();
 
-        if (type.IsValueType || type.IsEnum || type.IsPrimitive || type == typeof(string))
+        if (type.IsEnum || type.IsPrimitive || type == typeof(string))
+        {
             return "[" + (self.ToString() == "\0" ? "null" : self.ToString()) + "]";
-
-        if (type.IsArray)
+        }
+        else if (type.IsArray)
         {
             string res = "{";
             var arr = self as System.Array;
@@ -22,8 +23,7 @@ public static class DebugEx
                 res += GetStringDebug(a, levels - 1) + " ";
             return (res.Length > 3 ? res.Remove(res.Length - 1) : res) + "}";
         }
-
-        if (type.IsGenericType)
+        else if (type.IsGenericType)
         {
             string res = "{";
             var arr = self as ICollection;
@@ -31,8 +31,7 @@ public static class DebugEx
                 res += GetStringDebug(a, levels - 1) + " ";
             return (res.Length > 3 ? res.Remove(res.Length - 1) : res) + "}";
         }
-
-        if (type.IsClass)
+        else if (type.IsClass || type.IsValueType)
         {
             if (levels > 0)
             {
