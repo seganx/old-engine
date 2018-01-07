@@ -1,11 +1,8 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Globalization;
 using System.IO;
-using System;
 
 public static class MonoEx
 {
@@ -45,22 +42,22 @@ public static class MonoEx
             return 0;
     }
 
-    public static bool IsFlagOn(this IConvertible self, IConvertible flag)
+    public static bool IsFlagOn(this System.IConvertible self, System.IConvertible flag)
     {
         return ((int)self & (int)flag) != 0;
     }
 
-    public static IConvertible AddFlag(this IConvertible self, IConvertible flag)
+    public static System.IConvertible AddFlag(this System.IConvertible self, System.IConvertible flag)
     {
         int res = (int)self;
         res |= (int)flag;
         return res;
     }
 
-    public static int GetFlagsCount(this IConvertible self)
+    public static int GetFlagsCount(this System.IConvertible self)
     {
         var res = 0;
-        var values = Enum.GetValues(self.GetType());
+        var values = System.Enum.GetValues(self.GetType());
         foreach (var value in values)
             if (((int)self & (int)value) != 0)
                 res++;
@@ -278,6 +275,16 @@ public static class MonoEx
             if (returnValueFunc(selected) > returnValueFunc(item))
                 selected = item;
         return selected;
+    }
+
+    public static T RandomOne<T>(this System.Array self)
+    {
+        return (self != null && self.Length > 1) ? (T)self.GetValue(Random.Range(0, int.MaxValue) % self.Length) : default(T);
+    }
+
+    public static T RandomOne<T>(this List<T> self)
+    {
+        return (self != null && self.Count > 1) ? self[Random.Range(0, int.MaxValue) % self.Count] : default(T);
     }
     #endregion
 
