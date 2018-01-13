@@ -44,6 +44,8 @@ namespace SeganX
         {
             var data = CryptoService.DecryptWithMac(src, Core.CryptoKey, Core.Salt);
             var bundle = AssetBundle.LoadFromMemory(data);
+            if (bundle == null) return null;
+
             var path = bundle.GetAllAssetNames();
             foreach (var item in path)
             {
