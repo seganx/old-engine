@@ -7,25 +7,11 @@ namespace SeganX
 {
     public class Core : MonoBehaviour
     {
-        public static string BaseDeviceId { private set; get; }
-        public static string DeviceId { private set; get; }
-        public static string Salt { private set; get; }
-        public static bool IsFakeDeviceId { private set; get; }
-        public static byte[] CryptoKey { private set; get; }
-
-#if BAZAAR || MYKET
-    //  this part helps us to switch from old devices to new devices
-    private static string NewDeviceId = "";
-    private static bool NewDeviceIdSent
-    {
-        set { PlayerPrefs.SetInt("Core.NewDeviceIdSent", value ? 1 : 0); }
-        get { return PlayerPrefs.GetInt("Core.NewDeviceIdSent", 0) > 0; }
-    }
-#endif
-
         public string cryptokey = "";
         public string salt = "";
         public Text screenlog = null;
+
+        public Shader[] shaders;
 
 
         // Use this for initialization
@@ -106,6 +92,16 @@ namespace SeganX
 
             SceneManager.LoadScene(1, LoadSceneMode.Single);
         }
+
+
+        ////////////////////////////////////////////////////////////
+        /// STATIC MEMBERS
+        ////////////////////////////////////////////////////////////
+        public static string BaseDeviceId { private set; get; }
+        public static string DeviceId { private set; get; }
+        public static string Salt { private set; get; }
+        public static bool IsFakeDeviceId { private set; get; }
+        public static byte[] CryptoKey { private set; get; }
 
         public static string ComputeMD5(string str, string salt)
         {

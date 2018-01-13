@@ -13,7 +13,6 @@ public static class GameObjectEx
     {
         GameObject res = GameObject.Instantiate(self);
         res.name = self.name;
-        res.RefreshMaterials();
         res.transform.SetParent(self.transform.parent);
         res.transform.CopyValuesFrom(self.transform);
         return res;
@@ -23,7 +22,6 @@ public static class GameObjectEx
     {
         GameObject res = GameObject.Instantiate(self);
         res.name = self.name;
-        res.RefreshMaterials();
         if (self.transform.parent != null)
             res.transform.SetParent(self.transform.parent);
         res.transform.CopyValuesFrom(self.transform);
@@ -58,7 +56,6 @@ public static class GameObjectEx
     {
         GameObject res = GameObject.Instantiate(self);
         res.name = self.name;
-        res.RefreshMaterials();
         res.transform.SetParent(similarTo.parent);
         res.transform.CopyValuesFrom(similarTo);
         return res;
@@ -68,7 +65,6 @@ public static class GameObjectEx
     {
         GameObject res = GameObject.Instantiate(self);
         res.name = self.name;
-        res.RefreshMaterials();
         res.transform.SetParent(parent);
         res.transform.CopyValuesFrom(similarTo);
         return res;
@@ -79,30 +75,5 @@ public static class GameObjectEx
         self.transform.SetParent(null);
         self.SetActive(false);
         GameObject.Destroy(self);
-    }
-
-    public static GameObject RefreshMaterials(this GameObject self)
-    {
-        var renderers = self.GetComponentsInChildren<Renderer>(true);
-        foreach (var render in renderers)
-            foreach (var mat in render.materials)
-                mat.RefreshMaterial();
-
-        var graphics = self.GetComponentsInChildren<UnityEngine.UI.Graphic>(true);
-        foreach (var graphic in graphics)
-        {
-            graphic.material.RefreshMaterial();
-            graphic.materialForRendering.RefreshMaterial();
-        }
-        return self;
-    }
-
-    public static Material RefreshMaterial(this Material self)
-    {
-        if (self.shader == null || self.hideFlags != HideFlags.None) return self;
-        var shader = Shader.Find(self.shader.name);
-        if (shader == null) return self;
-        self.shader = shader;
-        return self;
     }
 }
