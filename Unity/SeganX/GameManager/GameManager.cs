@@ -36,14 +36,14 @@ namespace SeganX
             stateStack.Insert(0, typeof(T));
             currentState = Instantiate<GameState>(state);
             currentState.name = state.name;
-            AttachCanvas(currentState);
+            AttachState(currentState);
 
             return currentState as T;
         }
 
         private GameState CloseState()
         {
-            if (stateStack.Count < 1) return currentState;
+            if (stateStack.Count < 2) return currentState;
 
             stateStack.RemoveAt(0);
             var delay = currentState.PreClose();
@@ -53,7 +53,7 @@ namespace SeganX
             var state = Resources.Load<GameState>(prefabPath + stateStack[0].Name);
             currentState = Instantiate(state) as GameState;
             currentState.name = state.name;
-            AttachCanvas(currentState);
+            AttachState(currentState);
 
             return currentState;
         }
@@ -64,7 +64,7 @@ namespace SeganX
             T res = Instantiate<GameObject>(prefab).GetComponent<T>();
             guiStack.Insert(0, res);
             Resources.UnloadUnusedAssets();
-            AttachCanvas(res);
+            AttachState(res);
             return res;
         }
 
@@ -112,15 +112,17 @@ namespace SeganX
             return this;
         }
 
-        private void AttachCanvas(GameState panel)
+        private void AttachState(GameState panel)
         {
             if (panel == null) return;
-
-            var panelcanvas = panel.GetComponent<Canvas>();
-            if (panelcanvas == null)
-                panel.transform.SetParent(canvas.transform, false);
-            else if (panelcanvas.worldCamera == null)
-                panelcanvas.worldCamera = canvas.worldCamera;
+            if (panel.transform is RectTransform)
+            {
+                var panelcanvas = panel.GetComponent<Canvas>();
+                if (panelcanvas == null)
+                    panel.transform.SetParent(canvas.transform, false);
+                else if (panelcanvas.worldCamera == null)
+                    panelcanvas.worldCamera = canvas.worldCamera;
+            }
         }
 
         public virtual void LateUpdate()
