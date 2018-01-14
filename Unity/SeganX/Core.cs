@@ -34,7 +34,7 @@ namespace SeganX
                     PlayerPrefs.SetString("Core.BaseDeviceId", BaseDeviceId);
                 });
 #else
-            AdvertisingId = SystemInfo.deviceUniqueIdentifier;
+                BaseDeviceId = SystemInfo.deviceUniqueIdentifier;
 #endif
             }
 
