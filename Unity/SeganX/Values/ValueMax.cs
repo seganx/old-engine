@@ -48,5 +48,17 @@ namespace SeganX
         {
             return base.ToString() + " Percent[" + Percent + "] Max[" + Max + "]";
         }
+
+        public static ValueMax operator ++(ValueMax v)
+        {
+            v.Current++;
+            return v;
+        }
+
+        public static ValueMax operator --(ValueMax v)
+        {
+            v.Current--;
+            return v;
+        }
     }
 }

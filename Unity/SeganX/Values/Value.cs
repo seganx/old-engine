@@ -57,5 +57,11 @@ namespace SeganX
         {
             return v.Current + f;
         }
+
+        public static Value operator ++(Value v)
+        {
+            v.Current++;
+            return v;
+        }
     }
 }
