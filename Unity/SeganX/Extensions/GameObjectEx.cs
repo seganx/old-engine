@@ -37,6 +37,14 @@ public static class GameObjectEx
         return res.GetComponent<T>();
     }
 
+    public static T GetComponent<T>(this Component self, bool includeChildren, bool includeInactive)
+    {
+        var res = self.GetComponent<T>();
+        if (res == null && includeChildren)
+            res = self.GetComponentInChildren<T>(includeInactive);
+        return res;
+    }
+
     public static void DestroyNow(this GameObject self)
     {
         self.transform.SetParent(null);
