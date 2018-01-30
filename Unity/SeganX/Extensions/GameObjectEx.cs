@@ -37,6 +37,13 @@ public static class GameObjectEx
         return res.GetComponent<T>();
     }
 
+    public static T Clone<T>(this GameObject self, Transform parent, bool worldPositionStays = false) where T : Component
+    {
+        var res = self.Clone();
+        res.transform.SetParent(parent, worldPositionStays);
+        return res.GetComponent<T>();
+    }
+
     public static T GetComponent<T>(this Component self, bool includeChildren, bool includeInactive)
     {
         var res = self.GetComponent<T>();
