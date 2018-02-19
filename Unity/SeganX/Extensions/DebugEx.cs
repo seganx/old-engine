@@ -6,7 +6,14 @@ using System.Collections.Generic;
 
 public static class DebugEx
 {
-    public static string GetStringDebug(this object self, int levels = 3)
+    [System.Flags]
+    public enum MemberType
+    {
+        Field = 1 << 1,
+        Property = 1 << 2
+    }
+
+    public static string GetStringDebug(this object self, MemberType memberTypes = MemberType.Field | MemberType.Property, int levels = 3)
     {
         if (self == null) return "[null]";
         System.Type type = self.GetType();
@@ -20,7 +27,7 @@ public static class DebugEx
             string res = "{";
             var arr = self as System.Array;
             foreach (var a in arr)
-                res += GetStringDebug(a, levels - 1) + " ";
+                res += GetStringDebug(a, memberTypes, levels - 1) + " ";
             return (res.Length > 3 ? res.Remove(res.Length - 1) : res) + "}";
         }
         else if (type.IsGenericType)
@@ -28,7 +35,7 @@ public static class DebugEx
             string res = "{";
             var arr = self as ICollection;
             foreach (var a in arr)
-                res += GetStringDebug(a, levels - 1) + " ";
+                res += GetStringDebug(a, memberTypes, levels - 1) + " ";
             return (res.Length > 3 ? res.Remove(res.Length - 1) : res) + "}";
         }
         else if (type.IsClass || type.IsValueType)
@@ -39,16 +46,16 @@ public static class DebugEx
                 var members = type.GetMembers();
                 foreach (var member in members)
                 {
-                    if (member.MemberType == MemberTypes.Field)
+                    if (member.MemberType == MemberTypes.Field && (memberTypes & MemberType.Field) != 0)
                     {
                         var field = member as FieldInfo;
-                        res += field.Name + GetStringDebug(field.GetValue(self), levels - 1) + " ";
+                        res += field.Name + GetStringDebug(field.GetValue(self), memberTypes, levels - 1) + " ";
                     }
-                    if (member.MemberType == MemberTypes.Property)
+                    if (member.MemberType == MemberTypes.Property && (memberTypes & MemberType.Property) != 0)
                     {
                         var prop = member as PropertyInfo;
                         if (prop.CanRead)
-                            res += prop.Name + GetStringDebug(prop.GetValue(self, null), levels - 1) + " ";
+                            res += prop.Name + GetStringDebug(prop.GetValue(self, null), memberTypes, levels - 1) + " ";
                     }
                 }
                 res = res.Remove(res.Length - 1) + "}";

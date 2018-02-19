@@ -9,7 +9,7 @@ namespace SeganX
 {
     public enum UIDragState { Normal, Dragging, Drop }
 
-    public class UIDragable : Base, IDragHandler, IPointerDownHandler, IPointerUpHandler
+    public class UIDragable : Base, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
     {
         public Rect bound;
         public Vector2 snapThreshold = Vector2.one;
@@ -34,6 +34,16 @@ namespace SeganX
             stopUpdate = true;
             cancelDrag = false;
             current = null;
+        }
+
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            OnPointerDown(eventData);
+        }
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            OnPointerUp(eventData);
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -77,7 +87,6 @@ namespace SeganX
             if (current)
                 cancelDrag = true;
         }
-
     }
 
 }

@@ -23,7 +23,7 @@ namespace SeganX
             BaseDeviceId = PlayerPrefs.GetString("Core.BaseDeviceId", "");
             if (BaseDeviceId.Length < 1)
             {
-#if UNITY_EDITOR || UNITY_ANDROID || UNITY_IOS
+#if UNITY_ANDROID && !UNITY_EDITOR
                 //  Collect advertising ID
                 screenlog.text = "Version " + Application.version + "\n";
                 screenlog.text += "Getting advertising id...\n";
@@ -40,17 +40,17 @@ namespace SeganX
 
             //  wait for response of the request
 #if !UNITY_EDITOR
-        var startTime = System.DateTime.Now;
-        while (BaseDeviceId.Length < 1 && (System.DateTime.Now - startTime).TotalSeconds < 5)
-            yield return new WaitForEndOfFrame();
+            var startTime = System.DateTime.Now;
+            while (BaseDeviceId.Length < 1 && (System.DateTime.Now - startTime).TotalSeconds < 5)
+                yield return new WaitForEndOfFrame();
 #endif
 
-            //  validate advertising Id
+            //  validate base device Id
             if (BaseDeviceId.Length < 1)
             {
                 screenlog.text += "Failed to getting Advertising Id\nGetting MAC address...\n";
                 //  Collect MAC address
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
                 try
                 {
                     var activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
