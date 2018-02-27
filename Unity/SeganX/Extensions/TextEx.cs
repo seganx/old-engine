@@ -50,7 +50,7 @@ public static class TextEx
             return self;
         }
 
-        text = PersianTextShaper.PersianTextShaper.ShapeText(text.Replace('ي', 'ی'));
+        text = PersianTextShaper.PersianTextShaper.ShapeText(text.Replace('ي', 'ی').Replace("‌", ""));
 
         TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
         TextGenerator generator = self.cachedTextGenerator;
@@ -63,6 +63,7 @@ public static class TextEx
         return self;
     }
 
+#if OFF
     public static float GetTextHeight(this Text self, string text)
     {
         if (text.IsNullOrEmpty())
@@ -70,11 +71,12 @@ public static class TextEx
             self.text = text;
             return 0;
         }
-
-        TextGenerationSettings settings = self.GetGenerationSettings(new Vector2(self.rectTransform.rect.width, self.rectTransform.rect.height));
-        TextGenerator generator = self.cachedTextGenerator;
-        return generator.GetPreferredHeight(text, settings) / settings.scaleFactor;
+        return self.preferredHeight;
+        //TextGenerationSettings settings = self.GetGenerationSettings(new Vector2(self.rectTransform.rect.width, self.rectTransform.rect.height));
+        //TextGenerator generator = self.cachedTextGenerator;
+        //return generator.GetPreferredHeight(text, settings) / settings.scaleFactor;
     }
+#endif
 
     public static Text FitAlignment(this Text self, bool rtl)
     {

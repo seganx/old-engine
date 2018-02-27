@@ -105,8 +105,8 @@ namespace SeganX.Console
                 lastText.repeated++;
                 if (lastText.visual)
                 {
-                    lastText.height = lastText.visual.GetTextHeight(lastText.visualText);
                     lastText.visual.text = lastText.visualText;
+                    lastText.height = lastText.visual.preferredHeight;// GetTextHeight(lastText.visualText);
                 }
             }
             else
@@ -144,7 +144,7 @@ namespace SeganX.Console
             var result = new LogText();
             result.text = str;
             result.color = color;
-            result.height = visual.GetTextHeight(str);
+            result.height = visual.preferredHeight;//.GetTextHeight(str);
             return result;
         }
 
