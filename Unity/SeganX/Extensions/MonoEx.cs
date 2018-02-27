@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine;
 
 public static class MonoEx
 {
@@ -208,8 +208,14 @@ public static class MonoEx
 
     public static string CleanForPersian(this string self)
     {
-        return self.Replace('ي', 'ی').Replace("‌", "");
+        return self.Replace('ي', 'ی');
     }
+
+    public static string Persian(this string self)
+    {
+        return PersianTextShaper.PersianTextShaper.ShapeText(CleanForPersian(self)).Replace("‌", "").Replace("‌", "");
+    }
+
     #endregion
 
     #region arrays

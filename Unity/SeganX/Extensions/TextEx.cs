@@ -50,7 +50,7 @@ public static class TextEx
             return self;
         }
 
-        text = PersianTextShaper.PersianTextShaper.ShapeText(text.Replace('ي', 'ی').Replace("‌", ""));
+        text = PersianTextShaper.PersianTextShaper.ShapeText(text.Replace('ي', 'ی')).Replace("‌", "").Replace("‌", "");
 
         TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
         TextGenerator generator = self.cachedTextGenerator;
