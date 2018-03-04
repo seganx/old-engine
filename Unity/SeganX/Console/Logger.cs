@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SeganX.Console
 {
-    public class Console_Log : MonoBehaviour
+    public class Logger : MonoBehaviour
     {
         public class LogText
         {
@@ -39,6 +39,7 @@ namespace SeganX.Console
             textVisual = scroll.content.GetChild<Text>(0);
             textVisual.text = "";
             GetComponent<Canvas>().enabled = true;
+            gameObject.SetActive(enable = false);
             
             Application.logMessageReceivedThreaded += HandleLog;
         }
@@ -160,12 +161,13 @@ namespace SeganX.Console
         /////////////////////////////////////////////////////////////////////////////
         //  STATICS
         /////////////////////////////////////////////////////////////////////////////
-        private static Console_Log instance = null;
+        private static Logger instance = null;
+        private static bool enable = false;
 
         public static bool Enabled
         {
-            get { return instance.gameObject.activeInHierarchy; }
-            set { instance.gameObject.SetActive(value); }
+            get { return enable; }
+            set { instance.gameObject.SetActive(enable = value); }
         }
 
         private static float ComputeHeight(List<LogText> list)
