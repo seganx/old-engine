@@ -25,6 +25,7 @@ namespace SeganX.Console
 
         private Text textVisual = null;
         private List<LogText> textList = new List<LogText>();
+        private volatile List<KeyValuePair<string, Color>> threadedList = new List<KeyValuePair<string, Color>>();
 
         void Awake()
         {
@@ -38,11 +39,8 @@ namespace SeganX.Console
             textVisual = scroll.content.GetChild<Text>(0);
             textVisual.text = "";
             GetComponent<Canvas>().enabled = true;
-            //gameObject.SetActive(false);
-
-
+            
             Application.logMessageReceivedThreaded += HandleLog;
-            AddToLog("Start Version " + Application.version + " on " + Core.DeviceId + " based on " + Core.BaseDeviceId, Color.green);
         }
 
         void OnEnable()
@@ -80,13 +78,23 @@ namespace SeganX.Console
         {
             if (!Enabled || condition.IsNullOrEmpty() || condition.Length < 5) return;
 
-            switch (type)
+            lock (threadedList)
             {
-                case LogType.Assert:
-                case LogType.Warning: AddToLog(condition + "\n" + stacktrace, Color.yellow); break;
-                case LogType.Error:
-                case LogType.Exception: AddToLog(condition + "\n" + stacktrace, Color.red); break;
-                default: AddToLog(condition, Color.white); break;
+                switch (type)
+                {
+                    case LogType.Assert:
+                    case LogType.Warning:
+                        threadedList.Add(new KeyValuePair<string, Color>(condition + "\n" + stacktrace, Color.yellow));
+                        break;
+
+                    case LogType.Error:
+                    case LogType.Exception:
+                        threadedList.Add(new KeyValuePair<string, Color>(condition + "\n" + stacktrace, Color.red));
+                        break;
+
+                    default: threadedList.Add(new KeyValuePair<string, Color>(condition, Color.white));
+                        break;
+                }
             }
         }
 
@@ -106,12 +114,15 @@ namespace SeganX.Console
                 if (lastText.visual)
                 {
                     lastText.visual.text = lastText.visualText;
-                    lastText.height = lastText.visual.preferredHeight;// GetTextHeight(lastText.visualText);
+                    lastText.height = textVisual.GetTextHeight(lastText.visualText);
                 }
             }
             else
             {
-                var logtext = CreateLogText(textVisual, str, color);
+                var logtext = new LogText();
+                logtext.text = str;
+                logtext.color = color;
+                logtext.height = textVisual.GetTextHeight(str);
                 textList.Add(logtext);
                 scroll.content.SetAnchordHeight(ComputeHeight(textList));
             }
@@ -127,6 +138,24 @@ namespace SeganX.Console
             scroll.content.SetAnchordPositionY(0);
         }
 
+        private void Start()
+        {
+            AddToLog("Start Version " + Application.version + " on " + Core.DeviceId + " based on " + Core.BaseDeviceId, Color.green);
+        }
+
+        private void Update()
+        {
+            lock (threadedList)
+            {
+                if (threadedList.Count > 0)
+                {
+                    var item = threadedList[0];
+                    threadedList.RemoveAt(0);
+                    AddToLog(item.Key, item.Value);
+                }
+            }
+        }
+
 
         /////////////////////////////////////////////////////////////////////////////
         //  STATICS
@@ -137,15 +166,6 @@ namespace SeganX.Console
         {
             get { return instance.gameObject.activeInHierarchy; }
             set { instance.gameObject.SetActive(value); }
-        }
-
-        private static LogText CreateLogText(Text visual, string str, Color color)
-        {
-            var result = new LogText();
-            result.text = str;
-            result.color = color;
-            result.height = visual.preferredHeight;//.GetTextHeight(str);
-            return result;
         }
 
         private static float ComputeHeight(List<LogText> list)

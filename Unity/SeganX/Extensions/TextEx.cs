@@ -63,7 +63,6 @@ public static class TextEx
         return self;
     }
 
-#if OFF
     public static float GetTextHeight(this Text self, string text)
     {
         if (text.IsNullOrEmpty())
@@ -71,12 +70,11 @@ public static class TextEx
             self.text = text;
             return 0;
         }
-        return self.preferredHeight;
-        //TextGenerationSettings settings = self.GetGenerationSettings(new Vector2(self.rectTransform.rect.width, self.rectTransform.rect.height));
-        //TextGenerator generator = self.cachedTextGenerator;
-        //return generator.GetPreferredHeight(text, settings) / settings.scaleFactor;
+
+        TextGenerationSettings settings = self.GetGenerationSettings(new Vector2(self.rectTransform.rect.width, self.rectTransform.rect.height));
+        TextGenerator generator = self.cachedTextGenerator;
+        return generator.GetPreferredHeight(text, settings) / settings.scaleFactor;
     }
-#endif
 
     public static Text FitAlignment(this Text self, bool rtl)
     {
