@@ -10,11 +10,10 @@ namespace SeganX
         [SpritePreview(50)]
         public Sprite preview = null;
 
+
         public void GenerateId(object x)
         {
-            var ws = new WWW("locator.8khan.ir/Tests/Sajad/1.1/config.json");
-            while (ws.isDone == false) ;
-            Debug.Log(ws.text);
+            id = AssetIdGenerator.GenerateId();
         }
     }
 }

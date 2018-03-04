@@ -1,6 +1,8 @@
-﻿#if UNITY_EDITOR
+﻿using UnityEngine;
+
+#if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine;
+#endif
 
 namespace SeganX
 {
@@ -14,6 +16,7 @@ namespace SeganX
         }
     }
 
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(SpritePreviewAttribute))]
     public class SpritePreviewAttributeDrawer : PropertyDrawer
     {
@@ -95,5 +98,5 @@ namespace SeganX
             GUI.DrawTextureWithTexCoords(position, sprite.texture, coords);
         }
     }
-}
 #endif
+}

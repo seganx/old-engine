@@ -1,11 +1,14 @@
-﻿#if UNITY_EDITOR
+﻿using UnityEngine;
+
+#if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine;
+#endif
 
 namespace SeganX
 {
     public class EnumFlagAttribute : PropertyAttribute { }
 
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(EnumFlagAttribute))]
     public class EnumFlagsAttributeDrawer : PropertyDrawer
     {
@@ -67,5 +70,5 @@ namespace SeganX
             return GUI.skin.label.CalcSize(new GUIContent(label)).x + 10;
         }
     }
-}
 #endif
+}

@@ -7,10 +7,14 @@ namespace SeganX
     [CreateAssetMenu(menuName = "Game/AssetData")]
     public class AssetData : ScriptableObject
     {
-        public int version = 1;
+        [HideInInspector]
+        public string uri = "";
+        [InspectorButton(100, "Generate Id", "GenerateId")]
+        public int id = 0;
         public string type = "";
         public string tags = "";
         public List<AssetItem> prefabs = new List<AssetItem>();
+
 
         public bool HasTag(string[] taglist)
         {
@@ -20,6 +24,10 @@ namespace SeganX
             return false;
         }
 
+        public void GenerateId(object sender)
+        {
+            id = AssetIdGenerator.GenerateId(); 
+        }
 
 
         ////////////////////////////////////////////////////////////
@@ -40,9 +48,11 @@ namespace SeganX
             return res;
         }
 
-        public static AssetData LoadEncrypted(byte[] src)
+        public static AssetData LoadEncrypted(string uri, byte[] src)
         {
             var data = CryptoService.DecryptWithMac(src, Core.CryptoKey, Core.Salt);
+            if (data == null) return null;
+
             var bundle = AssetBundle.LoadFromMemory(data);
             if (bundle == null) return null;
 
@@ -54,19 +64,11 @@ namespace SeganX
                 {
                     all.Remove(asset);
                     all.Add(asset);
+                    asset.uri = uri;
                     return asset;
                 }
             }
             return null;
-        }
-
-        public static List<KeyValuePair<int, string>> LoadList(XmlReader reader)
-        {
-            var res = new List<KeyValuePair<int, string>>();
-            while (reader.Read())
-                if (reader.NodeType == XmlNodeType.Element && reader.Name == "bundle")
-                    res.Add(new KeyValuePair<int, string>(reader.GetAttribute("version").ToInt(0), reader.GetAttribute("link")));
-            return res;
         }
     }
 }

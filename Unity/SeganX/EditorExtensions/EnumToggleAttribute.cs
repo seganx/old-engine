@@ -1,11 +1,14 @@
-﻿#if UNITY_EDITOR
+﻿using UnityEngine;
+
+#if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine;
+#endif
 
 namespace SeganX
 {
     public class EnumToggleAttribute : PropertyAttribute { }
 
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(EnumToggleAttribute))]
     public class EnumToggleAttributeDrawer : PropertyDrawer
     {
@@ -55,6 +58,6 @@ namespace SeganX
             return GUI.skin.label.CalcSize(new GUIContent(label)).x + 10;
         }
     }
-}
 #endif
+}
 

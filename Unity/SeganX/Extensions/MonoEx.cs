@@ -114,6 +114,16 @@ public static class MonoEx
         else return defaultValue;
     }
 
+    public static uint ToUint(this string self, uint defaultValue = 0)
+    {
+        if (string.IsNullOrEmpty(self))
+            return defaultValue;
+        uint res = 0;
+        if (uint.TryParse(self, out res))
+            return res;
+        else return defaultValue;
+    }
+
     public static float ToFloat(this string self, float defaultValue = 0)
     {
         if (string.IsNullOrEmpty(self))

@@ -1,7 +1,9 @@
-#if UNITY_EDITOR
 using UnityEngine;
+
+#if UNITY_EDITOR
 using UnityEditor;
 using System.Reflection;
+#endif
 
 namespace SeganX
 {
@@ -38,6 +40,7 @@ namespace SeganX
         }
     }
 
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(InspectorButtonAttribute))]
     public class InspectorButtonPropertyDrawer : PropertyDrawer
     {
@@ -71,5 +74,5 @@ namespace SeganX
             EditorGUI.PropertyField(position, prop);
         }
     }
-}
 #endif
+}
