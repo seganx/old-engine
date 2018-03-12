@@ -7,6 +7,18 @@ using System.IO;
 
 public static class TransformEx
 {
+    public static Vector2 Scale(this Vector2 self, float x, float y)
+    {
+        self.x *= x; self.y *= y;
+        return self;
+    }
+
+    public static Vector3 Scale(this Vector3 self, float x, float y, float z)
+    {
+        self.x *= x; self.y *= y; self.z *= z;
+        return self;
+    }
+
     public static Transform CopyValuesFrom(this Transform self, Transform source)
     {
         self.localScale = source.localScale;
