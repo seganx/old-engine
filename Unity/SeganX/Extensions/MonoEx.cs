@@ -306,7 +306,7 @@ public static class MonoEx
 
     public static T RandomOne<T>(this List<T> self)
     {
-        return (self != null && self.Count > 1) ? self[Random.Range(0, int.MaxValue) % self.Count] : default(T);
+        return (self != null && self.Count > 0) ? self[Random.Range(0, int.MaxValue) % self.Count] : default(T);
     }
     #endregion
 
