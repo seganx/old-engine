@@ -212,18 +212,24 @@ public static class MonoEx
 
     public static int GetBreakCount(this string self)
     {
+        if (self == null) return 0;
         var lines = self.Split('\n');
         return lines.Length;
     }
 
+    public static string CleanFromCode(this string self)
+    {
+        return (self == null) ? null : self.Replace('"', '\'');
+    }
+
     public static string CleanForPersian(this string self)
     {
-        return self.Replace('ي', 'ی');
+        return (self == null) ? null : self.Replace('ي', 'ی');
     }
 
     public static string Persian(this string self)
     {
-        return PersianTextShaper.PersianTextShaper.ShapeText(CleanForPersian(self)).Replace("‌", "").Replace("‌", "");
+        return (self == null) ? null : PersianTextShaper.PersianTextShaper.ShapeText(CleanForPersian(self)).Replace("‌", "").Replace("‌", "");
     }
 
     #endregion

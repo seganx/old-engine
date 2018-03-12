@@ -52,14 +52,22 @@ public static class TextEx
 
         text = PersianTextShaper.PersianTextShaper.ShapeText(text.Replace('ي', 'ی')).Replace("‌", "").Replace("‌", "");
 
-        TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
-        TextGenerator generator = self.cachedTextGenerator;
+        if (self.horizontalOverflow == HorizontalWrapMode.Wrap)
+        {
+            if (self.rectTransform.rect.width < 1)
+                Canvas.ForceUpdateCanvases();
 
-        var lines = text.Split('\n');
-        for (int i = 0; i < lines.Length; i++)
-            lines[i] = generator.WrapLine(lines[i], settings);
+            TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
+            TextGenerator generator = self.cachedTextGenerator;
 
-        self.text = string.Join("\n", lines);
+            var lines = text.Split('\n');
+            for (int i = 0; i < lines.Length; i++)
+                lines[i] = generator.WrapLine(lines[i], settings);
+
+            self.text = string.Join("\n", lines);
+        }
+        else self.text = text;
+
         return self;
     }
 
@@ -71,7 +79,10 @@ public static class TextEx
             return 0;
         }
 
-        TextGenerationSettings settings = self.GetGenerationSettings(new Vector2(self.rectTransform.rect.width, self.rectTransform.rect.height));
+        if (self.rectTransform.rect.width < 1)
+            Canvas.ForceUpdateCanvases();
+
+        TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
         TextGenerator generator = self.cachedTextGenerator;
         return generator.GetPreferredHeight(text, settings) / settings.scaleFactor;
     }

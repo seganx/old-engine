@@ -32,7 +32,6 @@ public class UIPersianInputField : Base
     public void OnInputTextChanged(string value)
     {
         var res = inputField.text.Trim().Replace('ي', 'ی');
-        inputText.SetTextAndWrap(res, true);
-        inputField.textComponent.FitAlignment(res.IsRtl());
+        inputText.SetTextAndWrap(res, autoAlignment);
     }
 }
