@@ -33,7 +33,7 @@ public static class TextEx
         return string.Join("\n", lines.ToArray());
     }
 
-    public static Text SetTextAndWrap(this Text self, string text, bool autoRtl = false)
+    public static Text SetTextAndWrap(this Text self, string text, bool autoRtl = false, bool forcePersian = false)
     {
         if (text.IsNullOrEmpty())
         {
@@ -44,7 +44,7 @@ public static class TextEx
         if (autoRtl)
             self.FitAlignment(text.IsRtl());
 
-        if (text.HasRtl() == false)
+        if (!forcePersian && !text.HasRtl())
         {
             self.text = text;
             return self;
