@@ -76,7 +76,7 @@ namespace SeganX
 
         public static int GetInt(string key, int defaultValue)
         {
-            return PlayerPrefs.GetInt(DecryptString(key), defaultValue);
+            return PlayerPrefs.GetInt(EncryptString(key), defaultValue);
         }
 
         public static void SetFloat(string key, float value)
@@ -86,7 +86,7 @@ namespace SeganX
 
         public static float GetFloat(string key, float defaultValue)
         {
-            return PlayerPrefs.GetFloat(DecryptString(key), defaultValue);
+            return PlayerPrefs.GetFloat(EncryptString(key), defaultValue);
         }
 
         public static void SetString(string key, string value)
@@ -96,7 +96,7 @@ namespace SeganX
 
         public static string GetString(string key, string defaultValue)
         {
-            var tmp = PlayerPrefs.GetString(DecryptString(key), defaultValue);
+            var tmp = PlayerPrefs.GetString(EncryptString(key), defaultValue);
             return tmp == defaultValue ? tmp : DecryptString(tmp);
         }
 
