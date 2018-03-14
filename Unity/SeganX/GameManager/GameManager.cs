@@ -17,6 +17,9 @@ namespace SeganX
         public GameState CurrentState { get { return currentState; } }
         public bool IsEmpty { get { return currentState == null && CurrentPopup == null && stateStack.Count < 1; } }
 
+        public System.Action<GameState> OnBackButton = null;
+        public System.Action<GameState> OnOpenState = null;
+
         public T OpenState<T>() where T : GameState
         {
             T state = Resources.Load<T>(prefabPath + typeof(T).Name);
@@ -37,6 +40,8 @@ namespace SeganX
             currentState = Instantiate<GameState>(state);
             currentState.name = state.name;
             AttachState(currentState);
+
+            OnOpenState(currentState);
 
             return currentState as T;
         }
@@ -65,6 +70,7 @@ namespace SeganX
             guiStack.Insert(0, res);
             Resources.UnloadUnusedAssets();
             AttachState(res);
+            OnOpenState(res);
             return res;
         }
 
@@ -105,6 +111,8 @@ namespace SeganX
 
         public GameManager BackButton()
         {
+            OnBackButton(guiStack.Count > 0 ? guiStack[0] : currentState);
+
             if (guiStack.Count > 0)
                 ClosePopup();
             else if (currentState != null)

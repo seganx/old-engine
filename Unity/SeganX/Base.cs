@@ -14,6 +14,11 @@ public class Base : MonoBehaviour
         Destroy(gameObject, delay);
     }
 
+    public void OnClick(string info)
+    {
+        Analytics.InGame_Tap(info);
+    }
+
     public void DestroyScript(float delay)
     {
         Destroy(this, delay);
