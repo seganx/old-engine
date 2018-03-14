@@ -12,6 +12,7 @@ namespace SeganX
         public bool UseDefaultTagFieldDrawer = false;
     }
 
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(TagSelectorAttribute))]
     public class TagSelectorPropertyDrawer : PropertyDrawer
     {
@@ -63,4 +64,5 @@ namespace SeganX
             }
         }
     }
+#endif
 }

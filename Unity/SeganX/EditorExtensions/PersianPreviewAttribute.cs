@@ -1,6 +1,8 @@
-﻿#if UNITY_EDITOR
+﻿using UnityEngine;
+
+#if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine;
+#endif
 
 namespace SeganX
 {
@@ -14,6 +16,7 @@ namespace SeganX
         }
     }
 
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(PersianPreviewAttribute))]
     public class PersianPreviewAttributeDrawer : PropertyDrawer
     {
@@ -47,5 +50,5 @@ namespace SeganX
             EditorGUI.LabelField(position, persianStr, style);
         }
     }
-}
 #endif
+}
