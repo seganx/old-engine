@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace SeganX
 {
-    public class LocalText : MonoBehaviour
+    public class LocalText : Base
     {
         public Text target = null;
         

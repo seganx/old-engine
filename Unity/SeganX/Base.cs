@@ -14,7 +14,7 @@ public class Base : MonoBehaviour
         Destroy(gameObject, delay);
     }
 
-    public void OnClick(string info)
+    public void OnAnalyticTap(string info)
     {
         Analytics.InGame_Tap(info);
     }
