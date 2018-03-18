@@ -17,8 +17,8 @@ namespace SeganX
         public GameState CurrentState { get { return currentState; } }
         public bool IsEmpty { get { return currentState == null && CurrentPopup == null && stateStack.Count < 1; } }
 
-        public System.Action<GameState> OnBackButton = null;
-        public System.Action<GameState> OnOpenState = null;
+        public System.Action<GameState> OnBackButton = new System.Action<GameState>(x => { });
+        public System.Action<GameState> OnOpenState = new System.Action<GameState>(x => { });
 
         public T OpenState<T>() where T : GameState
         {
@@ -148,7 +148,7 @@ namespace SeganX
         private void OnValidate()
         {
             var validPath = Application.dataPath + "/Resources/" + prefabPath;
-            if(System.IO.Directory.Exists(validPath) == false)
+            if (System.IO.Directory.Exists(validPath) == false)
             {
                 System.IO.Directory.CreateDirectory(validPath);
             }

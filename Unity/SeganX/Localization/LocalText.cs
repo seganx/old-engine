@@ -3,10 +3,11 @@ using UnityEngine.UI;
 
 namespace SeganX
 {
+    [ExecuteInEditMode]
     public class LocalText : Base
     {
         public Text target = null;
-        
+
         [TextArea(3, 100)]
         public string currnetText = "";
         public bool autoRtl = false;
@@ -37,6 +38,11 @@ namespace SeganX
         {
             if (target == null) target = transform.GetComponent<Text>(true, true);
             if (target) target.SetTextAndWrap(currnetText);
+        }
+
+        private void OnRectTransformDimensionsChange()
+        {
+            OnValidate();
         }
 #endif
     }
