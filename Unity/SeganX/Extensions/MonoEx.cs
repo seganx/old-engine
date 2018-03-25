@@ -99,6 +99,12 @@ public static class MonoEx
             return self.Replace("\\", "/");
     }
 
+    public static string ExcludeFileExtention(this string self)
+    {
+        var index = self.LastIndexOf('.');
+        return (index > 0) ? self.Remove(index, self.Length - index) : self;
+    }
+
     public static bool ToBoolean(this string self)
     {
         return self.ToLower() == "true";

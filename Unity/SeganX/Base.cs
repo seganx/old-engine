@@ -14,10 +14,12 @@ public class Base : MonoBehaviour
         Destroy(gameObject, delay);
     }
 
+#if OFF
     public void OnAnalyticTap(string info)
     {
         Analytics.InGame_Tap(info);
     }
+#endif
 
     public void DestroyScript(float delay)
     {

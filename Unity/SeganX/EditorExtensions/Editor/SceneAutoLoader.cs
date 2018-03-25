@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 
-namespace SeganX.Editor
+namespace SeganX
 {
 
     /// <summary>

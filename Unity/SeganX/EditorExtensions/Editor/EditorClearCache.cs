@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 
-namespace SeganX.Editor
+namespace SeganX
 {
     public class EditorCacheItems
     {

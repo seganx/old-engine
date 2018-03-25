@@ -149,9 +149,7 @@ namespace SeganX
         {
             var validPath = Application.dataPath + "/Resources/" + prefabPath;
             if (System.IO.Directory.Exists(validPath) == false)
-            {
                 System.IO.Directory.CreateDirectory(validPath);
-            }
         }
 
 #if UNITY_EDITOR && OFF

@@ -7,37 +7,45 @@ using System.Reflection;
 
 namespace SeganX
 {
-    [System.AttributeUsage(System.AttributeTargets.Field)]
     public class InspectorButtonAttribute : PropertyAttribute
     {
-        public readonly float ButtonWidth = 100;
-        public readonly string[] ButtonNames;
-        public readonly string[] MethodNames;
+        public readonly bool hideProperty = false;
+        public readonly float buttonWidth = 100;
+        public readonly string[] buttonNames;
+        public readonly string[] methodNames;
 
-        public InspectorButtonAttribute(float width, string buttonName, string methodName)
+        public InspectorButtonAttribute(float width, string buttonName, string methodName, bool hideProperty = false)
         {
-            ButtonWidth = width;
-            this.MethodNames = new string[1] { methodName };
-            this.ButtonNames = new string[1] { buttonName };
+            buttonWidth = width;
+            methodNames = new string[1] { methodName };
+            buttonNames = new string[1] { buttonName };
+            this.hideProperty = hideProperty;
         }
-        public InspectorButtonAttribute(float width, string buttonName1, string methodName1, string buttonName2, string methodName2)
+
+        public InspectorButtonAttribute(float width, string buttonName1, string methodName1, string buttonName2, string methodName2, bool hideProperty = false)
         {
-            ButtonWidth = width;
-            this.MethodNames = new string[2] { methodName1, methodName2 };
-            this.ButtonNames = new string[2] { buttonName1, buttonName2 };
+            buttonWidth = width;
+            methodNames = new string[2] { methodName1, methodName2 };
+            buttonNames = new string[2] { buttonName1, buttonName2 };
+            this.hideProperty = hideProperty;
         }
-        public InspectorButtonAttribute(float width, string buttonName1, string methodName1, string buttonName2, string methodName2, string buttonName3, string methodName3)
+
+        public InspectorButtonAttribute(float width, string buttonName1, string methodName1, string buttonName2, string methodName2, string buttonName3, string methodName3, bool hideProperty = false)
         {
-            ButtonWidth = width;
-            this.MethodNames = new string[3] { methodName1, methodName2, methodName3 };
-            this.ButtonNames = new string[3] { buttonName1, buttonName2, buttonName3 };
+            buttonWidth = width;
+            methodNames = new string[3] { methodName1, methodName2, methodName3 };
+            buttonNames = new string[3] { buttonName1, buttonName2, buttonName3 };
+            this.hideProperty = hideProperty;
         }
-        public InspectorButtonAttribute(float width, string buttonName1, string methodName1, string buttonName2, string methodName2, string buttonName3, string methodName3, string buttonName4, string methodName4)
+
+        public InspectorButtonAttribute(float width, string buttonName1, string methodName1, string buttonName2, string methodName2, string buttonName3, string methodName3, string buttonName4, string methodName4, bool hideProperty = false)
         {
-            ButtonWidth = width;
-            this.MethodNames = new string[4] { methodName1, methodName2, methodName3, methodName4 };
-            this.ButtonNames = new string[4] { buttonName1, buttonName2, buttonName3, buttonName4 };
+            buttonWidth = width;
+            methodNames = new string[4] { methodName1, methodName2, methodName3, methodName4 };
+            buttonNames = new string[4] { buttonName1, buttonName2, buttonName3, buttonName4 };
+            this.hideProperty = hideProperty;
         }
+
     }
 
 #if UNITY_EDITOR
@@ -54,24 +62,32 @@ namespace SeganX
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return base.GetPropertyHeight(property, label) * 2;
+            var attrib = attribute as InspectorButtonAttribute;
+            if (attrib.hideProperty)
+                return base.GetPropertyHeight(property, label);
+            else
+                return base.GetPropertyHeight(property, label) * 2;
         }
 
         public override void OnGUI(Rect position, SerializedProperty prop, GUIContent label)
         {
-            position.height /= 2;
-            InspectorButtonAttribute inspectorButtonAttribute = (InspectorButtonAttribute)attribute;
-            var n = inspectorButtonAttribute.MethodNames.Length - 1;
-            float xOffset = n < 1 ? 0 : (position.width - inspectorButtonAttribute.ButtonWidth) / n;
-            for (int i = 0; i < inspectorButtonAttribute.MethodNames.Length; i++)
+            var attrib = attribute as InspectorButtonAttribute;
+            if (attrib.hideProperty == false) position.height /= 2;
+
+            var n = attrib.methodNames.Length - 1;
+            float xOffset = n < 1 ? 0 : (position.width - attrib.buttonWidth) / n;
+            for (int i = 0; i < attrib.methodNames.Length; i++)
             {
-                Rect buttonRect = new Rect(position.x + xOffset * i, position.y, inspectorButtonAttribute.ButtonWidth, position.height);
-                if (GUI.Button(buttonRect, inspectorButtonAttribute.ButtonNames[i]))
-                    CallMethod(prop, inspectorButtonAttribute.MethodNames[i]);
+                Rect buttonRect = new Rect(position.x + xOffset * i, position.y, attrib.buttonWidth, position.height);
+                if (GUI.Button(buttonRect, attrib.buttonNames[i]))
+                    CallMethod(prop, attrib.methodNames[i]);
             }
 
-            position.y += position.height;
-            EditorGUI.PropertyField(position, prop);
+            if (attrib.hideProperty == false)
+            {
+                position.y += position.height;
+                EditorGUI.PropertyField(position, prop);
+            }
         }
     }
 #endif
