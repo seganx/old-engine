@@ -44,7 +44,7 @@ namespace SeganX
             position.height = baseHeight;
             EditorGUI.PropertyField(position, property);
 
-            var persianStr = PersianTextShaper.PersianTextShaper.ShapeText(property.stringValue.Replace('ي', 'ی'));
+            var persianStr = PersianTextShaper.PersianTextShaper.ShapeText(property.stringValue.CleanFromCode().CleanForPersian());
             position.y += baseHeight;
             position.height = previewHeight;
             EditorGUI.LabelField(position, persianStr, style);

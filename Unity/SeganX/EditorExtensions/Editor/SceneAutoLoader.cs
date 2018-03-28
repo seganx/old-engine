@@ -45,6 +45,7 @@ namespace SeganX
         {
             return !LoadMasterOnPlay;
         }
+
         [MenuItem("SeganX/Scene Autoload/Load Master On Play")]
         private static void EnableLoadMasterOnPlay()
         {
@@ -56,6 +57,7 @@ namespace SeganX
         {
             return LoadMasterOnPlay;
         }
+
         [MenuItem("SeganX/Scene Autoload/Don't Load Master On Play")]
         private static void DisableLoadMasterOnPlay()
         {

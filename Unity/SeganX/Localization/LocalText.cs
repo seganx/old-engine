@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 namespace SeganX
 {
@@ -7,23 +8,17 @@ namespace SeganX
     [RequireComponent(typeof(Text))]
     public class LocalText : Base
     {
-        [System.Serializable]
-        public class LocalKit
-        {
-            public int id = 0;
-            public Localization localization = null;
-            [InspectorButton(100, "Save Text", "OnSaveText", true)]
-            public int buttons = 0;
-        }
-        
         public Text target = null;
-
-        [TextArea(3, 100)]
-        public string currnetText = "";
         public bool autoRtl = false;
         public bool forcePersian = false;
+        public int stringId = 0;
 
-        public LocalKit localKit;
+#if UNITY_EDITOR
+        [TextArea(3, 100)]
+        public string currnetText = "";
+#else
+        private string currnetText = "";
+#endif
 
         public void SetText(string text)
         {
@@ -52,38 +47,31 @@ namespace SeganX
             target.SetTextAndWrap(string.Format(currnetText, arg0, arg1, arg2, arg3), autoRtl, forcePersian);
         }
 
-#if UNITY_EDITOR
-        public void LoadTextFromlocalization()
+        public void Awake()
         {
-            if (localKit.id > 0)
+            if (stringId > 0)
             {
-                currnetText = localKit.localization.Get(localKit.id);
-                target.SetTextAndWrap(currnetText);
+                currnetText = LocalizationService.Get(stringId);
+                target.SetTextAndWrap(currnetText, autoRtl, forcePersian);
             }
         }
 
-        public void OnSaveText(object sender)
+#if UNITY_EDITOR
+        public void OnNewText(object sender)
         {
-            if (localKit.localization)
-            {
-                localKit.id = localKit.localization.UpdateString(localKit.id, currnetText);
-                localKit.localization.Save();
-            }
+            stringId = LocalizationService.UpdateString(stringId, currnetText);
         }
 
         private void OnValidate()
         {
             if (target == null) target = transform.GetComponent<Text>(true, true);
-
-
-
-            target.SetTextAndWrap(currnetText);
+            target.SetTextAndWrap(currnetText, autoRtl, forcePersian);
         }
 
         private void OnRectTransformDimensionsChange()
         {
             if (UnityEditor.EditorApplication.isPlaying == false)
-                target.SetTextAndWrap(currnetText);
+                target.SetTextAndWrap(currnetText, autoRtl, forcePersian);
         }
 #endif
 

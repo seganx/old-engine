@@ -98,6 +98,7 @@ public static class TextEx
             case TextAnchor.LowerLeft: if (rtl) self.alignment = TextAnchor.LowerRight; break;
             case TextAnchor.LowerRight: if (!rtl) self.alignment = TextAnchor.LowerLeft; break;
         }
+
         return self;
     }
 }
