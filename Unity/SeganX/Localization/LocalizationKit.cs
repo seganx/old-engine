@@ -49,6 +49,8 @@ namespace SeganX
             var res = new LocalKitData.LocalStrings() { i = LocalizationService.Instance.baseId++, s = text };
             if (text == null) res.s = res.i.ToString();
             kit.strings.Add(res);
+            UnityEditor.EditorUtility.SetDirty(this);
+            UnityEditor.AssetDatabase.SaveAssets();
             return res.i;
         }
 
@@ -59,6 +61,8 @@ namespace SeganX
             {
                 res = new LocalKitData.LocalStrings() { i = LocalizationService.Instance.baseId++, s = text };
                 kit.strings.Add(res);
+                UnityEditor.EditorUtility.SetDirty(this);
+                UnityEditor.AssetDatabase.SaveAssets();
             }
             else res.s = text;
             return res.i;

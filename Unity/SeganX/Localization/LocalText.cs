@@ -6,6 +6,7 @@ namespace SeganX
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(Text))]
+    [AddComponentMenu("UI/SeganX/LocalText")]
     public class LocalText : Base
     {
         public Text target = null;
@@ -57,11 +58,6 @@ namespace SeganX
         }
 
 #if UNITY_EDITOR
-        public void OnNewText(object sender)
-        {
-            stringId = LocalizationService.UpdateString(stringId, currnetText);
-        }
-
         private void OnValidate()
         {
             if (target == null) target = transform.GetComponent<Text>(true, true);

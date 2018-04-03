@@ -32,6 +32,7 @@ namespace SeganX
         {
             var local = target as LocalizationKit;
             DrawKitItems(local);
+            EditorUtility.SetDirty(local);
         }
 
         public static void DrawKitItems(LocalizationKit localKit)

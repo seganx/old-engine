@@ -40,7 +40,7 @@ namespace SeganX
             {
                 local.currnetText = curText.CleanFromCode().CleanForPersian();
                 if (local.stringId > 0)
-                    local.stringId = LocalizationService.UpdateString(stringId, local.currnetText);
+                    local.stringId = LocalizationService.UpdateString(local.stringId, local.currnetText);
             }
 
             rect = EditorGUILayout.GetControlRect();
@@ -56,7 +56,7 @@ namespace SeganX
 
                 rect.x = EditorGUIUtility.currentViewWidth - 108;
                 if (GUI.Button(rect, "New Text"))
-                    local.OnNewText(null);
+                    local.stringId = LocalizationService.UpdateString(0, local.currnetText);
             }
 
             if (isSettingId)
