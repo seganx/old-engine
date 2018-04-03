@@ -54,8 +54,13 @@ public static class TextEx
 
         if (self.horizontalOverflow == HorizontalWrapMode.Wrap)
         {
+#if UNITY_EDITOR
+            if (UnityEditor.EditorApplication.isPlaying && self.rectTransform.rect.width < 1)
+                Canvas.ForceUpdateCanvases();
+#else
             if (self.rectTransform.rect.width < 1)
                 Canvas.ForceUpdateCanvases();
+#endif
 
             TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
             TextGenerator generator = self.cachedTextGenerator;
