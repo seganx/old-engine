@@ -42,6 +42,22 @@ namespace SeganX
 
             if (GUILayout.Button("Add new string"))
                 filter = localKit.AddString(null).ToString();
+            if (GUILayout.Button("Export"))
+            {
+                var filename = EditorUtility.SaveFilePanel("Save exported data", null, localKit.name, "json");
+                if (filename.HasContent(4))
+                {
+                    System.IO.File.WriteAllText(filename, JsonUtility.ToJson(localKit.kit, true), System.Text.Encoding.UTF8);
+                }
+            }
+            if (GUILayout.Button("Import"))
+            {
+                var filename = EditorUtility.OpenFilePanelWithFilters("Open json to import", null, new string[] { "Json File", "json" });
+                if (filename.HasContent(4))
+                {
+                    localKit.kit = JsonUtility.FromJson<LocalizationKit.LocalKitData>(System.IO.File.ReadAllText(filename));
+                }
+            }
 
             EditorGUIUtility.labelWidth = 60;
             EditorGUILayout.LabelField("Number of strings: " + localKit.kit.strings.Count);

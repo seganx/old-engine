@@ -14,7 +14,7 @@ public class Base : MonoBehaviour
         Destroy(gameObject, delay);
     }
 
-#if OFF
+#if ANALYTICS
     public void OnAnalyticTap(string info)
     {
         Analytics.InGame_Tap(info);

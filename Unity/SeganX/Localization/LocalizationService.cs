@@ -11,8 +11,12 @@ namespace SeganX
         public int baseId = 111000;
         public LocalizationKit currentKit = null;
 
-#if UNITY_EDITOR
         private void OnEnable()
+        {
+            instance = this;
+        }
+
+        private void Awake()
         {
             instance = this;
         }
@@ -22,24 +26,19 @@ namespace SeganX
         ////////////////////////////////////////////////////////////
         public static List<LocalizationKit> kits = new List<LocalizationKit>();
         private static LocalizationService instance = null;
-        public static LocalizationService Instance { get { CheckService(); return instance; } }
 
-        public static void CheckService()
+
+        public static LocalizationService Instance
         {
-            var path = "/Resources/Localization/";
-            var fileName = path + "LocalizationService.asset";
-            if (File.Exists(Application.dataPath + fileName)) return;
-
-            var ioPath = Application.dataPath + path;
-            if (!Directory.Exists(ioPath)) Directory.CreateDirectory(ioPath);
-
-            instance = ScriptableObject.CreateInstance<LocalizationService>();
-            UnityEditor.AssetDatabase.CreateAsset(instance, "Assets" + fileName);
-
-            instance.currentKit = ScriptableObject.CreateInstance<LocalizationKit>();
-            UnityEditor.AssetDatabase.CreateAsset(instance.currentKit, "Assets" + path + "LocKit_fa.asset");
-
-            UnityEditor.AssetDatabase.SaveAssets();
+            get
+            {
+#if UNITY_EDITOR
+                CheckService();
+#endif
+                if (instance == null)
+                    instance = Resources.Load<LocalizationService>("Localization/LocalizationService");
+                return instance;
+            }
         }
 
         public static string Get(int id)
@@ -56,6 +55,25 @@ namespace SeganX
                 return Instance.currentKit.UpdateString(id, text);
             else
                 return id;
+        }
+
+#if UNITY_EDITOR
+        public static void CheckService()
+        {
+            var path = "/Resources/Localization/";
+            var fileName = path + "LocalizationService.asset";
+            if (File.Exists(Application.dataPath + fileName)) return;
+
+            var ioPath = Application.dataPath + path;
+            if (!Directory.Exists(ioPath)) Directory.CreateDirectory(ioPath);
+
+            instance = ScriptableObject.CreateInstance<LocalizationService>();
+            UnityEditor.AssetDatabase.CreateAsset(instance, "Assets" + fileName);
+
+            instance.currentKit = ScriptableObject.CreateInstance<LocalizationKit>();
+            UnityEditor.AssetDatabase.CreateAsset(instance.currentKit, "Assets" + path + "LocKit_fa.asset");
+
+            UnityEditor.AssetDatabase.SaveAssets();
         }
 #endif
     }
