@@ -49,6 +49,7 @@ namespace SeganX
                 return id.ToString();
         }
 
+#if UNITY_EDITOR
         public static int UpdateString(int id, string text)
         {
             if (Instance.currentKit)
@@ -57,7 +58,6 @@ namespace SeganX
                 return id;
         }
 
-#if UNITY_EDITOR
         public static void CheckService()
         {
             var path = "/Resources/Localization/";
