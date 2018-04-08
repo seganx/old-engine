@@ -13,7 +13,7 @@ namespace SeganX
 
         public void GenerateId(object x)
         {
-            id = AssetIdGenerator.GenerateId();
+            id = EditorOnlineData.GenerateAssetId();
         }
     }
 }

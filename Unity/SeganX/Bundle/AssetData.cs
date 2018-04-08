@@ -24,11 +24,12 @@ namespace SeganX
             return false;
         }
 
+#if UNITY_EDITOR
         public void GenerateId(object sender)
         {
-            id = AssetIdGenerator.GenerateId(); 
+            id = EditorOnlineData.GenerateAssetId();
         }
-
+#endif
 
         ////////////////////////////////////////////////////////////
         /// STATIC MEMBERS
