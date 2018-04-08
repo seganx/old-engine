@@ -41,6 +41,8 @@ namespace SeganX
             }
         }
 
+        public static bool IsEnglish { get { return Instance.currentKit.kit.language.Contains("en"); } }
+
         public static string Get(int id)
         {
             if (Instance.currentKit)
