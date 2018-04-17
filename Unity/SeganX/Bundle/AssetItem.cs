@@ -11,9 +11,12 @@ namespace SeganX
         public Sprite preview = null;
 
 
+#if UNITY_EDITOR
         public void GenerateId(object x)
         {
             id = EditorOnlineData.GenerateAssetId();
+            UnityEditor.EditorUtility.SetDirty(this);
         }
+#endif
     }
 }

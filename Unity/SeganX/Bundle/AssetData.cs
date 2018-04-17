@@ -28,6 +28,7 @@ namespace SeganX
         public void GenerateId(object sender)
         {
             id = EditorOnlineData.GenerateAssetId();
+            UnityEditor.EditorUtility.SetDirty(this);
         }
 #endif
 
