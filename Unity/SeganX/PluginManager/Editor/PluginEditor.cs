@@ -9,9 +9,6 @@ public class PluginEditor : Editor
 {
     private const float buttonWidth = 120;
 
-    private bool isSettingPath = false;
-    private string folder = "";
-
     private GUIStyle style = null;
 
     public GUIStyle textStyle
@@ -30,16 +27,27 @@ public class PluginEditor : Editor
         var rect = EditorGUILayout.GetControlRect();
         float width = rect.width;
 
-        var title = plugin.activated ? "Activated " : "Deactivated ";
-        title += plugin.files.Count + " files ";
-        if (plugin.folder.Length > 2) title += "from " + Path.GetFileName(plugin.folder);
+        if (plugin.folder.Length > 2)
+        {
+            EditorGUI.LabelField(rect, "Source folder: " + Path.GetFileName(plugin.folder));
 
-        EditorGUI.LabelField(rect, title);
-        rect.width = buttonWidth;
-        rect.x = width - rect.width;
-        if (Directory.Exists(plugin.folder) && GUI.Button(rect, "Reveal in explorer"))
-            EditorUtility.RevealInFinder(plugin.folder);
+            rect.width = buttonWidth;
+            rect.x = width - rect.width;
+            if (Directory.Exists(plugin.folder) && GUI.Button(rect, "Reveal in explorer"))
+                EditorUtility.RevealInFinder(plugin.folder);
 
+            EditorGUILayout.LabelField((plugin.activated ? "Activated " : "Deactivated ") + plugin.files.Count + " files ");
+        }
+        else
+        {
+            EditorGUI.LabelField(rect, "Source folder: NONE!");
+            EditorGUILayout.Space();
+            EditorGUILayout.HelpBox("Source folder is not valid!\nPlease set source folder in order to setup plugin.", MessageType.Error);
+            rect = EditorGUILayout.GetControlRect();
+            DisplaySetFolderButton(plugin, rect);
+            return;
+        }
+            
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Scripting Define Symbols");
         plugin.symbols = EditorGUILayout.TextArea(plugin.symbols, GUILayout.MinHeight(30));
@@ -50,51 +58,38 @@ public class PluginEditor : Editor
 
         EditorGUILayout.Space();
         rect = EditorGUILayout.GetControlRect();
+        rect.width = buttonWidth;
+        DisplaySetFolderButton(plugin, rect);
 
-        if (isSettingPath)
-        {
-            rect.width = buttonWidth;
-            if (GUI.Button(rect, "Apply"))
-            {
-                isSettingPath = false;
-                plugin.folder = ValidateFolder(folder);
-                OnSetFolder(plugin);
-            }
+        rect.x = width - rect.width;
+        if (GUI.Button(rect, "Update source files"))
+            OnUpdateSource(plugin);
 
-            folder = EditorGUILayout.TextArea(folder, textStyle, GUILayout.MinHeight(60));
-            if (Directory.Exists(ValidateFolder(folder)) == false)
-                EditorGUILayout.HelpBox("Directory does not exist!", MessageType.Error);
-        }
-        else
-        {
-            rect.width = buttonWidth;
-            if (GUI.Button(rect, "Set Folder"))
-            {
-                plugin.folder = EditorUtility.OpenFolderPanel("Select plugin folder", plugin.folder, plugin.folder);
-                //isSettingPath = true;
-                //folder = plugin.folder;
-            }
+        EditorGUILayout.Separator();
+        rect = EditorGUILayout.GetControlRect();
+        rect.width = buttonWidth;
+        if (GUI.Button(rect, "Activate"))
+            OnActivate(plugin);
 
-            rect.x = width - rect.width;
-            if (GUI.Button(rect, "Update source files"))
-            {
-                OnUpdateSource(plugin);
-            }
-
-            EditorGUILayout.Separator();
-            rect = EditorGUILayout.GetControlRect();
-            rect.width = buttonWidth;
-            if (GUI.Button(rect, "Activate"))
-                OnActivate(plugin);
-
-            rect.x = width - rect.width;
-            if (GUI.Button(rect, "Dectivate"))
-                OnDeactivate(plugin);
-        }
+        rect.x = width - rect.width;
+        if (GUI.Button(rect, "Dectivate"))
+            OnDeactivate(plugin);
 
         EditorUtility.SetDirty(target);
     }
 
+    private void DisplaySetFolderButton(Plugin plugin, Rect rect)
+    {
+        if (GUI.Button(rect, "Set Folder"))
+        {
+            var folder = EditorUtility.OpenFolderPanel("Select plugin folder", plugin.folder, null);
+            if (folder.HasContent(4))
+            {
+                plugin.folder = ValidateFolder(folder);
+                OnSetFolder(plugin);
+            }
+        }
+    }
 
     private static string ValidateFolder(string folder)
     {
