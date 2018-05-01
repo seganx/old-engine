@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using SeganX;
 
 public class Base : MonoBehaviour
@@ -66,15 +67,28 @@ public class Base : MonoBehaviour
         callback(res);
     }
 
-    public void Download(string url, System.Action<WWW> callback)
+    public void Download(string url, byte[] postData, Dictionary<string, string> header, System.Action<WWW> callback)
     {
-        StartCoroutine(DoDownload(url, callback));
+        StartCoroutine(DoDownload(url, postData, header, callback));
     }
 
-    IEnumerator DoDownload(string url, System.Action<WWW> callback)
+    IEnumerator DoDownload(string url, byte[] postData, Dictionary<string, string> header, System.Action<WWW> callback)
     {
-        Debug.Log("Downloading from " + url);
-        var res = new WWW(url);
+        Debug.Log("Getting data from " + url);
+
+        WWW res = null;
+        if (postData != null)
+        {
+            if (header == null)
+                header = new Dictionary<string, string>();
+
+            if (header.ContainsKey("Content-Type") == false)
+                header.Add("Content-Type", "application/json");
+
+            res = new WWW(url, postData, header);
+        }
+        else res = new WWW(url);
+
         yield return res;
         Debug.Log("Received bytes: " + res.bytesDownloaded);
         callback(res);
