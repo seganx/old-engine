@@ -77,7 +77,7 @@ public class Base : MonoBehaviour
         Debug.Log("Getting data from " + url);
 
         WWW res = null;
-        if (postData != null)
+        if (postData != null || header != null)
         {
             if (header == null)
                 header = new Dictionary<string, string>();
