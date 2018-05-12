@@ -53,16 +53,17 @@ public class Base : MonoBehaviour
         var res = new WWW(path);
         yield return res;
 
-        if (res.error.HasContent())
+        if(res.error.HasContent())
         {
             Debug.Log("Failed to download from cache!\nDownloading from " + url);
             res = new WWW(url);
             yield return res;
             Debug.Log("Received bytes: " + res.bytesDownloaded);
-            if (res.error.IsNullOrEmpty() && res.bytes.Length > 0)
+            if(res.error.IsNullOrEmpty() && res.bytes.Length > 0)
                 PlayerPrefsEx.SaveData(filename, res.bytes);
         }
-        else Debug.Log("Loaded " + res.bytesDownloaded + " from cache");
+        else
+            Debug.Log("Loaded " + res.bytesDownloaded + " from cache");
 
         callback(res);
     }
@@ -72,25 +73,36 @@ public class Base : MonoBehaviour
         StartCoroutine(DoDownload(url, postData, header, callback));
     }
 
-    IEnumerator DoDownload(string url, byte[] postData, Dictionary<string, string> header, System.Action<WWW> callback)
+
+    IEnumerator DoDownload(string url, byte[] postData, Dictionary<string, string> httpheader, System.Action<WWW> callback)
     {
-        Debug.Log("Getting data from " + url);
-
         WWW res = null;
-        if (postData != null || header != null)
+        if(postData != null || httpheader != null)
         {
-            if (header == null)
-                header = new Dictionary<string, string>();
+            if(httpheader == null)
+                httpheader = new Dictionary<string, string>();
 
-            if (header.ContainsKey("Content-Type") == false)
-                header.Add("Content-Type", "application/json");
+            if(httpheader.ContainsKey("Content-Type") == false)
+                httpheader.Add("Content-Type", "application/json");
 
-            res = new WWW(url, postData, header);
+            if(postData != null)
+                Debug.Log("Getting data from " + url + "\nHeader: " + httpheader.GetStringDebug() + "\nPostData:" + System.Text.Encoding.UTF8.GetString(postData));
+            else
+                Debug.Log("Getting data from " + url + "\nHeader: " + httpheader.GetStringDebug());
+
+            res = new WWW(url, postData, httpheader);
         }
-        else res = new WWW(url);
+        else
+        {
+            Debug.Log("Getting data from " + url);
+            res = new WWW(url);
+        }
 
         yield return res;
-        Debug.Log("Received bytes: " + res.bytesDownloaded);
+        if(res.text.HasContent())
+            Debug.Log("Received " + res.bytesDownloaded + " bytes from " + url + ":\n" + res.text);
+        else
+            Debug.Log("Received " + res.bytesDownloaded + " bytes from " + url);
         callback(res);
     }
 }

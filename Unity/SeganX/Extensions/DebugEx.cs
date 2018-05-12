@@ -30,11 +30,11 @@ public static class DebugEx
                 res += GetStringDebug(a, memberTypes, levels - 1) + " ";
             return (res.Length > 3 ? res.Remove(res.Length - 1) : res) + "}";
         }
-        else if (type.IsGenericType)
+        else if(type.IsGenericType && !type.IsValueType)
         {
             string res = "{";
             var arr = self as ICollection;
-            foreach (var a in arr)
+            foreach(var a in arr)
                 res += GetStringDebug(a, memberTypes, levels - 1) + " ";
             return (res.Length > 3 ? res.Remove(res.Length - 1) : res) + "}";
         }
