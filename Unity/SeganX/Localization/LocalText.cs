@@ -14,12 +14,8 @@ namespace SeganX
         public bool forcePersian = false;
         public int stringId = 0;
 
-#if UNITY_EDITOR
         [TextArea(3, 100)]
         public string currnetText = "";
-#else
-        private string currnetText = "";
-#endif
 
         public void SetText(string text)
         {
