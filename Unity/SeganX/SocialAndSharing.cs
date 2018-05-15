@@ -117,6 +117,13 @@ namespace SeganX
 #endif
         }
 
+        public static void ShareTextAndImage(string message, string title, string filename)
+        {
+#if UNITY_ANDROID
+            new IntentClass().SetText(message, title).SetImage(filename).Start();
+#endif
+        }
+
         public static void RateUs()
         {
 #if UNITY_ANDROID
