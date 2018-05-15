@@ -7,8 +7,6 @@ namespace SeganX
     [CreateAssetMenu(menuName = "Game/AssetData")]
     public class AssetData : ScriptableObject
     {
-        [HideInInspector]
-        public string uri = "";
         [InspectorButton(100, "Generate Id", "GenerateId")]
         public int id = 0;
         public string type = "";
@@ -50,7 +48,7 @@ namespace SeganX
             return res;
         }
 
-        public static AssetData LoadEncrypted(string uri, byte[] src)
+        public static AssetData LoadEncrypted(int id, byte[] src)
         {
             var data = CryptoService.DecryptWithMac(src, Core.CryptoKey, Core.Salt);
             if (data == null) return null;
@@ -66,7 +64,10 @@ namespace SeganX
                 {
                     all.Remove(asset);
                     all.Add(asset);
-                    asset.uri = uri;
+
+                    if (id > 0)
+                        asset.id = id;
+
                     return asset;
                 }
             }
