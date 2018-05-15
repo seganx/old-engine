@@ -78,7 +78,7 @@ namespace SeganX
                 iObject.Call<AndroidJavaObject>("setAction", iClass.GetStatic<string>("ACTION_SEND"));
                 AndroidJavaObject uriObject = uriClass.CallStatic<AndroidJavaObject>("parse", "file://" + imagePath);
                 iObject.Call<AndroidJavaObject>("putExtra", iClass.GetStatic<string>("EXTRA_STREAM"), uriObject);
-                iObject.Call<AndroidJavaObject>("setType", "image/png");
+                iObject.Call<AndroidJavaObject>("setType", "image/*");
                 return this;
             }
 
