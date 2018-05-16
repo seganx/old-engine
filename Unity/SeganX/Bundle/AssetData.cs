@@ -50,6 +50,12 @@ namespace SeganX
 
         public static AssetData LoadEncrypted(int id, byte[] src)
         {
+            //  search to see if the asset bundle is already loaded
+            {
+                var loadedOne = all.Find(x => x.id == id);
+                if (loadedOne != null) return loadedOne;
+            }
+
             var data = CryptoService.DecryptWithMac(src, Core.CryptoKey, Core.Salt);
             if (data == null) return null;
 
