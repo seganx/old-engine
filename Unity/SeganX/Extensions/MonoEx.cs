@@ -99,6 +99,13 @@ public static class MonoEx
             return self.Replace("\\", "/");
     }
 
+    public static string MakeRelative(this string self, string referencePath)
+    {
+        var fileUri = new System.Uri(self);
+        var referenceUri = new System.Uri(referencePath);
+        return referenceUri.MakeRelativeUri(fileUri).ToString();
+    }
+
     public static string ExcludeFileExtention(this string self)
     {
         var index = self.LastIndexOf('.');

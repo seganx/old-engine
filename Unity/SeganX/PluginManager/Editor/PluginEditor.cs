@@ -47,7 +47,7 @@ public class PluginEditor : Editor
             DisplaySetFolderButton(plugin, rect);
             return;
         }
-            
+
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Scripting Define Symbols");
         plugin.symbols = EditorGUILayout.TextArea(plugin.symbols, GUILayout.MinHeight(30));
@@ -97,9 +97,9 @@ public class PluginEditor : Editor
         if (folder.HasContent(3))
         {
             if (Directory.Exists(folder) && Path.GetFileName(folder).HasContent() == false)
-                return folder.Remove(folder.Length - 1);
+                return folder.Remove(folder.Length - 1).MakeRelative(Application.dataPath);
             else
-                return folder;
+                return folder.MakeRelative(Application.dataPath);
         }
         return "";
     }
