@@ -18,6 +18,7 @@ namespace SeganX
                 public override string ToString() { return i + ":" + s; }
             }
 
+            public int baseId = 111000;
             public string language = "fa persian farsi";
             public List<LocalStrings> strings = new List<LocalStrings>();
         }
@@ -35,18 +36,11 @@ namespace SeganX
         private void OnEnable()
         {
             LocalizationService.CheckService();
-            LocalizationService.kits.Remove(this);
-            LocalizationService.kits.Add(this);
-        }
-
-        private void OnDisable()
-        {
-            LocalizationService.kits.Remove(this);
         }
 
         public int AddString(string text)
         {
-            var res = new LocalKitData.LocalStrings() { i = LocalizationService.Instance.baseId++, s = text };
+            var res = new LocalKitData.LocalStrings() { i = kit.baseId++, s = text };
             if (text == null) res.s = res.i.ToString();
             kit.strings.Add(res);
             UnityEditor.EditorUtility.SetDirty(this);
@@ -59,7 +53,7 @@ namespace SeganX
             var res = kit.strings.Find(x => x.i == index);
             if (res == null)
             {
-                res = new LocalKitData.LocalStrings() { i = LocalizationService.Instance.baseId++, s = text };
+                res = new LocalKitData.LocalStrings() { i = kit.baseId++, s = text };
                 kit.strings.Add(res);
                 UnityEditor.EditorUtility.SetDirty(this);
                 UnityEditor.AssetDatabase.SaveAssets();

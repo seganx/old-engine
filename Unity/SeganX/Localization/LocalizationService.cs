@@ -8,7 +8,6 @@ namespace SeganX
 {
     public class LocalizationService : ScriptableObject
     {
-        public int baseId = 111000;
         public LocalizationKit currentKit = null;
 
         private void OnEnable()
@@ -24,9 +23,7 @@ namespace SeganX
         ////////////////////////////////////////////////////////////
         /// STATIC MEMBERS
         ////////////////////////////////////////////////////////////
-        public static List<LocalizationKit> kits = new List<LocalizationKit>();
         private static LocalizationService instance = null;
-
 
         public static LocalizationService Instance
         {

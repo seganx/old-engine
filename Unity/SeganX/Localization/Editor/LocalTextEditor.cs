@@ -28,10 +28,11 @@ namespace SeganX
             EditorGUILayout.Space();
 
             var rect = EditorGUILayout.GetControlRect();
+            var maxWidth = rect.width;
             rect.width = 100;
             EditorGUI.PrefixLabel(rect, new GUIContent(local.stringId > 0 ? "Text: " + local.stringId : "Text: unlinked"));
 
-            rect.x = EditorGUIUtility.currentViewWidth - 108;
+            rect.x = maxWidth - 100;
             local.autoRtl = GUI.Toggle(rect, local.autoRtl, "Auto RTL", "Button");
             rect.x -= 110;
             local.forcePersian = GUI.Toggle(rect, local.forcePersian, "Force Persian", "Button");
@@ -54,7 +55,7 @@ namespace SeganX
                     stringId = local.stringId;
                 }
 
-                rect.x = EditorGUIUtility.currentViewWidth - 108;
+                rect.x = maxWidth - 100;
                 if (GUI.Button(rect, "New Text"))
                     local.stringId = LocalizationService.UpdateString(0, local.currnetText);
             }
