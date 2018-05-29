@@ -19,11 +19,7 @@ namespace SeganX
                 {
                     var src = File.ReadAllBytes(path);
                     var data = CryptoService.EncryptWithMac(src, core.cryptokey.GetBytes(), core.salt);
-#if UNITY_STANDALONE_WIN
-                    File.WriteAllBytes(path + ".seganx.win", data);
-#else
                     File.WriteAllBytes(path + ".seganx", data);
-#endif
                 }
             }
             if (GUILayout.Button("Decrypt File"))
@@ -33,11 +29,7 @@ namespace SeganX
                 {
                     var src = File.ReadAllBytes(path);
                     var data = CryptoService.DecryptWithMac(src, core.cryptokey.GetBytes(), core.salt);
-#if UNITY_STANDALONE_WIN
-                    File.WriteAllBytes(path.Replace(".seganx.win", ""), data);
-#else
                     File.WriteAllBytes(path.Replace(".seganx", ""), data);
-#endif
                 }
             }
         }

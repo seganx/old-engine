@@ -39,12 +39,12 @@ public class Base : MonoBehaviour
         callback();
     }
 
-    public void LoadFromCacheOrDownload(string url, int version, System.Action<WWW> callback)
+    public void LoadFromCacheOrDownload(string url, int version, System.Action<WWW> callback, System.Action<float> onProgressCallback = null)
     {
-        StartCoroutine(DoLoadFromCacheOrDownload(url, version, callback));
+        StartCoroutine(DoLoadFromCacheOrDownload(url, version, callback, onProgressCallback));
     }
 
-    IEnumerator DoLoadFromCacheOrDownload(string url, int version, System.Action<WWW> callback)
+    IEnumerator DoLoadFromCacheOrDownload(string url, int version, System.Action<WWW> callback, System.Action<float> onProgressCallback = null)
     {
         var filename = url.ComputeMD5(Core.Salt + version) + ".seganx";
         var path = "file:///" + Application.persistentDataPath + "/" + filename;
@@ -57,13 +57,24 @@ public class Base : MonoBehaviour
         {
             Debug.Log("Failed to download from cache!\nDownloading from " + url);
             res = new WWW(url);
-            yield return res;
-            Debug.Log("Received bytes: " + res.bytesDownloaded);
-            if(res.error.IsNullOrEmpty() && res.bytes.Length > 0)
+            if (onProgressCallback != null)
+            {
+                while (res.keepWaiting)
+                {
+                    onProgressCallback(res.progress);
+                    yield return null;
+                }
+            }
+            else yield return res;
+            
+            if (res.error.IsNullOrEmpty() && res.bytes.Length > 0)
+            {
+                Debug.Log("Received bytes: " + res.bytesDownloaded);
                 PlayerPrefsEx.SaveData(filename, res.bytes);
+            }
+            else Debug.LogWarning("Failed to download from " + url);
         }
-        else
-            Debug.Log("Loaded " + res.bytesDownloaded + " from cache");
+        else Debug.Log("Loaded " + res.bytesDownloaded + " from cache");
 
         callback(res);
     }

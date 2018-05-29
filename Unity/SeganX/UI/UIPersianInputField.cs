@@ -14,6 +14,7 @@ public class UIPersianInputField : Base
         inputField = GetComponent<InputField>();
         inputText = inputField.textComponent.gameObject.Clone<Text>();
         inputField.textComponent.color = new Color(0, 0, 0, 0);
+        inputText.raycastTarget = false;
         if (inputField == null || inputText == null)
         {
             Debug.LogWarning("Can't find objects in " + name);
@@ -31,7 +32,7 @@ public class UIPersianInputField : Base
 
     public void OnInputTextChanged(string value)
     {
-        var res = inputField.text.Trim().Replace('ي', 'ی');
+        var res = inputField.text.Trim().CleanForPersian();
         inputText.SetTextAndWrap(res, autoAlignment);
     }
 }
