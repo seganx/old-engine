@@ -150,7 +150,7 @@ public class PluginEditor : Editor
                     }
                     catch (System.Exception e)
                     {
-                        Debug.LogError(e.Message);
+                        Debug.LogWarning(e.Message);
                     }
             }
             catch { }
@@ -182,7 +182,7 @@ public class PluginEditor : Editor
                         }
                         catch (System.Exception e)
                         {
-                            Debug.LogError(e.Message);
+                            Debug.LogWarning(e.Message);
                         }
                 }
                 else if (File.Exists(path))
@@ -194,7 +194,7 @@ public class PluginEditor : Editor
                     }
                     catch (System.Exception e)
                     {
-                        Debug.LogError(e.Message);
+                        Debug.LogWarning(e.Message);
                     }
             }
             catch { }
@@ -227,7 +227,7 @@ public class PluginEditor : Editor
                     }
                     catch (System.Exception e)
                     {
-                        Debug.LogError(e.Message);
+                        Debug.LogWarning(e.Message);
                     }
             }
             catch { }
