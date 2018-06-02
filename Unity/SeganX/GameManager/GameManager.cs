@@ -85,13 +85,16 @@ namespace SeganX
             return OpenPopup<T>(popup.gameObject);
         }
 
-        public int ClosePopup(GameState popup)
+        public bool ClosePopup(GameState popup)
         {
-            guiStack.Remove(popup);
-            var delay = popup.PreClose();
-            Destroy(popup.gameObject, delay);
-            DelayCall(delay + 0.1f, () => Resources.UnloadUnusedAssets());
-            return guiStack.Count;
+            if (popup != null && guiStack.Remove(popup))
+            {
+                var delay = popup.PreClose();
+                Destroy(popup.gameObject, delay);
+                DelayCall(delay + 0.1f, () => Resources.UnloadUnusedAssets());
+                return true;
+            }
+            return false;
         }
 
         //  close current popup window and return the remains opened popup
@@ -102,20 +105,11 @@ namespace SeganX
             return closeAll ? ClosePopup(closeAll) : guiStack.Count;
         }
 
-        public GameManager CloseAll()
+        public GameManager Back(GameState gameState)
         {
-            ClosePopup(true);
-            BackButton();
-            return this;
-        }
+            OnBackButton(gameState);
 
-        public GameManager BackButton()
-        {
-            OnBackButton(guiStack.Count > 0 ? guiStack[0] : currentState);
-
-            if (guiStack.Count > 0)
-                ClosePopup();
-            else if (currentState != null)
+            if (ClosePopup(gameState) == false && currentState != null)
                 CloseState();
             return this;
         }

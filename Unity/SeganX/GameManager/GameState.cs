@@ -15,7 +15,7 @@ namespace SeganX
         //  will be called whene back button pressed
         public virtual void Back()
         {
-            gameManager.BackButton();
+            gameManager.Back(this);
         }
 
         public virtual void Reset()

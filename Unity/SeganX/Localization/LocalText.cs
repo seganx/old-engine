@@ -54,6 +54,11 @@ namespace SeganX
         {
             if (stringId > 0)
                 SetText(LocalizationService.Get(stringId));
+            else
+            {
+                displayText = currnetText;
+                DisplayText();
+            }
         }
 
         private void DisplayText()

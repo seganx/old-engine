@@ -30,6 +30,11 @@ namespace SeganX
         }
 #endif
 
+        public override string ToString()
+        {
+            return id + " : " + type;
+        }
+
         ////////////////////////////////////////////////////////////
         /// STATIC MEMBERS
         ////////////////////////////////////////////////////////////
