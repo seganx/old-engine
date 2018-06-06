@@ -6,7 +6,7 @@ namespace SeganX
 {
     public class GameManager : Base
     {
-        public string prefabPath = "Prefabs/UI/";
+        public string prefabPath = "Prefabs/States/";
         public Canvas canvas = null;
 
         private GameState currentState = null;
@@ -139,7 +139,7 @@ namespace SeganX
             }
         }
 
-        private void OnValidate()
+        private void Reset()
         {
             var validPath = Application.dataPath + "/Resources/" + prefabPath;
             if (System.IO.Directory.Exists(validPath) == false)

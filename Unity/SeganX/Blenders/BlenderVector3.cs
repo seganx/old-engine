@@ -33,7 +33,8 @@ namespace SeganX
             {
                 var d = value - current;
                 current += d * speed * deltaTime;
-                if (d.sqrMagnitude <= deltaTime) current = value;
+                if (d.magnitude <= deltaTime)
+                    current = value;
                 return true;
             }
             else return false;
