@@ -33,6 +33,28 @@ public static class TextEx
         return string.Join("\n", lines.ToArray());
     }
 
+    public static Text SetText(this Text self, string text, bool autoRtl = false, bool forcePersian = false)
+    {
+        if (text.IsNullOrEmpty())
+        {
+            self.text = text;
+            return self;
+        }
+
+        if (autoRtl)
+            self.FitAlignment(text.IsRtl());
+
+        if (!forcePersian && !text.HasRtl())
+        {
+            self.text = text;
+            return self;
+        }
+
+        self.text = PersianTextShaper.PersianTextShaper.ShapeText(text.Replace('ي', 'ی')).Replace("‌", "").Replace("‌", ""); ;
+
+        return self;
+    }
+
     public static Text SetTextAndWrap(this Text self, string text, bool autoRtl = false, bool forcePersian = false)
     {
         if (text.IsNullOrEmpty())

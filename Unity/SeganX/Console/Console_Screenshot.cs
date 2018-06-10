@@ -28,7 +28,7 @@ namespace SeganX.Console
 
         private void Share(string filename)
         {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
             Application.OpenURL(filename);
 
 #endif
