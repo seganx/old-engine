@@ -1,107 +1,64 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using System.Collections;
+﻿using System.IO;
+using UnityEngine;
 
 namespace SeganX
 {
-    public class Core : MonoBehaviour
+    public class Core : ScriptableObject
     {
-        public string cryptokey = "";
-        public string salt = "";
-        public Text screenlog = null;
-
-        public Shader[] shaders;
-
-
-        // Use this for initialization
-        IEnumerator Start()
+        public class Data
         {
-            Salt = salt;
-            CryptoKey = System.Text.Encoding.ASCII.GetBytes(cryptokey);
+            public string baseDeviceId;
+            public string deviceId;
+            public string saltHash;
+            public byte[] cryptoKey;
 
-            BaseDeviceId = PlayerPrefs.GetString("Core.BaseDeviceId", "");
-            if (BaseDeviceId.Length < 1)
+            public Data(string key, string salt)
             {
-#if UNITY_ANDROID && !UNITY_EDITOR
-                //  Collect advertising ID
-                screenlog.text = "Version " + Application.version + "\n";
-                screenlog.text += "Getting advertising id...\n";
-                Application.RequestAdvertisingIdentifierAsync((adId, trackingEnabled, error) =>
-                {
-                    screenlog.text += "AdvertisingId: " + adId + "\nTrackingEnabled: " + trackingEnabled + "\n";
-                    BaseDeviceId = string.IsNullOrEmpty(error) ? adId : System.Guid.NewGuid().ToString();
-                    PlayerPrefs.SetString("Core.BaseDeviceId", BaseDeviceId);
-                });
-#else
-                BaseDeviceId = SystemInfo.deviceUniqueIdentifier;
-#endif
+                baseDeviceId = SystemInfo.deviceUniqueIdentifier;
+                deviceId = ComputeMD5(baseDeviceId, salt);
+                saltHash = ComputeMD5(salt, salt);
+                cryptoKey = System.Text.Encoding.ASCII.GetBytes(key);
             }
-
-            //  wait for response of the request
-#if !UNITY_EDITOR
-            var startTime = System.DateTime.Now;
-            while (BaseDeviceId.Length < 1 && (System.DateTime.Now - startTime).TotalSeconds < 5)
-                yield return new WaitForEndOfFrame();
-#endif
-
-            //  validate base device Id
-            if (BaseDeviceId.Length < 1)
-            {
-                screenlog.text += "Failed to getting Advertising Id\nGetting MAC address...\n";
-                //  Collect MAC address
-#if UNITY_ANDROID && !UNITY_EDITOR
-                try
-                {
-                    var activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
-                    var wifiManager = activity.Call<AndroidJavaObject>("getSystemService", "wifi");
-                    var macaddress = wifiManager.Call<AndroidJavaObject>("getConnectionInfo").Call<string>("getMacAddress");
-                    if (macaddress.IndexOf("02:00:00", 0) < 0 && macaddress.IndexOf("00:00:00", 0) < 0)
-                    {
-                        BaseDeviceId = macaddress;
-                        PlayerPrefs.SetString("Core.BaseDeviceId", BaseDeviceId);
-                    }
-                    screenlog.text += "MAC address: " + macaddress;
-                }
-                catch (System.Exception ex)
-                {
-                    screenlog.text += "Failed to getting MAC address!\nError: " + ex + "\n";
-                }
-#elif UNITY_IOS
-#else
-#endif
-                yield return new WaitForSeconds(1);
-            }
-
-            //  validate base device id
-            if (BaseDeviceId.Length < 1)
-            {
-                IsFakeDeviceId = true;
-                BaseDeviceId = System.Guid.NewGuid().ToString();
-                PlayerPrefs.SetString("Core.BaseDeviceId", BaseDeviceId);
-            }
-            else IsFakeDeviceId = false;
-
-            //  verify and load unique device id
-            DeviceId = PlayerPrefs.GetString("Core.DeviceId", "");
-            if (DeviceId.Length < 1)
-            {
-                DeviceId = ComputeMD5(BaseDeviceId, salt);
-                PlayerPrefs.SetString("Core.DeviceId", DeviceId);
-            }
-
-            SceneManager.LoadScene(1, LoadSceneMode.Single);
         }
 
+        public string cryptokey = "";
+        public string salt = "";
+        public Shader[] shaders;
+
+        public Data data = null;
+
+        private void Awake()
+        {
+            data = new Data(cryptokey, salt);
+#if UNITY_EDITOR
+#else
+            cryptokey = "";
+            salt = "";
+#endif
+        }
 
         ////////////////////////////////////////////////////////////
         /// STATIC MEMBERS
         ////////////////////////////////////////////////////////////
-        public static string BaseDeviceId { private set; get; }
-        public static string DeviceId { private set; get; }
-        public static string Salt { private set; get; }
-        public static bool IsFakeDeviceId { private set; get; }
-        public static byte[] CryptoKey { private set; get; }
+        private static Core instance = null;
+
+        public static string BaseDeviceId { get { return Instance.data.baseDeviceId; } }
+        public static string DeviceId { get { return Instance.data.deviceId; } }
+        public static string Salt { get { return Instance.data.saltHash; } }
+        public static byte[] CryptoKey { get { return Instance.data.cryptoKey; } }
+
+        public static Core Instance
+        {
+            get
+            {
+#if UNITY_EDITOR
+                CheckService();
+#endif
+                if (instance == null) instance = Resources.Load<Core>("SeganX");
+                if (instance != null && instance.data == null) instance.Awake();
+                return instance;
+            }
+        }
 
         public static string ComputeMD5(string str, string salt)
         {
@@ -117,5 +74,21 @@ namespace SeganX
         }
 
 
+#if UNITY_EDITOR
+        public static void CheckService()
+        {
+            var path = "/Resources/";
+            var fileName = path + "SeganX.asset";
+            if (File.Exists(Application.dataPath + fileName)) return;
+
+            var ioPath = Application.dataPath + path;
+            if (!Directory.Exists(ioPath)) Directory.CreateDirectory(ioPath);
+
+            instance = CreateInstance<Core>();
+            UnityEditor.AssetDatabase.CreateAsset(instance, "Assets" + fileName);
+
+            UnityEditor.AssetDatabase.SaveAssets();
+        }
+#endif
     }
 }

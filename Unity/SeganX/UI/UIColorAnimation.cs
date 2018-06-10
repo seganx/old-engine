@@ -27,10 +27,15 @@ namespace SeganX
         }
 
         // Use this for initialization
-        void Start()
+        void Awake()
         {
             if (graphic == null)
                 graphic = GetComponent<Graphic>();
+        }
+
+        private void Start()
+        {
+            Update();
         }
 
         // Update is called once per frame

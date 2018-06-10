@@ -79,13 +79,12 @@ public class Base : MonoBehaviour
         callback(res);
     }
 
-    public void Download(string url, byte[] postData, Dictionary<string, string> header, System.Action<WWW> callback)
+    public void Download(string url, byte[] postData, Dictionary<string, string> header, System.Action<WWW> callback, System.Action<float> onProgressCallback = null)
     {
-        StartCoroutine(DoDownload(url, postData, header, callback));
+        StartCoroutine(DoDownload(url, postData, header, callback, onProgressCallback));
     }
 
-
-    IEnumerator DoDownload(string url, byte[] postData, Dictionary<string, string> httpheader, System.Action<WWW> callback)
+    IEnumerator DoDownload(string url, byte[] postData, Dictionary<string, string> httpheader, System.Action<WWW> callback, System.Action<float> onProgressCallback = null)
     {
         WWW res = null;
         if(postData != null || httpheader != null)
@@ -93,8 +92,11 @@ public class Base : MonoBehaviour
             if(httpheader == null)
                 httpheader = new Dictionary<string, string>();
 
-            if(httpheader.ContainsKey("Content-Type") == false)
+            if (httpheader.ContainsKey("Content-Type") == false)
+            {
                 httpheader.Add("Content-Type", "application/json");
+                httpheader.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+            }
 
             if(postData != null)
                 Debug.Log("Getting data from " + url + "\nHeader: " + httpheader.GetStringDebug() + "\nPostData:" + System.Text.Encoding.UTF8.GetString(postData));
@@ -109,8 +111,17 @@ public class Base : MonoBehaviour
             res = new WWW(url);
         }
 
-        yield return res;
-        if(res.text.HasContent())
+        if (onProgressCallback != null)
+        {
+            while (res.keepWaiting)
+            {
+                onProgressCallback(res.progress);
+                yield return null;
+            }
+        }
+        else yield return res;
+
+        if (res.text.HasContent())
             Debug.Log("Received " + res.bytesDownloaded + " bytes from " + url + ":\n" + res.text);
         else
             Debug.Log("Received " + res.bytesDownloaded + " bytes from " + url);
