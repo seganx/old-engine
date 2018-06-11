@@ -11,15 +11,13 @@ namespace SeganX
         {
             base.OnInspectorGUI();
 
-            var core = new Core.Data(target.As<Core>().cryptokey, target.As<Core>().salt);
-
             if (GUILayout.Button("Encrypt File"))
             {
                 var path = EditorUtility.OpenFilePanel("Encrypt File And Save", "", "");
                 if (path.Length > 3)
                 {
                     var src = File.ReadAllBytes(path);
-                    var data = CryptoService.EncryptWithMac(src, core.cryptoKey, core.saltHash);
+                    var data = CryptoService.EncryptWithMac(src, Core.CryptoKey, Core.Salt);
                     File.WriteAllBytes(path + ".seganx", data);
                 }
             }
@@ -30,7 +28,7 @@ namespace SeganX
                 if (path.Length > 3)
                 {
                     var src = File.ReadAllBytes(path);
-                    var data = CryptoService.DecryptWithMac(src, core.cryptoKey, core.saltHash);
+                    var data = CryptoService.DecryptWithMac(src, Core.CryptoKey, Core.Salt);
                     File.WriteAllBytes(path.Replace(".seganx", ""), data);
                 }
             }

@@ -12,24 +12,25 @@ namespace SeganX
             public string saltHash;
             public byte[] cryptoKey;
 
-            public Data(string key, string salt)
+            public Data(string key, string salt, bool hashSalt)
             {
                 baseDeviceId = SystemInfo.deviceUniqueIdentifier;
                 deviceId = ComputeMD5(baseDeviceId, salt);
-                saltHash = ComputeMD5(salt, salt);
+                saltHash = hashSalt ? ComputeMD5(salt, salt) : salt;
                 cryptoKey = System.Text.Encoding.ASCII.GetBytes(key);
             }
         }
 
         public string cryptokey = "";
         public string salt = "";
+        public bool hashSalt = false;
         public Shader[] shaders;
 
         public Data data = null;
 
         private void Awake()
         {
-            data = new Data(cryptokey, salt);
+            data = new Data(cryptokey, salt, hashSalt);
 #if UNITY_EDITOR
 #else
             cryptokey = "";
