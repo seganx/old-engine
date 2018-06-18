@@ -17,7 +17,7 @@ namespace SeganX
             var loctext = target.As<LocalText>();
             DrawItems(loctext);
             if (EditorApplication.isPlaying != false) return;
-            loctext.target.SetTextAndWrap(loctext.currnetText, loctext.autoRtl, loctext.forcePersian);
+            loctext.SetText(loctext.currnetText);
         }
 
         public void DrawItems(LocalText local)
