@@ -17,6 +17,13 @@ namespace SeganX
             id = EditorOnlineData.GenerateAssetId();
             UnityEditor.EditorUtility.SetDirty(this);
         }
+
+        private void OnValidate()
+        {
+            var image = GetComponent<UnityEngine.UI.Image>();
+            if (image != null)
+                image.sprite = preview;
+        }
 #endif
     }
 }

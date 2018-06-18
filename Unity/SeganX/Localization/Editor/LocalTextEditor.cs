@@ -15,9 +15,8 @@ namespace SeganX
         public override void OnInspectorGUI()
         {
             var loctext = target.As<LocalText>();
-
             DrawItems(loctext);
-
+            if (EditorApplication.isPlaying != false) return;
             loctext.target.SetTextAndWrap(loctext.currnetText, loctext.autoRtl, loctext.forcePersian);
         }
 
@@ -36,7 +35,8 @@ namespace SeganX
             local.autoRtl = GUI.Toggle(rect, local.autoRtl, "Auto RTL", "Button");
             rect.x -= 110;
             local.forcePersian = GUI.Toggle(rect, local.forcePersian, "Force Persian", "Button");
-            var curText = EditorGUILayout.TextArea(local.currnetText, GUILayout.MinHeight(60));
+
+            var curText = EditorGUILayout.TextArea(local.currnetText, new GUIStyle(GUI.skin.textArea) { wordWrap = true }, GUILayout.MinHeight(60));
             if (curText != local.currnetText)
             {
                 local.currnetText = curText.CleanFromCode().CleanForPersian();

@@ -53,12 +53,13 @@ namespace SeganX
         public void Awake()
         {
             if (stringId > 0)
-                SetText(LocalizationService.Get(stringId));
-            else
-            {
-                displayText = currnetText;
-                DisplayText();
-            }
+                currnetText = LocalizationService.Get(stringId);
+            displayText = currnetText;
+        }
+
+        private void Start()
+        {
+            DisplayText();
         }
 
         private void DisplayText()
@@ -72,8 +73,7 @@ namespace SeganX
         {
             if (UnityEditor.EditorApplication.isPlaying == false)
             {
-                if (target == null)
-                    target = transform.GetComponent<Text>(true, true);
+                if (target == null) target = transform.GetComponent<Text>(true, true);
 
                 if (lastText != currnetText)
                 {
