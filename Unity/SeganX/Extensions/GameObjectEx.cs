@@ -44,7 +44,7 @@ public static class GameObjectEx
         return res.GetComponent<T>();
     }
 
-    public static T GetComponent<T>(this Component self, bool includeChildren, bool includeInactive)
+    public static T GetComponent<T>(this Component self, bool includeChildren, bool includeInactive) where T : Component
     {
         var res = self.GetComponent<T>();
         if (res == null && includeChildren)

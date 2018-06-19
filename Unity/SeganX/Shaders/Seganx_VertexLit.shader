@@ -5,6 +5,7 @@ Shader "Seganx/VertexLit"
 	Properties 
 	{
 		_Color("Color", Color) = (1,1,1,1)
+		_AmbientColor("Ambient", Color) = (0,0,0,0)
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 		_ColorStrength("Color Strength", Float) = 1
 
@@ -34,6 +35,7 @@ Shader "Seganx/VertexLit"
 				#include "AutoLight.cginc"
 
 				fixed4 _Color;
+				fixed4 _AmbientColor;
 				sampler2D _MainTex;
 				float4 _MainTex_ST;
 				
@@ -76,7 +78,7 @@ Shader "Seganx/VertexLit"
 				{
 					fixed4 c = tex2D( _MainTex, v.uv0 ) * _Color * _ColorStrength;
 					c.rgb *= v.shd;
-					return c;
+					return c + _AmbientColor;
 				}
 
 			ENDCG

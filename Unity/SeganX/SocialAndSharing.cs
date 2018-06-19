@@ -5,48 +5,6 @@ namespace SeganX
 {
     public class SocialAndSharing
     {
-        //public static string SocialLink
-        //{
-        //    get { return PlayerPrefsEx.GetString("SocialAndSharing.SocialLink", ""); }
-        //    set { PlayerPrefs.SetString("SocialAndSharing.SocialLink", value); }
-        //}
-
-        public static string FacebookLink
-        {
-            get { return PlayerPrefsEx.GetString("SocialAndSharing.FacebookLink", ""); }
-            set { PlayerPrefsEx.SetString("SocialAndSharing.FacebookLink", value); }
-        }
-
-        public static string InstagramLink
-        {
-            get { return PlayerPrefsEx.GetString("SocialAndSharing.InstagramLink", ""); }
-            set { PlayerPrefsEx.SetString("SocialAndSharing.InstagramLink", value); }
-        }
-
-        public static string TelegramLink
-        {
-            get { return PlayerPrefsEx.GetString("SocialAndSharing.TelegramLink", ""); }
-            set { PlayerPrefsEx.SetString("SocialAndSharing.TelegramLink", value); }
-        }
-
-        public static string FeedbackEmail
-        {
-            get { return PlayerPrefsEx.GetString("SocialAndSharing.FeedbackEmail", ""); }
-            set { PlayerPrefsEx.SetString("SocialAndSharing.FeedbackEmail", value); }
-        }
-
-        public static string RateUsLink
-        {
-            get { return PlayerPrefsEx.GetString("SocialAndSharing.RateUsLink", ""); }
-            set { PlayerPrefsEx.SetString("SocialAndSharing.RateUsLink", value); }
-        }
-
-        public static string MarketPackage
-        {
-            get { return PlayerPrefsEx.GetString("SocialAndSharing.MarketPackage", ""); }
-            set { PlayerPrefsEx.SetString("SocialAndSharing.MarketPackage", value); }
-        }
-
 #if UNITY_ANDROID
         private class IntentClass
         {
@@ -72,11 +30,21 @@ namespace SeganX
                 return this;
             }
 
-            public IntentClass SetImage(string imagePath)
+            public IntentClass SetImageFile(string imagePath)
             {
                 AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
                 iObject.Call<AndroidJavaObject>("setAction", iClass.GetStatic<string>("ACTION_SEND"));
                 AndroidJavaObject uriObject = uriClass.CallStatic<AndroidJavaObject>("parse", "file://" + imagePath);
+                iObject.Call<AndroidJavaObject>("putExtra", iClass.GetStatic<string>("EXTRA_STREAM"), uriObject);
+                iObject.Call<AndroidJavaObject>("setType", "image/*");
+                return this;
+            }
+
+            public IntentClass SetImageUrl(string imageUrl)
+            {
+                AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
+                iObject.Call<AndroidJavaObject>("setAction", iClass.GetStatic<string>("ACTION_SEND"));
+                AndroidJavaObject uriObject = uriClass.CallStatic<AndroidJavaObject>("parse", imageUrl);
                 iObject.Call<AndroidJavaObject>("putExtra", iClass.GetStatic<string>("EXTRA_STREAM"), uriObject);
                 iObject.Call<AndroidJavaObject>("setType", "image/*");
                 return this;
@@ -117,22 +85,30 @@ namespace SeganX
 #endif
         }
 
-        public static void ShareTextAndImage(string message, string title, string filename)
+        public static void ShareTextAndImageFile(string message, string title, string filename)
         {
 #if UNITY_ANDROID
-            new IntentClass().SetText(message, title).SetImage(filename).Start();
+            new IntentClass().SetText(message, title).SetImageFile(filename).Start();
 #endif
         }
 
-        public static void RateUs()
+        public static void ShareTextAndImageUrl(string message, string title, string imageUrl)
         {
 #if UNITY_ANDROID
-            if (MarketPackage.IsNullOrEmpty())
-                Application.OpenURL(RateUsLink);
-            else if (MarketPackage == "view")
-                new IntentClass().SetView(MarketPackage, RateUsLink).Start();
+            new IntentClass().SetText(message, title).SetImageUrl(imageUrl).Start();
+#endif
+        }
+
+        public static void RateUs(string marketPackage, string rateUsLink)
+        {
+#if UNITY_ANDROID
+            if (marketPackage.IsNullOrEmpty())
+                Application.OpenURL(rateUsLink);
+
+            else if (marketPackage == "view")
+                new IntentClass().SetView(marketPackage, rateUsLink).Start();
             else
-                new IntentClass().SetRateUs(MarketPackage, RateUsLink).Start();
+                new IntentClass().SetRateUs(marketPackage, rateUsLink).Start();
 #endif
         }
 
@@ -141,28 +117,10 @@ namespace SeganX
             Application.OpenURL("https://telegram.me/" + username);
         }
 
-        public static void OpenTelegram()
+        public static void SendEmail(string emailAddress, string subject, string body)
         {
-            Application.OpenURL(TelegramLink);
-        }
-
-        public static void OpenInstagram()
-        {
-            Application.OpenURL(InstagramLink);
-        }
-
-        public static void OpenFacebook()
-        {
-            Application.OpenURL(FacebookLink);
-        }
-
-        public static void SendEmail(string subject, string body)
-        {
-            if (FeedbackEmail.Length > 5)
-                Application.OpenURL(FeedbackEmail);
-            if (FeedbackEmail.Length < 5)
-                return;
-            Application.OpenURL("mailto:" + FeedbackEmail + "?subject=" + subject.EscapeURL() + "&body=" + body.EscapeURL());
+            if (emailAddress.Length < 5) return;
+            Application.OpenURL("mailto:" + emailAddress + "?subject=" + subject.EscapeURL() + "&body=" + body.EscapeURL());
         }
     }
 }

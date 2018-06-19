@@ -90,7 +90,7 @@ Shader "Seganx/UI/Font/Shadow" {
 			{
 				fixed4 c = tex2D(_MainTex, i.uv0);
 				c.rgb += _ShadowColor.rgb;
-				c.a *= _ShadowColor.a;
+				c.a *= _ShadowColor.a * i.col.a;
 				return c;
 			}
 			ENDCG 
@@ -134,7 +134,7 @@ Shader "Seganx/UI/Font/Shadow" {
 				fixed4 c = tex2D(_MainTex, i.uv0);
 				c.rgb += i.col.rgb;
 				c.a *= i.col.a;
-				clip (c - 0.01f);
+				clip (c.a - 0.01f);
 				return c;
 			}
 			ENDCG 

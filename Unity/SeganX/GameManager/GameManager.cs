@@ -6,6 +6,7 @@ namespace SeganX
 {
     public class GameManager : Base
     {
+        public int version = 1;
         public string prefabPath = "Prefabs/States/";
         public Canvas canvas = null;
 

@@ -6,30 +6,46 @@ namespace SeganX
 {
     public class SimpleAnimation : MonoBehaviour
     {
+        [System.Serializable]
+        public class AnimationData
+        {
+            public string name = "";
+            public int id = 0;
+            public AnimationClip clip = null;
+        }
+
         public Animation target = null;
-        private List<AnimationState> animationStates = new List<AnimationState>();
+        public List<AnimationData> animations = new List<AnimationData>();
         private int lastPlayed = -1;
 
+        public AnimationData PlayById(int id, bool once = true)
+        {
+            var res = animations.Find(x => x.id == id);
+            if (!once || (res != null && lastPlayed != id))
+            {
+                lastPlayed = id;
+                target.CrossFade(res.clip.name);
+            }
+            return res;
+        }
+
+#if UNITY_EDITOR
         private void Reset()
         {
-            if (target == null) target = transform.GetComponent<Animation>(true, true);
-        }
+            if (target == null)
+                target = this.GetComponent<Animation>(true, true);
 
-        private void Awake()
-        {
+            lastPlayed = 0;
+            animations.Clear();
             foreach (AnimationState state in target)
-                animationStates.Add(state);
-        }
-
-        public SimpleAnimation PlayByIndex(int index)
-        {
-            if (lastPlayed != index)
             {
-                lastPlayed = index;
-                target.Play(animationStates[index].name);
+                var data = new AnimationData();
+                data.name = state.name;
+                data.id = lastPlayed++;
+                data.clip = state.clip;
+                animations.Add(data);
             }
-
-            return this;
         }
+#endif        
     }
 }
