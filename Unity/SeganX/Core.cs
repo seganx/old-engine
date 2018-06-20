@@ -5,6 +5,14 @@ namespace SeganX
 {
     public class Core : ScriptableObject
     {
+        [System.Serializable]
+        public class SecurityOptions
+        {
+            public string cryptokey = "";
+            public string salt = "";
+            public bool hashSalt = true;
+        }
+
         public class Data
         {
             public string baseDeviceId;
@@ -21,20 +29,39 @@ namespace SeganX
             }
         }
 
+#if UNITY_EDITOR
+        [System.Serializable]
+        public class AssetBundleBuildOptions
+        {
+            public string outputPath = "AssetBundles";
+            public bool android = true;
+            public bool windows = true;
+            public bool iOS = false;
+            public UnityEditor.BuildAssetBundleOptions buildOptions = UnityEditor.BuildAssetBundleOptions.None;
+        }
+#endif
+
+        [Header("Security Options:")]
         public string cryptokey = "";
         public string salt = "";
         public bool hashSalt = false;
-        public Shader[] shaders;
+
+        public SecurityOptions securityOptions;
+#if UNITY_EDITOR
+        public AssetBundleBuildOptions assetBundleBuildOptions;
+#endif
 
         public Data data = null;
 
         private void Awake()
         {
-            data = new Data(cryptokey, salt, hashSalt);
+            data = new Data(securityOptions.cryptokey, securityOptions.salt, securityOptions.hashSalt);
 #if UNITY_EDITOR
 #else
             cryptokey = "";
             salt = "";
+            securityOptions.cryptokey = "";
+            securityOptions.salt = "";
 #endif
         }
 
