@@ -16,8 +16,6 @@ namespace SeganX
         {
             var loctext = target.As<LocalText>();
             DrawItems(loctext);
-            if (EditorApplication.isPlaying != false) return;
-            loctext.SetText(loctext.currnetText);
         }
 
         public void DrawItems(LocalText local)
@@ -31,15 +29,19 @@ namespace SeganX
             rect.width = 100;
             EditorGUI.PrefixLabel(rect, new GUIContent(local.stringId > 0 ? "Text: " + local.stringId : "Text: unlinked"));
 
-            rect.x = maxWidth - 100;
+            rect.width = 70;
+            rect.x = maxWidth - rect.width;
             local.autoRtl = GUI.Toggle(rect, local.autoRtl, "Auto RTL", "Button");
-            rect.x -= 110;
-            local.forcePersian = GUI.Toggle(rect, local.forcePersian, "Force Persian", "Button");
+            rect.width = 80;
+            rect.x -= rect.width + 5;
+            local.autoHeight = GUI.Toggle(rect, local.autoHeight, "Auto Height", "Button");
+            rect.x -= rect.width + 5;
+            local.autoWidth = GUI.Toggle(rect, local.autoWidth, "Auto Width", "Button");
 
             var curText = EditorGUILayout.TextArea(local.currnetText, new GUIStyle(GUI.skin.textArea) { wordWrap = true }, GUILayout.MinHeight(60));
             if (curText != local.currnetText)
             {
-                local.currnetText = curText.CleanFromCode().CleanForPersian();
+                local.SetText(curText.CleanFromCode().CleanForPersian());
                 if (local.stringId > 0)
                     local.stringId = LocalizationService.UpdateString(local.stringId, local.currnetText);
             }
@@ -58,6 +60,11 @@ namespace SeganX
                 rect.x = maxWidth - 100;
                 if (GUI.Button(rect, "New Text"))
                     local.stringId = LocalizationService.UpdateString(0, local.currnetText);
+
+                rect.width = 90;
+                rect.x -= rect.width + 10;
+                local.forcePersian = GUI.Toggle(rect, local.forcePersian, "Force Persian", "Button");
+
             }
 
             if (isSettingId)

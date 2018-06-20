@@ -12,6 +12,8 @@ namespace SeganX
         public Text target = null;
         public bool autoRtl = false;
         public bool forcePersian = false;
+        public bool autoWidth = false;
+        public bool autoHeight = false;
         public int stringId = 0;
 
         [TextArea(3, 100)]
@@ -65,6 +67,8 @@ namespace SeganX
         private void DisplayText()
         {
             target.SetTextAndWrap(displayText, autoRtl, forcePersian);
+            if (autoWidth) target.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, target.preferredWidth);
+            if (autoHeight) target.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, target.preferredHeight);
         }
 
 #if UNITY_EDITOR

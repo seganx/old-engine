@@ -141,17 +141,13 @@ public static class TransformEx
 
     public static RectTransform SetAnchordHeight(this Transform self, float height)
     {
-        var size = (self as RectTransform).sizeDelta;
-        size.y = height;
-        (self as RectTransform).sizeDelta = size;
+        (self as RectTransform).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
         return self as RectTransform;
     }
 
     public static RectTransform SetAnchordWidth(this Transform self, float width)
     {
-        var size = (self as RectTransform).sizeDelta;
-        size.x = width;
-        (self as RectTransform).sizeDelta = size;
+        (self as RectTransform).SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
         return self as RectTransform;
     }
 
