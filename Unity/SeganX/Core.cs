@@ -19,6 +19,7 @@ namespace SeganX
             public string deviceId;
             public string saltHash;
             public byte[] cryptoKey;
+            public int valueKey = 77777;
 
             public Data(string key, string salt, bool hashSalt)
             {
@@ -26,6 +27,9 @@ namespace SeganX
                 deviceId = ComputeMD5(baseDeviceId, salt);
                 saltHash = hashSalt ? ComputeMD5(salt, salt) : salt;
                 cryptoKey = System.Text.Encoding.ASCII.GetBytes(key);
+
+                foreach (var s in key)
+                    valueKey += valueKey + s;
             }
         }
 
@@ -33,23 +37,37 @@ namespace SeganX
         [System.Serializable]
         public class AssetBundleBuildOptions
         {
+            [System.Serializable]
+            public class BuildOptions
+            {
+                public enum TextureResize : int { FullSize = 1, HalfSize = 2, QuarterSize = 4 }
+                public string folder = "android";
+                public string suffix = "";
+                public UnityEditor.BuildTarget platform = UnityEditor.BuildTarget.Android;
+                public TextureResize textureSize = TextureResize.FullSize;
+                public bool encrypt = true;
+                public bool active = true;
+            }
+
+            public string bundlesPath = "Assets/Editor/Bundles";
             public string outputPath = "AssetBundles";
-            public bool android = true;
-            public bool windows = true;
-            public bool iOS = false;
             public UnityEditor.BuildAssetBundleOptions buildOptions = UnityEditor.BuildAssetBundleOptions.None;
+            public BuildOptions[] builds = null;
         }
 #endif
-
-        [Header("Security Options:")]
-        public string cryptokey = "";
-        public string salt = "";
-        public bool hashSalt = false;
 
         public SecurityOptions securityOptions;
 #if UNITY_EDITOR
         public AssetBundleBuildOptions assetBundleBuildOptions;
 #endif
+
+        [Header("Deprecated: Use Security Options")]
+        [System.Obsolete("Use SecurityOptions.cryptokey")]
+        public string cryptokey = "";
+        [System.Obsolete("Use SecurityOptions.salt")]
+        public string salt = "";
+        [System.Obsolete("Use SecurityOptions.hashSalt")]
+        public bool hashSalt = false;
 
         public Data data = null;
 
@@ -74,6 +92,7 @@ namespace SeganX
         public static string DeviceId { get { return Instance.data.deviceId; } }
         public static string Salt { get { return Instance.data.saltHash; } }
         public static byte[] CryptoKey { get { return Instance.data.cryptoKey; } }
+        public static int ValueKey { get { return Instance.data.valueKey; } }
 
         public static Core Instance
         {

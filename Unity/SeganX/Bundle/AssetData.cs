@@ -10,6 +10,7 @@ namespace SeganX
         [InspectorButton(100, "Generate Id", "GenerateId")]
         public int id = 0;
         public string type = "";
+        [PersianPreview]
         public string tags = "";
         public List<AssetItem> prefabs = new List<AssetItem>();
 

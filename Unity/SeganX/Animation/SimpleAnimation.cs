@@ -24,7 +24,7 @@ namespace SeganX
             if (!once || (res != null && lastPlayed != id))
             {
                 lastPlayed = id;
-                target.CrossFade(res.clip.name);
+                target.CrossFade(res.clip.name, 0.1f, PlayMode.StopAll);
             }
             return res;
         }
