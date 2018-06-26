@@ -71,6 +71,11 @@ namespace SeganX
             if (autoHeight) target.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, target.preferredHeight);
         }
 
+        private void OnRectTransformDimensionsChange()
+        {
+            DisplayText();
+        }
+
 #if UNITY_EDITOR
         private string lastText = "";
         private void OnValidate()
@@ -85,12 +90,6 @@ namespace SeganX
                     DisplayText();
                 }
             }
-        }
-
-        private void OnRectTransformDimensionsChange()
-        {
-            if (UnityEditor.EditorApplication.isPlaying == false)
-                DisplayText();
         }
 #endif
 

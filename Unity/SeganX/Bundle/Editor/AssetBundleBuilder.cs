@@ -70,6 +70,8 @@ public class AssetBundleBuilder
             else
                 VerifyTexturesInBuilds(builds, (int)buildOption.textureSize, () => BuildAssetBundles(builds, buildOption.platform, outputPath, buildOption.suffix, buildOption.encrypt));
         }
+
+        EditorUtility.RevealInFinder(Core.Instance.assetBundleBuildOptions.outputPath);
     }
 
     public static void BuildAssetBundles(AssetBundleBuild[] builds, BuildTarget target, string outputPath, string suffix, bool encrypt)
@@ -109,7 +111,6 @@ public class AssetBundleBuilder
                 Debug.LogError(e.Message);
             }
         }
-
     }
 
     static public string VerifyDirectory(string outputPath, string folder)
