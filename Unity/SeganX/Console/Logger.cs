@@ -115,7 +115,7 @@ namespace SeganX.Console
                 if (lastText.visual)
                 {
                     lastText.visual.text = lastText.visualText;
-                    lastText.height = textVisual.GetTextHeight(lastText.visualText);
+                    lastText.height = lastText.visual.flexibleHeight;
                 }
             }
             else
@@ -123,7 +123,11 @@ namespace SeganX.Console
                 var logtext = new LogText();
                 logtext.text = str;
                 logtext.color = color;
-                logtext.height = textVisual.GetTextHeight(str);
+
+                textVisual.text = str;
+                logtext.height = textVisual.preferredHeight;
+                textVisual.text = "";
+
                 textList.Add(logtext);
                 scroll.content.SetAnchordHeight(ComputeHeight(textList));
             }

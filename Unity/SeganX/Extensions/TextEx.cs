@@ -74,7 +74,7 @@ public static class TextEx
 
         text = PersianTextShaper.PersianTextShaper.ShapeText(text.Replace('ي', 'ی')).Replace("‌", "").Replace("‌", "");
 
-        if (self.horizontalOverflow == HorizontalWrapMode.Wrap)
+        if (self.horizontalOverflow == HorizontalWrapMode.Wrap && self.rectTransform.rect.width > 0)
         {
             TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
             TextGenerator generator = new TextGenerator();
@@ -88,22 +88,6 @@ public static class TextEx
         else self.text = text;
 
         return self;
-    }
-
-    public static float GetTextHeight(this Text self, string text)
-    {
-        if (text.IsNullOrEmpty())
-        {
-            self.text = text;
-            return 0;
-        }
-
-        if (self.rectTransform.rect.width < 1)
-            Canvas.ForceUpdateCanvases();
-
-        TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
-        TextGenerator generator = self.cachedTextGenerator;
-        return generator.GetPreferredHeight(text, settings) / settings.scaleFactor;
     }
 
     public static Text FitAlignment(this Text self, bool rtl)
