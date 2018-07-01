@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace SeganX
@@ -21,9 +22,9 @@ namespace SeganX
             public byte[] cryptoKey;
             public int valueKey = 77777;
 
-            public Data(string key, string salt, bool hashSalt)
+            public Data(string key, string salt, bool hashSalt, string testDeviceId)
             {
-                baseDeviceId = SystemInfo.deviceUniqueIdentifier;
+                baseDeviceId = string.IsNullOrEmpty(testDeviceId) ? SystemInfo.deviceUniqueIdentifier : testDeviceId;
                 deviceId = ComputeMD5(baseDeviceId, salt);
                 saltHash = hashSalt ? ComputeMD5(salt, salt) : salt;
                 cryptoKey = System.Text.Encoding.ASCII.GetBytes(key);
@@ -54,13 +55,24 @@ namespace SeganX
             public UnityEditor.BuildAssetBundleOptions buildOptions = UnityEditor.BuildAssetBundleOptions.None;
             public BuildOptions[] builds = null;
         }
+
+        [System.Serializable]
+        public class TestDeviceID
+        {
+            public bool active = false;
+            public int deviceIndex = 0;
+            public string[] deviceId = new string[0];
+            public string DeviceId { get { return deviceId.Length > 0 ? deviceId[deviceIndex % deviceId.Length] : SystemInfo.deviceUniqueIdentifier; } }
+        }
 #endif
 
         public SecurityOptions securityOptions;
 #if UNITY_EDITOR
         public AssetBundleBuildOptions assetBundleBuildOptions;
+        public TestDeviceID testDeviceId;
 #endif
 
+#if OFF
         [Header("Deprecated: Use Security Options")]
         [System.Obsolete("Use SecurityOptions.cryptokey")]
         public string cryptokey = "";
@@ -68,16 +80,19 @@ namespace SeganX
         public string salt = "";
         [System.Obsolete("Use SecurityOptions.hashSalt")]
         public bool hashSalt = false;
+#endif
 
         public Data data = null;
 
         private void Awake()
         {
-            data = new Data(securityOptions.cryptokey, securityOptions.salt, securityOptions.hashSalt);
 #if UNITY_EDITOR
+            if (testDeviceId.active)
+                data = new Data(securityOptions.cryptokey, securityOptions.salt, securityOptions.hashSalt, testDeviceId.DeviceId);
+            else
+                data = new Data(securityOptions.cryptokey, securityOptions.salt, securityOptions.hashSalt, null);
 #else
-            cryptokey = "";
-            salt = "";
+            data = new Data(securityOptions.cryptokey, securityOptions.salt, securityOptions.hashSalt, null);
             securityOptions.cryptokey = "";
             securityOptions.salt = "";
 #endif
