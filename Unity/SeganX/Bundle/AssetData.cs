@@ -7,7 +7,6 @@ namespace SeganX
     [CreateAssetMenu(menuName = "Game/AssetData")]
     public class AssetData : ScriptableObject
     {
-        [InspectorButton(100, "Generate Id", "GenerateId")]
         public int id = 0;
         public string type = "";
         [PersianPreview]
@@ -22,14 +21,6 @@ namespace SeganX
                     return true;
             return false;
         }
-
-#if UNITY_EDITOR
-        public void GenerateId(object sender)
-        {
-            id = EditorOnlineData.GenerateAssetId();
-            UnityEditor.EditorUtility.SetDirty(this);
-        }
-#endif
 
         public override string ToString()
         {
@@ -65,7 +56,15 @@ namespace SeganX
             var data = CryptoService.DecryptWithMac(src, Core.CryptoKey, Core.Salt);
             if (data == null) return null;
 
-            var bundle = AssetBundle.LoadFromMemory(data);
+            AssetBundle bundle = null;
+            try
+            {
+                bundle = AssetBundle.LoadFromMemory(data);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("Can't load asset bundle " + id + " du to error: " + e.Message);
+            }
             if (bundle == null) return null;
 
             var path = bundle.GetAllAssetNames();

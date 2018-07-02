@@ -94,15 +94,20 @@ public class AssetBundleBuilder
             result = BuildPipeline.BuildAssetBundles(outputPath, builds, Core.Instance.assetBundleBuildOptions.buildOptions, target);
 
         // list and encrypt assets if needed
-        foreach (var item in result.GetAllAssetBundlesWithVariant())
+        var items = result.GetAllAssetBundles();
+        var fileList = new List<string>(items.Length);
+        foreach (var item in items)
         {
             var path = Path.Combine(outputPath, item);
+            var bundleFilePath = path + suffix + ".seganx";
+            fileList.Add(bundleFilePath + "\r\n");
             try
             {
+
                 var src = File.ReadAllBytes(path);
                 var data = encrypt ? CryptoService.EncryptWithMac(src, Core.CryptoKey, Core.Salt) : src;
-                File.WriteAllBytes(path + suffix + ".seganx", data);
-                Debug.Log("Built: " + path + suffix + ".seganx");
+                File.WriteAllBytes(bundleFilePath, data);
+                Debug.Log("Built: " + bundleFilePath);
                 File.Delete(path);
                 File.Delete(path + ".manifest");
             }
@@ -111,6 +116,8 @@ public class AssetBundleBuilder
                 Debug.LogError(e.Message);
             }
         }
+
+        File.AppendAllText(Path.Combine(outputPath, "Files.txt"), string.Concat(fileList.ToArray()));
     }
 
     static public string VerifyDirectory(string outputPath, string folder)
