@@ -10,6 +10,7 @@ namespace SeganX
         [SpritePreview(50)]
         public Sprite preview = null;
 
+        public string tags { set; get; }
 
 #if UNITY_EDITOR
         public void GenerateId(object x)

@@ -79,6 +79,9 @@ namespace SeganX
                     if (id > 0)
                         asset.id = id;
 
+                    foreach (var assetItem in asset.prefabs)
+                        assetItem.tags = asset.tags;
+
                     return asset;
                 }
             }
