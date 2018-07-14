@@ -6,7 +6,28 @@ using System.Collections.Generic;
 
 public static class TextEx
 {
-    static string WrapLine(this TextGenerator self, string line, TextGenerationSettings settings)
+    public static TextMesh SetText(this TextMesh self, string text, bool autoRtl = false, bool forcePersian = false)
+    {
+        if (text.IsNullOrEmpty())
+        {
+            self.text = text;
+            return self;
+        }
+
+        if (autoRtl)
+            self.FitAlignment(text.IsRtl());
+
+        if (!forcePersian && !text.HasRtl())
+        {
+            self.text = text;
+            return self;
+        }
+
+        self.text = PersianTextShaper.PersianTextShaper.ShapeText(text.Replace('ي', 'ی')).Replace("‌", "").Replace("‌", ""); ;
+        return self;
+    }
+
+    private static string WrapLine(this TextGenerator self, string line, TextGenerationSettings settings)
     {
         string str = "";
 
@@ -102,6 +123,17 @@ public static class TextEx
             case TextAnchor.LowerRight: if (!rtl) self.alignment = TextAnchor.LowerLeft; break;
         }
 
+        return self;
+    }
+
+    public static TextMesh FitAlignment(this TextMesh self, bool rtl)
+    {
+        switch (self.alignment)
+        {
+            case TextAlignment.Left: if (rtl) self.alignment = TextAlignment.Left; break;
+            case TextAlignment.Center: if (!rtl) self.alignment = TextAlignment.Center; break;
+            case TextAlignment.Right: if (rtl) self.alignment = TextAlignment.Right; break;
+        }
         return self;
     }
 }
