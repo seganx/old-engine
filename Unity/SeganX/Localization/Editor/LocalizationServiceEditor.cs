@@ -25,8 +25,8 @@ namespace SeganX
             EditorGUILayout.HelpBox("Current Kit file: " + local.currentKit.name, MessageType.None);
 
             LocalizationKitEditor.DrawKitItems(local.currentKit);
-            EditorUtility.SetDirty(local.currentKit);
 
+            EditorUtility.SetDirty(local.currentKit);
             EditorUtility.SetDirty(local);
         }
     }

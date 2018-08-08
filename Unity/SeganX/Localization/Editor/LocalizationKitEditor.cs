@@ -44,7 +44,7 @@ namespace SeganX
                 filter = localKit.AddString(null).ToString();
             if (GUILayout.Button("Export"))
             {
-                var filename = EditorUtility.SaveFilePanel("Save exported data", null, localKit.name, "json");
+                var filename = EditorUtility.SaveFilePanel("Save exported data", System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(localKit)), localKit.name, "json");
                 if (filename.HasContent(4))
                 {
                     System.IO.File.WriteAllText(filename, JsonUtility.ToJson(localKit.kit, true), System.Text.Encoding.UTF8);
@@ -52,7 +52,7 @@ namespace SeganX
             }
             if (GUILayout.Button("Import"))
             {
-                var filename = EditorUtility.OpenFilePanelWithFilters("Open json to import", null, new string[] { "Json File", "json" });
+                var filename = EditorUtility.OpenFilePanelWithFilters("Open json to import", System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(localKit)), new string[] { "Json File", "json" });
                 if (filename.HasContent(4))
                 {
                     localKit.kit = JsonUtility.FromJson<LocalizationKit.LocalKitData>(System.IO.File.ReadAllText(filename));
