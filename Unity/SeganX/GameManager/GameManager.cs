@@ -68,6 +68,7 @@ namespace SeganX
         {
             if (prefab == null) return null;
             T res = Instantiate<GameObject>(prefab).GetComponent<T>();
+            res.name = prefab.name;
             guiStack.Insert(0, res);
             Resources.UnloadUnusedAssets();
             AttachState(res);
@@ -108,10 +109,10 @@ namespace SeganX
 
         public GameManager Back(GameState gameState)
         {
-            OnBackButton(gameState);
-
             if (ClosePopup(gameState) == false && currentState != null)
                 CloseState();
+
+            OnBackButton(CurrentPopup != null ? CurrentPopup : currentState);
             return this;
         }
 

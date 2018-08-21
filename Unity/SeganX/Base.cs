@@ -79,6 +79,48 @@ public class Base : MonoBehaviour
         callback(res);
     }
 
+    public void GetFileFromCacheOrDownload(string url, int version, System.Action<string> callback, System.Action<float> onProgressCallback = null)
+    {
+        StartCoroutine(DoGetFileFromCacheOrDownload(url, version, callback, onProgressCallback));
+    }
+
+    IEnumerator DoGetFileFromCacheOrDownload(string url, int version, System.Action<string> callback, System.Action<float> onProgressCallback = null)
+    {
+        var filename = url.ComputeMD5(Core.Salt + version) + ".seganx";
+        var path = Application.persistentDataPath + "/" + filename;
+
+        Debug.Log("Finding file in cache " + path);
+
+        if (System.IO.File.Exists(path) == false)
+        {
+            Debug.Log("Failed to find file from cache!\nDownloading from " + url);
+            var res = new WWW(url);
+            if (onProgressCallback != null)
+            {
+                while (res.keepWaiting)
+                {
+                    onProgressCallback(res.progress);
+                    yield return null;
+                }
+            }
+            else yield return res;
+
+            if (res.error.IsNullOrEmpty() && res.bytes.Length > 0)
+            {
+                Debug.Log("Received bytes: " + res.bytesDownloaded);
+                PlayerPrefsEx.SaveData(filename, res.bytes);
+            }
+            else
+            {
+                Debug.LogWarning("Failed to download from " + url);
+                path = "";
+            }
+        }
+
+        callback(path);
+    }
+
+
     public void Download(string url, byte[] postData, Dictionary<string, string> header, System.Action<WWW> callback, System.Action<float> onProgressCallback = null)
     {
         StartCoroutine(DoDownload(url, postData, header, callback, onProgressCallback));

@@ -23,7 +23,7 @@ public static class TextEx
             return self;
         }
 
-        self.text = PersianTextShaper.PersianTextShaper.ShapeText(text.Replace('ي', 'ی')).Replace("‌", "").Replace("‌", ""); ;
+        self.text = text.Persian();
         return self;
     }
 
@@ -71,7 +71,7 @@ public static class TextEx
             return self;
         }
 
-        self.text = PersianTextShaper.PersianTextShaper.ShapeText(text.Replace('ي', 'ی')).Replace("‌", "").Replace("‌", ""); ;
+        self.text = text.Persian();
 
         return self;
     }
@@ -93,7 +93,7 @@ public static class TextEx
             return self;
         }
 
-        text = PersianTextShaper.PersianTextShaper.ShapeText(text.Replace('ي', 'ی')).Replace("‌", "").Replace("‌", "");
+        text = text.Persian();
 
         if (self.horizontalOverflow == HorizontalWrapMode.Wrap && self.rectTransform.rect.width > 0)
         {

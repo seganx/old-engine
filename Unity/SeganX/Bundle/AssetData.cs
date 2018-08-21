@@ -56,19 +56,51 @@ namespace SeganX
             var data = CryptoService.DecryptWithMac(src, Core.CryptoKey, Core.Salt);
             if (data == null) return null;
 
-            AssetBundle bundle = null;
             try
             {
-                bundle = AssetBundle.LoadFromMemory(data);
+                var bundle = AssetBundle.LoadFromMemory(data);
+                return GetAssetData(bundle, id);
             }
             catch (System.Exception e)
             {
                 Debug.LogError("Can't load asset bundle " + id + " du to error: " + e.Message);
+                return null;
             }
-            if (bundle == null) return null;
+        }
 
-            var path = bundle.GetAllAssetNames();
-            foreach (var item in path)
+        public static AssetData LoadEncrypted(int id, string path)
+        {
+            //  search to see if the asset bundle is already loaded
+            {
+                var loadedOne = all.Find(x => x.id == id);
+                if (loadedOne != null) return loadedOne;
+            }
+
+            //  search for cahched file
+            var filename = path + ".cache";
+            if (System.IO.File.Exists(filename) == false)
+            {
+                var bytes = System.IO.File.ReadAllBytes(path);
+                var data = CryptoService.DecryptWithMac(bytes, Core.CryptoKey, Core.Salt);
+                System.IO.File.WriteAllBytes(filename, data);
+            }
+
+            try
+            {
+                var bundle = AssetBundle.LoadFromFile(filename);
+                return GetAssetData(bundle, id);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("Can't load asset bundle " + id + " du to error: " + e.Message);
+                return null;
+            }
+        }
+
+        private static AssetData GetAssetData(AssetBundle bundle, int id)
+        {
+            var paths = bundle.GetAllAssetNames();
+            foreach (var item in paths)
             {
                 var asset = bundle.LoadAsset<AssetData>(item);
                 if (asset != null)

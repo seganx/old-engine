@@ -52,6 +52,24 @@ namespace SeganX
             DisplayText();
         }
 
+        public void SetFormatetText(object arg0, object arg1, object arg2, object arg3, object arg4)
+        {
+            displayText = string.Format(currnetText, arg0, arg1, arg2, arg3, arg4);
+            DisplayText();
+        }
+
+        public void SetFormatetText(object arg0, object arg1, object arg2, object arg3, object arg4, object arg5)
+        {
+            displayText = string.Format(currnetText, arg0, arg1, arg2, arg3, arg4, arg5);
+            DisplayText();
+        }
+
+        public void SetFormatetText(object arg0, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
+        {
+            displayText = string.Format(currnetText, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+            DisplayText();
+        }
+
         public void Awake()
         {
             if (stringId > 0)

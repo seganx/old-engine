@@ -242,7 +242,19 @@ public static class MonoEx
 
     public static string Persian(this string self)
     {
-        return (self == null) ? null : PersianTextShaper.PersianTextShaper.ShapeText(CleanForPersian(self)).Replace("‌", "").Replace("‌", "");
+        return (self == null) ? null : PersianTextShaper.PersianTextShaper.ShapeText(CleanForPersian(self))
+            .Replace("‌", "")
+            .Replace("‌", "")
+            .Replace('٠', '۰')
+            .Replace('١', '۱')
+            .Replace('٢', '۲')
+            .Replace('٣', '۳')
+            .Replace('٤', '۴')
+            .Replace('٥', '۵')
+            .Replace('٦', '۶')
+            .Replace('٧', '۷')
+            .Replace('٨', '۸')
+            .Replace('٩', '۹');
     }
 
     #endregion

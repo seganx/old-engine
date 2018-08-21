@@ -54,26 +54,10 @@ namespace SeganX
             gua.sendAppScreenHit(newScreenName);
         }
 
-        public static void Shop(string action, string label)
+        public static void Event(string category, string action, string label = null)
         {
-            gua.sendEventHit("shop", action, label);
+            gua.sendEventHit(category, action, label);
         }
-
-        public static void Purchase(string action, string label)
-        {
-            gua.sendEventHit("purchase", action, label);
-        }
-
-        public static void Chest(string action, string label)
-        {
-            gua.sendEventHit("chest", action, label);
-        }
-
-        public static void BigChest(string action, string label)
-        {
-            gua.sendEventHit("bigChest", action, label);
-        }
-
 
         // If analyticsDisabled is true, all analytics is disabled = no hits are sent.
         // If analyticsDisabled is false, analytics are enabled and hits will be sent
@@ -179,85 +163,5 @@ namespace SeganX
 
             } // !gua.analyticsDisabled
         } // Awake
-
-#if OFF
-    void Start()
-    {
-        exampleAnalyticsTestHits();
-    }
-
-    void exampleAnalyticsTestHits()
-    {
-        GoogleUniversalAnalytics gua = GoogleUniversalAnalytics.Instance;
-
-
-        // event for entering "test-start" screen
-        gua.sendAppScreenHit("test-start");
-
-
-        // event in "test-main" category with "test-enter-shop" action,
-        // rest of the parameters are optional label and value.
-        gua.sendEventHit("test-main", "test-enter-shop", "TestEnterShop", 123);
-
-
-        // ad hoc example of a purchase transaction containing bunch of items
-        // Note: Not sure if there is recommendation if item prices should
-        //       include or exclude shipping & taxes. Probably best to compare
-        //       the two options, pick one and stick to it. Here we use item
-        //       prices which include all the extra costs.
-        string transactionID = gua.clientID + UnityEngine.Random.Range(0, 1000000000);
-        // here are some test values which are hopefully reasonable enough
-        string currencyCode = "EUR"; // http://en.wikipedia.org/wiki/ISO_4217#Active_codes
-        int itemQuantity = 10;
-        double totalPrice = 9.99;
-        double itemPrice = totalPrice / itemQuantity;
-        double vatPc = 0.24; // for example - Finland has 24% VAT as of 2013
-        double shippingPc = 0.30; // let's use sales channel cost as "shipping", and assume it equals 30% after taxes
-        double tax = totalPrice - totalPrice / (1 + vatPc);
-        double shipping = (totalPrice - tax) * shippingPc;
-        gua.sendTransactionHit(transactionID, "test-affiliation", totalPrice, shipping, tax, "EUR");
-        string itemName = "test-item3";
-        string itemCode = "TESTSKU003";
-        string itemCategory = "test-items";
-        gua.sendItemHit(transactionID, itemName, itemPrice, itemQuantity, itemCode, itemCategory, currencyCode);
-
-
-        // some examples of social media events: (+1 and Like)
-        gua.sendSocialHit("GooglePlus", "plus", "test-social-target-gplus");
-        gua.sendSocialHit("Facebook", "like", "test-social-target-fb");
-
-
-        // could log exceptions like this (this one is non-fatal)
-        // Note: If a truly fatal exception occurs, handling/sending those to
-        //       GUA might not be possible with the Unity's WWW class, so for
-        //       reliable hard exception tracking you should look at using some
-        //       dedicated packages with OS-native implementation.
-        gua.sendExceptionHit("test-exception", false);
-
-
-        // example of timing event, e.g. for measuring average loading times...
-        gua.sendUserTimingHit("loadtimes", "init", 100, "test-loadtimes-init");
-
-
-        // test custom appview event of going to screen named "test-end",
-        // with the event containing forced end of current session
-        //
-        // (The default gua.sendSomething()-style helpers check for the
-        //  analyticsDisabled as the first thing, but for custom hits it's
-        //  good to check that first like we do here. This way we won't
-        //  build a hit for nothing to be discarded by gua.sendHit() if
-        //  analytics is disabled due to user opt-out, for example.)
-        //
-        if (!gua.analyticsDisabled)
-        {
-            gua.beginHit(GoogleUniversalAnalytics.HitType.Appview);
-            gua.addApplicationVersion();
-            gua.addContentDescription("test-end");
-            gua.addSessionControl(false);
-            gua.sendHit();
-        }
-    }
-
-#endif
     }
 }

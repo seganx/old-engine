@@ -1,17 +1,47 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
+using UnityEngine.Profiling;
 
 namespace SeganX.Console
 {
     public class Console_Info : MonoBehaviour
     {
         public delegate string OnDisplayInfoEvent(string info);
+        public Text label = null;
+        public Text systemInfo = null;
+
+        void OnEnable()
+        {
+            if (gameObject.activeInHierarchy == false) return;
+            Invoke("OnEnable", 0.5f);
+
+            string str = "Ver: " + Application.version + "\nId: " + DisplayDeviceID;
+
+            if (OnDisplayInfo != null)
+                str = OnDisplayInfo(str);
+
+            label.text = str;
+            systemInfo.text = GetSystemInfo();
+        }
+
+        public static string GetSystemInfo()
+        {
+            return "GPU Memory: " + SystemInfo.graphicsMemorySize + " - System Memory: " + SystemInfo.systemMemorySize +
+                "\nTotalAllocatedMemory: " + Profiler.GetTotalAllocatedMemoryLong() / 1048576 +
+                "\nTotalReservedMemory: " + Profiler.GetTotalReservedMemoryLong() / 1048576 +
+                "\nTotalUnusedReservedMemory:" + Profiler.GetTotalUnusedReservedMemoryLong() / 1048576 + 
+#if UNITY_EDITOR
+                "mb\nDrawCalls: " + UnityEditor.UnityStats.drawCalls + 
+                "\nUsed Texture Memory: " + UnityEditor.UnityStats.usedTextureMemorySize / 1048576 + 
+                "\nRenderedTextureCount: " + UnityEditor.UnityStats.usedTextureCount;
+#else
+                "";
+#endif
+        }
+
         public static OnDisplayInfoEvent OnDisplayInfo = null;
 
-        public Text label = null;
-
-        public string DisplayDeviceID
+        public static string DisplayDeviceID
         {
             get
             {
@@ -25,19 +55,6 @@ namespace SeganX.Console
                 }
                 return res;
             }
-        }
-
-        void OnEnable()
-        {
-            if (gameObject.activeInHierarchy == false) return;
-            Invoke("OnEnable", 0.5f);
-
-            string str = "Ver: " + Application.version + "\nId: " + DisplayDeviceID;
-            if (OnDisplayInfo != null)
-                str = OnDisplayInfo(str);
-            //str += "\n" + System.DateTime.Now + " - Server: " + Network.Instance.ServerType + " - Nickname: " + Game.Instance.player.NickName;
-
-            label.text = str;
         }
 
         public static void SetOnDisplayInfo(OnDisplayInfoEvent onDisplayInfo)
