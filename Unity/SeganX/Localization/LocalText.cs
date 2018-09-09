@@ -11,82 +11,64 @@ namespace SeganX
     {
         public Text target = null;
         public bool autoRtl = false;
-        public bool forcePersian = false;
         public bool autoWidth = false;
         public bool autoHeight = false;
         public int stringId = 0;
-
-        [TextArea(3, 100)]
         public string currnetText = "";
 
-        private string displayText = "";
+        private object[] localargs = null;
 
         public void SetText(string text)
         {
+            localargs = null;
             if (currnetText == text) return;
-            displayText = currnetText = text;
+            currnetText = text;
             DisplayText();
         }
 
-        public void SetFormatetText(object arg)
+        public void SetFormatetText(params object[] args)
         {
-            displayText = string.Format(currnetText, arg);
-            DisplayText();
-        }
-
-        public void SetFormatetText(object arg0, object arg1)
-        {
-            displayText = string.Format(currnetText, arg0, arg1);
-            DisplayText();
-        }
-
-        public void SetFormatetText(object arg0, object arg1, object arg2)
-        {
-            displayText = string.Format(currnetText, arg0, arg1, arg2);
-            DisplayText();
-        }
-
-        public void SetFormatetText(object arg0, object arg1, object arg2, object arg3)
-        {
-            displayText = string.Format(currnetText, arg0, arg1, arg2, arg3);
-            DisplayText();
-        }
-
-        public void SetFormatetText(object arg0, object arg1, object arg2, object arg3, object arg4)
-        {
-            displayText = string.Format(currnetText, arg0, arg1, arg2, arg3, arg4);
-            DisplayText();
-        }
-
-        public void SetFormatetText(object arg0, object arg1, object arg2, object arg3, object arg4, object arg5)
-        {
-            displayText = string.Format(currnetText, arg0, arg1, arg2, arg3, arg4, arg5);
-            DisplayText();
-        }
-
-        public void SetFormatetText(object arg0, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
-        {
-            displayText = string.Format(currnetText, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
-            DisplayText();
-        }
-
-        public void Awake()
-        {
-            if (stringId > 0)
-                currnetText = LocalizationService.Get(stringId);
-            displayText = currnetText;
-        }
-
-        private void Start()
-        {
+            localargs = args;
+            if (stringId > 0) currnetText = LocalizationService.Get(stringId);
             DisplayText();
         }
 
         private void DisplayText()
         {
-            target.SetTextAndWrap(displayText, autoRtl, forcePersian);
+            if (localargs == null)
+                target.SetTextAndWrap(currnetText, autoRtl, LocalizationService.IsPersian);
+            else
+                target.SetTextAndWrap(string.Format(currnetText, localargs), autoRtl, LocalizationService.IsPersian);
+
             if (autoWidth) target.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, target.preferredWidth);
             if (autoHeight) target.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, target.preferredHeight);
+        }
+
+        private void OnLanguageChanged()
+        {
+            if (stringId == 0) return;
+            if (localargs == null)
+            {
+                currnetText = LocalizationService.Get(stringId);
+                DisplayText();
+            }
+            else SetFormatetText(localargs);
+        }
+
+        private void Awake()
+        {
+            all.Add(this);
+            if (stringId > 0) currnetText = LocalizationService.Get(stringId);
+        }
+
+        private void OnDestroy()
+        {
+            all.Remove(this);
+        }
+
+        private void Start()
+        {
+            DisplayText();
         }
 
         private void OnRectTransformDimensionsChange()
@@ -95,21 +77,36 @@ namespace SeganX
         }
 
 #if UNITY_EDITOR
-        private string lastText = "";
         private void OnValidate()
         {
             if (UnityEditor.EditorApplication.isPlaying == false)
             {
                 if (target == null) target = transform.GetComponent<Text>(true, true);
-
-                if (lastText != currnetText)
-                {
-                    lastText = displayText = currnetText;
-                    DisplayText();
-                }
+                DisplayText();
             }
         }
 #endif
 
+
+        //////////////////////////////////////////////////////////
+        //  STATIC MEMEBRS
+        //////////////////////////////////////////////////////////
+        public static List<LocalText> all = new List<LocalText>();
+
+        public static void LanguageChanged()
+        {
+            foreach (var item in all)
+                item.OnLanguageChanged();
+        }
+
+#if UNITY_EDITOR
+        public static void SetStringId(LocalText local, int stringId)
+        {
+            local.stringId = stringId;
+            if (local.stringId > 0)
+                local.currnetText = LocalizationService.Get(stringId);
+            local.DisplayText();
+        }
+#endif
     }
 }

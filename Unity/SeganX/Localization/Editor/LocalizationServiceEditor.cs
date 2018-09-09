@@ -12,28 +12,23 @@ namespace SeganX
         {
             var local = target as LocalizationService;
 
-            local.currentKit = (LocalizationKit)EditorGUILayout.ObjectField("Currnet Kit:", local.currentKit, typeof(LocalizationKit), false);
-
             if (local.currentKit == null)
             {
                 EditorGUILayout.HelpBox("Please select a Kit file for localization service!", MessageType.Warning);
-                return;
+                local.currentKit = (LocalizationKit)EditorGUILayout.ObjectField("Currnet Kit:", local.currentKit, typeof(LocalizationKit), false);
             }
-
-            EditorGUILayout.Space();
-            EditorGUILayout.Separator();
-            EditorGUILayout.HelpBox("Current Kit file: " + local.currentKit.name, MessageType.None);
-
-            LocalizationKitEditor.DrawKitItems(local.currentKit);
-
-            EditorUtility.SetDirty(local.currentKit);
-            EditorUtility.SetDirty(local);
+            else base.OnInspectorGUI();
         }
     }
 
-
     static class LocalizationMenu
     {
+        [MenuItem("SeganX/Localization/Current Kit")]
+        private static void CurrentKit()
+        {
+            Selection.activeObject = LocalizationService.Instance.currentKit;
+        }
+
         [MenuItem("SeganX/Localization/Settings")]
         private static void Settings()
         {

@@ -23,7 +23,6 @@ namespace SeganX
             public List<LocalStrings> strings = new List<LocalStrings>();
         }
 
-
         public LocalKitData kit = new LocalKitData();
 
         public string Get(int id)
@@ -44,7 +43,6 @@ namespace SeganX
             if (text == null) res.s = res.i.ToString();
             kit.strings.Add(res);
             UnityEditor.EditorUtility.SetDirty(this);
-            UnityEditor.AssetDatabase.SaveAssets();
             return res.i;
         }
 
@@ -55,10 +53,9 @@ namespace SeganX
             {
                 res = new LocalKitData.LocalStrings() { i = kit.baseId++, s = text };
                 kit.strings.Add(res);
-                UnityEditor.EditorUtility.SetDirty(this);
-                UnityEditor.AssetDatabase.SaveAssets();
             }
             else res.s = text;
+            UnityEditor.EditorUtility.SetDirty(this);
             return res.i;
         }
 #endif

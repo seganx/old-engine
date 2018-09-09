@@ -61,21 +61,16 @@ namespace SeganX
                 if (GUI.Button(rect, "New Text"))
                     local.stringId = LocalizationService.UpdateString(0, local.currnetText);
 
-                rect.width = 90;
-                rect.x -= rect.width + 10;
-                local.forcePersian = GUI.Toggle(rect, local.forcePersian, "Force Persian", "Button");
-
             }
 
             if (isSettingId)
             {
                 stringId = EditorGUI.IntField(rect, stringId);
-                rect.x = EditorGUIUtility.currentViewWidth - 108;
+                rect.x = maxWidth - 100;
                 if (GUI.Button(rect, "Apply"))
                 {
                     isSettingId = false;
-                    local.stringId = stringId;
-                    local.Awake();
+                    LocalText.SetStringId(local, stringId);
                 }
             }
         }

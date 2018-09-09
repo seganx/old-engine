@@ -9,6 +9,7 @@ namespace SeganX
     public class LocalizationService : ScriptableObject
     {
         public LocalizationKit currentKit = null;
+        public List<LocalizationKit> kits = new List<LocalizationKit>();
 
         private void OnEnable()
         {
@@ -18,6 +19,19 @@ namespace SeganX
         private void Awake()
         {
             instance = this;
+        }
+
+        private string GetString(int id)
+        {
+            return currentKit == null ? id.ToString() : currentKit.Get(id);
+        }
+
+        private void SetLanguageKit(string language)
+        {
+            var kit = kits.Find(x => x.kit.language.Contains(language));
+            if (kit == null) return;
+            currentKit = kit;
+            LocalText.LanguageChanged();
         }
 
         ////////////////////////////////////////////////////////////
@@ -39,13 +53,16 @@ namespace SeganX
         }
 
         public static bool IsEnglish { get { return Instance.currentKit.kit.language.Contains("en"); } }
+        public static bool IsPersian { get { return Instance.currentKit.kit.language.Contains("fa"); } }
 
         public static string Get(int id)
         {
-            if (Instance.currentKit)
-                return Instance.currentKit.Get(id);
-            else
-                return id.ToString();
+            return Instance.GetString(id);
+        }
+
+        public static void SetLanguage(string language)
+        {
+            Instance.SetLanguageKit(language);
         }
 
 #if UNITY_EDITOR
