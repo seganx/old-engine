@@ -1,49 +1,52 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace SeganX
 {
-    public enum UIDragState { Normal, Dragging, Drop }
-
-    public class UIDragable : Base, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
+    public class UIDragable : Base, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
-        public Rect bound;
-        public Vector2 snapThreshold = Vector2.one;
+        public enum State { StartDrag, Dragging, EndDrag }
+
+        [System.Serializable]
+        public class Bound
+        {
+            public bool activated = false;
+            public Vector2 min = Vector2.zero;
+            public Vector2 max = Vector2.zero;
+        }
+
+        [System.Serializable]
+        public class Snap
+        {
+            public bool activated = false;
+            public Vector2 threshold = Vector2.one;
+        }
+
+        public Snap snap = new Snap();
+        public Bound bound = new Bound();
+        public Action<State> OnStateChanged = new Action<State>(s => { });
+
         private Vector2 offset = Vector2.zero;
-        private bool stopUpdate = true;
 
-        public bool freezed { get; set; }
-        public bool isDragging { get { return current == this; } }
+        public bool IsFreezed { get; set; }
+        public bool IsDragging { get { return current == this; } }
+        public Vector2 Position { get; private set; }
+        public Vector2 Delta { get; private set; }
 
-        public Vector2 position { get; private set; }
-        public Vector2 delta { get; private set; }
-
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            stopUpdate = false;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRectTransform, eventData.position, eventData.enterEventCamera ?? eventData.pressEventCamera, out offset);
-            offset = rectTransform.anchoredPosition - offset;
-        }
-
-        public void OnPointerUp(PointerEventData eventData)
-        {
-            stopUpdate = true;
-            cancelDrag = false;
-            current = null;
-        }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            OnPointerDown(eventData);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRectTransform, eventData.position, eventData.enterEventCamera ?? eventData.pressEventCamera, out offset);
+            offset = rectTransform.anchoredPosition - offset;
+            OnStateChanged(State.StartDrag);
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            OnPointerUp(eventData);
+            cancelDrag = false;
+            current = null;
+            OnStateChanged(State.EndDrag);
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -51,34 +54,38 @@ namespace SeganX
             if (cancelDrag)
             {
                 eventData.pointerDrag = null;
-                cancelDrag = false;
-                current = null;
+                OnEndDrag(eventData);
                 return;
             }
-            if (stopUpdate || freezed) return;
+
+            if (IsFreezed) return;
             current = this;
 
             Vector2 localPoint;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRectTransform, eventData.position, eventData.enterEventCamera ?? eventData.pressEventCamera, out localPoint);
             localPoint += offset;
-            localPoint.x = Mathf.RoundToInt(localPoint.x / snapThreshold.x) * snapThreshold.x;
-            localPoint.y = Mathf.RoundToInt(localPoint.y / snapThreshold.y) * snapThreshold.y;
 
-            if (bound.width > 1 || bound.height > 1)
+            if (snap.activated)
             {
-                if (localPoint.x < bound.x) localPoint.x = bound.x;
-                if (localPoint.y > bound.y) localPoint.y = bound.y;
-                if (localPoint.x > bound.x + bound.width - rectTransform.rect.width) localPoint.x = bound.x + bound.width - rectTransform.rect.width;
-                if (localPoint.y < bound.y - bound.height + rectTransform.rect.height) localPoint.y = bound.y - bound.height + rectTransform.rect.height;
+                localPoint.x = Mathf.RoundToInt(localPoint.x / snap.threshold.x) * snap.threshold.x;
+                localPoint.y = Mathf.RoundToInt(localPoint.y / snap.threshold.y) * snap.threshold.y;
             }
 
-            position = localPoint;
-            delta = eventData.delta;
+            if (bound.activated)
+            {
+                localPoint.x = Mathf.Clamp(localPoint.x, bound.min.x, bound.max.x);
+                localPoint.y = Mathf.Clamp(localPoint.y, bound.min.y, bound.max.y);
+            }
+
+            Position = localPoint;
+            Delta = eventData.delta;
+
+            OnStateChanged(State.Dragging);
         }
 
 
         ////////////////////////////////////////////////////////////
-        /// STATIV MEMBERS
+        /// STATIC MEMBERS
         ////////////////////////////////////////////////////////////
         public static UIDragable current = null;
         private static bool cancelDrag = false;
