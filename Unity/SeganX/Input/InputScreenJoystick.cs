@@ -41,6 +41,9 @@ namespace SeganX
         [Tooltip("Should the joystick snap to finger? If it's FALSE, the MoveBase checkbox logic will be ommited")]
         public bool SnapsToFinger = true;
 
+        [Tooltip("Should the joystick hold last data or just reset data on release? If it's TRUE, the values will not set to zero on release")]
+        public bool persistent = false;
+
         [Tooltip("Constraints on the joystick movement axis")]
         public ControlMovementDirection JoystickMoveAxis = ControlMovementDirection.Both;
 
@@ -84,6 +87,8 @@ namespace SeganX
         void LateUpdate()
         {
             joystick.OnLateUpdate();
+            if (!persistent && !joystick.isPointerDown && !joystick.isPointerHold && !joystick.isPointerUp)
+                joystick.verticalValue = joystick.horizontalValue = 0;
         }
 
         public virtual void OnDrag(PointerEventData eventData)
@@ -156,7 +161,6 @@ namespace SeganX
             intermediateStickPosition = initialStickPosition;
 
             joystick.OnPointerUp();
-            joystick.verticalValue = joystick.horizontalValue = 0;
 
             // We also hide it if we specified that behavior
             if (HideOnRelease)

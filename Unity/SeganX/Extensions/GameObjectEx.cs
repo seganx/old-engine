@@ -13,7 +13,7 @@ public static class GameObjectEx
     {
         var res = GameObject.Instantiate(self);
         res.name = self.name;
-        res.RefreshMaterials();
+        //res.RefreshMaterials();
         if (self.transform.parent != null)
             res.transform.SetParent(self.transform.parent, false);
         res.transform.CopyValuesFrom(self.transform);

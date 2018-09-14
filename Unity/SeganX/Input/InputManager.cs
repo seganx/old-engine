@@ -11,7 +11,7 @@ namespace SeganX
             public float pressTime = 0;
             public bool isPointerDown = false;
             public bool isPointerHold = false;
-            public bool isPointerUp = true;
+            public bool isPointerUp = false;
             public bool isPointerClick { get { return isPointerDown && !isPointerHold; } }
 
             public void OnPointerDown()
@@ -34,6 +34,7 @@ namespace SeganX
                     isPointerHold = true;
                     pressTime += Time.deltaTime;
                 }
+                isPointerUp = false;
             }
         }
 
@@ -41,6 +42,24 @@ namespace SeganX
         {
             public float verticalValue = 0;
             public float horizontalValue = 0;
+
+            public Vector3 Direction3D
+            {
+                get
+                {
+                    tmp3D.Set(horizontalValue, 0, verticalValue);
+                    return tmp3D.normalized;
+                }
+            }
+
+            public Vector3 Direction3DRoundedClamped
+            {
+                get
+                {
+                    tmp3D.Set(Mathf.RoundToInt(Mathf.Clamp(horizontalValue, -1.4f, 1.4f)), 0, Mathf.RoundToInt(Mathf.Clamp(verticalValue, -1.4f, 1.4f)));
+                    return tmp3D;
+                }
+            }
         }
 
         public class SteeringWheel : Button
@@ -57,5 +76,8 @@ namespace SeganX
         public static Button Accelerate = new Button();
         public static Button Boost = new Button();
         public static Button Break = new Button();
+
+        private static Vector3 tmp3D = Vector3.zero;
+
     }
 }
