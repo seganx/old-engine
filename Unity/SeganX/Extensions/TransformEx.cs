@@ -151,6 +151,13 @@ public static class TransformEx
         return self as RectTransform;
     }
 
+    public static RectTransform SetAnchordSize(this Transform self, float width, float height)
+    {
+        (self as RectTransform).SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+        (self as RectTransform).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+        return self as RectTransform;
+    }
+
     public static Transform SetPosition(this Transform self, float x, float y, float z)
     {
         var pos = self.position;
