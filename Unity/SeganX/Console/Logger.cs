@@ -77,7 +77,7 @@ namespace SeganX.Console
 
         void HandleLog(string condition, string stacktrace, LogType type)
         {
-            if (!Enabled || condition.IsNullOrEmpty() || condition.Length < 5) return;
+            if (!Enabled || condition.IsNullOrEmpty()) return;
 
             lock (threadedList)
             {
@@ -185,7 +185,6 @@ namespace SeganX.Console
             return height;
         }
 
-#if UNITY_EDITOR
         [Console("Console")]
         public static void SaveLog()
         {
@@ -197,6 +196,19 @@ namespace SeganX.Console
             System.IO.File.WriteAllText(filename, str.Replace("\n", "\r\n"));
             Application.OpenURL(filename);
         }
-#endif
+
+        [Console("Clear", "Cache")]
+        public static void ClearCache()
+        {
+            PlayerPrefs.DeleteAll();
+            Caching.ClearCache();
+        }
+
+        [Console("Clear", "Data")]
+        public static void ClearData()
+        {
+            ClearCache();
+            PlayerPrefsEx.ClearData();
+        }
     }
 }

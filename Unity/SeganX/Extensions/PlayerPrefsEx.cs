@@ -120,5 +120,27 @@ namespace SeganX
             else return new T();
         }
 
+        public static void ClearData()
+        {
+            var files = Directory.GetFiles(Application.persistentDataPath);
+            foreach (var item in files)
+                try { File.Delete(item); }
+                catch { };
+
+            var dirs = Directory.GetDirectories(Application.persistentDataPath);
+            foreach (var item in dirs)
+                try { Directory.Delete(item, true); }
+                catch { };
+
+            files = Directory.GetFiles(Application.temporaryCachePath);
+            foreach (var item in files)
+                try { File.Delete(item); }
+                catch { };
+
+            dirs = Directory.GetDirectories(Application.temporaryCachePath);
+            foreach (var item in dirs)
+                try { Directory.Delete(item, true); }
+                catch { };
+        }
     }
 }
