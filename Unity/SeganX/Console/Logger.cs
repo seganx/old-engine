@@ -185,7 +185,8 @@ namespace SeganX.Console
             return height;
         }
 
-        [Console("Console")]
+#if UNITY_EDITOR
+        [Console("Save", "Log")]
         public static void SaveLog()
         {
             string str = "";
@@ -196,12 +197,14 @@ namespace SeganX.Console
             System.IO.File.WriteAllText(filename, str.Replace("\n", "\r\n"));
             Application.OpenURL(filename);
         }
+#endif
 
         [Console("Clear", "Cache")]
         public static void ClearCache()
         {
             PlayerPrefs.DeleteAll();
             Caching.ClearCache();
+            Debug.Log("Cache Cleared");
         }
 
         [Console("Clear", "Data")]
@@ -209,6 +212,7 @@ namespace SeganX.Console
         {
             ClearCache();
             PlayerPrefsEx.ClearData();
+            Debug.Log("Data Cleared");
         }
     }
 }
