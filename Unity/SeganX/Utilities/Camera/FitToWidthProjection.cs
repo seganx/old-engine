@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class FitToWidthProjection : MonoBehaviour
 {
-    private Camera currCamera = null;
+    public Camera currCamera = null;
 
     // Update is called once per frame
     void Update()
@@ -29,4 +28,14 @@ public class FitToWidthProjection : MonoBehaviour
         currCamera.transparencySortMode = TransparencySortMode.Orthographic;
     }
 
+    private void OnValidate()
+    {
+        if (currCamera == null) currCamera = transform.GetComponent<Camera>(true, true);
+        if (currCamera == null) currCamera = Camera.main;
+    }
+
+    private void Reset()
+    {
+        OnValidate();
+    }
 }

@@ -22,6 +22,12 @@ namespace SeganX
             Both = Horizontal | Vertical
         }
 
+        public enum Shape
+        {
+            Circle = 0,
+            Square = 1
+        }
+
         public Camera CurrentEventCamera { get; set; }
 
         // ------- Inspector visible variables ---------------------------------------
@@ -30,6 +36,9 @@ namespace SeganX
 
         [Tooltip("The range in non-scaled pixels for which we can drag the joystick around.")]
         public float MovementRange = 50f;
+
+        [Tooltip("The shape of the joystick")]
+        public Shape shape = Shape.Circle;
 
         [Space(15f)]
         [Tooltip("Should the joystick be hidden on release?")]
@@ -116,17 +125,17 @@ namespace SeganX
             if ((JoystickMoveAxis & ControlMovementDirection.Vertical) == 0)
                 stickAnchoredPosition.y = intermediateStickPosition.y;
 
-            stickTransform.anchoredPosition = stickAnchoredPosition;
-
             // Find current difference between the previous central point of the joystick and it's current position
-            Vector2 difference = new Vector2(stickAnchoredPosition.x, stickAnchoredPosition.y) - intermediateStickPosition;
+            Vector2 difference = stickAnchoredPosition - intermediateStickPosition;
 
             // Normalization stuff
             var diffMagnitude = difference.magnitude;
             var normalizedDifference = difference / diffMagnitude;
 
+            var isMaxRange = shape == Shape.Circle ? diffMagnitude > MovementRange : (Math.Abs(difference.x) > MovementRange || Math.Abs(difference.y) > MovementRange);
+
             // If the joystick is being dragged outside of it's range
-            if (diffMagnitude > MovementRange)
+            if (isMaxRange)
             {
                 if (MoveBase && SnapsToFinger)
                 {
@@ -135,18 +144,26 @@ namespace SeganX
                     var addition = normalizedDifference * baseMovementDifference;
                     baseTransform.anchoredPosition += addition;
                     intermediateStickPosition += addition;
+                    stickTransform.anchoredPosition = stickAnchoredPosition;
                 }
                 else
                 {
-                    stickTransform.anchoredPosition = intermediateStickPosition + normalizedDifference * MovementRange;
+                    if (shape == Shape.Circle)
+                    {
+                        stickTransform.anchoredPosition = intermediateStickPosition + normalizedDifference * MovementRange;
+                    }
+                    else
+                    {
+                        if (Math.Abs(difference.x) > MovementRange) stickAnchoredPosition.x = intermediateStickPosition.x + Math.Sign(difference.x) * MovementRange;
+                        if (Math.Abs(difference.y) > MovementRange) stickAnchoredPosition.y = intermediateStickPosition.y + Math.Sign(difference.y) * MovementRange;
+                        stickTransform.anchoredPosition = stickAnchoredPosition;
+                    }
                 }
             }
+            else stickTransform.anchoredPosition = stickAnchoredPosition;            
 
             // We should now calculate axis values based on final position and not on "virtual" one
-            var finalStickAnchoredPosition = stickTransform.anchoredPosition;
-
-            // Sanity recalculation
-            Vector2 finalDifference = new Vector2(finalStickAnchoredPosition.x, finalStickAnchoredPosition.y) - intermediateStickPosition;
+            Vector2 finalDifference = stickTransform.anchoredPosition - intermediateStickPosition;
 
             // We don't need any values that are greater than 1 or less than -1
             joystick.horizontalValue = Mathf.Clamp(finalDifference.x * oneOverMovementRange, -1f, 1f);
