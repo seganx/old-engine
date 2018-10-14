@@ -4,7 +4,7 @@ Shader "Seganx/UI/Glow" {
 	Properties {
 		_MainTex ("Sprite", 2D) = "white" {}
 		_GlowTex ("RGBA", 2D) = "white" {}
-		
+        _Speed("Speed", Float) = 0.1
 		[Enum(ON,1,OFF,0)]	_ZWrite ("Z Write", Int) = 1
 		[Enum(BACK,2,FRONT,1,OFF,0)]	_Cull ("Cull", Int) = 2
 		[Enum(Zero,0,One,1,DstColor,2,SrcColor,3,SrcAlpha,5,DstAlpha,7,OneMinusSrcAlpha,10)] _BlendSrc ("SrcFactor", Int) = 5
@@ -71,6 +71,7 @@ Shader "Seganx/UI/Glow" {
 			sampler2D _GlowTex;
 			uniform float4 _MainTex_ST;
 			uniform float4 _GlowTex_ST;
+            uniform float _Speed;
 			
 			fixed4 _GlowColor;
 			
@@ -82,8 +83,7 @@ Shader "Seganx/UI/Glow" {
 				o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
 
 				o.uv1 = TRANSFORM_TEX(v.texcoord, _GlowTex);
-				o.uv1 = o.uv1 * 0.2f + 0.4f;
-				o.uv1.y -= _Time.y / 2;
+                o.uv1.y -= _Time.y * _Speed;
 
 				return o;
 			}
@@ -91,9 +91,9 @@ Shader "Seganx/UI/Glow" {
 			fixed4 frag (v2f i) : SV_Target
 			{
 				fixed4 c = tex2D(_MainTex, i.texcoord);
-				fixed4 g = i.color * tex2D(_GlowTex, i.uv1).a;
+				fixed4 g = i.color * tex2D(_GlowTex, i.uv1);
 				c.rgb += 2 * c.rgb * g * i.color.a;
-				return c;
+                return c;
 			}
 			ENDCG 
 		}

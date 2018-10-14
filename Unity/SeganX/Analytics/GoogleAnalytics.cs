@@ -51,11 +51,13 @@ namespace SeganX
         // make helper methods for.
         public static void changeScreen(string newScreenName)
         {
+            if (gua == null) return;
             gua.sendAppScreenHit(newScreenName);
         }
 
         public static void Event(string category, string action, string label = null)
         {
+            if (gua == null || category.IsNullOrEmpty() || action.IsNullOrEmpty()) return;
             gua.sendEventHit(category, action, label);
         }
 

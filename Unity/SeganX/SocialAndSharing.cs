@@ -52,6 +52,7 @@ namespace SeganX
 
             public IntentClass SetRateUs(string marketPackage, string uri)
             {
+                Debug.Log("RateUs: " + marketPackage + " " + uri);
                 AndroidJavaClass uriClass = new AndroidJavaClass("android.net.Uri");
                 iObject.Call<AndroidJavaObject>("setAction", iClass.GetStatic<string>("ACTION_EDIT"));
                 iObject.Call<AndroidJavaObject>("setData", uriClass.CallStatic<AndroidJavaObject>("parse", uri));
@@ -103,9 +104,14 @@ namespace SeganX
         {
 #if UNITY_ANDROID
             if (marketPackage.IsNullOrEmpty())
+#if BAZAAR
+                marketPackage = "com.farsitel.bazaar";
+#else
                 Application.OpenURL(rateUsLink);
+            else 
+#endif
 
-            else if (marketPackage == "view")
+            if (marketPackage == "view")
                 new IntentClass().SetView(marketPackage, rateUsLink).Start();
             else
                 new IntentClass().SetRateUs(marketPackage, rateUsLink).Start();
