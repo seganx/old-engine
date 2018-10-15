@@ -4,7 +4,7 @@ using UnityEngine.Profiling;
 
 namespace SeganX.Console
 {
-    public class Console_Info : MonoBehaviour
+    public class Info : MonoBehaviour
     {
         public delegate string OnDisplayInfoEvent(string info);
         public Text label = null;
@@ -24,6 +24,12 @@ namespace SeganX.Console
             systemInfo.text = GetSystemInfo();
         }
 
+
+        //////////////////////////////////////////////////////////////
+        //  STATIC MEMBERS
+        //////////////////////////////////////////////////////////////
+        public static event OnDisplayInfoEvent OnDisplayInfo = null;
+
         public static string GetSystemInfo()
         {
             return "GPU Memory: " + SystemInfo.graphicsMemorySize + " - System Memory: " + SystemInfo.systemMemorySize +
@@ -38,8 +44,6 @@ namespace SeganX.Console
                 "";
 #endif
         }
-
-        public static OnDisplayInfoEvent OnDisplayInfo = null;
 
         public static string DisplayDeviceID
         {

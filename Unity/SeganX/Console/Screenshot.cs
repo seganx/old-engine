@@ -4,7 +4,7 @@ using System.IO;
 
 namespace SeganX.Console
 {
-    public class Console_Screenshot : MonoBehaviour
+    public class Screenshot : MonoBehaviour
     {
         public void CaptureAndShare()
         {
