@@ -20,7 +20,6 @@ namespace SeganX
         public float space = 0;
         public float vPading = 0;
 
-
         private void Perform()
         {
             if (options.IsFlagOn(Option.ContentSize))
@@ -55,7 +54,19 @@ namespace SeganX
 
         public void FitSize()
         {
-            transform.SetAnchordHeight(UpdatePositions());
+            //transform.SetAnchordHeight(UpdatePositions());
+            float height = 0;
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                RectTransform rt = transform.GetChild(i) as RectTransform;
+                if (rt.gameObject.activeInHierarchy)
+                {
+                    var r = rt.rect;
+                    var dh = Mathf.Abs(r.max.y - r.min.y - rt.anchoredPosition.y);
+                    if (height < dh) height = dh;
+                }
+            }
+            transform.SetAnchordHeight(height + padding);
         }
 
         void Update()

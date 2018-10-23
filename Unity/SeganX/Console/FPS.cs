@@ -14,7 +14,7 @@ namespace SeganX.Console
         private float accum = 0f;           // FPS accumulated over the interval
         private int frames = 0;             // Frames drawn over the interval
 
-        private WaitForSeconds waitForFrame = null;
+        private WaitForSeconds waitForCounting = null;
 
         void OnEnable() { StartCoroutine(FpsCounter()); }
         void OnDisable() { StopCoroutine(FpsCounter()); }
@@ -25,7 +25,7 @@ namespace SeganX.Console
             if (fpsLabel == null)
                 fpsLabel = GetComponent<Text>();
 
-            waitForFrame = new WaitForSeconds(frequency);
+            waitForCounting = new WaitForSeconds(frequency);
         }
 
         // Update is called once per frame
@@ -53,7 +53,7 @@ namespace SeganX.Console
                 accum = 0.0F;
                 frames = 0;
 
-                yield return new WaitForSeconds(frequency);
+                yield return waitForCounting;
             }
         }
     }
