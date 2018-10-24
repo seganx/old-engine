@@ -97,6 +97,9 @@ public static class TextEx
 
         if (self.horizontalOverflow == HorizontalWrapMode.Wrap && self.rectTransform.rect.width > 0)
         {
+            if (self.rectTransform.rect.width < 1)
+                self.rectTransform.ForceUpdateRectTransforms();
+
             TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
             TextGenerator generator = new TextGenerator();
 

@@ -22,13 +22,14 @@ namespace SeganX
 
         private void Perform()
         {
+            if (options.IsFlagOn(Option.ItemPosition))
+                UpdatePositions();
+
             if (options.IsFlagOn(Option.ContentSize))
                 FitSize();
-            else if (options.IsFlagOn(Option.ItemPosition))
-                UpdatePositions();
         }
 
-        public float UpdatePositions()
+        public void UpdatePositions()
         {
             float left = 0;
             float height = padding;
@@ -48,13 +49,10 @@ namespace SeganX
                     height += rt.rect.height + space;
                 }
             }
-            height -= space;
-            return height + padding;
         }
 
         public void FitSize()
         {
-            //transform.SetAnchordHeight(UpdatePositions());
             float height = 0;
             for (int i = 0; i < transform.childCount; i++)
             {
