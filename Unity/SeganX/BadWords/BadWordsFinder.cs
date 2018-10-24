@@ -11,12 +11,12 @@ public static class BadWordsFinder
     {
         badWordMatchers.Clear();
         foreach (var item in badWords)
-            AddBadWord(item);
+            AddBadWord(item.Trim());
     }
 
     public static void AddBadWord(string badWord)
     {
-        if (badWord == null || badWord.Trim().IsNullOrEmpty()) return;
+        if (badWord == null || badWord.IsNullOrEmpty()) return;
 
         var s = badWord;
         for (int i = 0; i < badWord.Length; i++)
