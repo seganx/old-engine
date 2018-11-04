@@ -95,19 +95,22 @@ public static class TextEx
 
         text = text.Persian();
 
-        if (self.horizontalOverflow == HorizontalWrapMode.Wrap && self.rectTransform.rect.width > 0)
+        if (self.horizontalOverflow == HorizontalWrapMode.Wrap)
         {
-            if (self.rectTransform.rect.width < 1)
-                self.rectTransform.ForceUpdateRectTransforms();
-
-            TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
-            TextGenerator generator = new TextGenerator();
-
-            var lines = text.Split('\n');
-            for (int i = 0; i < lines.Length; i++)
-                lines[i] = generator.WrapLine(lines[i], settings);
-
-            self.text = string.Join("\n", lines);
+            if (self.rectTransform.rect.width > 0)
+            {
+                TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
+                if (settings.font.characterInfo.Length > 0)
+                {
+                    TextGenerator generator = new TextGenerator();
+                    var lines = text.Split('\n');
+                    for (int i = 0; i < lines.Length; i++)
+                        lines[i] = generator.WrapLine(lines[i], settings);
+                    self.text = string.Join("\n", lines);
+                }
+                else self.text = null;
+            }
+            else self.text = null;
         }
         else self.text = text;
 
