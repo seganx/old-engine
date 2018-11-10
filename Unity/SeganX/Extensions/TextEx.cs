@@ -30,12 +30,10 @@ public static class TextEx
     private static string WrapLine(this TextGenerator self, string line, TextGenerationSettings settings)
     {
         string str = "";
-
         float lineWidth = 0;
         float speceWidth = self.GetPreferredWidth(" ", settings);
         float maxWidth = (settings.generationExtents.x > 20 ? settings.generationExtents.x : 99999) * settings.scaleFactor;
-        List<string> lines = new List<string>();
-
+        List<string> lines = new List<string>(50);
         var words = line.Split(' ');
         for (int i = words.Length - 1; i >= 0; --i)
         {
@@ -47,10 +45,12 @@ public static class TextEx
                 str = "";
                 i++;
             }
-            else str = words[i] + " " + str;
+            else if (str.Length > 0)
+                str = words[i] + " " + str;
+            else
+                str = words[i];
         }
         if (str.Length > 0) lines.Add(str);
-
         return string.Join("\n", lines.ToArray());
     }
 
@@ -108,7 +108,7 @@ public static class TextEx
                         lines[i] = generator.WrapLine(lines[i], settings);
                     self.text = string.Join("\n", lines);
                 }
-                else self.text = null;
+                // else do nothing
             }
             else self.text = null;
         }
