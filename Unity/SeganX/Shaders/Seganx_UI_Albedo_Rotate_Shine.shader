@@ -5,10 +5,12 @@ Shader "Seganx/UI/Albedo/Rotate_Shine" {
 		_MainTex ("Sprite", 2D) = "white" {}
 		_ColorStrength ("Color Strength", Float) = 1
 		_Queue ("Queue", Int) = 3002
-		_Speed1 ("Speed", Float) = 2.0
-		_Radius1 ("Radius", Float) = 0.5
-		_Speed2 ("Speed", Float) = 2.0
-		_Radius2 ("Radius", Float) = 0.5
+        _Color1("Shine Color Front:", Color) = (0.5,0.5,0.5,0.5)
+		_Speed1 ("Shine Speed Front", Float) = 2.0
+		_Radius1 ("Shine Radius Front", Float) = 0.5
+        _Color2("Shine Color Back:", Color) = (0.5,0.5,0.5,0.5)
+		_Speed2 ("Shine Speed Back", Float) = 2.0
+		_Radius2 ("Shine Radius Back", Float) = 0.5
 		
 
 		[Enum(ON,1,OFF,0)]	_ZWrite ("Z Write", Int) = 0
@@ -108,13 +110,15 @@ Shader "Seganx/UI/Albedo/Rotate_Shine" {
 
 
 			float _ColorStrength;
+            float4 _Color1;
+            float4 _Color2;
 
 			fixed4 frag (vs_out i) : SV_Target
 			{
-				fixed4 c1 = tex2D(_MainTex, i.uv0);
-				fixed4 c2 = tex2D(_MainTex, i.uv1);
+				fixed4 c1 = tex2D(_MainTex, i.uv0) * _Color1;
+				fixed4 c2 = tex2D(_MainTex, i.uv1) * _Color2;
 				
-				fixed4 c = (c1 + c2) * i.col * 0.5f;
+				fixed4 c = (c1 + c2) * i.col;
 
 				clip (c.a - 0.01);
 				return c * _ColorStrength;
