@@ -4,15 +4,20 @@ namespace SeganX
 {
     public struct BlenderVector2
     {
+        public enum BlendMode { StaticSpeed, Acceleration }
+
         public float speed;
         public Vector2 value;
         public Vector2 current;
+        public BlendMode blendMode;
 
-        public BlenderVector2(float x , float y, float blendSpeed)
+
+        public BlenderVector2(float x, float y, float blendSpeed, BlendMode mode = BlendMode.Acceleration)
         {
             speed = blendSpeed;
             value.x = current.x = x;
             value.y = current.y = y;
+            blendMode = mode;
         }
 
         public void Setup(float x, float y)
@@ -31,9 +36,16 @@ namespace SeganX
         {
             if (current != value)
             {
-                var d = value - current;
-                current += d * speed * deltaTime;
-                if (d.sqrMagnitude <= deltaTime) current = value;
+                if (blendMode == BlendMode.StaticSpeed)
+                {
+                    current = Vector2.MoveTowards(current, value, 30 * speed * deltaTime);
+                }
+                else
+                {
+                    var d = value - current;
+                    current += d * speed * deltaTime;
+                    if (d.sqrMagnitude <= deltaTime) current = value;
+                }
                 return true;
             }
             else return false;

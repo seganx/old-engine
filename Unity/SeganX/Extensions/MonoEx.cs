@@ -29,6 +29,11 @@ public static class MonoEx
         return x >= x1 && x <= x2;
     }
 
+    public static string ToStringPrice(this int x)
+    {
+        return x.ToString("0,0");
+    }
+
     public static int ToInt(this float self)
     {
         return Mathf.RoundToInt(self);

@@ -77,10 +77,13 @@ public static class GameObjectEx
 
     public static Material RefreshMaterial(this Material self)
     {
+#if IGNOREFMAT
+#else
         if (self.shader == null || self.hideFlags != HideFlags.None) return self;
         var shader = Shader.Find(self.shader.name);
         if (shader == null) return self;
         self.shader = shader;
+#endif
         return self;
     }
 }
