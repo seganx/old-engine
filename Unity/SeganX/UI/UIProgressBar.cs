@@ -15,13 +15,14 @@ namespace SeganX
 
         public UIProgressBar Setup()
         {
-            initwidth = transform.As<RectTransform>().rect.width;
+            initwidth = rectTransform.rect.width;
             return this;
         }
 
         public void Set(float value, float maxValue)
         {
-            transform.SetAnchordWidth(value * initwidth / maxValue);
+            var width = Mathf.Clamp(value * initwidth / maxValue, 0, initwidth);
+            transform.SetAnchordWidth(width);
         }
     }
 }

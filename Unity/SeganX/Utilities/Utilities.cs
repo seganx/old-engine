@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Xml;
+﻿using System;
 using System.IO;
+using System.Xml;
+
 
 namespace SeganX
 {
@@ -21,7 +20,7 @@ namespace SeganX
             //  check to see if XML is valid
             var document = new XmlDocument();
             try { document.LoadXml(xmlText); }
-            catch (System.Xml.XmlException e)
+            catch (XmlException e)
             {
                 lastErrorMessage = e.Message;
                 return null;
@@ -33,11 +32,35 @@ namespace SeganX
                 reader.WhitespaceHandling = WhitespaceHandling.None;
                 return reader;
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 lastErrorMessage = e.Message;
                 return null;
             }
+        }
+
+        public static DateTime UnixTimeToLocalTime(string date)
+        {
+            DateTime res = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            res = res.AddSeconds(double.Parse(date));
+            return res.ToLocalTime();
+        }
+
+        public static DateTime UnixTimeToLocalTime(long date)
+        {
+            DateTime res = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            res = res.AddSeconds(date);
+            return res.ToLocalTime();
+        }
+
+        public static string TimeToString(TimeSpan span)
+        {
+            if (span.Days > 0)
+                return span.Days + ":" + span.Hours + ":" + span.Minutes + ":" + span.Seconds;
+            else if (span.Hours > 0)
+                return span.Hours + ":" + span.Minutes + ":" + span.Seconds;
+            else
+                return span.Minutes + ":" + span.Seconds;
         }
     }
 }

@@ -25,10 +25,17 @@ namespace SeganX
 
     public class GoogleAnalytics : MonoBehaviour
     {
-        public string trackingID = "UA-120955744-1";
-        public string appName = "ChestParty";
+        public string trackingID_bzr = "UA-122378394-1";
+        public string appName_bzr = "Tank Online";
+        public string trackingID_ggl = "UA-126181947-1";
+        public string appName_ggl = "Tank Arena";
+
+
         public string newLevelAnalyticsEventPrefix = "level-";
         public bool useHTTPS = false;
+
+        public string TrackingID { get { return LocalizationService.IsPersian ? trackingID_bzr : trackingID_ggl; } }
+        public string AppName { get { return LocalizationService.IsPersian ? appName_bzr : appName_ggl; } }
 
         private static GoogleUniversalAnalytics gua { get { return GoogleUniversalAnalytics.Instance; } }
 
@@ -83,7 +90,7 @@ namespace SeganX
 
             string appVersion = Application.version;
 
-            gua.initialize(trackingID, clientID, appName, appVersion, useHTTPS);
+            gua.initialize(TrackingID, clientID, AppName, appVersion, useHTTPS);
             //gua.setStringEscaping(useStringEscaping); // see the docs about this
 
             if (PlayerPrefs.HasKey(disableAnalyticsByUserOptOutPrefKey))

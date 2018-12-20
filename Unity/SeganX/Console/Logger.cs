@@ -148,7 +148,7 @@ namespace SeganX.Console
             AddToLog("Start Version " + Application.version + " on " + Core.DeviceId + " based on " + Core.BaseDeviceId, Color.green);
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             lock (threadedList)
             {

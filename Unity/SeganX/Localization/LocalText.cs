@@ -26,7 +26,7 @@ namespace SeganX
             DisplayText();
         }
 
-        public void SetFormatetText(params object[] args)
+        public void SetFormatedText(params object[] args)
         {
             localargs = args;
             if (stringId > 0) currnetText = LocalizationService.Get(stringId);
@@ -52,7 +52,7 @@ namespace SeganX
                 currnetText = LocalizationService.Get(stringId);
                 DisplayText();
             }
-            else SetFormatetText(localargs);
+            else SetFormatedText(localargs);
         }
 
         private void Awake()

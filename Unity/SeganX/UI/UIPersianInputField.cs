@@ -1,15 +1,15 @@
-﻿using UnityEngine;
+﻿using SeganX;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 public class UIPersianInputField : Base
 {
     public bool autoAlignment = true;
-    private InputField inputField = null;
 
+    public InputField inputField { get; private set; }
     public Text inputText { get; private set; }
 
-    void Awake()
+    private void Awake()
     {
         inputField = GetComponent<InputField>();
         inputText = inputField.textComponent.gameObject.Clone<Text>();
@@ -25,7 +25,7 @@ public class UIPersianInputField : Base
         inputField.onValueChanged.AddListener(OnInputTextChanged);
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         OnInputTextChanged(inputField.text);
     }
@@ -33,6 +33,6 @@ public class UIPersianInputField : Base
     public void OnInputTextChanged(string value)
     {
         var res = inputField.text.Trim().CleanForPersian();
-        inputText.SetTextAndWrap(res, autoAlignment);
+        inputText.SetTextAndWrap(res, autoAlignment, LocalizationService.IsPersian);
     }
 }

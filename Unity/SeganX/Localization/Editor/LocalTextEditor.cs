@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 
 namespace SeganX
 {
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(LocalText))]
     public class LocalTextEditor : Editor
     {
@@ -14,8 +13,25 @@ namespace SeganX
 
         public override void OnInspectorGUI()
         {
-            var loctext = target.As<LocalText>();
-            DrawItems(loctext);
+            if (targets.Length < 2)
+            {
+                var loctext = target.As<LocalText>();
+                DrawItems(loctext);
+            }
+            else
+            {
+                var loctext = targets[0].As<LocalText>();
+                var curText = EditorGUILayout.TextArea(loctext.currnetText, new GUIStyle(GUI.skin.textArea) { wordWrap = true }, GUILayout.MinHeight(60));
+                if (curText != loctext.currnetText)
+                {
+                    foreach (LocalText local in targets)
+                    {
+                        local.SetText(curText.CleanFromCode().CleanForPersian());
+                        if (local.stringId > 0)
+                            local.stringId = LocalizationService.UpdateString(local.stringId, local.currnetText);
+                    }
+                }
+            }
         }
 
         public void DrawItems(LocalText local)
