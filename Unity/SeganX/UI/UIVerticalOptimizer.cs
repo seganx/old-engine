@@ -6,13 +6,13 @@ namespace SeganX
 {
     public class UIVerticalOptimizer : MonoBehaviour
     {
-        private RectTransform parentOfParent = null;
+        //private RectTransform parentOfParent = null;
         private RectTransform parent = null;
 
         private void Start()
         {
             parent = transform.parent.AsRectTransform();
-            parentOfParent = parent.parent.AsRectTransform();
+            //parentOfParent = parent.parent.AsRectTransform();
         }
 
         private void Update()

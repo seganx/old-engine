@@ -185,7 +185,6 @@ namespace SeganX.Console
             return height;
         }
 
-#if UNITY_EDITOR
         [Console("Save", "Log")]
         public static void SaveLog()
         {
@@ -193,11 +192,10 @@ namespace SeganX.Console
             foreach (var item in instance.textList)
                 str += item.visualText + "\n";
 
-            var filename = System.IO.Path.GetTempFileName() + ".txt";
+            var filename = Application.temporaryCachePath + ".txt";
             System.IO.File.WriteAllText(filename, str.Replace("\n", "\r\n"));
             Application.OpenURL(filename);
         }
-#endif
 
         [Console("Clear", "Cache")]
         public static void ClearCache()

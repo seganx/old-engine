@@ -100,7 +100,7 @@ public static class TextEx
             if (self.rectTransform.rect.width > 0)
             {
                 TextGenerationSettings settings = self.GetGenerationSettings(self.rectTransform.rect.size);
-                if (settings.font.characterInfo.Length > 0)
+                //if (settings.font.characterInfo.Length > 0)
                 {
                     TextGenerator generator = new TextGenerator();
                     var lines = text.Split('\n');
