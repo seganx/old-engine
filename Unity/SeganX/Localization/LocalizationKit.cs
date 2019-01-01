@@ -14,7 +14,7 @@ namespace SeganX
             public class LocalStrings
             {
                 public int i = 0;
-                public string s = "";
+                public string s = string.Empty;
                 public override string ToString() { return i + ":" + s; }
             }
 

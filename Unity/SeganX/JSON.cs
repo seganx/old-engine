@@ -111,7 +111,7 @@ namespace SeganX
         {
             #region common interface
 
-            public string Name = "";
+            public string Name = string.Empty;
 
             public virtual Node this[int aIndex] { get { return null; } set { } }
 
@@ -394,7 +394,7 @@ namespace SeganX
                 Node ctx = null;
                 int i = 0;
                 StringBuilder Token = new StringBuilder();
-                string TokenName = "";
+                string TokenName = string.Empty;
                 bool QuoteMode = false;
                 bool TokenIsQuoted = false;
                 while (i < aJSON.Length)
@@ -412,7 +412,7 @@ namespace SeganX
                             {
                                 ctx.Add(TokenName, stack.Peek());
                             }
-                            TokenName = "";
+                            TokenName = string.Empty;
                             Token.Length = 0;
                             ctx = stack.Peek();
                             break;
@@ -429,7 +429,7 @@ namespace SeganX
                             {
                                 ctx.Add(TokenName, stack.Peek());
                             }
-                            TokenName = "";
+                            TokenName = string.Empty;
                             Token.Length = 0;
                             ctx = stack.Peek();
                             break;
@@ -451,7 +451,7 @@ namespace SeganX
                                 ParseElement(ctx, Token.ToString(), TokenName, TokenIsQuoted);
                                 TokenIsQuoted = false;
                             }
-                            TokenName = "";
+                            TokenName = string.Empty;
                             Token.Length = 0;
                             if (stack.Count > 0)
                                 ctx = stack.Peek();
@@ -484,7 +484,7 @@ namespace SeganX
                                 ParseElement(ctx, Token.ToString(), TokenName, TokenIsQuoted);
                                 TokenIsQuoted = false;
                             }
-                            TokenName = "";
+                            TokenName = string.Empty;
                             Token.Length = 0;
                             TokenIsQuoted = false;
                             break;

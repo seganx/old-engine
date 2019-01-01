@@ -8,9 +8,9 @@ namespace SeganX
     public class AssetData : ScriptableObject
     {
         public int id = 0;
-        public string type = "";
+        public string type = string.Empty;
         [PersianPreview]
-        public string tags = "";
+        public string tags = string.Empty;
         public List<AssetItem> prefabs = new List<AssetItem>();
 
 

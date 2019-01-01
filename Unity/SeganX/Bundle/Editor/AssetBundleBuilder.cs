@@ -10,7 +10,7 @@ public class AssetBundleBuilder
 {
     public class BuildTextureData
     {
-        public string path = "";
+        public string path = string.Empty;
         public int maxSize = 256;
     }
 

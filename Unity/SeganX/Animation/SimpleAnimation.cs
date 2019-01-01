@@ -10,7 +10,7 @@ namespace SeganX
         [System.Serializable]
         public class AnimationData
         {
-            public string name = "";
+            public string name = string.Empty;
             public int id = 0;
             public int group = 0;
             public int chance = 1;

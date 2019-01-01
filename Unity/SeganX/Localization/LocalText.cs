@@ -5,7 +5,6 @@ using System.Collections.Generic;
 namespace SeganX
 {
     [ExecuteInEditMode]
-    [RequireComponent(typeof(Text))]
     [AddComponentMenu("UI/SeganX/LocalText")]
     public class LocalText : Base
     {
@@ -14,7 +13,7 @@ namespace SeganX
         public bool autoWidth = false;
         public bool autoHeight = false;
         public int stringId = 0;
-        public string currnetText = "";
+        public string currnetText = string.Empty;
 
         private object[] localargs = null;
 
@@ -40,8 +39,8 @@ namespace SeganX
             else
                 target.SetTextAndWrap(string.Format(currnetText, localargs), autoRtl, LocalizationService.IsPersian);
 
-            if (autoWidth) target.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, target.preferredWidth);
-            if (autoHeight) target.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, target.preferredHeight);
+            if (autoWidth) rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, target.preferredWidth + rectTransform.rect.width - target.rectTransform.rect.width);
+            if (autoHeight) rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, target.preferredHeight + rectTransform.rect.height - target.rectTransform.rect.height);
         }
 
         private void OnLanguageChanged()

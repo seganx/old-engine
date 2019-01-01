@@ -7,7 +7,7 @@ namespace SeganX
 {
     public static class Utilities
     {
-        public static string lastErrorMessage = "";
+        public static string lastErrorMessage = string.Empty;
 
         public static XmlReader ParseXml(string xmlText)
         {

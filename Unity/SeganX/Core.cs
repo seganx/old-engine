@@ -9,8 +9,8 @@ namespace SeganX
         [System.Serializable]
         public class SecurityOptions
         {
-            public string cryptokey = "";
-            public string salt = "";
+            public string cryptokey = string.Empty;
+            public string salt = string.Empty;
             public bool hashSalt = true;
         }
 
@@ -43,7 +43,7 @@ namespace SeganX
             {
                 public enum TextureResize : int { FullSize = 1, HalfSize = 2, QuarterSize = 4 }
                 public string folder = "android";
-                public string suffix = "";
+                public string suffix = string.Empty;
                 public UnityEditor.BuildTarget platform = UnityEditor.BuildTarget.Android;
                 public TextureResize textureSize = TextureResize.FullSize;
                 public bool encrypt = true;
@@ -75,9 +75,9 @@ namespace SeganX
 #if OFF
         [Header("Deprecated: Use Security Options")]
         [System.Obsolete("Use SecurityOptions.cryptokey")]
-        public string cryptokey = "";
+        public string cryptokey = string.Empty;
         [System.Obsolete("Use SecurityOptions.salt")]
-        public string salt = "";
+        public string salt = string.Empty;
         [System.Obsolete("Use SecurityOptions.hashSalt")]
         public bool hashSalt = false;
 #endif
@@ -93,8 +93,8 @@ namespace SeganX
                 data = new Data(securityOptions.cryptokey, securityOptions.salt, securityOptions.hashSalt, null);
 #else
             data = new Data(securityOptions.cryptokey, securityOptions.salt, securityOptions.hashSalt, null);
-            securityOptions.cryptokey = "";
-            securityOptions.salt = "";
+            securityOptions.cryptokey = string.Empty;
+            securityOptions.salt = string.Empty;
 #endif
         }
 

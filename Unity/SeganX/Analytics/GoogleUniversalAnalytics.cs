@@ -237,8 +237,8 @@ public sealed class GoogleUniversalAnalytics
         // Make custom User-Agent when running under iOS:
         string deviceModel = SystemInfo.deviceModel;
         string operatingSystem = SystemInfo.operatingSystem;
-        string iDeviceType = "";
-        string iOSVersion = "";
+        string iDeviceType = string.Empty;
+        string iOSVersion = string.Empty;
         if (deviceModel.StartsWith("iPhone"))
         {
             iDeviceType = "iPhone";

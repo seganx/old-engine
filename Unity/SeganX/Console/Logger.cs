@@ -11,7 +11,7 @@ namespace SeganX.Console
         {
             public int repeated = 1;
             public Color color = Color.white;
-            public string text = "";
+            public string text = string.Empty;
             public float top = 0;
             public float height = 0;
             public Text visual = null;
@@ -37,7 +37,7 @@ namespace SeganX.Console
             }
 
             textVisual = scroll.content.GetChild<Text>(0);
-            textVisual.text = "";
+            textVisual.text = string.Empty;
             GetComponent<Canvas>().enabled = true;
             gameObject.SetActive(enable = false);
             
@@ -126,7 +126,7 @@ namespace SeganX.Console
 
                 textVisual.text = str;
                 logtext.height = textVisual.preferredHeight;
-                textVisual.text = "";
+                textVisual.text = string.Empty;
 
                 textList.Add(logtext);
                 scroll.content.SetAnchordHeight(ComputeHeight(textList));
@@ -188,12 +188,14 @@ namespace SeganX.Console
         [Console("Save", "Log")]
         public static void SaveLog()
         {
-            string str = "";
+            string str = string.Empty;
             foreach (var item in instance.textList)
                 str += item.visualText + "\n";
 
             var filename = Application.temporaryCachePath + ".txt";
             System.IO.File.WriteAllText(filename, str.Replace("\n", "\r\n"));
+            Debug.Log("Saved to " + filename);
+
             Application.OpenURL(filename);
         }
 
@@ -211,6 +213,19 @@ namespace SeganX.Console
             ClearCache();
             PlayerPrefsEx.ClearData();
             Debug.Log("Data Cleared");
+        }
+
+
+        [Console("Path", "Data")]
+        public static void PathData()
+        {
+            Debug.Log(Application.persistentDataPath);
+        }
+
+        [Console("Path", "Cache")]
+        public static void PathCache()
+        {
+            Debug.Log(Application.temporaryCachePath);
         }
     }
 }

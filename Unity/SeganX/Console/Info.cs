@@ -49,7 +49,7 @@ namespace SeganX.Console
         {
             get
             {
-                string res = "";
+                string res = string.Empty;
                 string str = Core.DeviceId;
                 for (int i = 0; i < str.Length; i++)
                 {

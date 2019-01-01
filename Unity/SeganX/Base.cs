@@ -113,7 +113,7 @@ public class Base : MonoBehaviour
             else
             {
                 Debug.LogWarning("Failed to download from " + url);
-                path = "";
+                path = string.Empty;
             }
         }
 

@@ -29,7 +29,7 @@ public static class TextEx
 
     private static string WrapLine(this TextGenerator self, string line, TextGenerationSettings settings)
     {
-        string str = "";
+        string str = string.Empty;
         float lineWidth = 0;
         float speceWidth = self.GetPreferredWidth(" ", settings);
         float maxWidth = (settings.generationExtents.x > 20 ? settings.generationExtents.x : 99999) * settings.scaleFactor;
@@ -42,7 +42,7 @@ public static class TextEx
             {
                 lineWidth = 0;
                 lines.Add(str);
-                str = "";
+                str = string.Empty;
                 i++;
             }
             else if (str.Length > 0)

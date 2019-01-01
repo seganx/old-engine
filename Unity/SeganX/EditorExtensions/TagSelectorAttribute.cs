@@ -49,11 +49,11 @@ namespace SeganX
 
                     //Adjust the actual string value of the property based on the selection
                     if (index == 0)
-                        property.stringValue = "";
+                        property.stringValue = string.Empty;
                     else if (index >= 1)
                         property.stringValue = tagList[index];
                     else
-                        property.stringValue = "";
+                        property.stringValue = string.Empty;
                 }
 
                 EditorGUI.EndProperty();

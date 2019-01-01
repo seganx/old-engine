@@ -8,7 +8,7 @@ namespace SeganX
     [CustomEditor(typeof(LocalizationKit))]
     public class LocalizationKitEditor : Editor
     {
-        static string filter = "";
+        static string filter = string.Empty;
 
         static GUIStyle style = null;
 
