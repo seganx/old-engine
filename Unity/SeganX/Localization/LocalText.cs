@@ -23,6 +23,7 @@ namespace SeganX
             if (currnetText == text) return;
             currnetText = text;
             DisplayText();
+            CheckSize();
         }
 
         public void SetFormatedText(params object[] args)
@@ -30,6 +31,7 @@ namespace SeganX
             localargs = args;
             if (stringId > 0) currnetText = LocalizationService.Get(stringId);
             DisplayText();
+            CheckSize();
         }
 
         private void DisplayText()
@@ -38,9 +40,23 @@ namespace SeganX
                 target.SetTextAndWrap(currnetText, autoRtl, LocalizationService.IsPersian);
             else
                 target.SetTextAndWrap(string.Format(currnetText, localargs), autoRtl, LocalizationService.IsPersian);
+        }
 
-            if (autoWidth) rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, target.preferredWidth + rectTransform.rect.width - target.rectTransform.rect.width);
-            if (autoHeight) rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, target.preferredHeight + rectTransform.rect.height - target.rectTransform.rect.height);
+        private void CheckSize()
+        {
+            if (autoWidth)
+            {
+                var widthOffset = rectTransform.rect.width - target.rectTransform.rect.width;
+                var widthAnchor = target.rectTransform.anchorMax.x - target.rectTransform.anchorMin.x;
+                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, target.preferredWidth + widthOffset * widthAnchor);
+            }
+
+            if (autoHeight)
+            {
+                var heightOffset = rectTransform.rect.height - target.rectTransform.rect.height;
+                var heightAnchor = target.rectTransform.anchorMax.y - target.rectTransform.anchorMin.y;
+                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, target.preferredHeight + heightOffset * heightAnchor);
+            }
         }
 
         private void OnLanguageChanged()
@@ -50,6 +66,7 @@ namespace SeganX
             {
                 currnetText = LocalizationService.Get(stringId);
                 DisplayText();
+                CheckSize();
             }
             else SetFormatedText(localargs);
         }
@@ -68,6 +85,7 @@ namespace SeganX
         private void Start()
         {
             DisplayText();
+            CheckSize();
         }
 
         private void OnRectTransformDimensionsChange()
@@ -82,6 +100,7 @@ namespace SeganX
             {
                 if (target == null) target = transform.GetComponent<Text>(true, true);
                 DisplayText();
+                CheckSize();
             }
         }
 #endif
@@ -105,6 +124,7 @@ namespace SeganX
             if (local.stringId > 0)
                 local.currnetText = LocalizationService.Get(stringId);
             local.DisplayText();
+            local.CheckSize();
         }
 #endif
     }
