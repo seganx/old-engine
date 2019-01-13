@@ -10,11 +10,13 @@ namespace SeganX
     {
         public string cmdSpace;
         public string cmdName;
+        public string cmdhelp;
 
-        public ConsoleAttribute(string space, string altName = "")
+        public ConsoleAttribute(string space, string altName = "", string help = "")
         {
             cmdSpace = space.ToLower();
             cmdName = altName.ToLower();
+            cmdhelp = help;
         }
     }
 }

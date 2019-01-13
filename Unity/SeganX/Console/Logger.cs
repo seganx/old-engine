@@ -191,12 +191,17 @@ namespace SeganX.Console
             string str = string.Empty;
             foreach (var item in instance.textList)
                 str += item.visualText + "\n";
+            str = str.Replace("\n", "\r\n");
 
-            var filename = Application.temporaryCachePath + ".txt";
-            System.IO.File.WriteAllText(filename, str.Replace("\n", "\r\n"));
+            var filename = Application.temporaryCachePath + "/log" +  System.DateTime.Now.Ticks + ".txt";
+            System.IO.File.WriteAllText(filename, str);
             Debug.Log("Saved to " + filename);
 
+#if UNITY_ANDROID && !UNITY_EDITOR
+            ShareText(Application.productName + " " + Application.version, str);
+#else
             Application.OpenURL(filename);
+#endif
         }
 
         [Console("Clear", "Cache")]
@@ -226,6 +231,28 @@ namespace SeganX.Console
         public static void PathCache()
         {
             Debug.Log(Application.temporaryCachePath);
+        }
+
+
+        private static void ShareText(string title, string message)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                AndroidJavaClass iClass = new AndroidJavaClass("android.content.Intent");
+                AndroidJavaObject iObject = new AndroidJavaObject("android.content.Intent");
+                iObject.Call<AndroidJavaObject>("setAction", iClass.GetStatic<string>("ACTION_SEND"));
+                if (string.IsNullOrEmpty(title) == false)
+                    iObject.Call<AndroidJavaObject>("putExtra", iClass.GetStatic<string>("EXTRA_TITLE"), title);
+                iObject.Call<AndroidJavaObject>("putExtra", iClass.GetStatic<string>("EXTRA_TEXT"), message);
+                iObject.Call<AndroidJavaObject>("setType", "text/plain");
+                AndroidJavaClass unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
+                currentActivity.Call("startActivity", iObject);
+            }
+            catch { }
+#elif UNITY_IOS && !UNITY_EDITOR
+#endif
         }
     }
 }

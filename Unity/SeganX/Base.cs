@@ -49,14 +49,17 @@ public class Base : MonoBehaviour
         var filename = url.ComputeMD5(Core.Salt + version) + ".seganx";
         var path = "file:///" + Application.persistentDataPath + "/" + filename;
 
-        Debug.Log("Try loading from cache " + path);
+        //Debug.Log("Try loading from cache " + path);
         var res = new WWW(path);
         yield return res;
 
-        if(res.error.HasContent())
+        if (res.error.HasContent())
         {
-            Debug.Log("Failed to download from cache!\nDownloading from " + url);
-            res = new WWW(url);
+            //Debug.Log("Failed to download from cache!\nDownloading from " + url);
+            var httpheader = new Dictionary<string, string>();
+            httpheader.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+
+            res = new WWW(url, null, httpheader);
             if (onProgressCallback != null)
             {
                 while (res.keepWaiting)
@@ -66,15 +69,15 @@ public class Base : MonoBehaviour
                 }
             }
             else yield return res;
-            
+
             if (res.error.IsNullOrEmpty() && res.bytes.Length > 0)
             {
-                Debug.Log("Received bytes: " + res.bytesDownloaded);
+                //Debug.Log("Received bytes: " + res.bytesDownloaded);
                 PlayerPrefsEx.SaveData(filename, res.bytes);
             }
             else Debug.LogWarning("Failed to download from " + url);
         }
-        else Debug.Log("Loaded " + res.bytesDownloaded + " from cache");
+        //else Debug.Log("Loaded " + res.bytesDownloaded + " from cache");
 
         callback(res);
     }
@@ -89,12 +92,15 @@ public class Base : MonoBehaviour
         var filename = url.ComputeMD5(Core.Salt + version) + ".seganx";
         var path = Application.persistentDataPath + "/" + filename;
 
-        Debug.Log("Finding file in cache " + path);
+        //Debug.Log("Finding file in cache " + path);
 
         if (System.IO.File.Exists(path) == false)
         {
-            Debug.Log("Failed to find file from cache!\nDownloading from " + url);
-            var res = new WWW(url);
+            //Debug.Log("Failed to find file from cache!\nDownloading from " + url);
+            var httpheader = new Dictionary<string, string>();
+            httpheader.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+
+            var res = new WWW(url, null, httpheader);
             if (onProgressCallback != null)
             {
                 while (res.keepWaiting)
@@ -107,7 +113,7 @@ public class Base : MonoBehaviour
 
             if (res.error.IsNullOrEmpty() && res.bytes.Length > 0)
             {
-                Debug.Log("Received bytes: " + res.bytesDownloaded);
+                //Debug.Log("Received bytes: " + res.bytesDownloaded);
                 PlayerPrefsEx.SaveData(filename, res.bytes);
             }
             else
@@ -129,9 +135,9 @@ public class Base : MonoBehaviour
     IEnumerator DoDownload(string url, byte[] postData, Dictionary<string, string> httpheader, System.Action<WWW> callback, System.Action<float> onProgressCallback = null)
     {
         WWW res = null;
-        if(postData != null || httpheader != null)
+        if (postData != null || httpheader != null)
         {
-            if(httpheader == null)
+            if (httpheader == null)
                 httpheader = new Dictionary<string, string>();
 
             if (httpheader.ContainsKey("Content-Type") == false)
@@ -140,7 +146,7 @@ public class Base : MonoBehaviour
                 httpheader.Add("Cache-Control", "no-cache, no-store, must-revalidate");
             }
 
-            if(postData != null)
+            if (postData != null)
                 Debug.Log("Getting data from " + url + "\nHeader: " + httpheader.GetStringDebug() + "\nPostData:" + System.Text.Encoding.UTF8.GetString(postData));
             else
                 Debug.Log("Getting data from " + url + "\nHeader: " + httpheader.GetStringDebug());

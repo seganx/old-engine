@@ -1761,7 +1761,7 @@ public sealed class GoogleUniversalAnalytics
 #endif
 
 #if UNITY_EDITOR
-		Debug.Log ("GA: " + sb.ToString() );
+		//Debug.Log ("GA: " + sb.ToString() );
 #endif
 
 #if UNITY_WEBPLAYER

@@ -13,7 +13,6 @@ public static class GameObjectEx
     {
         var res = GameObject.Instantiate(self);
         res.name = self.name;
-        res.RefreshMaterials();
         if (self.transform.parent != null)
             res.transform.SetParent(self.transform.parent, false);
         res.transform.CopyValuesFrom(self.transform);
@@ -77,13 +76,10 @@ public static class GameObjectEx
 
     public static Material RefreshMaterial(this Material self)
     {
-#if IGNOREFMAT
-#else
         if (self.shader == null || self.hideFlags != HideFlags.None) return self;
         var shader = Shader.Find(self.shader.name);
         if (shader == null) return self;
         self.shader = shader;
-#endif
         return self;
     }
 }

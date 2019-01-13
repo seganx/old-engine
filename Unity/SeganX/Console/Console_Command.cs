@@ -13,6 +13,7 @@ namespace SeganX.Console
         {
             public string space;
             public string name;
+            public string help;
             public MethodInfo info;
         }
 
@@ -32,9 +33,14 @@ namespace SeganX.Console
                     if (attrib.IsTypeOf<ConsoleAttribute>())
                     {
                         var cattrib = attrib.As<ConsoleAttribute>();
+
                         if (cattrib.cmdName.IsNullOrEmpty())
                             cattrib.cmdName = method.Name.ToLower();
-                        methods.Add(new MethodObject() { space = cattrib.cmdSpace, name = cattrib.cmdName, info = method });
+
+                        if (cattrib.cmdhelp.IsNullOrEmpty())
+                            cattrib.cmdhelp = GenerateMethodHelp(method);
+
+                        methods.Add(new MethodObject() { space = cattrib.cmdSpace, name = cattrib.cmdName, help = cattrib.cmdhelp, info = method });
                     }
                 }
             }
@@ -47,13 +53,11 @@ namespace SeganX.Console
             //  handle help command
             if (str.ToLower() == "help")
             {
-                string helpStr = "List of commands:\n";
-                if (methods.Count > 0)
+                string helpStr = methods.Count > 0 ? "List of commands:\n" : "No command founded!";
+                foreach (var item in methods)
                 {
-                    foreach (var item in methods)
-                        helpStr += item.space + " " + item.name + "\n";
+                    helpStr += item.space + " " + item.name + " " + item.help + "\n";
                 }
-                else helpStr += "No command founded!";
                 Debug.Log(helpStr);
                 return;
             }
@@ -90,10 +94,7 @@ namespace SeganX.Console
             }
             else if (methodParams.Length != cmd.Length - 2)
             {
-                var errorMsg = method.name + "(";
-                for (int z = 0; z < methodParams.Length; z++)
-                    errorMsg += methodParams[z].ParameterType.ToString().Replace("System.", "").Replace("Single", "float").Replace("Int32", "int") + " ";
-                Debug.Log(errorMsg + ")");
+                Debug.Log("Mismatched parameters!\n" + method.space + " " + method.name + " " + method.help);
                 return;
             }
 
@@ -119,5 +120,28 @@ namespace SeganX.Console
             method.info.Invoke(null, arglist);
         }
 
+        private static string GetTypeName(System.Type type)
+        {
+            if (type == typeof(bool))
+                return "bool";
+            else if (type == typeof(int))
+                return "int";
+            else if (type == typeof(string))
+                return "string";
+            else if (type == typeof(float))
+                return "float";
+            else
+                return type.Name;
+        }
+
+        private static string GenerateMethodHelp(MethodInfo info)
+        {
+            var methodParams = info.GetParameters();
+            if (methodParams.Length < 1) return string.Empty;
+            var stringParams = new string[methodParams.Length];
+            for (int i = 0; i < methodParams.Length; i++)
+                stringParams[i] = methodParams[i].Name + ":" + GetTypeName(methodParams[i].ParameterType);
+            return string.Join(" ", stringParams);
+        }
     }
 }

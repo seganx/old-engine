@@ -6,6 +6,7 @@ Shader "UI/Albedo/CutoutMask"
 	{
 		_MainTex ("Sprite (RGB)", 2D) = "white" {}
 		_MaskTex ("Mask (RGB)", 2D) = "white" {}
+        _MaskAlpha ("Mask Alpha Cutout", Float) = 0.5
 		_Queue ("Queue", Int) = 3002
 		
 		[Enum(ON,1,OFF,0)]	_ZWrite ("Z Write", Int) = 0
@@ -64,7 +65,7 @@ Shader "UI/Albedo/CutoutMask"
 			struct vs_in {
 				float4 pos : POSITION;
 				fixed4 col : COLOR;
-				float2 uv0 : TEXCOORD0;
+                float2 uv0 : TEXCOORD0;
 			};
 
 			struct vs_out {
@@ -84,17 +85,19 @@ Shader "UI/Albedo/CutoutMask"
 				vs_out o;
 				o.pos = UnityObjectToClipPos(v.pos);
 				o.uv0 = TRANSFORM_TEX(v.uv0, _MainTex);
-				o.uv1 = UnityObjectToViewPos(float4(v.pos.xyz, 0));
-				o.uv1 = TRANSFORM_TEX(o.uv1, _MaskTex);
+				o.uv1 = TRANSFORM_TEX(v.uv0, _MaskTex);
 				o.col = v.col;
 				return o;
 			}
 			
+            float _MaskAlpha;
+
 			fixed4 frag (vs_out i) : SV_Target
 			{
-				fixed4 m = tex2D( _MaskTex, i.uv1 );
-				clip( i.col.a - (m.r + m.g + m.b + m.a) / 4 );
-				return tex2D( _MainTex, i.uv0 ) * 0.9f;
+                fixed4 c = tex2D( _MainTex, i.uv0 ) * i.col;
+                c.a = tex2D( _MaskTex, i.uv1 ).a;
+				clip( c.a - _MaskAlpha );
+				return c;
 			}
 			
 			ENDCG
