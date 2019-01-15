@@ -10,7 +10,7 @@ public class Base : MonoBehaviour
     public RectTransform parentRectTransform { get { return transform.parent as RectTransform; } }
     public virtual bool Visible { set { gameObject.SetActive(value); } get { return gameObject.activeSelf; } }
 
-    public void DestroyGameObject(float delay)
+    public void DestroyGameObject(float delay = 0)
     {
         Destroy(gameObject, delay);
     }

@@ -262,6 +262,60 @@ public static class MonoEx
             .Replace('٩', '۹');
     }
 
+    private static int GetPersianAlphaForSort(this char self)
+    {
+        switch (self)
+        {
+            case 'آ': return 1;
+            case 'ب': return 2;
+            case 'پ': return 3;
+            case 'ت': return 4;
+            case 'ث': return 5;
+            case 'ج': return 6;
+            case 'چ': return 7;
+            case 'ح': return 8;
+            case 'خ': return 9;
+            case 'د': return 10;
+            case 'ذ': return 11;
+            case 'ر': return 12;
+            case 'ز': return 13;
+            case 'ژ': return 14;
+            case 'س': return 15;
+            case 'ش': return 16;
+            case 'ص': return 17;
+            case 'ض': return 18;
+            case 'ط': return 19;
+            case 'ظ': return 20;
+            case 'ع': return 21;
+            case 'غ': return 22;
+            case 'ف': return 23;
+            case 'ق': return 24;
+            case 'ک': return 25;
+            case 'گ': return 26;
+            case 'ل': return 27;
+            case 'م': return 28;
+            case 'ن': return 29;
+            case 'و': return 30;
+            case 'ه': return 31;
+            case 'ی': return 32;
+            default: return 35 + self;
+        }
+    }
+
+    public static int PersianCompare(this string self, string with)
+    {
+        int n = System.Math.Max(self.Length, with.Length);
+        int s = 0, w = 0;
+        for (int i = 0; i < n; i++)
+        {
+            s = i < self.Length ? self[i].GetPersianAlphaForSort() : 0;
+            w = i < with.Length ? with[i].GetPersianAlphaForSort() : 0;
+            if (s == w) continue;
+            return s - w;
+        }
+        return 0;
+    }
+
     #endregion
 
     #region arrays
