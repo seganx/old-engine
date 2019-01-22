@@ -266,39 +266,40 @@ public static class MonoEx
     {
         switch (self)
         {
-            case 'آ': return 1;
-            case 'ب': return 2;
-            case 'پ': return 3;
-            case 'ت': return 4;
-            case 'ث': return 5;
-            case 'ج': return 6;
-            case 'چ': return 7;
-            case 'ح': return 8;
-            case 'خ': return 9;
-            case 'د': return 10;
-            case 'ذ': return 11;
-            case 'ر': return 12;
-            case 'ز': return 13;
-            case 'ژ': return 14;
-            case 'س': return 15;
-            case 'ش': return 16;
-            case 'ص': return 17;
-            case 'ض': return 18;
-            case 'ط': return 19;
-            case 'ظ': return 20;
-            case 'ع': return 21;
-            case 'غ': return 22;
-            case 'ف': return 23;
-            case 'ق': return 24;
-            case 'ک': return 25;
-            case 'گ': return 26;
-            case 'ل': return 27;
-            case 'م': return 28;
-            case 'ن': return 29;
-            case 'و': return 30;
-            case 'ه': return 31;
-            case 'ی': return 32;
-            default: return 35 + self;
+            case 'آ': return 10;
+            case 'ا': return 11;
+            case 'ب': return 12;
+            case 'پ': return 13;
+            case 'ت': return 14;
+            case 'ث': return 15;
+            case 'ج': return 16;
+            case 'چ': return 17;
+            case 'ح': return 18;
+            case 'خ': return 19;
+            case 'د': return 20;
+            case 'ذ': return 21;
+            case 'ر': return 22;
+            case 'ز': return 23;
+            case 'ژ': return 24;
+            case 'س': return 25;
+            case 'ش': return 26;
+            case 'ص': return 27;
+            case 'ض': return 28;
+            case 'ط': return 29;
+            case 'ظ': return 30;
+            case 'ع': return 31;
+            case 'غ': return 32;
+            case 'ف': return 33;
+            case 'ق': return 34;
+            case 'ک': return 35;
+            case 'گ': return 36;
+            case 'ل': return 37;
+            case 'م': return 38;
+            case 'ن': return 39;
+            case 'و': return 40;
+            case 'ه': return 41;
+            case 'ی': return 42;
+            default: return 43 + self;
         }
     }
 

@@ -49,6 +49,14 @@ public class PluginEditor : Editor
         }
 
         EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Product Name: " + plugin.productName.Persian());
+        plugin.productName = EditorGUILayout.TextField(plugin.productName);
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Package Name:");
+        plugin.packageName = EditorGUILayout.TextField(plugin.packageName);
+
+        EditorGUILayout.Space();
         EditorGUILayout.LabelField("Scripting Define Symbols");
         plugin.symbols = EditorGUILayout.TextArea(plugin.symbols, GUILayout.MinHeight(30));
 
@@ -156,6 +164,12 @@ public class PluginEditor : Editor
             catch { }
 
         AddRemoveSymbol(obj.symbols, false);
+
+        if (obj.productName.HasContent(1))
+            PlayerSettings.productName = obj.productName;
+
+        if (obj.packageName.HasContent(1))
+            PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, obj.packageName);
 
         EditorUtility.SetDirty(obj);
         AssetDatabase.SaveAssets();

@@ -23,6 +23,7 @@ namespace SeganX.Console
         public ScrollRect scroll = null;
         public Toggle autoScroll = null;
 
+        private int threadCounter = 0;
         private Text textVisual = null;
         private List<LogText> textList = new List<LogText>();
         private volatile List<KeyValuePair<string, Color>> threadedList = new List<KeyValuePair<string, Color>>();
@@ -42,37 +43,6 @@ namespace SeganX.Console
             gameObject.SetActive(enable = false);
             
             Application.logMessageReceivedThreaded += HandleLog;
-        }
-
-        void OnEnable()
-        {
-            if (Enabled)
-                Invoke("OnEnable", 0.05f);
-
-            foreach (var item in textList)
-            {
-                float topEdge = item.top + scroll.content.anchoredPosition.y;
-                float botEdge = topEdge - item.height;
-                if (topEdge >= -scroll.viewport.rect.height && botEdge <= 0)
-                {
-                    if (item.visual == null)
-                    {
-                        item.visual = textVisual.gameObject.Clone<Text>();
-                        item.visual.rectTransform.SetAnchordPositionY(item.top);
-                        item.visual.rectTransform.SetAnchordHeight(item.height);
-                        item.visual.color = item.color;
-                        item.visual.text = item.visualText;
-                    }
-                }
-                else if (item.visual != null)
-                {
-                    item.visual.gameObject.DestroyNow();
-                    item.visual = null;
-                }
-            }
-
-            if (autoScroll.isOn)
-                scroll.normalizedPosition = Vector2.zero;
         }
 
         void HandleLog(string condition, string stacktrace, LogType type)
@@ -115,7 +85,7 @@ namespace SeganX.Console
                 if (lastText.visual)
                 {
                     lastText.visual.text = lastText.visualText;
-                    lastText.height = lastText.visual.flexibleHeight;
+                    lastText.height = lastText.visual.preferredHeight;
                 }
             }
             else
@@ -148,8 +118,10 @@ namespace SeganX.Console
             AddToLog("Start Version " + Application.version + " on " + Core.DeviceId + " based on " + Core.BaseDeviceId, Color.green);
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
+            if (threadCounter++ % 3 != 0) return;
+
             lock (threadedList)
             {
                 if (threadedList.Count > 0)
@@ -159,8 +131,32 @@ namespace SeganX.Console
                     AddToLog(item.Key, item.Value);
                 }
             }
-        }
 
+            foreach (var item in textList)
+            {
+                float topEdge = item.top + scroll.content.anchoredPosition.y;
+                float botEdge = topEdge - item.height;
+                if (topEdge >= -scroll.viewport.rect.height && botEdge <= 0)
+                {
+                    if (item.visual == null)
+                    {
+                        item.visual = textVisual.gameObject.Clone<Text>();
+                        item.visual.rectTransform.SetAnchordPositionY(item.top);
+                        item.visual.rectTransform.SetAnchordHeight(item.height);
+                        item.visual.color = item.color;
+                        item.visual.text = item.visualText;
+                    }
+                }
+                else if (item.visual != null)
+                {
+                    item.visual.gameObject.DestroyNow();
+                    item.visual = null;
+                }
+            }
+
+            if (autoScroll.isOn)
+                scroll.normalizedPosition = Vector2.zero;
+        }
 
         /////////////////////////////////////////////////////////////////////////////
         //  STATICS
@@ -233,6 +229,15 @@ namespace SeganX.Console
             Debug.Log(Application.temporaryCachePath);
         }
 
+
+#if UNITY_EDITOR && OFF
+        [Console("test", "console")]
+        public static void TestConsole(int n)
+        {
+            for (int i = 0; i < n; i++)
+                Debug.Log("this is a\n\ttest for console\n\tlogger + " + i * i * i * i);
+        }
+#endif
 
         private static void ShareText(string title, string message)
         {
