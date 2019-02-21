@@ -163,17 +163,15 @@ public class PluginEditor : Editor
             }
             catch { }
 
-        AddRemoveSymbol(obj.symbols, false);
+        EditorUtility.SetDirty(obj);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
 
         if (obj.productName.HasContent(1))
             PlayerSettings.productName = obj.productName;
 
-        if (obj.packageName.HasContent(1))
-            PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, obj.packageName);
-
-        EditorUtility.SetDirty(obj);
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
+        SetPackageName(obj.packageName);
+        AddRemoveSymbol(obj.symbols, true);
     }
 
     private static void OnDeactivate(Plugin obj)
@@ -214,7 +212,7 @@ public class PluginEditor : Editor
             catch { }
         obj.files.Reverse();
 
-        AddRemoveSymbol(obj.symbols, true);
+        AddRemoveSymbol(obj.symbols, false);
 
         EditorUtility.SetDirty(obj);
         AssetDatabase.SaveAssets();
@@ -247,7 +245,7 @@ public class PluginEditor : Editor
             catch { }
     }
 
-    public static void AddRemoveSymbol(string symbol, bool remove)
+    public static void AddRemoveSymbol(string symbol, bool addsymbols)
     {
 #if UNITY_ANDROID
         var buildTarget = BuildTargetGroup.Android;
@@ -258,13 +256,71 @@ public class PluginEditor : Editor
 #endif
 
         if (string.IsNullOrEmpty(symbol)) return;
-        var symbols = symbol.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries);
+
+        var newsymbols = new List<string>(symbol.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
         var str = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTarget);
-        if (remove)
-            foreach (var item in symbols)
-                str = str.Replace(item, "");
-        else if (str.Contains(symbol) == false)
-            str = str + ";" + string.Join(";", symbols);
+        var cursymbols = new List<string>(str.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries));
+
+        //  remove duplicated symbols
+        foreach (var item in newsymbols)
+            cursymbols.RemoveAll(x => x == item);
+
+        //  add new symbols
+        if (addsymbols)
+            foreach (var item in newsymbols)
+                cursymbols.Add(item);
+
+        cursymbols.Sort();
+        str = string.Join(";", cursymbols.ToArray());
         PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTarget, str);
+    }
+
+    public static void SetPackageName(string packageName)
+    {
+#if UNITY_ANDROID
+        var targetGroup = BuildTargetGroup.Android;
+#elif UNITY_IOS
+        var targetGroup = BuildTargetGroup.iOS;
+#elif UNITY_STANDALONE
+        var targetGroup = BuildTargetGroup.Standalone;
+#endif
+
+        var manifestAssets = AssetDatabase.FindAssets("AndroidManifest");
+        var currPackageName = PlayerSettings.GetApplicationIdentifier(targetGroup);
+
+        //  set new package name
+        if (packageName.HasContent(5))
+        {
+            PlayerSettings.SetApplicationIdentifier(targetGroup, packageName);
+
+            //  change package names in manifests
+            foreach (var item in manifestAssets)
+            {
+                var assetPath = AssetDatabase.GUIDToAssetPath(item);
+                var content = File.ReadAllText(assetPath);
+                if (content.Contains(currPackageName) || content.Contains("seganx_package_name"))
+                {
+                    content = content.Replace(currPackageName, packageName);
+                    content = content.Replace("seganx_package_name", packageName);
+                    File.WriteAllText(assetPath, content);
+                    Debug.Log("Package name changed to " + packageName + " in " + assetPath);
+                }
+            }
+        }
+        else  // vsalidate package name on new manifests
+        {
+            //  change package names in manifests
+            foreach (var item in manifestAssets)
+            {
+                var assetPath = AssetDatabase.GUIDToAssetPath(item);
+                var content = File.ReadAllText(assetPath);
+                if (content.Contains("seganx_package_name"))
+                {
+                    content = content.Replace("seganx_package_name", currPackageName);
+                    File.WriteAllText(assetPath, content);
+                    Debug.Log("Package name changed to " + currPackageName + " in " + assetPath);
+                }
+            }
+        }
     }
 }

@@ -25,9 +25,9 @@ namespace SeganX
 
     public class GoogleAnalytics : MonoBehaviour
     {
-        public string trackingID_bzr = "UA-122378394-1";
+        public string trackingID_bzr = "UA-123159528-1";
         public string appName_bzr = "Tank Online";
-        public string trackingID_ggl = "UA-126181947-1";
+        public string trackingID_ggl = "UA-123159528-1";
         public string appName_ggl = "Tank Arena";
 
 

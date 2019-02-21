@@ -11,20 +11,5 @@ namespace SeganX
         public Sprite preview = null;
 
         public string tags { set; get; }
-
-#if UNITY_EDITOR
-        public void GenerateId(object x)
-        {
-            id = EditorOnlineData.GenerateAssetId();
-            UnityEditor.EditorUtility.SetDirty(this);
-        }
-
-        private void OnValidate()
-        {
-            var image = GetComponent<UnityEngine.UI.Image>();
-            if (image != null)
-                image.sprite = preview;
-        }
-#endif
     }
 }
