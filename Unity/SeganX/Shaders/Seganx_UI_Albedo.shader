@@ -3,6 +3,8 @@
 Shader "Seganx/UI/Albedo/Simple" {
 	Properties {
 		_MainTex ("Sprite", 2D) = "white" {}
+        _ColorStrength("Color Strength", Float) = 1
+
 		_Queue ("Queue", Int) = 3002
 		
 		[Enum(ON,1,OFF,0)]	_ZWrite ("Z Write", Int) = 0
@@ -83,10 +85,13 @@ Shader "Seganx/UI/Albedo/Simple" {
 				return o;
 			}
 
+            float _ColorStrength;
+
 			fixed4 frag (vs_out i) : SV_Target
 			{
 				fixed4 c = tex2D(_MainTex, i.uv0) * i.col;
 				clip (c.a - 0.01);
+                c.rgb *= _ColorStrength;
 				return c;
 			}
 			ENDCG 

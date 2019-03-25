@@ -76,17 +76,6 @@ public class AssetBundleBuilder
 
     public static void BuildAssetBundles(AssetBundleBuild[] builds, BuildTarget target, string outputPath, string suffix, bool encrypt)
     {
-        if (target == BuildTarget.iOS)
-        {
-#if ENABLE_IOS_ON_DEMAND_RESOURCES
-                if (PlayerSettings.iOS.useOnDemandResources)
-                    options |= BuildAssetBundleOptions.UncompressedAssetBundle;
-#endif
-#if ENABLE_IOS_APP_SLICING
-                options |= BuildAssetBundleOptions.UncompressedAssetBundle;
-#endif
-        }
-
         AssetBundleManifest result = null;
         if (builds == null || builds.Length == 0)
             result = BuildPipeline.BuildAssetBundles(outputPath, Core.Instance.assetBundleBuildOptions.buildOptions, target);
