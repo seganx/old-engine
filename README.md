@@ -1,4 +1,4 @@
-# SeganX Game Engine Series
+# SeganX Game Engine Discontinued!
 
 Welcome to the SeganX game engine series – the lightweight solution for game development on PCs and portable devices. Our current version introduces a fresh design philosophy, emphasizing ease of use, flexibility, and innovation in game development.
 
